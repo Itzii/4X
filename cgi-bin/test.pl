@@ -20,19 +20,12 @@ my %_required_modules = (
 
 	'Data::Dumper'				=> [ 500, sub { } ],
 
-#	'CGI::Session'				=> [  500, sub { my $session = CGI::Session->new() } ],
 
 );
 
 my @_test_methods = (
 
-
-
-
-
 	[ 'WLE::4X::Objects::Server'						, \&test_Object_Server ],
-
-#	[ 'Objects::ComboBox'					, \&test_Object_ComboBox ],
 
 );
 
@@ -62,23 +55,60 @@ print "\n Total Time: " . sprintf( "%0.3f", $_end_time ) . " seconds";
 
 sub test_Object_Server {
 
-	my $server = WLE::4X::Objects::Server->new();
+	my $server = WLE::4X::Objects::Server->new(
+		'resource_file'		=> "../resources/official.res",
+		'state_files'		=> "../statefiles",
+		'log_files'			=> "../statefiles",
+	);
 
 	ok( defined( $server ) && ref( $server ) eq 'WLE::4X::Objects::Server', 'server object created');
 
+	ok( $server->last_error() eq '', 'no errors found' );
+
+	my $flag = 0;
+
+	$flag = $server->action_start_log();
+
+	ok( $flag == 0, 'action_start_log failed with no arguments' );
+
+	$flag = $server->action_start_log(
+		'log_id'		=> 'test  id',
+	);
+
+	ok( $flag == 0, 'action_start_log failed with invalid log_id' );
+
+	$flag = $server->action_start_log(
+		'log_id'		=> 'testid',
+	);
+
+	ok( $flag == 0, 'action_start_log failed with missing owner_id' );
+
+	$flag = $server->action_start_log(
+		'log_id'		=> 'testid',
+		'owner_id'		=> 'kdkd'
+	);
+
+	ok( $flag == 0, 'action_start_log failed with invalid owner_id' );
+
+	$flag = $server->action_start_log(
+		'log_id'		=> 'testid',
+		'owner_id'		=> 55,
+		'r_source_tags' => [],
+		'r_option_tags' => [],
+	);
+
+	ok( $flag == 0, 'action_start_log failed with missing source tag' );
+
+	$flag = $server->action_start_log(
+		'log_id'		=> 'testid',
+		'owner_id'		=> 55,
+		'r_source_tags' => [ 'src_base' ],
+		'r_option_tags' => [],
+	);
+
+	ok( $flag == 1, 'action_start_log successful' );
 
 }
-
-#sub test_Object_ComboBox {
-#
-#	my $combo = Objects::ComboBox->new();
-#
-#	ok( defined( $combo ) && ref( $combo ) eq 'Objects::ComboBox', 'combobox object created' );
-#
-#
-#
-#	return;
-#}
 
 
 
@@ -150,6 +180,8 @@ sub test {
 			eval "require $module_name";
 		}
 
+		print "\n";
+
 		foreach my $section ( @_test_methods ) {
 
 			my $module_name = $section->[ 0 ];
@@ -174,13 +206,6 @@ sub test {
 
 	print "\nFinished.\n";
 	done_testing();
-
-	unless ( defined( $_args{'dirty'} ) ) {
-
-		if ( defined( $_connection ) ) {
-			clear_tables( $_connection, 1 );
-		}
-	}
 
 }
 

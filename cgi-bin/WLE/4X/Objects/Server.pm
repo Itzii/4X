@@ -266,6 +266,21 @@ sub _open_for_writing {
 
 #############################################################################
 
+sub _close_all {
+    my $self        = shift;
+
+    if ( defined( $self->{'FH_LOG'} ) ) {
+        close( $self->{'FH_LOG'} );
+    }
+
+    if ( defined( $self->{'FH_STATE'} ) ) {
+        close( $self->{'FH_STATE'} );
+    }
+
+}
+
+#############################################################################
+
 sub _read_state {
     my $self        = shift;
     my $log_id      = shift;

@@ -51,6 +51,8 @@ sub action_create_game {
 
     $self->_save_state();
 
+    $self->_close_all();
+
     return 1;
 }
 
@@ -66,13 +68,9 @@ sub action_add_source {
     my $self        = shift;
     my %args        = @_;
 
-    print "\naction_add_source called ...";
-
     unless ( $self->_open_for_writing( $args{'log_id'} ) ) {
         return 0;
     }
-
-    print "\nchecking args ...";
 
     unless ( defined( $args{'source_tag'} ) ) {
         $self->set_error( 'Missing Source Tag' );
@@ -84,25 +82,23 @@ sub action_add_source {
         return 0;
     }
 
-    unless ( $self->{'DATA'}->{'STATUS'} eq '0' ) {
+    unless ( $self->{'DATA'}->{'STATE'} eq '0' ) {
         $self->set_error( 'Unable to add source tag to game in session.' );
         return 0;
     }
 
-    print "\nChecking for matches ...";
-
-    if ( matches_any( $args{'tag'}, $self->source_tags() ) ) {
+    if ( matches_any( $args{'source_tag'}, $self->source_tags() ) ) {
         $self->set_error( 'Source Tag Already Exists' );
         return 0;
     }
 
-    print "\nCall _raw_add_source ...";
+    $self->_raw_add_source( $args{'source_tag'} );
 
-    $self->_raw_add_source( $args{'tag'} );
-
-    $self->_log_add_source( 'tag' => $args{'tag'} );
+    $self->_log_add_source( 'tag' => $args{'source_tag'} );
 
     $self->_save_state();
+
+    $self->_close_all();
 
     return 1;
 
@@ -150,6 +146,8 @@ sub action_remove_source {
 
     $self->_save_state();
 
+    $self->_close_all();
+
     return 1;
 }
 
@@ -195,6 +193,8 @@ sub action_add_player {
 
     $self->_save_state();
 
+    $self->_close_all();
+
     return 1;
 }
 
@@ -239,6 +239,8 @@ sub action_remove_player {
     $self->_log_remove_player( 'player_id' => $args{'player_id'} );
 
     $self->_save_state();
+
+    $self->_close_all();
 
     return 1;
 }

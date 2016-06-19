@@ -3,13 +3,18 @@
 use strict;
 use warnings;
 
+
 STDOUT->autoflush( 1 );
 STDERR->autoflush( 1 );
+
+use lib ".";
 
 use Test::More;
 use Data::Dumper;
 use Time::HiRes;
 use Module::Load;
+
+use WLE::4X::Objects::Server;
 
 
 # Do not use credentials for a database with working data!!!!!
@@ -19,6 +24,7 @@ use Module::Load;
 my %_required_modules = (
 
 	'Data::Dumper'				=> [ 500, sub { } ],
+#	'Storable'					=> [ 500, sub { } ],
 
 
 );
@@ -55,6 +61,11 @@ print "\n Total Time: " . sprintf( "%0.3f", $_end_time ) . " seconds";
 
 sub test_Object_Server {
 
+	my $log_id = 'testid123';
+
+	unlink( '../statefiles/' . $log_id . '.log' );
+	unlink( '../statefiles/' . $log_id . '.state' );
+
 	my $server = WLE::4X::Objects::Server->new(
 		'resource_file'		=> "../resources/official.res",
 		'state_files'		=> "../statefiles",
@@ -67,47 +78,55 @@ sub test_Object_Server {
 
 	my $flag = 0;
 
-	$flag = $server->action_start_log();
+	$flag = $server->action_create_game();
 
-	ok( $flag == 0, 'action_start_log failed with no arguments' );
+	ok( $flag == 0, 'action_create_game failed with no arguments' );
 
-	$flag = $server->action_start_log(
+	$flag = $server->action_create_game(
 		'log_id'		=> 'test  id',
 	);
 
-	ok( $flag == 0, 'action_start_log failed with invalid log_id' );
+	ok( $flag == 0, 'action_create_game failed with invalid log_id' );
 
-	$flag = $server->action_start_log(
+	$flag = $server->action_create_game(
 		'log_id'		=> 'testid',
 	);
 
-	ok( $flag == 0, 'action_start_log failed with missing owner_id' );
+	ok( $flag == 0, 'action_create_game failed with missing owner_id' );
 
-	$flag = $server->action_start_log(
+	$flag = $server->action_create_game(
 		'log_id'		=> 'testid',
 		'owner_id'		=> 'kdkd'
 	);
 
-	ok( $flag == 0, 'action_start_log failed with invalid owner_id' );
+	ok( $flag == 0, 'action_create_game failed with invalid owner_id' );
 
-	$flag = $server->action_start_log(
+	$flag = $server->action_create_game(
 		'log_id'		=> 'testid',
 		'owner_id'		=> 55,
 		'r_source_tags' => [],
 		'r_option_tags' => [],
 	);
 
-	ok( $flag == 0, 'action_start_log failed with missing source tag' );
+	ok( $flag == 0, 'action_create_game failed with missing source tag' );
 
-	$flag = $server->action_start_log(
-		'log_id'		=> 'testid',
+	$flag = $server->action_create_game(
+		'log_id'		=> $log_id,
 		'owner_id'		=> 55,
 		'r_source_tags' => [ 'src_base' ],
 		'r_option_tags' => [],
 	);
 
-	ok( $flag == 1, 'action_start_log successful' );
+	ok( $flag == 1, 'action_create_game successful' );
 
+	$flag = $server->action_add_source(
+		'log_id'		=> $log_id,
+		'source_tag'	=> 'src_test',
+	);
+
+
+
+	return;
 }
 
 

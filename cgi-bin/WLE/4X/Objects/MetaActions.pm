@@ -5,6 +5,9 @@ use warnings;
 
 use WLE::4X::Methods::Simple;
 
+use WLE::4X::Objects::Element;
+use WLE::4X::Objects::ShipComponent;
+
 #############################################################################
 #
 # action_create_game - args
@@ -32,22 +35,22 @@ sub action_create_game {
     }
 
 
-    $self->{'DATA'}->{'SOURCE_TAGS'} = [ @{ $args{'r_source_tags'} } ];
+    $self->{'SETTINGS'}->{'SOURCE_TAGS'} = [ @{ $args{'r_source_tags'} } ];
 
-    if ( scalar( @{ $self->{'DATA'}->{'SOURCE_TAGS'} } ) == 0 ) {
+    if ( scalar( @{ $self->{'SETTINGS'}->{'SOURCE_TAGS'} } ) == 0 ) {
         $self->set_error( 'Must have at least one source tag.' );
         return 0;
     }
 
-    $self->{'DATA'}->{'OPTION_TAGS'} = [ @{ $args{'r_option_tags'} } ];
+    $self->{'SETTINGS'}->{'OPTION_TAGS'} = [ @{ $args{'r_option_tags'} } ];
 
-    $self->{'DATA'}->{'PLAYER_IDS'} = [ $args{'owner_id'} ];
+    $self->{'SETTINGS'}->{'PLAYER_IDS'} = [ $args{'owner_id'} ];
 
 
     $self->_log_data( $self->_owner_id() );
     $self->_log_data( $self->long_name() );
-    $self->_log_data( join( ',', @{ $self->{'DATA'}->{'SOURCE_TAGS'} } ) );
-    $self->_log_data( join( ',', @{ $self->{'DATA'}->{'OPTION_TAGS'} } ) );
+    $self->_log_data( join( ',', @{ $self->{'SETTINGS'}->{'SOURCE_TAGS'} } ) );
+    $self->_log_data( join( ',', @{ $self->{'SETTINGS'}->{'OPTION_TAGS'} } ) );
 
     $self->_save_state();
 
@@ -82,7 +85,7 @@ sub action_add_source {
         return 0;
     }
 
-    unless ( $self->{'DATA'}->{'STATE'} eq '0' ) {
+    unless ( $self->status() eq '0' ) {
         $self->set_error( 'Unable to add source tag to game in session.' );
         return 0;
     }
@@ -130,7 +133,7 @@ sub action_remove_source {
         return 0;
     }
 
-    unless ( $self->{'DATA'}->{'STATUS'} eq '0' ) {
+    unless ( $self->status() eq '0' ) {
         $self->set_error( 'Unable to remove source tag from game in session.' );
         return 0;
     }
@@ -143,6 +146,101 @@ sub action_remove_source {
     $self->_raw_remove_source( $args{'source_tag'} );
 
     $self->_log_remove_source( 'tag' => $args{'source_tag'} );
+
+    $self->_save_state();
+
+    $self->_close_all();
+
+    return 1;
+}
+
+#############################################################################
+#
+# action_add_option - args
+#
+# log_id        : required - 8-20 character unique indentifier [a-zA-Z0-9]
+# option_tag    : required - [a-zA-Z0-9_]
+#
+
+sub action_add_option {
+    my $self        = shift;
+    my %args        = @_;
+
+    unless ( $self->_open_for_writing( $args{'log_id'} ) ) {
+        return 0;
+    }
+
+    unless ( defined( $args{'option_tag'} ) ) {
+        $self->set_error( 'Missing Option Tag' );
+        return 0;
+    }
+
+    unless ( $args{'option_tag'} =~ m{ ^ [a-zA-Z0-9_]+ $ }xs ) {
+        $self->set_error( 'Invalid Option Tag' );
+        return 0;
+    }
+
+    unless ( $self->status() eq '0' ) {
+        $self->set_error( 'Unable to add option tag to game in session.' );
+        return 0;
+    }
+
+    if ( matches_any( $args{'option_tag'}, $self->option_tags() ) ) {
+        $self->set_error( 'Option Tag Already Exists' );
+        return 0;
+    }
+
+    $self->_raw_add_option( $args{'option_tag'} );
+
+    $self->_log_add_option( 'tag' => $args{'option_tag'} );
+
+    $self->_save_state();
+
+    $self->_close_all();
+
+    return 1;
+
+}
+
+#############################################################################
+#
+# action_remove_option - args
+#
+# log_id        : required - 8-20 character unique indentifier [a-zA-Z0-9]
+# option_tag     : required - [a-zA-Z0-9_]
+#
+
+sub action_remove_option {
+    my $self        = shift;
+    my %args        = @_;
+
+    unless ( $self->_open_for_writing( $args{'log_id'} ) ) {
+        return 0;
+    }
+
+    unless ( defined( $args{'option_tag'} ) ) {
+        $self->set_error( 'Missing Option Tag' );
+        return 0;
+    }
+
+    unless ( $args{'option_tag'} =~ m{ ^ [a-zA-Z0-9_]+ $ }xs ) {
+        $self->set_error( 'Invalid Option Tag' );
+        return 0;
+    }
+
+    unless ( $self->status() eq '0' ) {
+        $self->set_error( 'Unable to remove option tag from game in session.' );
+        return 0;
+    }
+
+    unless ( matches_any( $args{'tag'}, $self->option_tags() ) ) {
+        $self->set_error( 'Option Tag Doesn\'t Exist' );
+        return 0;
+    }
+
+    $self->_raw_remove_option( $args{'option_tag'} );
+
+    $self->_log_remove_option( 'tag' => $args{'option_tag'} );
 
     $self->_save_state();
 
@@ -177,7 +275,7 @@ sub action_add_player {
         return 0;
     }
 
-    unless ( $self->{'DATA'}->{'STATUS'} eq '0' ) {
+    unless ( $self->status() eq '0' ) {
         $self->set_error( 'Unable to add Players to game in session.' );
         return 0;
     }
@@ -224,7 +322,7 @@ sub action_remove_player {
         return 0;
     }
 
-    unless ( $self->{'DATA'}->{'STATUS'} eq '0' ) {
+    unless ( $self->status() eq '0' ) {
         $self->set_error( 'Unable to remove Players from game in session.' );
         return 0;
     }
@@ -244,6 +342,34 @@ sub action_remove_player {
 
     return 1;
 }
+
+#############################################################################
+
+sub action_begin {
+    my $self        = shift;
+    my %args        = @_;
+
+    unless ( $self->_open_for_writing( $args{'log_id'} ) ) {
+        return 0;
+    }
+
+    unless ( $self->status() eq '0' ) {
+        $self->set_error( 'Game is already in session.' );
+        return 0;
+    }
+
+    $self->_raw_begin();
+
+    $self->_log_begin();
+
+    $self->_save_state();
+
+    $self->_close_all();
+
+    return 1;
+}
+
+
 
 #############################################################################
 #############################################################################

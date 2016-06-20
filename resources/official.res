@@ -1,26 +1,29 @@
-$VAR = {
+$VAR1 = {
     'SOURCES' => [
         {
             'TAG' => 'src_base',
+            'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'New Dawn for the Galaxy',
         },
         {
             'TAG' => 'src_rift',
+            'SOURCE_TAG' => 'src_rift',
             'LONG_NAME' => 'Shadow of the Rift',
         },
         {
             'TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_rise',
             'LONG_NAME' => 'Rise of the Ancients',
         },
         {
             'TAG' => 'src_ship1',
+            'SOURCE_TAG' => 'src_ship1',
             'LONG_NAME' => 'Ship Pack One',
         },
 
     ],
-    'PLAYER_COUNT_SETTINGS' => [
-        {
-            'COUNT' => 2,
+    'PLAYER_COUNT_SETTINGS' => {
+        2   => {
             'SOURCE_TAG' => 'src_base',
             'START_TECH_COUNT' => 12,
             'ROUND_TECH_COUNT' => 4,
@@ -31,8 +34,7 @@ $VAR = {
             'VP_4' => 4,
             'DEVELOPMENTS' => 3,
         },
-        {
-            'COUNT' => 3,
+        3   => {
             'SOURCE_TAG' => 'src_base',
             'START_TECH_COUNT' => 14,
             'ROUND_TECH_COUNT' => 6,
@@ -43,8 +45,7 @@ $VAR = {
             'VP_4' => 4,
             'DEVELOPMENTS' => 4,
         },
-        {
-            'COUNT' => 4,
+        4   => {
             'SOURCE_TAG' => 'src_base',
             'START_TECH_COUNT' => 16,
             'ROUND_TECH_COUNT' => 7,
@@ -55,8 +56,7 @@ $VAR = {
             'VP_4' => 4,
             'DEVELOPMENTS' => 5,
         },
-        {
-            'COUNT' => 5,
+        5   => {
             'SOURCE_TAG' => 'src_base',
             'START_TECH_COUNT' => 18,
             'ROUND_TECH_COUNT' => 8,
@@ -67,8 +67,7 @@ $VAR = {
             'VP_4' => 4,
             'DEVELOPMENTS' => 6,
         },
-        {
-            'COUNT' => 6,
+        6   => {
             'SOURCE_TAG' => 'src_base',
             'START_TECH_COUNT' => 20,
             'ROUND_TECH_COUNT' => 9,
@@ -79,8 +78,8 @@ $VAR = {
             'VP_4' => 4,
             'DEVELOPMENTS' => 7,
         },
-        {
-            'COUNT' => 7,
+        7   => {
+            'TAG' => 7,
             'SOURCE_TAG' => 'src_base',
             'START_TECH_COUNT' => 22,
             'ROUND_TECH_COUNT' => 10,
@@ -92,8 +91,7 @@ $VAR = {
             'VP_4' => 6,
             'DEVELOPMENTS' => 8,
         },
-        {
-            'COUNT' => 8,
+        8   => {
             'SOURCE_TAG' => 'src_base',
             'START_TECH_COUNT' => 24,
             'ROUND_TECH_COUNT' => 11,
@@ -105,8 +103,7 @@ $VAR = {
             'VP_4' => 6,
             'DEVELOPMENTS' => 8,
         },
-        {
-            'COUNT' => 9,
+        9   => {
             'SOURCE_TAG' => 'src_base',
             'START_TECH_COUNT' => 26,
             'ROUND_TECH_COUNT' => 11,
@@ -119,7 +116,7 @@ $VAR = {
             'DEVELOPMENTS' => 8,
         },
 
-    ],
+    },
 
     'RACES' => [
         {
@@ -159,22 +156,22 @@ $VAR = {
             'COST_ORBITAL' => 5,
             'COST_MONUMENT' => 10,
             'SHIP_INTERCEPTOR' => {
-                'TYPE' => 'ship_interceptor_terran',
+                'TYPE' => 'shiptemplate_interceptor_terran',
                 'CLASS' => 'Explorer',
                 'COST' => 3,
             },
             'SHIP_CRUISER' => {
-                'TYPE' => 'ship_cruiser_terran',
+                'TYPE' => 'shiptemplate_cruiser_terran',
                 'CLASS' => 'Conqueror',
                 'COST' => 5,
             },
             'SHIP_DREADNOUGHT' => {
-                'TYPE' => 'ship_dreadnought_terran',
+                'TYPE' => 'shiptemplate_dreadnought_terran',
                 'CLASS' => 'Vanquisher',
                 'COST' => 8,
             },
             'SHIP_STARBASE' => {
-                'TYPE' => 'ship_starbase_terran',
+                'TYPE' => 'shiptemplate_starbase_terran',
                 'CLASS' => 'Defender',
                 'COST' => 3,
             },
@@ -216,22 +213,22 @@ $VAR = {
             'COST_ORBITAL' => 5,
             'COST_MONUMENT' => 10,
             'SHIP_INTERCEPTOR' => {
-                'TYPE' => 'ship_interceptor_terran',
+                'TYPE' => 'shiptemplate_interceptor_terran',
                 'CLASS' => 'Laika',
                 'COST' => 3,
             },
             'SHIP_CRUISER' => {
-                'TYPE' => 'ship_cruiser_terran',
+                'TYPE' => 'shiptemplate_cruiser_terran',
                 'CLASS' => 'Gagarin',
                 'COST' => 5,
             },
             'SHIP_DREADNOUGHT' => {
-                'TYPE' => 'ship_dreadnought_terran',
+                'TYPE' => 'shiptemplate_dreadnought_terran',
                 'CLASS' => 'Armstrong',
                 'COST' => 8,
             },
             'SHIP_STARBASE' => {
-                'TYPE' => 'ship_starbase_terran',
+                'TYPE' => 'shiptemplate_starbase_terran',
                 'CLASS' => 'Yang',
                 'COST' => 3,
             },
@@ -273,22 +270,22 @@ $VAR = {
             'COST_ORBITAL' => 5,
             'COST_MONUMENT' => 10,
             'SHIP_INTERCEPTOR' => {
-                'TYPE' => 'ship_interceptor_terran',
+                'TYPE' => 'shiptemplate_interceptor_terran',
                 'CLASS' => 'Falcon',
                 'COST' => 3,
             },
             'SHIP_CRUISER' => {
-                'TYPE' => 'ship_cruiser_terran',
+                'TYPE' => 'shiptemplate_cruiser_terran',
                 'CLASS' => 'Hawk',
                 'COST' => 5,
             },
             'SHIP_DREADNOUGHT' => {
-                'TYPE' => 'ship_dreadnought_terran',
+                'TYPE' => 'shiptemplate_dreadnought_terran',
                 'CLASS' => 'Eagle',
                 'COST' => 8,
             },
             'SHIP_STARBASE' => {
-                'TYPE' => 'ship_starbase_terran',
+                'TYPE' => 'shiptemplate_starbase_terran',
                 'CLASS' => 'Eyrie',
                 'COST' => 3,
             },
@@ -330,22 +327,22 @@ $VAR = {
             'COST_ORBITAL' => 5,
             'COST_MONUMENT' => 10,
             'SHIP_INTERCEPTOR' => {
-                'TYPE' => 'ship_interceptor_terran',
+                'TYPE' => 'shiptemplate_interceptor_terran',
                 'CLASS' => 'Horus',
                 'COST' => 3,
             },
             'SHIP_CRUISER' => {
-                'TYPE' => 'ship_cruiser_terran',
+                'TYPE' => 'shiptemplate_cruiser_terran',
                 'CLASS' => 'Ares',
                 'COST' => 5,
             },
             'SHIP_DREADNOUGHT' => {
-                'TYPE' => 'ship_dreadnought_terran',
+                'TYPE' => 'shiptemplate_dreadnought_terran',
                 'CLASS' => 'Mars',
                 'COST' => 8,
             },
             'SHIP_STARBASE' => {
-                'TYPE' => 'ship_starbase_terran',
+                'TYPE' => 'shiptemplate_starbase_terran',
                 'CLASS' => 'Kali',
                 'COST' => 3,
             },
@@ -387,22 +384,22 @@ $VAR = {
             'COST_ORBITAL' => 5,
             'COST_MONUMENT' => 10,
             'SHIP_INTERCEPTOR' => {
-                'TYPE' => 'ship_interceptor_terran',
+                'TYPE' => 'shiptemplate_interceptor_terran',
                 'CLASS' => 'Cobra',
                 'COST' => 3,
             },
             'SHIP_CRUISER' => {
-                'TYPE' => 'ship_cruiser_terran',
+                'TYPE' => 'shiptemplate_cruiser_terran',
                 'CLASS' => 'Lion',
                 'COST' => 5,
             },
             'SHIP_DREADNOUGHT' => {
-                'TYPE' => 'ship_dreadnought_terran',
+                'TYPE' => 'shiptemplate_dreadnought_terran',
                 'CLASS' => 'Elephant',
                 'COST' => 8,
             },
             'SHIP_STARBASE' => {
-                'TYPE' => 'ship_starbase_terran',
+                'TYPE' => 'shiptemplate_starbase_terran',
                 'CLASS' => 'Rhino',
                 'COST' => 3,
             },
@@ -444,22 +441,22 @@ $VAR = {
             'COST_ORBITAL' => 5,
             'COST_MONUMENT' => 10,
             'SHIP_INTERCEPTOR' => {
-                'TYPE' => 'ship_interceptor_terran',
+                'TYPE' => 'shiptemplate_interceptor_terran',
                 'CLASS' => 'Shuriken',
                 'COST' => 3,
             },
             'SHIP_CRUISER' => {
-                'TYPE' => 'ship_cruiser_terran',
+                'TYPE' => 'shiptemplate_cruiser_terran',
                 'CLASS' => 'Wakizashi',
                 'COST' => 5,
             },
             'SHIP_DREADNOUGHT' => {
-                'TYPE' => 'ship_dreadnought_terran',
+                'TYPE' => 'shiptemplate_dreadnought_terran',
                 'CLASS' => 'Katana',
                 'COST' => 8,
             },
             'SHIP_STARBASE' => {
-                'TYPE' => 'ship_starbase_terran',
+                'TYPE' => 'shiptemplate_starbase_terran',
                 'CLASS' => 'Naginata',
                 'COST' => 3,
             },
@@ -509,17 +506,17 @@ $VAR = {
                 'COST' => 3,
             },
             'SHIP_CRUISER' => {
-                'TYPE' => 'ship_cruiser_terran',
+                'TYPE' => 'shiptemplate_cruiser_terran',
                 'CLASS' => 'Pilum',
                 'COST' => 5,
             },
             'SHIP_DREADNOUGHT' => {
-                'TYPE' => 'ship_dreadnought_terran',
+                'TYPE' => 'shiptemplate_dreadnought_terran',
                 'CLASS' => 'Ballista',
                 'COST' => 8,
             },
             'SHIP_STARBASE' => {
-                'TYPE' => 'ship_starbase_terran',
+                'TYPE' => 'shiptemplate_starbase_terran',
                 'CLASS' => 'Scutum',
                 'COST' => 3,
             },
@@ -563,22 +560,22 @@ $VAR = {
             'COST_ORBITAL' => 5,
             'COST_MONUMENT' => 10,
             'SHIP_INTERCEPTOR' => {
-                'TYPE' => 'ship_interceptor_terran',
+                'TYPE' => 'shiptemplate_interceptor_terran',
                 'CLASS' => 'Advance',
                 'COST' => 3,
             },
             'SHIP_CRUISER' => {
-                'TYPE' => 'ship_cruiser_terran',
+                'TYPE' => 'shiptemplate_cruiser_terran',
                 'CLASS' => 'Discovery',
                 'COST' => 5,
             },
             'SHIP_DREADNOUGHT' => {
-                'TYPE' => 'ship_dreadnought_terran',
+                'TYPE' => 'shiptemplate_dreadnought_terran',
                 'CLASS' => 'Achievement',
                 'COST' => 8,
             },
             'SHIP_STARBASE' => {
-                'TYPE' => 'ship_starbase_terran',
+                'TYPE' => 'shiptemplate_starbase_terran',
                 'CLASS' => 'Knowledge',
                 'COST' => 3,
             },
@@ -621,22 +618,22 @@ $VAR = {
             'COST_ORBITAL' => 5,
             'COST_MONUMENT' => 10,
             'SHIP_INTERCEPTOR' => {
-                'TYPE' => 'ship_interceptor_planta',
+                'TYPE' => 'shiptemplate_interceptor_planta',
                 'CLASS' => 'Seed',
                 'COST' => 3,
             },
             'SHIP_CRUISER' => {
-                'TYPE' => 'ship_cruiser_planta',
+                'TYPE' => 'shiptemplate_cruiser_planta',
                 'CLASS' => 'Leaf',
                 'COST' => 5,
             },
             'SHIP_DREADNOUGHT' => {
-                'TYPE' => 'ship_dreadnought_planta',
+                'TYPE' => 'shiptemplate_dreadnought_planta',
                 'CLASS' => 'Branch',
                 'COST' => 8,
             },
             'SHIP_STARBASE' => {
-                'TYPE' => 'ship_starbase_planta',
+                'TYPE' => 'shiptemplate_starbase_planta',
                 'CLASS' => 'Root',
                 'COST' => 3,
             },
@@ -679,22 +676,22 @@ $VAR = {
             'COST_ORBITAL' => 5,
             'COST_MONUMENT' => 10,
             'SHIP_INTERCEPTOR' => {
-                'TYPE' => 'ship_interceptor_terran',
+                'TYPE' => 'shiptemplate_interceptor_terran',
                 'CLASS' => 'Wight',
                 'COST' => 3,
             },
             'SHIP_CRUISER' => {
-                'TYPE' => 'ship_cruiser_terran',
+                'TYPE' => 'shiptemplate_cruiser_terran',
                 'CLASS' => 'Banshee',
                 'COST' => 5,
             },
             'SHIP_DREADNOUGHT' => {
-                'TYPE' => 'ship_dreadnought_terran',
+                'TYPE' => 'shiptemplate_dreadnought_terran',
                 'CLASS' => 'Wraith',
                 'COST' => 8,
             },
             'SHIP_STARBASE' => {
-                'TYPE' => 'ship_starbase_terran',
+                'TYPE' => 'shiptemplate_starbase_terran',
                 'CLASS' => 'Revenant',
                 'COST' => 3,
             },
@@ -738,22 +735,22 @@ $VAR = {
             'COST_ORBITAL' => 4,
             'COST_MONUMENT' => 8,
             'SHIP_INTERCEPTOR' => {
-                'TYPE' => 'ship_interceptor_terran',
+                'TYPE' => 'shiptemplate_interceptor_terran',
                 'CLASS' => 'Gamma',
                 'COST' => 2,
             },
             'SHIP_CRUISER' => {
-                'TYPE' => 'ship_cruiser_terran',
+                'TYPE' => 'shiptemplate_cruiser_terran',
                 'CLASS' => 'Beta',
                 'COST' => 4,
             },
             'SHIP_DREADNOUGHT' => {
-                'TYPE' => 'ship_dreadnought_terran',
+                'TYPE' => 'shiptemplate_dreadnought_terran',
                 'CLASS' => 'Alpha',
                 'COST' => 7,
             },
             'SHIP_STARBASE' => {
-                'TYPE' => 'ship_starbase_terran',
+                'TYPE' => 'shiptemplate_starbase_terran',
                 'CLASS' => 'Delta',
                 'COST' => 2,
             },
@@ -796,22 +793,22 @@ $VAR = {
             'COST_ORBITAL' => 5,
             'COST_MONUMENT' => 10,
             'SHIP_INTERCEPTOR' => {
-                'TYPE' => 'ship_interceptor_hegemony',
+                'TYPE' => 'shiptemplate_interceptor_hegemony',
                 'CLASS' => 'Contact',
                 'COST' => 3,
             },
             'SHIP_CRUISER' => {
-                'TYPE' => 'ship_cruiser_hegemony',
+                'TYPE' => 'shiptemplate_cruiser_hegemony',
                 'CLASS' => 'Control',
                 'COST' => 5,
             },
             'SHIP_DREADNOUGHT' => {
-                'TYPE' => 'ship_dreadnought_hegemony',
+                'TYPE' => 'shiptemplate_dreadnought_hegemony',
                 'CLASS' => 'Dominate',
                 'COST' => 8,
             },
             'SHIP_STARBASE' => {
-                'TYPE' => 'ship_starbase_hegemony',
+                'TYPE' => 'shiptemplate_starbase_hegemony',
                 'CLASS' => 'Protect',
                 'COST' => 3,
             },
@@ -820,9 +817,9 @@ $VAR = {
 
     ],
 
-    'SHIPS' => [
+    'SHIP_TEMPLATES' => [
         {
-            'TAG' => 'ship_interceptor_terran',
+            'TAG' => 'shiptemplate_interceptor_terran',
             'INTIATIVE' => 2,
             'ENERGY' => 0,
             'COMPUTER' => 0,
@@ -837,7 +834,7 @@ $VAR = {
             'REQUIRES' => 'ship_drive',
         },
         {
-            'TAG' => 'ship_cruiser_terran',
+            'TAG' => 'shiptemplate_cruiser_terran',
             'INTIATIVE' => 1,
             'ENERGY' => 0,
             'COMPUTER' => 0,
@@ -854,7 +851,7 @@ $VAR = {
             'REQUIRES' => 'ship_drive',
         },
         {
-            'TAG' => 'ship_dreadnought_terran',
+            'TAG' => 'shiptemplate_dreadnought_terran',
             'INTIATIVE' => 0,
             'ENERGY' => 0,
             'COMPUTER' => 0,
@@ -873,7 +870,7 @@ $VAR = {
             'REQUIRES' => 'ship_drive',
         },
         {
-            'TAG' => 'ship_starbase_terran',
+            'TAG' => 'shiptemplate_starbase_terran',
             'INTIATIVE' => 4,
             'ENERGY' => 3,
             'COMPUTER' => 0,
@@ -889,7 +886,7 @@ $VAR = {
             'EXCLUDE' => 'ship_drive',
         },
         {
-            'TAG' => 'ship_interceptor_planta',
+            'TAG' => 'shiptemplate_interceptor_planta',
             'INTIATIVE' => 0,
             'ENERGY' => 2,
             'COMPUTER' => 1,
@@ -904,7 +901,7 @@ $VAR = {
             'REQUIRES' => 'ship_drive',
         },
         {
-            'TAG' => 'ship_cruiser_planta',
+            'TAG' => 'shiptemplate_cruiser_planta',
             'INTIATIVE' => 0,
             'ENERGY' => 2,
             'COMPUTER' => 1,
@@ -920,7 +917,7 @@ $VAR = {
             'REQUIRES' => 'ship_drive',
         },
         {
-            'TAG' => 'ship_dreadnought_planta',
+            'TAG' => 'shiptemplate_dreadnought_planta',
             'INTIATIVE' => 0,
             'ENERGY' => 2,
             'COMPUTER' => 1,
@@ -938,7 +935,7 @@ $VAR = {
             'REQUIRES' => 'ship_drive',
         },
         {
-            'TAG' => 'ship_starbase_planta',
+            'TAG' => 'shiptemplate_starbase_planta',
             'INTIATIVE' => 2,
             'ENERGY' => 5,
             'COMPUTER' => 1,
@@ -954,7 +951,7 @@ $VAR = {
             'EXCLUDE' => 'ship_drive',
         },
         {
-            'TAG' => 'ship_interceptor_hegemony',
+            'TAG' => 'shiptemplate_interceptor_hegemony',
             'INTIATIVE' => 3,
             'ENERGY' => 1,
             'COMPUTER' => 0,
@@ -970,7 +967,7 @@ $VAR = {
             'REQUIRES' => 'ship_drive',
         },
         {
-            'TAG' => 'ship_cruiser_hegemony',
+            'TAG' => 'shiptemplate_cruiser_hegemony',
             'INTIATIVE' => 2,
             'ENERGY' => 2,
             'COMPUTER' => 0,
@@ -988,7 +985,7 @@ $VAR = {
             'REQUIRES' => 'ship_drive',
         },
         {
-            'TAG' => 'ship_dreadnought_hegemony',
+            'TAG' => 'shiptemplate_dreadnought_hegemony',
             'INTIATIVE' => 1,
             'ENERGY' => 3,
             'COMPUTER' => 0,
@@ -1008,7 +1005,7 @@ $VAR = {
             'REQUIRES' => 'ship_drive',
         },
         {
-            'TAG' => 'ship_starbase_hegemony',
+            'TAG' => 'shiptemplate_starbase_hegemony',
             'INTIATIVE' => 5,
             'ENERGY' => 3,
             'COMPUTER' => 0,
@@ -3234,9 +3231,8 @@ $VAR = {
         },
     ],
 
-    'COMPONENTS' => [
-        {
-            'TAG' => 'comp_antimatter_cannon',
+    'COMPONENTS' => {
+        'comp_antimatter_cannon' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Antimatter Cannon',
             'REQUIRES' => 'tech_antimatter_cannon',
@@ -3252,8 +3248,7 @@ $VAR = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        {
-            'TAG' => 'comp_antimatter_missile',
+        'comp_antimatter_missile' => {
             'SOURCE_TAG' => 'src_rise',
             'LONG_NAME' => 'Antimatter Missile',
             'REQUIRES' => 'tech_antimatter_missile',
@@ -3269,8 +3264,7 @@ $VAR = {
             'IS_MISSILE' => 1,
             'PROVIDES' => '',
         },
-        {
-            'TAG' => 'comp_axion_computer',
+        'comp_axion_computer' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Axion Computer',
             'REQUIRES' => 'discovery',
@@ -3286,8 +3280,7 @@ $VAR = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        {
-            'TAG' => 'comp_conifold_field',
+        'comp_conifold_field' => {
             'SOURCE_TAG' => 'src_rise',
             'LONG_NAME' => 'Conifold Field',
             'REQUIRES' => 'tech_conifold_field',
@@ -3303,8 +3296,7 @@ $VAR = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        {
-            'TAG' => 'comp_coniformal_drive',
+        'comp_coniformal_drive' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Coniformal Drive',
             'REQUIRES' => 'discovery',
@@ -3320,8 +3312,7 @@ $VAR = {
             'IS_MISSILE' => 0,
             'PROVIDES' => 'ship_drive',
         },
-        {
-            'TAG' => 'comp_electron_computer',
+        'comp_electron_computer' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Electron Computer',
             'REQUIRES' => '',
@@ -3337,8 +3328,7 @@ $VAR = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        {
-            'TAG' => 'comp_flux_missile',
+        'comp_flux_missile' => {
             'SOURCE_TAG' => 'src_rise',
             'LONG_NAME' => 'Flux Missiles',
             'REQUIRES' => 'tech_flux_missile',
@@ -3354,8 +3344,7 @@ $VAR = {
             'IS_MISSILE' => 1,
             'PROVIDES' => '',
         },
-        {
-            'TAG' => 'comp_flux_shield',
+        'comp_flux_shield' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Flux Shield',
             'REQUIRES' => 'discovery',
@@ -3371,8 +3360,7 @@ $VAR = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        {
-            'TAG' => 'comp_fusion_drive',
+        'comp_fusion_drive' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Fusion Drive',
             'REQUIRES' => 'tech_fusion_drive',
@@ -3388,8 +3376,7 @@ $VAR = {
             'IS_MISSILE' => 0,
             'PROVIDES' => 'ship_drive',
         },
-        {
-            'TAG' => 'comp_fusion_source',
+        'comp_fusion_source' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Fusion Source',
             'REQUIRES' => 'tech_fusion_source',
@@ -3405,8 +3392,7 @@ $VAR = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        {
-            'TAG' => 'comp_gauss_shield',
+        'comp_gauss_shield' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Gauss Shield',
             'REQUIRES' => 'tech_gauss_shield',
@@ -3422,8 +3408,7 @@ $VAR = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        {
-            'TAG' => 'comp_gluon_computer',
+        'comp_gluon_computer' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Gluon Computer',
             'REQUIRES' => 'tech_gluon_computer',
@@ -3439,8 +3424,7 @@ $VAR = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        {
-            'TAG' => 'comp_hull',
+        'comp_hull' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Hull',
             'REQUIRES' => '',
@@ -3456,8 +3440,7 @@ $VAR = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        {
-            'TAG' => 'comp_hypergrid_source',
+        'comp_hypergrid_source' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Hypergrid Source',
             'REQUIRES' => 'discovery',
@@ -3473,8 +3456,7 @@ $VAR = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        {
-            'TAG' => 'comp_imp_hull',
+        'comp_imp_hull' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Improved Hull',
             'REQUIRES' => 'tech_improved_hull',
@@ -3490,8 +3472,7 @@ $VAR = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        {
-            'TAG' => 'comp_interceptor_bay',
+        'comp_interceptor_bay' => {
             'SOURCE_TAG' => 'src_rise',
             'LONG_NAME' => 'Interceptor Bay',
             'REQUIRES' => 'tech_interceptor_bay',
@@ -3507,8 +3488,7 @@ $VAR = {
             'IS_MISSILE' => 0,
             'PROVIDES' => 'interceptor_bay',
         },
-        {
-            'TAG' => 'comp_ion_cannon',
+        'comp_ion_cannon' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Ion Cannon',
             'REQUIRES' => '',
@@ -3524,8 +3504,7 @@ $VAR = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        {
-            'TAG' => 'comp_ion_disruptor',
+        'comp_ion_disruptor' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Ion Disruptor',
             'REQUIRES' => 'discovery',
@@ -3541,8 +3520,7 @@ $VAR = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        {
-            'TAG' => 'comp_ion_turret',
+        'comp_ion_turret' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Ion Turret',
             'REQUIRES' => 'discovery',
@@ -3558,8 +3536,7 @@ $VAR = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        {
-            'TAG' => 'comp_jump_drive',
+        'comp_jump_drive' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Jump Drive',
             'REQUIRES' => 'discovery',
@@ -3578,8 +3555,7 @@ $VAR = {
                 'ship_drive',
             ],
         },
-        {
-            'TAG' => 'comp_morph_shield',
+        'comp_morph_shield' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Morph Shield',
             'REQUIRES' => 'discovery',
@@ -3595,8 +3571,7 @@ $VAR = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        {
-            'TAG' => 'comp_muon_source',
+        'comp_muon_source' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Muon Source',
             'REQUIRES' => 'discovery',
@@ -3612,8 +3587,7 @@ $VAR = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        {
-            'TAG' => 'comp_nuclear_drive',
+        'comp_nuclear_drive' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Nuclear Drive',
             'REQUIRES' => '',
@@ -3629,8 +3603,7 @@ $VAR = {
             'IS_MISSILE' => 0,
             'PROVIDES' => 'ship_drive',
         },
-        {
-            'TAG' => 'comp_nuclear_source',
+        'comp_nuclear_source' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Nuclear Source',
             'REQUIRES' => '',
@@ -3646,8 +3619,7 @@ $VAR = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        {
-            'TAG' => 'comp_phase_shield',
+        'comp_phase_shield' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Phase Shield',
             'REQUIRES' => 'tech_phase_shield',
@@ -3663,8 +3635,7 @@ $VAR = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        {
-            'TAG' => 'comp_plasma_cannon',
+        'comp_plasma_cannon' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Plasma Cannon',
             'REQUIRES' => 'tech_plasma_cannon',
@@ -3680,8 +3651,7 @@ $VAR = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        {
-            'TAG' => 'comp_plasma_missile',
+        'comp_plasma_missile' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Plasma Missiles',
             'REQUIRES' => 'tech_plasma_missile',
@@ -3697,8 +3667,7 @@ $VAR = {
             'IS_MISSILE' => 1,
             'PROVIDES' => '',
         },
-        {
-            'TAG' => 'comp_positron_computer',
+        'comp_positron_computer' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Positron Computer',
             'REQUIRES' => 'tech_positron_computer',
@@ -3714,8 +3683,7 @@ $VAR = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        {
-            'TAG' => 'comp_sentient_hull',
+        'comp_sentient_hull' => {
             'SOURCE_TAG' => 'src_rise',
             'LONG_NAME' => 'Sentient Hull',
             'REQUIRES' => 'tech_sentient_hull',
@@ -3731,8 +3699,7 @@ $VAR = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        {
-            'TAG' => 'comp_shard_hull',
+        'comp_shard_hull' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Shard Hull',
             'REQUIRES' => 'discovery',
@@ -3748,8 +3715,7 @@ $VAR = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        {
-            'TAG' => 'comp_tachyon_drive',
+        'comp_tachyon_drive' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Tachyon Drive',
             'REQUIRES' => 'tech_tachyon_drive',
@@ -3765,8 +3731,7 @@ $VAR = {
             'IS_MISSILE' => 0,
             'PROVIDES' => 'ship_drive',
         },
-        {
-            'TAG' => 'comp_tachyon_source',
+        'comp_tachyon_source' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Tachyon Source',
             'REQUIRES' => 'tech_tachyon_source',
@@ -3782,8 +3747,7 @@ $VAR = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        {
-            'TAG' => 'comp_zero_point_source',
+        'comp_zero_point_source' => {
             'SOURCE_TAG' => 'src_rise',
             'LONG_NAME' => 'Zero-Point Source',
             'REQUIRES' => 'tech_zero_point_source',
@@ -3799,7 +3763,7 @@ $VAR = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-    ],
+    },
     'ANCIENT_SHIPS' => [
         {
             'TAG' => 'ship_ancient1',
@@ -3827,7 +3791,7 @@ $VAR = {
             'COMPONENTS' => [
                 'comp_ion_cannon',
                 'comp_ion_cannon',
-                'comp_plasma_missile'
+                'comp_plasma_missile',
                 'comp_hull',
                 'comp_electron_computer',
             ],

@@ -14,6 +14,10 @@ use WLE::4X::Objects::MetaActions;
 use WLE::4X::Objects::RawActions;
 use WLE::4X::Objects::LogActions;
 
+use WLE::4X::Objects::Element;
+use WLE::4X::Objects::ShipComponent;
+
+
 # state breakdown
 
 # d1:dd2:dd3:dd4
@@ -57,15 +61,17 @@ sub _init {
 
     $self->{'FH_STATE'} = undef;
     $self->{'FH_LOG'} = undef;
-
-    $self->{'FILE_RESOURCES'} = $args{'resource_file'};
-    $self->{'DIR_STATE_FILES'} = $args{'state_files'};
-    $self->{'DIR_LOG_FILES'} = $args{'log_files'};
-
-    $self->{'DIR_STATE_FILES'} =~ s{ /$ }{}xs;
-    $self->{'DIR_LOG_FILES'} =~ s{ /$ }{}xs;
-
     $self->{'LAST_ERROR'} = '';
+
+    $self->{'ENV'} = {};
+
+    $self->{'ENV'}->{'FILE_RESOURCES'} = $args{'resource_file'};
+    $self->{'ENV'}->{'DIR_STATE_FILES'} = $args{'state_files'};
+    $self->{'ENV'}->{'DIR_LOG_FILES'} = $args{'log_files'};
+
+    $self->{'ENV'}->{'DIR_STATE_FILES'} =~ s{ /$ }{}xs;
+    $self->{'ENV'}->{'DIR_LOG_FILES'} =~ s{ /$ }{}xs;
+
 
     unless ( -e $self->_file_resources() ) {
         $self->set_error( 'Unable to locate core resource file: ' . $self->_file_resources() );
@@ -85,19 +91,19 @@ sub _init {
         return $self;
     }
 
-    $self->{'DATA'} = {};
+    $self->{'SETTINGS'} = {};
 
-    $self->{'DATA'}->{'LOG_ID'} = '';
-    $self->{'DATA'}->{'OWNER_ID'} = 0;
+    $self->{'SETTINGS'}->{'LOG_ID'} = '';
+    $self->{'SETTINGS'}->{'OWNER_ID'} = 0;
 
-    $self->{'DATA'}->{'SOURCE_TAGS'} = [];
-    $self->{'DATA'}->{'OPTION_TAGS'} = [];
+    $self->{'SETTINGS'}->{'SOURCE_TAGS'} = [];
+    $self->{'SETTINGS'}->{'OPTION_TAGS'} = [];
 
-    $self->{'DATA'}->{'LONG_NAME'} = '';
+    $self->{'SETTINGS'}->{'LONG_NAME'} = '';
 
-    $self->{'DATA'}->{'STATE'} = '0';
+    $self->{'SETTINGS'}->{'STATE'} = '0';
 
-    $self->{'DATA'}->{'PLAYER_IDS'} = [];
+    $self->{'SETTINGS'}->{'PLAYER_IDS'} = [];
 
 
     return $self;
@@ -113,7 +119,7 @@ sub has_option {
         return 1;
     }
 
-    return matches_any( $option, @{ $self->{'DATA'}->{'OPTION_TAGS'} } );
+    return matches_any( $option, @{ $self->{'SETTINGS'}->{'OPTION_TAGS'} } );
 }
 
 #############################################################################
@@ -121,7 +127,7 @@ sub has_option {
 sub source_tags {
     my $self        = shift;
 
-    return @{ $self->{'DATA'}->{'SOURCE_TAGS'} };
+    return @{ $self->{'SETTINGS'}->{'SOURCE_TAGS'} };
 }
 
 #############################################################################
@@ -129,7 +135,7 @@ sub source_tags {
 sub option_tags {
     my $self        = shift;
 
-    return @{ $self->{'DATA'}->{'OPTION_TAGS'} };
+    return @{ $self->{'SETTINGS'}->{'OPTION_TAGS'} };
 }
 
 #############################################################################
@@ -137,7 +143,7 @@ sub option_tags {
 sub player_ids {
     my $self        = shift;
 
-    return @{ $self->{'DATA'}->{'PLAYER_IDS'} };
+    return @{ $self->{'SETTINGS'}->{'PLAYER_IDS'} };
 }
 
 
@@ -167,7 +173,15 @@ sub set_error {
 sub long_name {
     my $self        = shift;
 
-    return $self->{'DATA'}->{'LONG_NAME'};
+    return $self->{'SETTINGS'}->{'LONG_NAME'};
+}
+
+#############################################################################
+
+sub status {
+    my $self        = shift;
+
+    return $self->{'SETTINGS'}->{'STATE'};
 }
 
 #############################################################################
@@ -175,7 +189,7 @@ sub long_name {
 sub log_id {
     my $self        = shift;
 
-    return $self->{'DATA'}->{'LOG_ID'};
+    return $self->{'SETTINGS'}->{'LOG_ID'};
 }
 
 #############################################################################
@@ -186,7 +200,7 @@ sub _set_log_id {
 
     if ( defined( $value ) ) {
         if ( $value =~ m{ ^ [0-9a-zA-Z]{8,20} $ }xs ) {
-            $self->{'DATA'}->{'LOG_ID'} = $value;
+            $self->{'SETTINGS'}->{'LOG_ID'} = $value;
             return 1;
         }
     }
@@ -205,7 +219,7 @@ sub _set_log_id {
 sub _owner_id {
     my $self        = shift;
 
-    return $self->{'DATA'}->{'OWNER_ID'};
+    return $self->{'SETTINGS'}->{'OWNER_ID'};
 }
 
 #############################################################################
@@ -216,7 +230,7 @@ sub _set_owner_id {
 
     if ( defined( $value ) ) {
         if ( looks_like_number( $value ) ) {
-            $self->{'DATA'}->{'OWNER_ID'} = $value;
+            $self->{'SETTINGS'}->{'OWNER_ID'} = $value;
             return 1;
         }
     }
@@ -301,6 +315,8 @@ sub _read_state {
     my $single_line = join( '', @data );
     eval $single_line;
 
+
+
     $self->{'DATA'} = $VAR1;
 
 
@@ -320,11 +336,46 @@ sub _save_state {
 
     # using Data::Dumper
 
-    print { $self->{'FH_STATE'} } Dumper( $self->{'DATA'} );
+    my %data = ();
+
+    $data{'SETTINGS'} = $self->{'SETTINGS'};
+
+    unless ( $self->status() eq '0' ) {
+
+        # ship components
+        $data{'COMPONENTS'} = {};
+
+        foreach my $key ( keys( %{ $self->{'COMPONENTS'} } ) ) {
+            $data{'COMPONENTS'}->{ $key } = {};
+            $self->{'COMPONENTS'}->{ $key }->to_hash( $data{'COMPONENTS'}->{ $key } );
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    }
+
+    truncate( $self->{'FH_STATE'}, 0 );
+
+    print { $self->{'FH_STATE'} } Dumper( \%data );
 
     # using Storable
 
-#    store_fd( $self->{'DATA'}, $self->{'FH_STATE'} );
+#    stores_fd( $self->{'DATA'}, $self->{'FH_STATE'} );
 
     return;
 }
@@ -359,7 +410,7 @@ sub _open_file_with_lock {
 sub _file_resources {
     my $self        = shift;
 
-    return $self->{'FILE_RESOURCES'};
+    return $self->{'ENV'}->{'FILE_RESOURCES'};
 }
 
 #############################################################################
@@ -367,7 +418,7 @@ sub _file_resources {
 sub _dir_state_files {
     my $self        = shift;
 
-    return $self->{'DIR_STATE_FILES'};
+    return $self->{'ENV'}->{'DIR_STATE_FILES'};
 }
 
 #############################################################################
@@ -375,7 +426,7 @@ sub _dir_state_files {
 sub _dir_log_files {
     my $self        = shift;
 
-    return $self->{'DIR_LOG_FILES'};
+    return $self->{'ENV'}->{'DIR_LOG_FILES'};
 }
 
 #############################################################################

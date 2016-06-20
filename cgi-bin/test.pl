@@ -31,7 +31,11 @@ my %_required_modules = (
 
 my @_test_methods = (
 
+	[ 'WLE::4X::Objects::Element'						, \&test_Object_Element ],
+	[ 'WLE::4X::Objects::ShipComponent'					, \&test_Object_ShipComponent ],
+
 	[ 'WLE::4X::Objects::Server'						, \&test_Object_Server ],
+
 
 );
 
@@ -57,6 +61,28 @@ print "\n Total Time: " . sprintf( "%0.3f", $_end_time ) . " seconds";
 #############################################################################
 #############################################################################
 #############################################################################
+#############################################################################
+
+sub test_Object_Element {
+
+	my $element = WLE::4X::Objects::Element->new( 'server' => '1' );
+
+	ok( defined( $element ) && ref( $element ) eq 'WLE::4X::Objects::Element', 'element object created');
+
+	return;
+}
+
+#############################################################################
+
+sub test_Object_ShipComponent {
+
+	my $component = WLE::4X::Objects::ShipComponent->new( 'server' => '1' );
+
+	ok( defined( $component ) && ref( $component ) eq 'WLE::4X::Objects::ShipComponent', 'component object created');
+
+	return;
+}
+
 #############################################################################
 
 sub test_Object_Server {
@@ -124,7 +150,16 @@ sub test_Object_Server {
 		'source_tag'	=> 'src_test',
 	);
 
+	$flag = $server->action_add_option(
+		'log_id'		=> $log_id,
+		'option_tag'	=> 'option_test',
+	);
 
+	$flag = $server->action_begin(
+		'log_id'		=> $log_id,
+	);
+
+	ok( $flag == 1, 'action_begin successful' );
 
 	return;
 }

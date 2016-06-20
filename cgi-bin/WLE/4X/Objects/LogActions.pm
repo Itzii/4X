@@ -8,8 +8,11 @@ use WLE::4X::Methods::Simple;
 my %actions = (
     'add_source'        => \&_log_add_source,
     'remove_source'     => \&_log_remove_source,
+    'add_option'        => \&_log_add_option,
+    'remove_option'     => \&_log_remove_option,
     'add_player'        => \&_log_add_player,
     'remove_player'     => \&_log_remove_player,
+    'begin'             => \&_log_begin,
 
 );
 
@@ -136,6 +139,38 @@ sub _log_remove_source {
 
 #############################################################################
 
+sub _log_add_option {
+    my $self        = shift;
+    my %args        = @_;
+
+    if ( defined( $args{'parse'} ) ) {
+        $self->_raw_add_option( $args{'tag'} );
+    }
+    else {
+        $self->_log_data( 'add_option:' . $args{'tag'} );
+    }
+
+    return;
+}
+
+#############################################################################
+
+sub _log_remove_option {
+    my $self        = shift;
+    my %args        = @_;
+
+    if ( defined( $args{'parse'} ) ) {
+        $self->_raw_remove_option( $args{'tag'} );
+    }
+    else {
+        $self->_log_data( 'remove_option:' . $args{'tag'} );
+    }
+
+    return;
+}
+
+#############################################################################
+
 sub _log_add_player {
     my $self        = shift;
     my %args        = @_;
@@ -166,6 +201,21 @@ sub _log_remove_player {
     return;
 }
 
+#############################################################################
+
+sub _log_begin {
+    my $self        = shift;
+    my %args        = @_;
+
+    if ( defined( $args{'parse'} ) ) {
+        $self->_raw_begin();
+    }
+    else {
+        $self->_log_data( 'begin' );
+    }
+
+    return;
+}
 
 #############################################################################
 #############################################################################

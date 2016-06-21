@@ -33,6 +33,7 @@ my @_test_methods = (
 
 	[ 'WLE::4X::Objects::Element'						, \&test_Object_Element ],
 	[ 'WLE::4X::Objects::ShipComponent'					, \&test_Object_ShipComponent ],
+	[ 'WLE::4X::Objects::Technology'					, \&test_Object_Technology ],
 
 	[ 'WLE::4X::Objects::Server'						, \&test_Object_Server ],
 
@@ -79,6 +80,17 @@ sub test_Object_ShipComponent {
 	my $component = WLE::4X::Objects::ShipComponent->new( 'server' => '1' );
 
 	ok( defined( $component ) && ref( $component ) eq 'WLE::4X::Objects::ShipComponent', 'component object created');
+
+	return;
+}
+
+#############################################################################
+
+sub test_Object_Technology {
+
+	my $technology = WLE::4X::Objects::Technology->new( 'server' => '1' );
+
+	ok( defined( $technology ) && ref( $technology ) eq 'WLE::4X::Objects::Technology', 'technology object created');
 
 	return;
 }

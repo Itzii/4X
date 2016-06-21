@@ -115,11 +115,12 @@ sub _raw_begin {
     my $VAR1;
     my @data = <$fh>;
     my $single_line = join( '', @data );
-    eval $single_line;
+    eval $single_line; warn $@ if $@;
 
     # setup ship component tiles
 
     unless ( defined( $VAR1->{'COMPONENTS'} ) ) {
+        print "\nno components found";
         $self->set_error( 'Missing Section in resource file: COMPONENTS' );
         return 0;
     }
@@ -142,14 +143,39 @@ sub _raw_begin {
         }
     }
 
+    # setup technology tiles
 
+    unless ( defined( $VAR1->{'TECHNOLOGY'} ) ) {
+        $self->set_error( 'Missing Section in resource file: TECHNOLOGY' );
+        return 0;
+    }
 
-#    # setup technology tiles
-#
-#    unless ( defined( $VAR1->{'TECHNOLOGY'} ) ) {
-#        $self->set_error( 'Missing Section in resource file: TECHNOLOGY' );
-#        return 0;
-#    }
+    $self->{'TECHNOLOGY'} = {};
+
+    foreach my $tech_key ( keys( %{ $VAR1->{'TECHNOLOGY'} } ) ) {
+
+        my $technology = WLE::4X::Objects::Technology->new( 'server' => $self, 'tag' => $tech_key );
+
+        print "\n" . $tech_key;
+
+        my @instances = $technology->from_hash( $VAR1->{'TECHNOLOGY'}->{ $tech_key } );
+
+        if ( @instances ) {
+            if ( matches_any( $instances[ 0 ]->source_tag(), $self->source_tags() ) ) {
+
+                if ( $instances[ 0 ]->required_option() eq '' ) {
+                    foreach ( @instances ) {
+                        $self->{'TECHNOLOGY'}->{ $_->tag() } = $_;
+                    }
+                }
+                elsif ( matches_any( $instances[ 0 ]->required_option(), $self->option_tags() ) ) {
+                    foreach ( @instances ) {
+                        $self->{'TECHNOLOGY'}->{ $_->tag() } = $_;
+                    }
+                }
+            }
+        }
+    }
 
 
 

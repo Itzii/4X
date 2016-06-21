@@ -124,6 +124,19 @@ sub has_option {
 
 #############################################################################
 
+sub has_source {
+    my $self        = shift;
+    my $source      = shift;
+
+    if ( $source eq '' ) {
+        return 1;
+    }
+
+    return matches_any( $source, @{ $self->{'SETTINGS'}->{'SOURCE_TAGS'} } );
+}
+
+#############################################################################
+
 sub source_tags {
     my $self        = shift;
 
@@ -342,6 +355,10 @@ sub _save_state {
 
     unless ( $self->status() eq '0' ) {
 
+        $data{'VP_BAG'} = $self->{'VP_BAG'};
+        
+
+
         # ship components
         $data{'COMPONENTS'} = {};
 
@@ -349,6 +366,10 @@ sub _save_state {
             $data{'COMPONENTS'}->{ $key } = {};
             $self->{'COMPONENTS'}->{ $key }->to_hash( $data{'COMPONENTS'}->{ $key } );
         }
+
+        # technology
+        $data{'TECH_BAG'}
+
 
 
 

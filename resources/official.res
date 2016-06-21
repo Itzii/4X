@@ -79,7 +79,6 @@ $VAR1 = {
             'DEVELOPMENTS' => 7,
         },
         7   => {
-            'TAG' => 7,
             'SOURCE_TAG' => 'src_base',
             'START_TECH_COUNT' => 22,
             'ROUND_TECH_COUNT' => 10,
@@ -1674,17 +1673,16 @@ $VAR1 = {
             'WARPS' => 64,
             'DISCOVERY' => 1,
             'ANCIENTS' => 0,
+            'GCDS' => 1,
             'VP' => 4,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 1,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 1,
-            'RES_MONEY' => 0,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 2,
-            'KEYWORDS' => [
-                'gcds',
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'science', 'ADVANCED' => 1 },
+                { 'TYPE' => 'minerals', },
+                { 'TYPE' => 'minerals', 'ADVANCED' => 1 },
+                { 'TYPE' => 'wild' },
+                { 'TYPE' => 'wild' },
             ],
         },
         'tile_101' => {
@@ -1698,14 +1696,10 @@ $VAR1 = {
             'ANCIENTS' => 1,
             'VP' => 2,
             'ANCIENT_LINK' => 0,
-            'RES_SCIENCE' => 0,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 1,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'minerals', },
+                { 'TYPE' => 'minerals', 'ADVANCED' => 1 },
+                { 'TYPE' => 'money', },
             ],
         },
         'tile_102' => {
@@ -1719,14 +1713,9 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 1,
-            'RES_MINERALS' => 0,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 0,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'science', 'ADVANCED' => 1 },
             ],
         },
         'tile_103' => {
@@ -1740,14 +1729,9 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 2,
             'ANCIENT_LINK' => 0,
-            'RES_SCIENCE' => 0,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 0,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 0,
-            'RES_MONEY_ADV' => 1,
-            'RES_WILD' => 1,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'money', 'ADVANCED' => 1 },
+                { 'TYPE' => 'wild' },
             ],
         },
         'tile_104' => {
@@ -1761,14 +1745,11 @@ $VAR1 = {
             'ANCIENTS' => 2,
             'VP' => 2,
             'ANCIENT_LINK' => 0,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 1,
-            'RES_MINERALS' => 0,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 1,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'science', 'ADVANCED' => 1 },
+                { 'TYPE' => 'money', },
+                { 'TYPE' => 'money', 'ADVANCED' => 1 },
             ],
         },
         'tile_105' => {
@@ -1782,14 +1763,10 @@ $VAR1 = {
             'ANCIENTS' => 1,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 0,
-            'RES_MINERALS_ADV' => 1,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'minerals', 'ADVANCED' => 1 },
+                { 'TYPE' => 'money', },
             ],
         },
         'tile_106' => {
@@ -1803,14 +1780,9 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 2,
             'ANCIENT_LINK' => 0,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 0,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'minerals', },
             ],
         },
         'tile_107' => {
@@ -1824,14 +1796,10 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 2,
             'ANCIENT_LINK' => 0,
-            'RES_SCIENCE' => 0,
-            'RES_SCIENCE_ADV' => 1,
-            'RES_MINERALS' => 0,
-            'RES_MINERALS_ADV' => 1,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', 'ADVANCED' => 1 },
+                { 'TYPE' => 'minerals', 'ADVANCED' => 1 },
+                { 'TYPE' => 'money', },
             ],
         },
         'tile_108' => {
@@ -1845,14 +1813,10 @@ $VAR1 = {
             'ANCIENTS' => 1,
             'VP' => 2,
             'ANCIENT_LINK' => 0,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 0,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 0,
-            'RES_MONEY_ADV' => 1,
-            'RES_WILD' => 1,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'money', 'ADVANCED' => 1 },
+                { 'TYPE' => 'wild' },
             ],
         },
         'tile_201' => {
@@ -1866,14 +1830,9 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 1,
             'ANCIENT_LINK' => 0,
-            'RES_SCIENCE' => 0,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'minerals', },
+                { 'TYPE' => 'money', },
             ],
         },
         'tile_202' => {
@@ -1887,14 +1846,9 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 1,
             'ANCIENT_LINK' => 0,
-            'RES_SCIENCE' => 0,
-            'RES_SCIENCE_ADV' => 1,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 0,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', 'ADVANCED' => 1 },
+                { 'TYPE' => 'minerals', },
             ],
         },
         'tile_203' => {
@@ -1908,14 +1862,10 @@ $VAR1 = {
             'ANCIENTS' => 2,
             'VP' => 1,
             'ANCIENT_LINK' => 0,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'minerals', },
+                { 'TYPE' => 'money', },
             ],
         },
         'tile_204' => {
@@ -1929,14 +1879,10 @@ $VAR1 = {
             'ANCIENTS' => 1,
             'VP' => 2,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 0,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 0,
-            'RES_MINERALS_ADV' => 1,
-            'RES_MONEY' => 0,
-            'RES_MONEY_ADV' => 1,
-            'RES_WILD' => 1,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'minerals', 'ADVANCED' => 1 },
+                { 'TYPE' => 'money', 'ADVANCED' => 1 },
+                { 'TYPE' => 'wild' },
             ],
         },
         'tile_205' => {
@@ -1950,14 +1896,10 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 1,
             'ANCIENT_LINK' => 0,
-            'RES_SCIENCE' => 0,
-            'RES_SCIENCE_ADV' => 1,
-            'RES_MINERALS' => 0,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 1,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', 'ADVANCED' => 1 },
+                { 'TYPE' => 'money', },
+                { 'TYPE' => 'money', 'ADVANCED' => 1 },
             ],
         },
         'tile_206' => {
@@ -1971,14 +1913,8 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 1,
             'ANCIENT_LINK' => 0,
-            'RES_SCIENCE' => 0,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 0,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'minerals', },
             ],
         },
         'tile_207' => {
@@ -1992,14 +1928,7 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 1,
             'ANCIENT_LINK' => 0,
-            'RES_SCIENCE' => 0,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 0,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 0,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
             ],
         },
         'tile_208' => {
@@ -2013,14 +1942,7 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 1,
             'ANCIENT_LINK' => 0,
-            'RES_SCIENCE' => 0,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 0,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 0,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
             ],
         },
         'tile_209' => {
@@ -2033,16 +1955,11 @@ $VAR1 = {
             'DISCOVERY' => 0,
             'ANCIENTS' => 0,
             'VP' => 1,
-            'ANCIENT_LINK' => 0,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 0,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 0,
-            'RES_MONEY_ADV' => 1,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'money', 'ADVANCED' => 1 },
             ],
+            'ANCIENT_LINK' => 0,
         },
         'tile_210' => {
             'SOURCE_TAG' => 'src_base',
@@ -2055,14 +1972,9 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 1,
             'ANCIENT_LINK' => 0,
-            'RES_SCIENCE' => 0,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'minerals', },
+                { 'TYPE' => 'money', },
             ],
         },
         'tile_211' => {
@@ -2076,36 +1988,29 @@ $VAR1 = {
             'ANCIENTS' => 1,
             'VP' => 2,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 0,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 0,
-            'RES_MINERALS_ADV' => 1,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 1,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'minerals', 'ADVANCED' => 1 },
+                { 'TYPE' => 'money', },
+                { 'TYPE' => 'wild' },
             ],
         },
         'tile_212' => {
             'SOURCE_TAG' => 'src_rise',
-            'REQUIRED_OPTION' => '',
+            'REQUIRED_OPTION' => 'hive_worlds',
             'ID' => '212',
             'LONG_NAME' => 'Lambda Fornacis',
             'STACK' => 2,
             'WARPS' => 64,
             'DISCOVERY' => 1,
             'ANCIENTS' => 3,
+            'HIVE' => 1,
             'VP' => 2,
             'ANCIENT_LINK' => 0,
-            'RES_SCIENCE' => 0,
-            'RES_SCIENCE_ADV' => 1,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 1,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
-                'hive',
+            'RESOURCES' => [
+                { 'TYPE' => 'science', 'ADVANCED' => 1 },
+                { 'TYPE' => 'minerals', },
+                { 'TYPE' => 'minerals', 'ADVANCED' => 1 },
+                { 'TYPE' => 'money', },
             ],
         },
         'tile_213' => {
@@ -2119,14 +2024,9 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 1,
             'ANCIENT_LINK' => 0,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 0,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'minerals', },
             ],
         },
         'tile_221' => {
@@ -2140,14 +2040,12 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 1,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 1,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'science', 'ADVANCED' => 1 },
+                { 'TYPE' => 'minerals', },
+                { 'TYPE' => 'money', },
+                { 'TYPE' => 'money', 'ADVANCED' => 1 },
             ],
         },
         'tile_222' => {
@@ -2161,14 +2059,11 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 1,
-            'RES_MINERALS' => 0,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 1,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'science', 'ADVANCED' => 1 },
+                { 'TYPE' => 'money', },
+                { 'TYPE' => 'money', 'ADVANCED' => 1 },
             ],
         },
         'tile_223' => {
@@ -2182,14 +2077,12 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 1,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 1,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'science', 'ADVANCED' => 1 },
+                { 'TYPE' => 'minerals', },
+                { 'TYPE' => 'money', },
+                { 'TYPE' => 'money', 'ADVANCED' => 1 },
             ],
         },
         'tile_224' => {
@@ -2203,14 +2096,11 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 1,
-            'RES_MINERALS' => 0,
-            'RES_MINERALS_ADV' => 1,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'science', 'ADVANCED' => 1 },
+                { 'TYPE' => 'minerals', 'ADVANCED' => 1 },
+                { 'TYPE' => 'money', },
             ],
         },
         'tile_225' => {
@@ -2224,14 +2114,12 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 1,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 1,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'science', 'ADVANCED' => 1 },
+                { 'TYPE' => 'minerals', },
+                { 'TYPE' => 'money', },
+                { 'TYPE' => 'money', 'ADVANCED' => 1 },
             ],
         },
         'tile_226' => {
@@ -2245,14 +2133,10 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'minerals', },
+                { 'TYPE' => 'money', },
             ],
         },
         'tile_227' => {
@@ -2266,14 +2150,12 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 1,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 1,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'science', 'ADVANCED' => 1 },
+                { 'TYPE' => 'minerals', },
+                { 'TYPE' => 'money', },
+                { 'TYPE' => 'money', 'ADVANCED' => 1 },
             ],
         },
         'tile_228' => {
@@ -2287,14 +2169,10 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 0,
-            'RES_MINERALS_ADV' => 1,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'minerals', 'ADVANCED' => 1 },
+                { 'TYPE' => 'money', },
             ],
         },
         'tile_229' => {
@@ -2308,14 +2186,12 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 1,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 1,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'science', 'ADVANCED' => 1 },
+                { 'TYPE' => 'minerals', },
+                { 'TYPE' => 'money', },
+                { 'TYPE' => 'money', 'ADVANCED' => 1 },
             ],
         },
         'tile_230' => {
@@ -2329,14 +2205,11 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 0,
-            'RES_MINERALS_ADV' => 1,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 1,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'minerals', 'ADVANCED' => 1 },
+                { 'TYPE' => 'money', },
+                { 'TYPE' => 'money', 'ADVANCED' => 1 },
             ],
         },
         'tile_231' => {
@@ -2350,14 +2223,12 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 1,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 1,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'science', 'ADVANCED' => 1 },
+                { 'TYPE' => 'minerals', },
+                { 'TYPE' => 'money', },
+                { 'TYPE' => 'money', 'ADVANCED' => 1 },
             ],
         },
         'tile_232' => {
@@ -2371,14 +2242,11 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 1,
-            'RES_MONEY' => 0,
-            'RES_MONEY_ADV' => 1,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'minerals', },
+                { 'TYPE' => 'minerals', 'ADVANCED' => 1 },
+                { 'TYPE' => 'money', 'ADVANCED' => 1 },
             ],
         },
         'tile_233' => {
@@ -2392,14 +2260,12 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 1,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 1,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'science', 'ADVANCED' => 1 },
+                { 'TYPE' => 'minerals', },
+                { 'TYPE' => 'money', },
+                { 'TYPE' => 'money', 'ADVANCED' => 1 },
             ],
         },
         'tile_234' => {
@@ -2413,15 +2279,11 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 0,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 1,
-            'RES_MONEY' => 0,
-            'RES_MONEY_ADV' => 1,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
-                'orbital',
+            'ORBITAL' => 1,
+            'RESOURCES' => [
+                { 'TYPE' => 'minerals', },
+                { 'TYPE' => 'minerals', 'ADVANCED' => 1 },
+                { 'TYPE' => 'money', 'ADVANCED' => 1 },
             ],
         },
         'tile_235' => {
@@ -2435,14 +2297,12 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 1,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 1,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'science', 'ADVANCED' => 1 },
+                { 'TYPE' => 'minerals', },
+                { 'TYPE' => 'money', },
+                { 'TYPE' => 'money', 'ADVANCED' => 1 },
             ],
         },
         'tile_236' => {
@@ -2456,14 +2316,11 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 0,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 0,
-            'RES_SCIENCE_ADV' => 1,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 1,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', 'ADVANCED' => 1 },
+                { 'TYPE' => 'minerals', },
+                { 'TYPE' => 'money', },
+                { 'TYPE' => 'money', 'ADVANCED' => 1 },
             ],
         },
         'tile_237' => {
@@ -2477,14 +2334,12 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 1,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 1,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'science', 'ADVANCED' => 1 },
+                { 'TYPE' => 'minerals', },
+                { 'TYPE' => 'money', },
+                { 'TYPE' => 'money', 'ADVANCED' => 1 },
             ],
         },
         'tile_238' => {
@@ -2498,14 +2353,13 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 1,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 1,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 1,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'science', 'ADVANCED' => 1 },
+                { 'TYPE' => 'minerals', },
+                { 'TYPE' => 'minerals', 'ADVANCED' => 1 },
+                { 'TYPE' => 'money', },
+                { 'TYPE' => 'money', 'ADVANCED' => 1 },
             ],
         },
         'tile_239' => {
@@ -2519,14 +2373,11 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 1,
-            'RES_MINERALS' => 0,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 1,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'science', 'ADVANCED' => 1 },
+                { 'TYPE' => 'money', },
+                { 'TYPE' => 'money', 'ADVANCED' => 1 },
             ],
         },
         'tile_240' => {
@@ -2540,14 +2391,12 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 1,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 1,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'science', 'ADVANCED' => 1 },
+                { 'TYPE' => 'minerals', },
+                { 'TYPE' => 'money', },
+                { 'TYPE' => 'money', 'ADVANCED' => 1 },
             ],
         },
         'tile_271' => {
@@ -2559,17 +2408,13 @@ $VAR1 = {
             'WARPS' => 27,
             'DISCOVERY' => 1,
             'ANCIENTS' => 1,
+            'DESTROYER' => 1,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 0,
-            'RES_MINERALS_ADV' => 1,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
-                'ancient_destroyer',
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'minerals', 'ADVANCED' => 1 },
+                { 'TYPE' => 'money', },
             ],
         },
         'tile_272' => {
@@ -2581,17 +2426,13 @@ $VAR1 = {
             'WARPS' => 27,
             'DISCOVERY' => 1,
             'ANCIENTS' => 1,
+            'DESTROYER' => 1,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 0,
-            'RES_SCIENCE_ADV' => 1,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
-                'ancient_destroyer',
+            'RESOURCES' => [
+                { 'TYPE' => 'science', 'ADVANCED' => 1 },
+                { 'TYPE' => 'minerals', },
+                { 'TYPE' => 'money', },
             ],
         },
         'tile_273' => {
@@ -2602,18 +2443,14 @@ $VAR1 = {
             'STACK' => 4,
             'WARPS' => 27,
             'DISCOVERY' => 1,
+            'DESTROYER' => 1,
             'ANCIENTS' => 1,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 0,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 1,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
-                'ancient_destroyer',
+            'RESOURCES' => [
+                { 'TYPE' => 'minerals', },
+                { 'TYPE' => 'minerals', 'ADVANCED' => 1 },
+                { 'TYPE' => 'money', },
             ],
         },
         'tile_274' => {
@@ -2625,17 +2462,13 @@ $VAR1 = {
             'WARPS' => 27,
             'DISCOVERY' => 1,
             'ANCIENTS' => 1,
+            'DESTROYER' => 1,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 1,
-            'RES_MINERALS' => 0,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
-                'ancient_destroyer',
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'science', 'ADVANCED' => 1 },
+                { 'TYPE' => 'money', },
             ],
         },
         'tile_281' => {
@@ -2649,15 +2482,9 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 2,
             'ANCIENT_LINK' => 0,
-            'RES_SCIENCE' => 0,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 0,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
-                'warp',
+            'WORMHOLE' => 1,
+            'RESOURCES' => [
+                { 'TYPE' => 'money', },
             ],
         },
         'tile_301' => {
@@ -2671,14 +2498,10 @@ $VAR1 = {
             'ANCIENTS' => 2,
             'VP' => 2,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 0,
-            'RES_MINERALS_ADV' => 1,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'minerals', 'ADVANCED' => 1 },
+                { 'TYPE' => 'money', },
             ],
         },
         'tile_302' => {
@@ -2692,14 +2515,9 @@ $VAR1 = {
             'ANCIENTS' => 1,
             'VP' => 2,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 0,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 0,
-            'RES_MONEY_ADV' => 1,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'minerals', },
+                { 'TYPE' => 'money', 'ADVANCED' => 1 },
             ],
         },
         'tile_303' => {
@@ -2713,14 +2531,8 @@ $VAR1 = {
             'ANCIENTS' => 1,
             'VP' => 2,
             'ANCIENT_LINK' => 1,
-            'RES_SCIENCE' => 0,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 0,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 0,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 1,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'wild' },
             ],
         },
         'tile_304' => {
@@ -2734,14 +2546,9 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 1,
             'ANCIENT_LINK' => 0,
-            'RES_SCIENCE' => 0,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 0,
-            'RES_MONEY_ADV' => 1,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'minerals', },
+                { 'TYPE' => 'money', 'ADVANCED' => 1 },
             ],
         },
         'tile_305' => {
@@ -2755,14 +2562,9 @@ $VAR1 = {
             'ANCIENTS' => 1,
             'VP' => 1,
             'ANCIENT_LINK' => 0,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 0,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'minerals', },
             ],
         },
         'tile_306' => {
@@ -2776,14 +2578,9 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 1,
             'ANCIENT_LINK' => 0,
-            'RES_SCIENCE' => 0,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 1,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'minerals', },
+                { 'TYPE' => 'money', },
             ],
         },
         'tile_307' => {
@@ -2797,14 +2594,9 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 1,
             'ANCIENT_LINK' => 0,
-            'RES_SCIENCE' => 0,
-            'RES_SCIENCE_ADV' => 1,
-            'RES_MINERALS' => 0,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', 'ADVANCED' => 1 },
+                { 'TYPE' => 'money', },
             ],
         },
         'tile_308' => {
@@ -2818,14 +2610,9 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 1,
             'ANCIENT_LINK' => 0,
-            'RES_SCIENCE' => 1,
-            'RES_SCIENCE_ADV' => 0,
-            'RES_MINERALS' => 0,
-            'RES_MINERALS_ADV' => 1,
-            'RES_MONEY' => 0,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', },
+                { 'TYPE' => 'minerals', 'ADVANCED' => 1 },
             ],
         },
         'tile_309' => {
@@ -2839,14 +2626,9 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 1,
             'ANCIENT_LINK' => 0,
-            'RES_SCIENCE' => 0,
-            'RES_SCIENCE_ADV' => 1,
-            'RES_MINERALS' => 0,
-            'RES_MINERALS_ADV' => 0,
-            'RES_MONEY' => 1,
-            'RES_MONEY_ADV' => 0,
-            'RES_WILD' => 0,
-            'KEYWORDS' => [
+            'RESOURCES' => [
+                { 'TYPE' => 'science', 'ADVANCED' => 1 },
+                { 'TYPE' => 'money', },
             ],
         },
         'tile_310' => {
@@ -3040,7 +2822,7 @@ $VAR1 = {
         },
         'tile_319' => {
             'SOURCE_TAG' => 'src_rise',
-            'REQUIRED_OPTION' => '',
+            'REQUIRED_OPTION' => 'hive_worlds',
             'ID' => '319',
             'LONG_NAME' => 'Upsilon Hydrae',
             'STACK' => 3,
@@ -3049,6 +2831,7 @@ $VAR1 = {
             'ANCIENTS' => 3,
             'VP' => 2,
             'ANCIENT_LINK' => 0,
+            'HIVE' => 1,
             'RES_SCIENCE' => 1,
             'RES_SCIENCE_ADV' => 0,
             'RES_MINERALS' => 1,
@@ -3057,7 +2840,6 @@ $VAR1 = {
             'RES_MONEY_ADV' => 1,
             'RES_WILD' => 0,
             'KEYWORDS' => [
-                'hive',
             ],
         },
         'tile_320' => {
@@ -3197,6 +2979,7 @@ $VAR1 = {
             'ANCIENTS' => 0,
             'VP' => 2,
             'ANCIENT_LINK' => 0,
+            'WORMHOLE' => 1,
             'RES_SCIENCE' => 1,
             'RES_SCIENCE_ADV' => 0,
             'RES_MINERALS' => 0,
@@ -3205,7 +2988,6 @@ $VAR1 = {
             'RES_MONEY_ADV' => 0,
             'RES_WILD' => 0,
             'KEYWORDS' => [
-                'warp',
             ],
         },
         'tile_382' => {

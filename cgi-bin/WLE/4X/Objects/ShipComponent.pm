@@ -49,8 +49,6 @@ sub _init {
 
     $self->{'IS_MISSILE'} = 0;
 
-    $self->{'PROVIDES'} = [];
-
     return $self;
 }
 
@@ -136,27 +134,6 @@ sub is_missile {
 
 #############################################################################
 
-sub provides {
-    my $self        = shift;
-
-    return $self->{'PROVIDES'};
-}
-
-#############################################################################
-
-sub does_provide {
-    my $self        = shift;
-    my $value       = shift;
-
-    if ( $value eq '' ) {
-        return 1;
-    }
-
-    return matches_any( $value, @{ $self->provides() } );
-}
-
-#############################################################################
-
 sub from_hash {
     my $self        = shift;
     my $r_hash      = shift;
@@ -173,17 +150,6 @@ sub from_hash {
         if ( looks_like_number( $r_hash->{ $tag } ) ) {
             $self->{ $tag } = $r_hash->{ $tag };
         }
-    }
-
-    my $provides = $r_hash->{'PROVIDES'};
-
-    if ( ref( $provides ) eq 'SCALAR') {
-        unless ( $provides eq '' ) {
-            push( @{ $self->{'PROVIDES'} }, $provides );
-        }
-    }
-    elsif ( ref( $provides ) eq 'ARRAY' ) {
-        push( @{ $self->{'PROVIDES'} }, @{ $provides } );
     }
 
     return 1;
@@ -210,8 +176,6 @@ sub to_hash {
     $r_hash->{'ATTACK_COUNT'} = $self->attack_count();
     $r_hash->{'ATTACK_DAMAGE'} = $self->attack_damage();
     $r_hash->{'IS_MISSILE'} = $self->is_missile();
-
-    $r_hash->{'PROVIDES'} = @{ $self->provides() };
 
     return 1;
 }

@@ -38,8 +38,6 @@ sub _init {
     $self->{'BASE_COST'} = 0;
     $self->{'MIN_COST'} = 0;
 
-    $self->{'PROVIDES'} = [];
-
     return $self;
 }
 
@@ -69,27 +67,6 @@ sub min_cost {
 
 #############################################################################
 
-sub provides {
-    my $self        = shift;
-
-    return $self->{'PROVIDES'};
-}
-
-#############################################################################
-
-sub does_provide {
-    my $self        = shift;
-    my $value       = shift;
-
-    if ( $value eq '' ) {
-        return 1;
-    }
-
-    return matches_any( $value, @{ $self->provides() } );
-}
-
-#############################################################################
-
 sub from_hash {
     my $self        = shift;
     my $r_hash      = shift;
@@ -98,8 +75,6 @@ sub from_hash {
     unless( $self->WLE::4X::Objects::Element::from_hash( $r_hash ) ) {
         return ();
     }
-
-    print "\nfrom hash ... " . $self->tag();
 
     if ( defined( $r_hash->{'CATEGORY'} ) ) {
         $self->{'CATEGORY'} = $r_hash->{'CATEGORY'};
@@ -113,23 +88,10 @@ sub from_hash {
         $self->{'MIN_COST'} = $r_hash->{'MIN_COST'};
     }
 
-    my $provides = $r_hash->{'PROVIDES'};
-
-    if ( ref( $provides ) eq 'SCALAR') {
-        unless ( $provides eq '' ) {
-            push( @{ $self->{'PROVIDES'} }, $provides );
-        }
-    }
-    elsif ( ref( $provides ) eq 'ARRAY' ) {
-        push( @{ $self->{'PROVIDES'} }, @{ $provides } );
-    }
-
     my @final = ();
 
     if ( $flag_m && looks_like_number( $r_hash->{'COUNT'} ) ) {
         foreach my $index ( 1 .. $r_hash->{'COUNT'} ) {
-
-            print "\ntag: " . $self->tag() . ' -- ' . $index;
 
             my $tech = WLE::4X::Objects::Technology->new( 'server' => $self->server(), 'tag' => $self->tag() . '_' . $index );
             $tech->from_hash( $r_hash, 0 );
@@ -157,8 +119,6 @@ sub to_hash {
 
     $r_hash->{'BASE_COST'} = $self->base_cost();
     $r_hash->{'MIN_COST'} = $self->min_cost();
-
-    $r_hash->{'PROVIDES'} = @{ $self->provides() };
 
     return 1;
 }

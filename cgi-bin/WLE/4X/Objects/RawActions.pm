@@ -117,10 +117,53 @@ sub _raw_begin {
     my $single_line = join( '', @data );
     eval $single_line; warn $@ if $@;
 
+    # settings
+
+    unless ( defined( $VAR1->{'PLAYER_COUNT_SETTINGS'} ) ) {
+        $self->set_error( 'Missing Section in resource file: PLAYER_COUNT_SETTINGS' );
+        return 0;
+    }
+
+    my $settings = $VAR1->{'PLAYER_COUNT_SETTINGS'}->{ scalar( $self->player_ids() ) };
+
+    unless ( defined( $settings ) ) {
+        $self->set_error( 'Invalid Player Count: ' . scalar( $self->player_ids() ) );
+        return 0;
+    }
+
+    unless ( $self->has_source( $settings->{'SOURCE_TAG'} ) ) {
+        $self->set_error( 'Invalid player count for chosen sources: ' . scalar( $self->player_ids() ) );
+        return 0;
+    }
+
+    # vp tokens
+
+    $self->{'VP_BAG'} = [];
+
+    foreach my $value ( 1 .. 4 ) {
+        if ( defined( $settings->{'VP_' . $value } ) ) {
+            foreach ( 0 .. $settings->{'VP_' . $value } - 1 ) {
+                push( @{ $self->{'VP_BAG'} }, $value );
+            }
+        }
+    }
+
+    shuffle_in_place( $self->{'VP_BAG'} );
+
+
+
+
+#    'START_TECH_COUNT' => 22,
+#    'ROUND_TECH_COUNT' => 10,
+#    'SECTOR_LIMIT_2' => 12,
+#    'SECTOR_LIMIT_3' => 22,
+#    'DEVELOPMENTS' => 8,
+
+
+
     # setup ship component tiles
 
     unless ( defined( $VAR1->{'COMPONENTS'} ) ) {
-        print "\nno components found";
         $self->set_error( 'Missing Section in resource file: COMPONENTS' );
         return 0;
     }
@@ -156,8 +199,6 @@ sub _raw_begin {
 
         my $technology = WLE::4X::Objects::Technology->new( 'server' => $self, 'tag' => $tech_key );
 
-        print "\n" . $tech_key;
-
         my @instances = $technology->from_hash( $VAR1->{'TECHNOLOGY'}->{ $tech_key } );
 
         if ( @instances ) {
@@ -189,20 +230,6 @@ sub _raw_begin {
 
 
 
-#    unless ( defined( $VAR1->{'PLAYER_COUNT_SETTINGS'} ) ) {
-#        $self->set_error( 'Missing Section in resource file: PLAYER_COUNT_SETTINGS' );
-#        return 0;
-#    }
-
-#    foreach my $count_section ( @{ $VAR1->{'PLAYER_COUNT_SETTINGS'} } ) {
-#        if ( $count_section->{'TAG'} == scalar( $self->player_ids() ) ) {
-#
-#
-#
-#
-#
-#        }
-#    }
 
 
     $self->{'SETTINGS'}->{'STATE'} = '0:0';

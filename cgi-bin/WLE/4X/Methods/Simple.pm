@@ -8,6 +8,7 @@ our @EXPORT    = qw(
 
     looks_like_number
     matches_any
+    shuffle_in_place
 
 );
 
@@ -59,6 +60,21 @@ sub matches_any {
 	}
 
 	return 0;
+}
+
+#############################################################################
+
+sub shuffle_in_place {
+    my $r_array     = shift;
+
+    my $index = @{ $r_array };
+
+    while ( --$index ) {
+        my $position = int rand( $index + 1 );
+        @{ $r_array }[ $index, $position ] = @{ $r_array }[ $position, $index ];
+    }
+
+    return;
 }
 
 #############################################################################

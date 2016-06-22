@@ -1,4 +1,4 @@
-package WLE::4X::Objects::Technology;
+package WLE::4X::Objects::Development;
 
 use strict;
 use warnings;
@@ -29,14 +29,17 @@ sub _init {
     my $self		= shift;
     my %args		= @_;
 
-    $args{'type'} = 'shipcomponent';
+    $args{'type'} = 'development';
 
-    $self->WLE::4X::Objects::Element::_init( %args );
+    unless( $self->WLE::4X::Objects::Element::_init( %args ) ) {
+        return undef;
+    }
 
-    $self->{'CATEGORY'} = '';
-
-    $self->{'BASE_COST'} = 0;
-    $self->{'MIN_COST'} = 0;
+    $self->{'RESOURCES'} = {
+        'SCIENCE'       => 0,
+        'MINERALS'      => 0,
+        'MONEY'         => 0,
+    };
 
     if ( defined( $args{'hash'} ) ) {
         if ( $self->from_hash( $args{'hash'} ) ) {
@@ -50,30 +53,6 @@ sub _init {
 
 #############################################################################
 
-sub category {
-    my $self        = shift;
-
-    return $self->{'CATEGORY'};
-}
-
-#############################################################################
-
-sub base_cost {
-    my $self        = shift;
-
-    return $self->{'BASE_COST'};
-}
-
-#############################################################################
-
-sub min_cost {
-    my $self        = shift;
-
-    return $self->{'MIN_COST'};
-}
-
-#############################################################################
-
 sub from_hash {
     my $self        = shift;
     my $r_hash      = shift;
@@ -82,16 +61,12 @@ sub from_hash {
         return 0;
     }
 
-    if ( defined( $r_hash->{'CATEGORY'} ) ) {
-        $self->{'CATEGORY'} = $r_hash->{'CATEGORY'};
-    }
-
-    if ( looks_like_number( $r_hash->{'BASE_COST'} ) ) {
-        $self->{'BASE_COST'} = $r_hash->{'BASE_COST'};
-    }
-
-    if ( looks_like_number( $r_hash->{'MIN_COST'} ) ) {
-        $self->{'MIN_COST'} = $r_hash->{'MIN_COST'};
+    if ( defined( $r_hash->{'RESOURCES'} ) ) {
+        foreach my $type ( 'SCIENCE', 'MINERALS', 'MONEY' ) {
+            if ( defined( $r_hash->{'RESOURCES'}->{ $type } ) ) {
+                $self->{'RESOURCES'}->{ $type } = $r_hash->{'RESOURCES'}->{ $type };
+            }
+        }
     }
 
     return 1;
@@ -107,10 +82,7 @@ sub to_hash {
         return 0;
     }
 
-    $r_hash->{'CATEGORY'} = $self->category();
-
-    $r_hash->{'BASE_COST'} = $self->base_cost();
-    $r_hash->{'MIN_COST'} = $self->min_cost();
+    $r_hash->{'RESOURCES'} = $self->{'RESOURCES'};
 
     return 1;
 }

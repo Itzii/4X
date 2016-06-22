@@ -16,6 +16,10 @@ use WLE::4X::Objects::LogActions;
 
 use WLE::4X::Objects::Element;
 use WLE::4X::Objects::ShipComponent;
+use WLE::4X::Objects::Technology;
+use WLE::4X::Objects::Development;
+use WLE::4X::Objects::Discovery;
+use WLE::4X::Objects::Tile;
 
 
 # state breakdown
@@ -326,11 +330,131 @@ sub _read_state {
     my $VAR1;
     my @data = <$fh>;
     my $single_line = join( '', @data );
-    eval $single_line;
+    eval $single_line; warn $@ if $@;
 
+    $self->{'TECH_DRAW_COUNT'} = $VAR1->{'ROUND_TECH_COUNT'};
 
+    # setup ship component tiles
+    # print STDERR "\n  ship components ... ";
 
-    $self->{'DATA'} = $VAR1;
+    unless ( defined( $VAR1->{'COMPONENTS'} ) ) {
+        $self->set_error( 'Missing Section in resource file: COMPONENTS' );
+        return 0;
+    }
+
+    $self->{'COMPONENTS'} = {};
+
+    foreach my $component_key ( keys( %{ $VAR1->{'COMPONENTS'} } ) ) {
+        my $component = WLE::4X::Objects::ShipComponent->new(
+            'server' => $self,
+            'tag' => $component_key,
+            'hash' => $VAR1->{'COMPONENTS'}->{ $component_key },
+        );
+
+        if ( defined( $component ) ) {
+            $self->{'COMPONENTS'}->{ $component_key } = $component;
+        }
+    }
+
+    # setup technology tiles
+#    print STDERR "\n  technology ... ";
+
+    unless ( defined( $VAR1->{'TECHNOLOGY'} ) ) {
+        $self->set_error( 'Missing Section in resource file: TECHNOLOGY' );
+        return 0;
+    }
+
+    $self->{'TECHNOLOGY'} = {};
+
+    foreach my $tech_key ( keys( %{ $VAR1->{'TECHNOLOGY'} } ) ) {
+
+        my $technology = WLE::4X::Objects::Technology->new(
+            'server' => $self,
+            'tag' => $tech_key,
+            'hash' => $VAR1->{'TECHNOLOGY'}->{ $tech_key },
+        );
+
+        if ( defined( $technology ) ) {
+            $self->{'TECHNOLOGY'}->{ $technology->tag() } = $technology;
+        }
+    }
+
+    $self->{'TECH_BAG'} = $VAR1->{'TECH_BAG'};
+
+    $self->{'AVAILABLE_TECH'} = $VAR1->{'AVAILABLE_TECH'};
+
+    # vp tokens
+    # print STDERR "\n  vp tokens ... ";
+
+    $self->{'VP_BAG'} = $VAR1->{'VP_BAG'};
+
+    # discoveries
+#    print STDERR "\n  discoveries ... ";
+
+    $self->{'DISCOVERIES'} = {};
+
+    foreach my $disc_key ( keys( %{ $VAR1->{'DISCOVERIES'} } ) ) {
+
+        my $discovery = WLE::4X::Objects::Discovery->new(
+            'server' => $self,
+            'tag' => $disc_key,
+            'hash' => $VAR1->{'DISCOVERIES'}->{ $disc_key },
+        );
+
+        if ( defined( $discovery ) ) {
+            $self->{'DISCOVERIES'}->{ $discovery->tag() } = $discovery;
+        }
+    }
+
+    $self->{'DISCOVERY_BAG'} = $VAR1->{'DISCOVERY_BAG'};
+
+    # tiles
+#    print STDERR "\n  tiles ... ";
+
+    $self->{'TILE_STACK_1'} = $VAR1->{'TILE_STACK_1'};
+    $self->{'TILE_STACK_2'} = $VAR1->{'TILE_STACK_2'};
+    $self->{'TILE_STACK_3'} = $VAR1->{'TILE_STACK_3'};
+
+    $self->{'TILES'} = {};
+
+    $self->{'BOARD'} = $VAR1->{'BOARD'};
+
+#    print STDERR "\nReading Tiles ... ";
+
+    foreach my $tile_key ( keys( %{ $VAR1->{'TILES'} } ) ) {
+
+        my $tile = WLE::4X::Objects::Tile->new(
+            'server' => $self,
+            'tag' => $tile_key,
+            'hash' => $VAR1->{'TILES'}->{ $tile_key },
+        );
+
+#        print "\nTile: " . $tile->tag();
+
+        if ( defined( $tile ) ) {
+            $self->{'TILES'}->{ $tile->tag() } = $tile;
+        }
+    }
+
+    # developments
+#    print STDERR "\n  developments ... ";
+
+    $self->{'DEVELOPMENTS'} = [];
+
+    foreach my $dev_key ( keys( %{ $VAR1->{'DEVELOPMENTS'} } ) ) {
+
+        my $development = WLE::4X::Objects::Development->new(
+            'server' => $self,
+            'tag' => $dev_key,
+            'hash' => $VAR1->{'DEVELOPMENTS'}->{ $dev_key },
+        );
+
+        if ( defined( $development ) ) {
+            push( @{ $self->{'DEVELOPMENTS'} }, $development );
+        }
+    }
+
+    $self->{'SETTINGS'} = $VAR1->{'SETTINGS'};
 
 
     # using Storable
@@ -355,9 +479,7 @@ sub _save_state {
 
     unless ( $self->status() eq '0' ) {
 
-        $data{'VP_BAG'} = $self->{'VP_BAG'};
-        
-
+        $data{'TECH_DRAW_COUNT'} = $self->{'TECH_DRAW_COUNT'};
 
         # ship components
         $data{'COMPONENTS'} = {};
@@ -368,20 +490,52 @@ sub _save_state {
         }
 
         # technology
-        $data{'TECH_BAG'}
 
+        $data{'TECHNOLOGY'} = {};
 
+        foreach my $key ( keys( %{ $self->{'TECHNOLOGY'} } ) ) {
+            $data{'TECHNOLOGY'}->{ $key } = {};
+            $self->{'TECHNOLOGY'}->{ $key }->to_hash( $data{'TECHNOLOGY'}->{ $key } );
+        }
 
+        $data{'TECH_BAG'} = $self->{'TECH_BAG'};
+        $data{'AVAILABLE_TECH'} = $self->{'AVAILABLE_TECH'};
 
+        # vp tokens
 
+        $data{'VP_BAG'} = $self->{'VP_BAG'};
 
+        # discoveries
 
+        foreach my $key ( keys( %{ $self->{'DISCOVERIES'} } ) ) {
+            $data{'DISCOVERIES'}->{ $key } = {};
+            $self->{'DISCOVERIES'}->{ $key }->to_hash( $data{'DISCOVERIES'}->{ $key } );
+        }
 
+        $data{'DISCOVERY_BAG'} = $self->{'DISCOVERY_BAG'};
 
+        # tiles
 
+        foreach my $key ( keys( %{ $self->{'TILES'} } ) ) {
+            $data{'TILES'}->{ $key } = {};
+            $self->{'TILES'}->{ $key }->to_hash( $data{'TILES'}->{ $key } );
+        }
 
+        $data{'TILE_STACK_1'} = $self->{'TILE_STACK_1'};
+        $data{'TILE_STACK_2'} = $self->{'TILE_STACK_2'};
+        $data{'TILE_STACK_3'} = $self->{'TILE_STACK_3'};
 
+        $data{'BOARD'} = $self->{'BOARD'};
 
+        # developments
+
+        my @developments = ();
+        foreach my $development ( @{ $self->{'DEVELOPMENTS'} } ) {
+            my $dev_hash = {};
+            $development->to_hash( $dev_hash );
+            push( @developments, $dev_hash );
+        }
+        $data{'DEVELOPMENTS'} = \@developments;
 
 
 

@@ -183,6 +183,17 @@ sub test_Object_Server {
 		'option_tag'	=> 'option_test',
 	);
 
+	$flag = $server->action_add_player(
+		'log_id'		=> $log_id,
+		'player_id'		=> 200,
+	);
+
+	$flag = $server->action_add_player(
+		'log_id'		=> $log_id,
+		'player_id'		=> 300,
+	);
+
+
 	$flag = $server->action_begin(
 		'log_id'		=> $log_id,
 	);

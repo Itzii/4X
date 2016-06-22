@@ -49,6 +49,13 @@ sub _init {
 
     $self->{'IS_MISSILE'} = 0;
 
+    if ( defined( $args{'hash'} ) ) {
+        if ( $self->from_hash( $args{'hash'} ) ) {
+            return $self;
+        }
+        return undef;
+    }
+
     return $self;
 }
 

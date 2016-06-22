@@ -40,6 +40,8 @@ sub _init {
 
     $self->{'REQUIRED_OPTION'} = '';
 
+    $self->{'COUNT'} = 1;
+
     $self->{'PROVIDES'} = [];
 
     $self->{'PARENT_TAG'} = '';
@@ -118,6 +120,14 @@ sub required_option {
     my $self        = shift;
 
     return $self->{'REQUIRED_OPTION'};
+}
+
+#############################################################################
+
+sub count {
+    my $self        = shift;
+
+    return $self->{'COUNT'};
 }
 
 #############################################################################
@@ -267,6 +277,10 @@ sub from_hash {
         $self->{'REQUIRED_OPTION'} = $r_hash->{'REQUIRED_OPTION'};
     }
 
+    if ( defined( $r_hash->{'COUNT'} ) ) {
+        $self->{'COUNT'} = $r_hash->{'COUNT'};
+    }
+
     my $provides = $r_hash->{'PROVIDES'};
 
     if ( ref( $provides ) eq 'SCALAR') {
@@ -297,8 +311,9 @@ sub to_hash {
     $r_hash->{'LONG_NAME'} = $self->long_name();
     $r_hash->{'OWNER_ID'} = $self->owner_id();
     $r_hash->{'REQUIRED_OPTION'} = $self->required_option();
+    $r_hash->{'COUNT'} = $self->count();
 
-    $r_hash->{'PROVIDES'} = @{ $self->provides() };
+    $r_hash->{'PROVIDES'} = $self->provides();
 
     return 1;
 }

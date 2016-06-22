@@ -31,7 +31,9 @@ sub _init {
 
     $args{'type'} = 'tile';
 
-    $self->WLE::4X::Objects::Element::_init( %args );
+    unless ( $self->WLE::4X::Objects::Element::_init( %args ) ) {
+        return undef;
+    }
 
     $self->{'ID'} = 0;
     $self->{'STACK'} = 0;
@@ -52,6 +54,13 @@ sub _init {
 
 
     $self->{'RESOURCE_SLOTS'} = [];
+
+    if ( defined( $args{'hash'} ) ) {
+        if ( $self->from_hash( $args{'hash'} ) ) {
+            return $self;
+        }
+        return undef;
+    }
 
     return $self;
 }
@@ -204,7 +213,7 @@ sub from_hash {
 
     if ( defined( $r_hash->{'RESOURCES'} ) ) {
         if ( ref( $r_hash->{'RESOURCES'} ) eq 'ARRAY' ) {
-            my @resources;
+            my @resources = ();
 
             foreach my $slot ( @{ $r_hash->{'RESOURCES'} } ) {
                 if ( ref( $slot ) eq 'HASH' ) {
@@ -215,8 +224,14 @@ sub from_hash {
                     if ( looks_like_number( $slot->{'FILLED'} ) ) {
                         $local_slot{'FILLED'} = $slot->{'FILLED'};
                     }
+                    else {
+                        $local_slot{'FILLED'} = 0;
+                    }
                     if ( looks_like_number( $slot->{'ADVANCED'} ) ) {
                         $local_slot{'ADVANCED'} = $slot->{'ADVANCED'};
+                    }
+                    else {
+                        $local_slot{'ADVANCED'} = 0;
                     }
 
                     push( @resources, \%local_slot );
@@ -240,12 +255,17 @@ sub to_hash {
         return 0;
     }
 
-    $r_hash->{'CATEGORY'} = $self->category();
+    $r_hash->{'ID'} = sprintf( '%03i', $self->tile_id() );
 
-    $r_hash->{'BASE_COST'} = $self->base_cost();
-    $r_hash->{'MIN_COST'} = $self->min_cost();
+    $r_hash->{'WARPS'} = $self->{'WARPS'};
 
-    $r_hash->{'PROVIDES'} = @{ $self->provides() };
+    $r_hash->{'STACK'} = $self->{'STACK'};
+
+    foreach my $tag ( 'VP', 'ANCIENT_LINK', 'HIVE', 'DISCOVERY', 'ORBITAL', 'MONOLITH', 'ANCIENTS', 'GCDS', 'DESTROYER' ) {
+        $r_hash->{ $tag } = $self->{ $tag };
+    }
+
+    $r_hash->{'RESOURCES'} = $self->{'RESOURCE_SLOTS'};
 
     return 1;
 }

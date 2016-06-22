@@ -67,6 +67,10 @@ sub matches_any {
 sub shuffle_in_place {
     my $r_array     = shift;
 
+    if ( scalar( @{ $r_array } ) < 2 ) {
+        return;
+    }
+
     my $index = @{ $r_array };
 
     while ( --$index ) {

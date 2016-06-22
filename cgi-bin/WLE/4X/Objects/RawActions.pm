@@ -296,7 +296,7 @@ sub _raw_begin {
 
     $self->{'TILES'} = {};
 
-    $self->{'BOARD'} = { '0' => [], '1' => [], '2' => [], '3' => [] };
+    $self->{'BOARD'} = WLE::4X::Objects::Board->new( 'server' => $self );
 
 #    print STDERR "\nReading Tiles ... ";
 
@@ -319,7 +319,7 @@ sub _raw_begin {
                     $self->{'TILES'}->{ $tile->tag() } = $tile;
 
                     if ( $tile->which_stack() == 0 ) {
-                        $self->{'BOARD'}->{ 0 } = [ $tile->tag() ];
+                        $self->board()->place_tile( 0, 0, $tile->tag() );
                     }
                     elsif ( $tile->which_stack() == 1 ) {
                         push( @{ $self->{'TILE_STACK_1'} }, $tile->tag() );

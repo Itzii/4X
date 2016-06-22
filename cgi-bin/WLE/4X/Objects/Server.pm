@@ -13,6 +13,7 @@ use WLE::4X::Methods::Simple;
 use WLE::4X::Objects::MetaActions;
 use WLE::4X::Objects::RawActions;
 use WLE::4X::Objects::LogActions;
+use WLE::4X::Objects::HexMethods;
 
 use WLE::4X::Objects::Element;
 use WLE::4X::Objects::ShipComponent;
@@ -199,6 +200,23 @@ sub status {
     my $self        = shift;
 
     return $self->{'SETTINGS'}->{'STATE'};
+}
+
+#############################################################################
+
+sub board {
+    my $self        = shift;
+
+    return $self->{'BOARD'};
+}
+
+#############################################################################
+
+sub tile_from_tag {
+    my $self        = shift;
+    my $tag         = shift;
+
+    return $self->{'TILES'}->{ $tag };
 }
 
 #############################################################################

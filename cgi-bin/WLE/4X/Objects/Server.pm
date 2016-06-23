@@ -13,7 +13,6 @@ use WLE::4X::Methods::Simple;
 use WLE::4X::Objects::MetaActions;
 use WLE::4X::Objects::RawActions;
 use WLE::4X::Objects::LogActions;
-use WLE::4X::Objects::HexMethods;
 
 use WLE::4X::Objects::Element;
 use WLE::4X::Objects::ShipComponent;
@@ -21,6 +20,7 @@ use WLE::4X::Objects::Technology;
 use WLE::4X::Objects::Development;
 use WLE::4X::Objects::Discovery;
 use WLE::4X::Objects::Tile;
+use WLE::4X::Objects::Board;
 
 
 # state breakdown

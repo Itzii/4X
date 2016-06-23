@@ -35,13 +35,11 @@ $VAR1 = {
             'DEVELOPMENTS' => 3,
             'POSITIONS' => [
                 {
-                    'RING' => 2,
-                    'INDEX' => 0,
+                    'SPACE' => '0,-2',
                     'WARPS' => 27,
                 },
                 {
-                    'RING' => 2,
-                    'INDEX' => 6,
+                    'SPACE' => '0,2',
                     'WARPS' => 27,
                 },
             ],
@@ -58,18 +56,15 @@ $VAR1 = {
             'DEVELOPMENTS' => 4,
             'POSITIONS' => [
                 {
-                    'RING' => 2,
-                    'INDEX' => 0,
+                    'SPACE' => '0,-2',
                     'WARPS' => 27,
                 },
                 {
-                    'RING' => 2,
-                    'INDEX' => 4,
+                    'SPACE' => '2,0',
                     'WARPS' => 45,
                 },
                 {
-                    'RING' => 2,
-                    'INDEX' => 8,
+                    'SPACE' => '2,0',
                     'WARPS' => 54,
                 },
             ],
@@ -86,23 +81,19 @@ $VAR1 = {
             'DEVELOPMENTS' => 5,
             'POSITIONS' => [
                 {
-                    'RING' => 2,
-                    'INDEX' => 2,
+                    'SPACE' => '2,2',
                     'WARPS' => 54,
                 },
                 {
-                    'RING' => 2,
-                    'INDEX' => 4,
+                    'SPACE' => '2,0',
                     'WARPS' => 54,
                 },
                 {
-                    'RING' => 2,
-                    'INDEX' => 8,
+                    'SPACE' => '-2,-2',
                     'WARPS' => 54,
                 },
                 {
-                    'RING' => 2,
-                    'INDEX' => 10,
+                    'SPACE' => '-2,0',
                     'WARPS' => 54,
                 },
             ],
@@ -119,28 +110,23 @@ $VAR1 = {
             'DEVELOPMENTS' => 6,
             'POSITIONS' => [
                 {
-                    'RING' => 2,
-                    'INDEX' => 0,
+                    'SPACE' => '0,-2',
                     'WARPS' => 27,
                 },
                 {
-                    'RING' => 2,
-                    'INDEX' => 2,
+                    'SPACE' => '2,-2',
                     'WARPS' => 27,
                 },
                 {
-                    'RING' => 2,
-                    'INDEX' => 4,
+                    'SPACE' => '2,0',
                     'WARPS' => 54,
                 },
                 {
-                    'RING' => 2,
-                    'INDEX' => 8,
+                    'SPACE' => '-2,-2',
                     'WARPS' => 54,
                 },
                 {
-                    'RING' => 2,
-                    'INDEX' => 10,
+                    'SPACE' => '-2,0',
                     'WARPS' => 45,
                 },
             ],
@@ -157,33 +143,27 @@ $VAR1 = {
             'DEVELOPMENTS' => 7,
             'POSITIONS' => [
                 {
-                    'RING' => 2,
-                    'INDEX' => 0,
+                    'SPACE' => '0,-2',
                     'WARPS' => 27,
                 },
                 {
-                    'RING' => 2,
-                    'INDEX' => 2,
+                    'SPACE' => '2,-2',
                     'WARPS' => 54,
                 },
                 {
-                    'RING' => 2,
-                    'INDEX' => 4,
+                    'SPACE' => '0,-2',
                     'WARPS' => 45,
                 },
                 {
-                    'RING' => 2,
-                    'INDEX' => 6,
+                    'SPACE' => '0,2',
                     'WARPS' => 27,
                 },
                 {
-                    'RING' => 2,
-                    'INDEX' => 8,
+                    'SPACE' => '-2,-2',
                     'WARPS' => 54,
                 },
                 {
-                    'RING' => 2,
-                    'INDEX' => 10,
+                    'SPACE' => '-2,0',
                     'WARPS' => 45,
                 },
             ],
@@ -201,32 +181,25 @@ $VAR1 = {
             'DEVELOPMENTS' => 8,
             'POSITIONS' => [
                 {
-                    'RING' => 3,
-                    'INDEX' => 1,
+                    'SPACE' => '1,-3',
                 },
                 {
-                    'RING' => 3,
-                    'INDEX' => 4,
+                    'SPACE' => '3,-2',
                 },
                 {
-                    'RING' => 3,
-                    'INDEX' => 7,
+                    'SPACE' => '2,1',
                 },
                 {
-                    'RING' => 3,
-                    'INDEX' => 9,
+                    'SPACE' => '0,3',
                 },
                 {
-                    'RING' => 3,
-                    'INDEX' => 11,
+                    'SPACE' => '-2,3',
                 },
                 {
-                    'RING' => 3,
-                    'INDEX' => 13,
+                    'SPACE' => '-3,2',
                 },
                 {
-                    'RING' => 3,
-                    'INDEX' => 16,
+                    'SPACE' => '-2,-1',
                 },
             ],
         },
@@ -243,36 +216,28 @@ $VAR1 = {
             'DEVELOPMENTS' => 8,
             'POSITIONS' => [
                 {
-                    'RING' => 3,
-                    'INDEX' => 0,
+                    'SPACE' => '0,-3',
                 },
                 {
-                    'RING' => 3,
-                    'INDEX' => 2,
+                    'SPACE' => '2,-3',
                 },
                 {
-                    'RING' => 3,
-                    'INDEX' => 4,
+                    'SPACE' => '3,-2',
                 },
                 {
-                    'RING' => 3,
-                    'INDEX' => 7,
+                    'SPACE' => '2,1',
                 },
                 {
-                    'RING' => 3,
-                    'INDEX' => 9,
+                    'SPACE' => '0,3',
                 },
                 {
-                    'RING' => 3,
-                    'INDEX' => 11,
+                    'SPACE' => '-2,3',
                 },
                 {
-                    'RING' => 3,
-                    'INDEX' => 13,
+                    'SPACE' => '-3,2',
                 },
                 {
-                    'RING' => 3,
-                    'INDEX' => 16,
+                    'SPACE' => '-2,-1',
                 },
             ],
         },
@@ -289,40 +254,31 @@ $VAR1 = {
             'DEVELOPMENTS' => 8,
             'POSITIONS' => [
                 {
-                    'RING' => 3,
-                    'INDEX' => 1,
+                    'SPACE' => '1,-3',
                 },
                 {
-                    'RING' => 3,
-                    'INDEX' => 3,
+                    'SPACE' => '3,-3',
                 },
                 {
-                    'RING' => 3,
-                    'INDEX' => 5,
+                    'SPACE' => '3,-1',
                 },
                 {
-                    'RING' => 3,
-                    'INDEX' => 7,
+                    'SPACE' => '2,1',
                 },
                 {
-                    'RING' => 3,
-                    'INDEX' => 9,
+                    'SPACE' => '0,3',
                 },
                 {
-                    'RING' => 3,
-                    'INDEX' => 11,
+                    'SPACE' => '-2,3',
                 },
                 {
-                    'RING' => 3,
-                    'INDEX' => 13,
+                    'SPACE' => '-3,2',
                 },
                 {
-                    'RING' => 3,
-                    'INDEX' => 15,
+                    'SPACE' => '-3,0',
                 },
                 {
-                    'RING' => 3,
-                    'INDEX' => 17,
+                    'SPACE' => '-1,-2',
                 },
             ],
         },

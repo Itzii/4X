@@ -318,6 +318,8 @@ sub _raw_begin {
                 ) {
                     $self->{'TILES'}->{ $tile->tag() } = $tile;
 
+                    print "\n" . $tile->as_ascii();
+
                     if ( $tile->which_stack() == 0 ) {
                         $self->board()->place_tile( 0, 0, $tile->tag() );
                     }

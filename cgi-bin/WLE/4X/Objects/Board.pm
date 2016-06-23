@@ -1,4 +1,4 @@
-package WLE::4X::Objects::Element;
+package WLE::4X::Objects::Board;
 
 use strict;
 use warnings;
@@ -143,6 +143,42 @@ sub location_in_direction {
     }
 
     return undef;
+}
+
+#############################################################################
+
+sub stack_from_location {
+    my $self        = shift;
+    my $x_pos       = shift;
+    my $y_pos       = shift;
+
+    unless ( looks_like_number( $x_pos ) && looks_like_number( $y_pos ) ) {
+        return -1;
+    }
+
+    if ( $x_pos == 0 && $y_pos == 0 ) {
+        return 0;
+    }
+
+    if (
+        ( $x_pos == 1 && $y_pos > -2 && $y_pos < 1 )
+        || ( $x_pos == 0 && $y_pos > -2 && $y_pos < 2 )
+        || ( $x_pos == -1 && $y_pos > -1 && $y_pos < 2 )
+    ) {
+        return 1;
+    }
+
+    if (
+        ( $x_pos == 2 && $y_pos > -3 && $y_pos < 1 )
+        || ( $x_pos == 1 && ( $y_pos == -2 || $y_pos == 1 ) )
+        || ( $x_pos == 0 && ( $y_pos == -2 || $y_pos == 2 ) )
+        || ( $x_pos == -1 && ( $y_pos == -1 || $y_pos == 2 ) )
+        || ( $x_pos == 2 && $y_pos > -1 && $y_pos < 3 )
+    ) {
+        return 2;
+    }
+
+    return 3;
 }
 
 #############################################################################

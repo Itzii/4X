@@ -150,7 +150,7 @@ sub monolith_count {
 sub ancient_count {
     my $self        = shift;
 
-    return $self->{'ANCIENT'};
+    return $self->{'ANCIENTS'};
 }
 
 #############################################################################
@@ -171,7 +171,26 @@ sub destroyer_count {
 
 #############################################################################
 
+sub has_warp_on_side {
+    my $self        = shift;
+    my $direction   = shift;
 
+    unless ( looks_like_number( $direction ) ) {
+        return 0;
+    }
+
+    while ( $direction < 0 ) {
+        $direction += 6;
+    }
+
+    while ( $direction > 5 ) {
+        $direction -= 6;
+    }
+
+    my $bitmask = 2 ** $direction;
+
+    return ( ( $self->{'WARPS'} & $bitmask ) > 0 ) ? 1 : 0;
+}
 
 
 #############################################################################
@@ -268,6 +287,88 @@ sub to_hash {
     $r_hash->{'RESOURCES'} = $self->{'RESOURCE_SLOTS'};
 
     return 1;
+}
+
+#############################################################################
+
+sub as_ascii {
+    my $self        = shift;
+
+    my @display = (
+        '     -------------',
+        '    / XXX  0 HIVE \\',
+        '   / MON WORM ORB  \\',
+        '  /5               1\\',
+        ' /                   \\',
+        '/ s   m   c   w       \\',
+        '\ s+  m+  c+  W       /',
+        ' \                   /',
+        '  \4  ANC    DISC  2/',
+        '   \xxxxxxxxxxxxxxx/',
+        '    \      3      /',
+        '     -------------',
+    );
+
+    my $id = sprintf( '%03i', $self->tile_id() );
+    my $name = substr( sprintf( '%-15s', $self->long_name() ), 0, 15 );
+    my $ancient_count = $self->ancient_count();
+    my $disc_count = $self->discovery_count();
+
+    foreach $_ ( @display ) {
+
+        foreach my $direction ( 0 .. 5 ) {
+            if ( $self->has_warp_on_side( $direction ) ) {
+                $_ =~ s{ $direction }{O}xs;
+            }
+            else {
+                $_ =~ s{ $direction }{ }xs;
+            }
+        }
+
+        $_ =~ s{ XXX }{$id}xsm;
+
+        $_ =~ s{ xxxxxxxxxxxxxxx }{$name}xs;
+
+        unless ( $self->monolith_count() > 0 ) {
+            $_ =~ s{MON}{   }xs;
+        }
+
+        unless ( $self->orbital_count() > 0 ) {
+            $_ =~ s{ORB}{   }xs;
+        }
+
+        if ( $ancient_count > 0 ) {
+            $_ =~ s{ANC\s}{ANC$ancient_count}xs;
+        }
+        else {
+            $_ =~ s{ANC\s}{    }xs;
+        }
+
+        unless ( $disc_count > 0 ) {
+            $_ =~ s{DISC}{    }xs;
+        }
+
+        unless ( $self->has_wormhole() ) {
+            $_ =~ s{WORM}{    }xs;
+        }
+
+        unless ( $self->is_hive() ) {
+            $_ =~ s{HIVE}{    }xs;
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    return join( "\n", @display );
 }
 
 #############################################################################

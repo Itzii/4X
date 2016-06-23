@@ -36,6 +36,11 @@ my @_test_methods = (
 	[ 'WLE::4X::Objects::Element'						, \&test_Object_Element ],
 	[ 'WLE::4X::Objects::ShipComponent'					, \&test_Object_ShipComponent ],
 	[ 'WLE::4X::Objects::Technology'					, \&test_Object_Technology ],
+	[ 'WLE::4X::Objects::Discovery'						, \&test_Object_Discovery ],
+	[ 'WLE::4X::Objects::Development'					, \&test_Object_Development ],
+	[ 'WLE::4X::Objects::Tile'							, \&test_Object_Tile ],
+	[ 'WLE::4X::Objects::Board'							, \&test_Object_Board ],
+
 
 	[ 'WLE::4X::Objects::Server'						, \&test_Object_Server ],
 
@@ -110,6 +115,52 @@ sub test_Object_Technology {
 
 	return;
 }
+
+#############################################################################
+
+sub test_Object_Discovery {
+
+	my $discovery = WLE::4X::Objects::Discovery->new( 'server' => '1' );
+
+	ok( defined( $discovery ) && ref( $discovery ) eq 'WLE::4X::Objects::Discovery', 'discovery object created');
+
+	return;
+}
+
+#############################################################################
+
+sub test_Object_Development {
+
+	my $development = WLE::4X::Objects::Development->new( 'server' => '1' );
+
+	ok( defined( $development ) && ref( $development ) eq 'WLE::4X::Objects::Development', 'development object created');
+
+	return;
+}
+
+#############################################################################
+
+sub test_Object_Tile {
+
+	my $tile = WLE::4X::Objects::Tile->new( 'server' => '1' );
+
+	ok( defined( $tile ) && ref( $tile ) eq 'WLE::4X::Objects::Tile', 'tile object created');
+
+	return;
+}
+
+#############################################################################
+
+sub test_Object_Board {
+
+	my $board = WLE::4X::Objects::Board->new( 'server' => '1' );
+
+	ok( defined( $board ) && ref( $board ) eq 'WLE::4X::Objects::Board', 'board object created');
+
+	return;
+}
+
+
 
 #############################################################################
 

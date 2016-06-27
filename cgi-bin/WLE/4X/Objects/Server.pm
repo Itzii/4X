@@ -212,6 +212,14 @@ sub board {
 
 #############################################################################
 
+sub ship_components {
+    my $self        = shift;
+
+    return $self->{'COMPONENTS'};
+}
+
+#############################################################################
+
 sub tile_from_tag {
     my $self        = shift;
     my $tag         = shift;
@@ -475,6 +483,25 @@ sub _read_state {
     $self->{'SETTINGS'} = $VAR1->{'SETTINGS'};
 
 
+    # races
+
+    $self->{'RACES'} = {};
+
+    foreach my $race_tag ( keys( %{ $VAR1->{'RACES'} } ) ) {
+
+        my $race = WLE::4X::Objects::Race->new(
+            'server' => $self,
+            'tag' => $race_tag,
+            'hash' => $VAR1->{'RACES'}->{ $race_tag },
+        );
+
+        if ( defined( $race ) ) {
+            $self->{'RACES'}->{ $race_tag } = $race;
+        }
+    }
+
+
+
     # using Storable
 
 #    $self->{'DATA'} = fd_retrieve( $fh );
@@ -543,7 +570,8 @@ sub _save_state {
         $data{'TILE_STACK_2'} = $self->{'TILE_STACK_2'};
         $data{'TILE_STACK_3'} = $self->{'TILE_STACK_3'};
 
-        $data{'BOARD'} = $self->{'BOARD'};
+        $data{'BOARD'} = {};
+        $self->{'BOARD'}->to_hash( $data{'BOARD'} );
 
         # developments
 
@@ -555,9 +583,13 @@ sub _save_state {
         }
         $data{'DEVELOPMENTS'} = \@developments;
 
+        # races
 
-
-
+        $data{'RACES'} = {};
+        foreach my $race_tag ( %{ $self->{'RACES'} } ) {
+            $data{'RACES'}->{ $race_tag } = {};
+            $self->{'RACES'}->{ $race_tag }->to_hash( $data{'RACES'} );
+        }
 
 
     }

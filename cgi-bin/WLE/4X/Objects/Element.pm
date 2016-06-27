@@ -35,6 +35,7 @@ sub _init {
     $self->{'SOURCE'} = '';
 
     $self->{'LONG_NAME'} = '';
+    $self->{'FLAVOR'} = '';
 
     $self->{'OWNER_ID'} = '';
 
@@ -100,6 +101,25 @@ sub long_name {
 
 #############################################################################
 
+sub set_log_name {
+    my $self        = shift;
+    my $value       = shift;
+
+    $self->{'LONG_NAME'} = $value;
+
+    return;
+}
+
+#############################################################################
+
+sub flavor {
+    my $self        = shift;
+
+    return $self->{'FLAVOR'};
+}
+
+#############################################################################
+
 sub owner_id {
     my $self        = shift;
 
@@ -135,7 +155,7 @@ sub count {
 sub provides {
     my $self        = shift;
 
-    return $self->{'PROVIDES'};
+    return @{ $self->{'PROVIDES'} };
 }
 
 #############################################################################
@@ -148,7 +168,7 @@ sub does_provide {
         return 1;
     }
 
-    return matches_any( $value, @{ $self->provides() } );
+    return matches_any( $value, $self->provides() );
 }
 
 #############################################################################
@@ -242,6 +262,31 @@ sub remove_child {
 
 #############################################################################
 
+sub copy_of {
+    my $self        = shift;
+    my $new_tag     = shift;
+
+    my $copy = WLE::4X::Objects::Element->new( 'server' => $self->server(), 'tag' => $new_tag );
+
+    $copy->{'SOURCE'} = $self->{'SOURCE'};
+    $copy->{'TYPE'} = $self->{'TYPE'};
+
+    $copy->{'LONG_NAME'} = $self->{'LONG_NAME'};
+    $copy->{'FLAVOR'} = $self->{'FLAVOR'};
+
+    $copy->{'OWNER_ID'} = $self->{'OWNER_ID'};
+    $copy->{'REQUIRED_OPTION'} = $self->{'REQUIRED_OPTION'};
+
+    $copy->{'COUNT'} = $self->{'COUNT'};
+
+    my @provides = @{ $self->{'PROVIDES'} };
+    $copy->{'PROVIDES'} = \@provides;
+
+    return $copy;
+}
+
+#############################################################################
+
 sub from_hash {
     my $self        = shift;
     my $r_hash      = shift;
@@ -267,6 +312,10 @@ sub from_hash {
 
     if ( defined( $r_hash->{'LONG_NAME'} ) ) {
         $self->{'LONG_NAME'} = $r_hash->{'LONG_NAME'};
+    }
+
+    if ( defined( $r_hash->{'FLAVOR'} ) ) {
+        $self->{'FLAVOR'} = $r_hash->{'FLAVOR'};
     }
 
     if ( defined( $r_hash->{'OWNER_ID'} ) ) {
@@ -313,7 +362,7 @@ sub to_hash {
     $r_hash->{'REQUIRED_OPTION'} = $self->required_option();
     $r_hash->{'COUNT'} = $self->count();
 
-    $r_hash->{'PROVIDES'} = $self->provides();
+    $r_hash->{'PROVIDES'} = $self->{'PROVIDES'};
 
     return 1;
 }

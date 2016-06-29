@@ -368,30 +368,32 @@ sub from_hash {
         if ( ref( $r_hash->{'SHIP_TEMPLATES'} ) eq 'ARRAY' ) {
 
             foreach my $template_section ( @{ $r_hash->{'SHIP_TEMPLATES'} } ) {
-                if ( defined( $template_section->{'CLASS'} ) ) {
-                    my $template = WLE::4X::Objects::ShipTemplate->new( 'server' => $self->server(), 'hash' => $template_section );
-                    if ( defined( $template ) ) {
-                        push( @templates, $template->tag() );
-                        $self->server()->templates()->{ $template->tag() } = $template;
-                    }
-                }
-                elsif ( defined( $template_section->{'TAG'} ) ) {
-                    my $tag = $self->long_name();
-                    $tag =~ s{ \W }{_}xsi;
-                    $tag = 'shiptemplate_' . $tag . '_' . $template_index;
 
-                    my $original_template = $self->server()->templates()->{ $template_section->{'TAG'} };
-                    if ( defined( $original_template ) ) {
-                        my $template = $original_template->copy_of( $tag );
+                if ( ref( $template_section ) eq 'HASHREF' ) {
+                    if ( defined( $template_section->{'COST'} ) ) {
+                        my $tag = $self->long_name();
+                        $tag =~ s{ \W }{_}xsi;
+                        $tag = 'shiptemplate_' . $tag . '_' . $template_index;
 
-                        if ( defined( $template ) ) {
-                            $template->set_long_name( $template_section->{'LONG_NAME'} );
-                            $template->set_cost( $template_section->{'COST'} );
+                        my $original_template = $self->server()->templates()->{ $template_section->{'TAG'} };
+                        if ( defined( $original_template ) ) {
+                            my $template = $original_template->copy_of( $tag );
 
-                            push( @templates, $template->tag() );
-                            $self->server()->templates()->{ $template->tag() } = $template;
+                            if ( defined( $template ) ) {
+                                $template->set_long_name( $template_section->{'LONG_NAME'} );
+                                $template->set_cost( $template_section->{'COST'} );
+
+                                push( @templates, $template->tag() );
+                                $self->server()->templates()->{ $template->tag() } = $template;
+
+                                push( @{ $self->{'SHIP_TEMPLATES'} }, $tag );
+                            }
                         }
                     }
+                }
+                else {
+
+                    push( @{ $self->{'SHIP_TEMPLATES'} }, $template_section );
                 }
             }
         }

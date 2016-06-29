@@ -387,6 +387,26 @@ sub _raw_begin {
 
     $self->{'DEVELOPMENTS'} = \@developments;
 
+    # ship templates
+
+#    print STDERR "\n  ship templates ... ";
+
+    $self->{'SHIP_TEMPLATES'} = {};
+
+    foreach my $template_key ( keys( %{ $VAR1->{'SHIP_TEMPLATES'} } ) ) {
+
+        my $template = WLE::4X::Objects::ShipTemplate->new(
+            'server' => $self,
+            'tag' => $template_key,
+            'hash' => $VAR1->{'SHIP_TEMPLATES'}->{ $template_key },
+        );
+
+        if ( defined( $template ) ) {
+            $self->{'SHIP_TEMPLATE'}->{ $template->tag() } = $template;
+        }
+    }
+
+
     # races
 #    print STDERR "\n  races ... ";
 

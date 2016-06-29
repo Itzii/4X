@@ -202,6 +202,29 @@ sub _read_state {
 
     $self->{'SETTINGS'} = $VAR1->{'SETTINGS'};
 
+    # setup ship templates
+#    print STDERR "\n  ship templates ... ";
+
+    unless ( defined( $VAR1->{'SHIP_TEMPLATES'} ) ) {
+        $self->set_error( 'Missing Section in resource file: SHIP_TEMPLATES' );
+        return 0;
+    }
+
+    $self->{'SHIP_TEMPLATES'} = {};
+
+    foreach my $template_key ( keys( %{ $VAR1->{'SHIP_TEMPLATES'} } ) ) {
+
+        my $template = WLE::4X::Objects::ShipTemplate->new(
+            'server' => $self,
+            'tag' => $template_key,
+            'hash' => $VAR1->{'SHIP_TEMPLATES'}->{ $template_key },
+        );
+
+        if ( defined( $template ) ) {
+            $self->{'SHIP_TEMPLATES'}->{ $template->tag() } = $template;
+        }
+    }
+
 
     # races
 
@@ -219,7 +242,6 @@ sub _read_state {
             $self->{'RACES'}->{ $race_tag } = $race;
         }
     }
-
 
 
     # using Storable
@@ -302,6 +324,19 @@ sub _save_state {
             push( @developments, $dev_hash );
         }
         $data{'DEVELOPMENTS'} = \@developments;
+
+        # ship templates
+
+        $data{'SHIP_TEMPLATES'} = {};
+        foreach my $template_tag ( %{ $self->{'SHIP_TEMPLATES'} } ) {
+
+            if ( defined( $self->{'SHIP_TEMPLATES'}->{ $template_tag } ) ) {
+                my %template_hash = ();
+                $self->{'SHIP_TEMPLATES'}->{ $template_tag }->to_hash( \%template_hash );
+
+                $data{'SHIP_TEMPLATES'}->{ $template_tag } = \%template_hash;
+            }
+        }
 
         # races
 

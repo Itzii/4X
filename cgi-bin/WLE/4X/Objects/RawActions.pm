@@ -318,7 +318,7 @@ sub _raw_begin {
                 ) {
                     $self->{'TILES'}->{ $tile->tag() } = $tile;
 
-                    print "\n" . $tile->as_ascii();
+#                    print STDERR "\n" . $tile->as_ascii();
 
                     if ( $tile->which_stack() == 0 ) {
                         $self->board()->place_tile( 0, 0, $tile->tag() );
@@ -387,7 +387,35 @@ sub _raw_begin {
 
     $self->{'DEVELOPMENTS'} = \@developments;
 
+    # races
+#    print STDERR "\n  races ... ";
 
+    foreach my $race_key ( keys( %{ $VAR1->{'RACES'} } ) ) {
+
+        my $race = WLE::4X::Objects::Race->new(
+            'server' => $self,
+            'tag' => $race_key,
+            'hash' => $VAR1->{'RACES'}->{ $race_key },
+        );
+
+#        print STDERR "\nRace: " . $race->tag();
+
+        if ( defined( $race ) ) {
+
+            my %race_hash = ();
+            $race->to_hash( \%race_hash );
+#            print STDERR "\n" . Dumper( \%race_hash );
+
+            if ( matches_any( $race->source_tag(), $self->source_tags() ) ) {
+                if (
+                    $race->required_option() eq ''
+                    || matches_any( $race->required_option(), $self->option_tags() )
+                ) {
+                    $self->{'RACES'}->{ $race->tag() } = $race;
+                }
+            }
+        }
+    }
 
 
     $self->{'SETTINGS'}->{'STATE'} = '0:0';

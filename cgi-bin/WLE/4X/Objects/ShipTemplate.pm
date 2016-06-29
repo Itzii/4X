@@ -214,7 +214,7 @@ sub total_hull_points {
         }
     }
 
-    return $energy;
+    return $hull;
 }
 
 #############################################################################
@@ -250,7 +250,7 @@ sub total_movement {
         }
     }
 
-    return $energy;
+    return $move;
 }
 
 #############################################################################
@@ -339,7 +339,7 @@ sub remove_component {
 
     foreach my $old_component ( $self->components() ) {
         if ( $old_component eq $component_tag && $flag_found_component == 0 ) {
-            $flag_found_componet = 1;
+            $flag_found_component = 1;
         }
         else {
             push( @new_components, $old_component );
@@ -368,7 +368,7 @@ sub _problem {
         my $component = $self->server()->ship_components()->{ $component_tag };
 
         if ( defined( $component ) ) {
-            if ( matches_any( 'ship_drive', $component->provides() ) {
+            if ( matches_any( 'ship_drive', $component->provides() ) ) {
                 $flag_contains_drive = 1;
             }
         }

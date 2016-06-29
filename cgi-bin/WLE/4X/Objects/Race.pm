@@ -379,14 +379,18 @@ sub from_hash {
                     my $tag = $self->long_name();
                     $tag =~ s{ \W }{_}xsi;
                     $tag = 'shiptemplate_' . $tag . '_' . $template_index;
-                    my $template = $self->server()->templates()->{ $template_section->{'TAG'} }->copy_of( $tag );
 
-                    if ( defined( $template ) ) {
-                        $template->set_long_name( $template_section->{'LONG_NAME'} );
-                        $template->set_cost( $template_section->{'COST'} );
+                    my $original_template = $self->server()->templates()->{ $template_section->{'TAG'} };
+                    if ( defined( $original_template ) ) {
+                        my $template = $original_template->copy_of( $tag );
 
-                        push( @templates, $template->tag() );
-                        $self->server()->templates()->{ $template->tag() } = $template;
+                        if ( defined( $template ) ) {
+                            $template->set_long_name( $template_section->{'LONG_NAME'} );
+                            $template->set_cost( $template_section->{'COST'} );
+
+                            push( @templates, $template->tag() );
+                            $self->server()->templates()->{ $template->tag() } = $template;
+                        }
                     }
                 }
             }

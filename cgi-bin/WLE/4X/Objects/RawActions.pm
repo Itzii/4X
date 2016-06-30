@@ -395,6 +395,11 @@ sub _raw_begin {
 
     foreach my $template_key ( keys( %{ $VAR1->{'SHIP_TEMPLATES'} } ) ) {
 
+        print STDERR "\nKey Exists: " . $template_key;
+
+#        print STDERR Dumper( $VAR1->{'SHIP_TEMPLATES'}->{ $template_key } );
+
+
         my $template = WLE::4X::Objects::ShipTemplate->new(
             'server' => $self,
             'tag' => $template_key,
@@ -403,6 +408,8 @@ sub _raw_begin {
 
         if ( defined( $template ) ) {
             $self->{'SHIP_TEMPLATE'}->{ $template->tag() } = $template;
+
+            print STDERR "\nTemplate Defined: " . $template->tag();
         }
     }
 

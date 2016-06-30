@@ -380,6 +380,9 @@ sub from_hash {
                             my $template = $original_template->copy_of( $tag );
 
                             if ( defined( $template ) ) {
+
+
+
                                 $template->set_long_name( $template_section->{'LONG_NAME'} );
                                 $template->set_cost( $template_section->{'COST'} );
 

@@ -26,7 +26,7 @@ sub action_create_game {
 
     $self->set_error( '' );
 
-    unless ( $self->_set_owner_id( $args{'owner_id'} ) ) {
+    unless ( $self->_set_owner_id( $args{'user'} ) ) {
         return 0;
     }
 
@@ -44,7 +44,7 @@ sub action_create_game {
 
     $self->{'SETTINGS'}->{'OPTION_TAGS'} = [ @{ $args{'r_option_tags'} } ];
 
-    $self->{'SETTINGS'}->{'PLAYER_IDS'} = [ $args{'owner_id'} ];
+    $self->{'SETTINGS'}->{'PLAYER_IDS'} = [ $args{'user'} ];
 
 
     $self->_log_data( $self->_owner_id() );
@@ -82,11 +82,6 @@ sub action_add_source {
 
     unless ( $args{'source_tag'} =~ m{ ^ [a-zA-Z0-9_]+ $ }xs ) {
         $self->set_error( 'Invalid Source Tag' );
-        return 0;
-    }
-
-    unless ( $self->status() eq '0' ) {
-        $self->set_error( 'Unable to add source tag to game in session.' );
         return 0;
     }
 

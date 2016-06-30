@@ -1214,6 +1214,7 @@ $VAR1 = {
     'SHIP_TEMPLATES' => {
 
         'shiptemplate_interceptor_terran' => {
+            'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_interceptor',
             'INTIATIVE' => 2,
             'ENERGY' => 0,
@@ -1229,6 +1230,7 @@ $VAR1 = {
             'REQUIRES' => 'ship_drive',
         },
         'shiptemplate_cruiser_terran' => {
+            'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_cruiser',
             'INTIATIVE' => 1,
             'ENERGY' => 0,
@@ -1246,6 +1248,7 @@ $VAR1 = {
             'REQUIRES' => 'ship_drive',
         },
         'shiptemplate_dreadnought_terran' => {
+            'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_dreadnought',
             'INTIATIVE' => 0,
             'ENERGY' => 0,
@@ -1265,6 +1268,7 @@ $VAR1 = {
             'REQUIRES' => 'ship_drive',
         },
         'shiptemplate_starbase_terran' => {
+            'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_starbase',
             'INTIATIVE' => 4,
             'ENERGY' => 3,
@@ -1281,6 +1285,7 @@ $VAR1 = {
             'EXCLUDE' => 'ship_drive',
         },
         'shiptemplate_interceptor_planta' => {
+            'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_interceptor',
             'INTIATIVE' => 0,
             'ENERGY' => 2,
@@ -1296,6 +1301,7 @@ $VAR1 = {
             'REQUIRES' => 'ship_drive',
         },
         'shiptemplate_cruiser_planta' => {
+            'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_cruiser',
             'INTIATIVE' => 0,
             'ENERGY' => 2,
@@ -1312,6 +1318,7 @@ $VAR1 = {
             'REQUIRES' => 'ship_drive',
         },
         'shiptemplate_dreadnought_planta' => {
+            'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_dreadnought',
             'INTIATIVE' => 0,
             'ENERGY' => 2,
@@ -1330,6 +1337,7 @@ $VAR1 = {
             'REQUIRES' => 'ship_drive',
         },
         'shiptemplate_starbase_planta' => {
+            'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_starbase',
             'INTIATIVE' => 2,
             'ENERGY' => 5,
@@ -1346,6 +1354,7 @@ $VAR1 = {
             'EXCLUDE' => 'ship_drive',
         },
         'shiptemplate_interceptor_hegemony' => {
+            'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_interceptor',
             'INTIATIVE' => 3,
             'ENERGY' => 1,
@@ -1362,6 +1371,7 @@ $VAR1 = {
             'REQUIRES' => 'ship_drive',
         },
         'shiptemplate_cruiser_hegemony' => {
+            'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_cruiser',
             'INTIATIVE' => 2,
             'ENERGY' => 2,
@@ -1380,6 +1390,7 @@ $VAR1 = {
             'REQUIRES' => 'ship_drive',
         },
         'shiptemplate_dreadnought_hegemony' => {
+            'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_dreadnought',
             'INTIATIVE' => 1,
             'ENERGY' => 3,
@@ -1400,6 +1411,7 @@ $VAR1 = {
             'REQUIRES' => 'ship_drive',
         },
         'shiptemplate_starbase_hegemony' => {
+            'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_starbase',
             'INTIATIVE' => 5,
             'ENERGY' => 3,
@@ -1418,6 +1430,7 @@ $VAR1 = {
         },
 
         'shiptemplate_interceptor_rho_indi' => {
+            'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_interceptor',
             'INTIATIVE' => 3,
             'ENERGY' => 0,
@@ -1433,6 +1446,7 @@ $VAR1 = {
             'REQUIRES' => 'ship_drive',
         },
         'shiptemplate_cruiser_rho_indi' => {
+            'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_cruiser',
             'INTIATIVE' => 2,
             'ENERGY' => 0,
@@ -1451,6 +1465,7 @@ $VAR1 = {
         },
 
         'shiptemplate_starbase_rho_indi' => {
+            'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_starbase',
             'INTIATIVE' => 4,
             'ENERGY' => 3,
@@ -1468,6 +1483,7 @@ $VAR1 = {
         },
 
         'shiptemplate_starbase_exiles' => {
+            'SOURCE_TAG' => 'src_rise',
             'CLASS' => 'class_starbase',
             'INTIATIVE' => 0,
             'ENERGY' => 4,

@@ -362,14 +362,16 @@ sub from_hash {
     }
 
     my @templates = ();
-    my $template_index = 1;
 
     if ( defined( $r_hash->{'SHIP_TEMPLATES'} ) ) {
         if ( ref( $r_hash->{'SHIP_TEMPLATES'} ) eq 'ARRAY' ) {
 
+            my $template_index = 1;
+
             foreach my $template_section ( @{ $r_hash->{'SHIP_TEMPLATES'} } ) {
 
-                if ( ref( $template_section ) eq 'HASHREF' ) {
+                if ( ref( $template_section ) eq 'HASH' ) {
+
                     if ( defined( $template_section->{'COST'} ) ) {
                         my $tag = $self->long_name();
                         $tag =~ s{ \W }{_}xsi;
@@ -381,8 +383,6 @@ sub from_hash {
 
                             if ( defined( $template ) ) {
 
-
-
                                 $template->set_long_name( $template_section->{'LONG_NAME'} );
                                 $template->set_cost( $template_section->{'COST'} );
 
@@ -393,6 +393,8 @@ sub from_hash {
                             }
                         }
                     }
+
+                    $template_index++;
                 }
                 else {
 
@@ -454,19 +456,21 @@ sub to_hash {
         $r_hash->{'VP_SLOTS'}->{ $section_tag } = $self->{'VP_SLOTS'}->{ $section_tag };
     }
 
-    my @templates = ();
-    foreach my $template_tag ( @{ $self->{'SHIP_TEMPLATES'} } ) {
-        my $template = $self->server()->templates()->{ $template_tag };
+#    my @templates = ();
+#    foreach my $template_tag ( @{ $self->{'SHIP_TEMPLATES'} } ) {
+#        my $template = $self->server()->templates()->{ $template_tag };
+#
+#        if ( defined( $template ) ) {
+#            my $template_hash = {};
+#            if ( $template->to_hash( $template_hash ) ) {
+#                push( @templates, $template_hash );
+#            }
+#        }
+#    }
+#
+#    $r_hash->{'SHIP_TEMPLATES'} = \@templates;
 
-        if ( defined( $template ) ) {
-            my $template_hash = {};
-            if ( $template->to_hash( $template_hash ) ) {
-                push( @templates, $template_hash );
-            }
-        }
-    }
-
-    $r_hash->{'SHIP_TEMPLATES'} = \@templates;
+    $r_hash->{'SHIP_TEMPLATES'} = $self->{'SHIP_TEMPLATES'};
 
     return 1;
 }

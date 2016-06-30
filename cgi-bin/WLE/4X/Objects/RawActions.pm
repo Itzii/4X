@@ -139,6 +139,10 @@ sub _raw_begin {
         return 0;
     }
 
+    $self->{'PLAYERS_DONE'} = [];
+    $self->{'PLAYERS_PENDING'} = [ 1 .. scalar( $self->player_ids() ) ];
+    shuffle_in_place( $self->{'PLAYERS_PENDING'} );
+
     unless ( $self->has_source( $settings->{'SOURCE_TAG'} ) ) {
         $self->set_error( 'Invalid player count for chosen sources: ' . scalar( $self->player_ids() ) );
         # print STDERR $self->{'LAST_ERROR'};
@@ -395,8 +399,6 @@ sub _raw_begin {
 
     foreach my $template_key ( keys( %{ $VAR1->{'SHIP_TEMPLATES'} } ) ) {
 
-        print STDERR "\nKey Exists: " . $template_key;
-
 #        print STDERR Dumper( $VAR1->{'SHIP_TEMPLATES'}->{ $template_key } );
 
 
@@ -407,15 +409,15 @@ sub _raw_begin {
         );
 
         if ( defined( $template ) ) {
-            $self->{'SHIP_TEMPLATE'}->{ $template->tag() } = $template;
-
-            print STDERR "\nTemplate Defined: " . $template->tag();
+            $self->{'SHIP_TEMPLATES'}->{ $template->tag() } = $template;
         }
     }
 
 
     # races
 #    print STDERR "\n  races ... ";
+
+    $self->{'RACES'} = {};
 
     foreach my $race_key ( keys( %{ $VAR1->{'RACES'} } ) ) {
 
@@ -445,7 +447,7 @@ sub _raw_begin {
     }
 
 
-    $self->{'SETTINGS'}->{'STATE'} = '0:0';
+    $self->{'SETTINGS'}->{'STATUS'} = '0:' . $self->{'PLAYERS_PENDING'}->[ 0 ];
 
     return;
 }

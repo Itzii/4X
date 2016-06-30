@@ -326,9 +326,10 @@ sub _save_state {
         $data{'DEVELOPMENTS'} = \@developments;
 
         # ship templates
+#        print STDERR "\n saving ship_templates ... ";
 
         $data{'SHIP_TEMPLATES'} = {};
-        foreach my $template_tag ( %{ $self->{'SHIP_TEMPLATES'} } ) {
+        foreach my $template_tag ( keys( %{ $self->{'SHIP_TEMPLATES'} } ) ) {
 
             if ( defined( $self->{'SHIP_TEMPLATES'}->{ $template_tag } ) ) {
                 my %template_hash = ();

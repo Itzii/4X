@@ -491,6 +491,8 @@ sub copy_of {
 
     my $copy = $self->WLE::4X::Objects::Element::copy_of( $new_tag );
 
+    bless( $copy, 'WLE::4X::Objects::ShipTemplate' );
+
     $copy->{'CLASS'} = $self->{'CLASS'};
     $copy->{'COST'} = $self->{'COST'};
 
@@ -516,21 +518,15 @@ sub from_hash {
     my $self        = shift;
     my $r_hash      = shift;
 
-    print STDERR " ... parsing from hash ... ";
-
     unless( $self->WLE::4X::Objects::Element::from_hash( $r_hash ) ) {
-        print STDERR " ShipTemplate: Failed to parse element".
         return 0;
     }
-
-    print STDERR " ... parsed element ... ";
 
     unless ( defined( $r_hash->{'CLASS'} ) ) {
-        print STDERR " ShipTemplate: Class element isn't defined".
         return 0;
     }
 
-    print STDERR " ... middle of parsing ... ";
+    $self->{ 'CLASS' } = $r_hash->{'CLASS'};
 
     foreach my $tag ( 'VP_DRAW', 'INITIATIVE', 'ENERGY', 'COMPUTER', 'SHIELDS', 'SLOTS', 'HULL_POINTS', 'COST' ) {
         if ( defined( $r_hash->{ $tag } ) ) {
@@ -543,8 +539,6 @@ sub from_hash {
     if ( defined( $r_hash->{'COMPONENTS'} ) ) {
         $self->{'COMPONENTS'} = $r_hash->{'COMPONENTS'};
     }
-
-    print STDERR " ... finished parsing ... ";
 
     return 1;
 }

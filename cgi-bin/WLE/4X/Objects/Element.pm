@@ -101,7 +101,7 @@ sub long_name {
 
 #############################################################################
 
-sub set_log_name {
+sub set_long_name {
     my $self        = shift;
     my $value       = shift;
 
@@ -340,7 +340,6 @@ sub from_hash {
     elsif ( ref( $provides ) eq 'ARRAY' ) {
         push( @{ $self->{'PROVIDES'} }, @{ $provides } );
     }
-
 
     return 1;
 }

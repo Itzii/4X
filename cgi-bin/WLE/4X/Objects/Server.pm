@@ -39,7 +39,11 @@ use WLE::4X::Objects::ShipTemplate;
 # 1 - game has started - selecting races and positions
 #
 # dd2 -
-#  00 -
+#  player index
+#
+#   dd3 -
+#    00 - waiting to select race
+#    01 - waiting to select location
 #
 # 2 - normal turn
 # 3 - game has finished
@@ -81,6 +85,8 @@ sub _init {
     $self->{'ENV'}->{'DIR_STATE_FILES'} =~ s{ /$ }{}xs;
     $self->{'ENV'}->{'DIR_LOG_FILES'} =~ s{ /$ }{}xs;
 
+    $self->{'ENV'}->{'CURRENT_USER'} = '';
+
 
     unless ( -e $self->_file_resources() ) {
         $self->set_error( 'Unable to locate core resource file: ' . $self->_file_resources() );
@@ -110,7 +116,7 @@ sub _init {
 
     $self->{'SETTINGS'}->{'LONG_NAME'} = '';
 
-    $self->{'SETTINGS'}->{'STATE'} = '0';
+    $self->{'SETTINGS'}->{'STATUS'} = '0';
 
     $self->{'SETTINGS'}->{'PLAYER_IDS'} = [];
 
@@ -171,6 +177,21 @@ sub player_ids {
     return @{ $self->{'SETTINGS'}->{'PLAYER_IDS'} };
 }
 
+#############################################################################
+
+sub current_user {
+    my $self        = shift;
+
+    return $self->{'ENV'}->{'CURRENT_USER'};
+}
+
+#############################################################################
+
+sub user_is_owner {
+    my $self        = shift;
+
+    return ( $self->current_user() eq $self->_owner_id() );
+}
 
 #############################################################################
 
@@ -206,7 +227,15 @@ sub long_name {
 sub status {
     my $self        = shift;
 
-    return $self->{'SETTINGS'}->{'STATE'};
+    return $self->{'SETTINGS'}->{'STATUS'};
+}
+
+#############################################################################
+
+sub status_parts {
+    my $self        = shift;
+
+    return split( /:/, $self->status() );
 }
 
 #############################################################################
@@ -348,6 +377,81 @@ sub _state_file {
 
     return $self->_dir_state_files() . '/' . $self->log_id() . '.state';
 }
+
+#############################################################################
+
+sub do {
+    my $self        = shift;
+    my %args        = @_;
+
+    unless ( defined( $args{'action'} ) ) {
+        return ( 'success' => 0, 'message' => "Missing 'action' element" );
+    }
+
+    unless ( defined( $args{'user'} ) ) {
+        return ( 'success' => 0, 'message' => "Missing 'user' element" );
+    }
+
+    my $action = lc( $args{'action'} );
+    delete( $args{'action'} );
+
+    my %actions = (
+
+        'status'    => { 'flag_prestart' => 0, 'flag_owner_only' => 0, 'flag_player_phase' => 0, 'method' => \&status },
+
+
+
+    );
+
+    unless ( defined( $actions{ $action } ) ) {
+        return ( 'success' => 0, 'message' => "Invalid 'action' element." );
+    }
+
+    if ( $actions{ $action }->{'flag_prestart'} && $self->status() ne '0' ) {
+        return ( 'success' => 0, 'message' => 'Unable to perform action on game in progress.' );
+    }
+
+    if ( $actions{ $action }->{'flag_owner_only'} && $self->user_is_owner() == 0 )  {
+        return ( 'success' => 0, 'message' => 'Action is allowed by game owner only.' );
+    }
+
+
+
+
+    my %response = (
+        'success' => 0,
+        'message' => '',
+    );
+
+
+
+
+
+
+
+    if ( $action eq 'add_source' ) {
+        $response{'success'} = $self->action_add_source( %args );
+        $response{'message'} = $self->last_error();
+        return %response;
+    }
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #############################################################################
 #############################################################################

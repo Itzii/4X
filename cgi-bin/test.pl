@@ -181,75 +181,93 @@ sub test_Object_Server {
 
 	ok( $server->last_error() eq '', 'no errors found' );
 
-	my $flag = 0;
+	my %response;
 
-	$flag = $server->action_create_game();
+	%response = $server->do(
+		'action' 		=> 'create_game',
+	);
 
-	ok( $flag == 0, 'action_create_game failed with no arguments' );
+	ok( $response{'success'} == 0, 'action_create_game failed with no arguments' );
 
-	$flag = $server->action_create_game(
+	%response = $server->do(
+		'action' 		=> 'create_game',
 		'log_id'		=> 'test  id',
 	);
 
-	ok( $flag == 0, 'action_create_game failed with invalid log_id' );
+	ok( $response{'success'} == 0, 'action_create_game failed with invalid log_id' );
 
-	$flag = $server->action_create_game(
+	%response = $server->do(
+		'action' 		=> 'create_game',
+		'log_id'		=> $log_id,
+	);
+
+	ok( $response{'success'} == 0, 'action_create_game failed with missing owner_id' );
+
+	%response = $server->do(
+		'action' 		=> 'create_game',
+		'user'			=> 'kdkd',
 		'log_id'		=> 'testid',
 	);
 
-	ok( $flag == 0, 'action_create_game failed with missing owner_id' );
+	ok( $response{'success'} == 0, 'action_create_game failed with invalid owner_id' );
 
-	$flag = $server->action_create_game(
-		'log_id'		=> 'testid',
-		'owner_id'		=> 'kdkd'
-	);
-
-	ok( $flag == 0, 'action_create_game failed with invalid owner_id' );
-
-	$flag = $server->action_create_game(
-		'log_id'		=> 'testid',
-		'owner_id'		=> 55,
+	%response = $server->do(
+		'action' 		=> 'create_game',
+		'user'			=> 55,
+		'log_id'		=> $log_id,
 		'r_source_tags' => [],
 		'r_option_tags' => [],
 	);
 
-	ok( $flag == 0, 'action_create_game failed with missing source tag' );
+	ok( $response{'success'} == 0, 'action_create_game failed with missing source tag' );
 
-	$flag = $server->action_create_game(
+	%response = $server->do(
+		'action' 		=> 'create_game',
+		'user'			=> 55,
 		'log_id'		=> $log_id,
-		'owner_id'		=> 55,
 		'r_source_tags' => [ 'src_base' ],
 		'r_option_tags' => [],
 	);
 
-	ok( $flag == 1, 'action_create_game successful' );
+	show( $response{'message'} );
+	ok( $response{'success'} == 1, 'create_game successful' );
 
-	$flag = $server->action_add_source(
+	%response = $server->do(
+		'action' 		=> 'add_source',
+		'user'			=> 55,
 		'log_id'		=> $log_id,
 		'source_tag'	=> 'src_test',
 	);
 
-	$flag = $server->action_add_option(
+	%response = $server->do(
+		'action' 		=> 'add_option',
+		'user'			=> 55,
 		'log_id'		=> $log_id,
 		'option_tag'	=> 'option_test',
 	);
 
-	$flag = $server->action_add_player(
+	%response = $server->do(
+		'action' 		=> 'add_player',
+		'user'			=> 55,
 		'log_id'		=> $log_id,
 		'player_id'		=> 200,
 	);
 
-	$flag = $server->action_add_player(
+	%response = $server->do(
+		'action' 		=> 'add_player',
+		'user'			=> 55,
 		'log_id'		=> $log_id,
 		'player_id'		=> 300,
 	);
 
-
-	$flag = $server->action_begin(
+	%response = $server->do(
+		'action' 		=> 'begin',
+		'user'			=> 55,
 		'log_id'		=> $log_id,
 	);
 
-	ok( $flag == 1, 'action_begin successful' );
+
+	ok( $response{'success'} == 1, 'action_begin successful' );
 
 	return;
 }

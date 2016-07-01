@@ -3,8 +3,6 @@ package WLE::4X::Objects::Server;
 use strict;
 use warnings;
 
-use WLE::4X::Methods::Simple;
-
 my %actions = (
     'add_source'        => \&_log_add_source,
     'remove_source'     => \&_log_remove_source,
@@ -13,10 +11,11 @@ my %actions = (
     'add_player'        => \&_log_add_player,
     'remove_player'     => \&_log_remove_player,
     'begin'             => \&_log_begin,
+    'player_order'      => \&_log_player_order,
+    'tile_stack'        => \&_log_tile_stack,
+    'development_stack' => \&_log_development_stack,
 
 );
-
-my $ADD_PLAYER          = 'add_player';
 
 
 #############################################################################
@@ -57,12 +56,6 @@ sub action_parse_state_from_log {
 
     flock( $fh_log, LOCK_SH );
 
-    unless ( $self->set_owner_id( <$fh_log> ) ) {
-        return 0;
-    }
-
-    $self->{'DATA'}->{'PLAYER_IDS'} = [ $self->_owner_id() ];
-
     $self->{'DATA'}->{'LONG_NAME'} = <$fh_log>;
 
     $self->{'DATA'}->{'SOURCE_TAGS'} = split( /,/, <$fh_log> );
@@ -79,9 +72,14 @@ sub action_parse_state_from_log {
     while ( defined( $line ) ) {
 
         my ( $action, $data ) = split( /:/, $line, 2 );
+        my $VAR1;
+
+        eval $data; warn $@ if $@;
+
+        $data->{'parse'} = 1;
 
         if ( defined( $actions{ $action } ) ) {
-            $actions{ $action }->( $self, 'parse' => 1, $data );
+            $actions{ $action }->( $self, $data );
         }
         else {
             $self->set_error( 'Invalid Action In Log: ' . $action );
@@ -109,13 +107,14 @@ sub action_parse_state_from_log {
 
 sub _log_add_source {
     my $self        = shift;
-    my %args        = @_;
+    my $r_args      = shift;
 
-    if ( defined( $args{'parse'} ) ) {
-        $self->_raw_add_source( $args{'tag'} );
+    if ( defined( $r_args->{'parse'} ) ) {
+        $self->_raw_add_source( $r_args->{'tag'} );
     }
     else {
-        $self->_log_data( 'add_source:' . $args{'tag'} );
+        $Data::Dumper::Indent = 0;
+        $self->_log_data( 'add_source:' . Dumper( $r_args ) );
     }
 
     return;
@@ -125,13 +124,14 @@ sub _log_add_source {
 
 sub _log_remove_source {
     my $self        = shift;
-    my %args        = @_;
+    my $r_args      = shift;
 
-    if ( defined( $args{'parse'} ) ) {
-        $self->_raw_remove_source( $args{'tag'} );
+    if ( defined( $r_args->{'parse'} ) ) {
+        $self->_raw_remove_source( $r_args->{'tag'} );
     }
     else {
-        $self->_log_data( 'remove_source:' . $args{'tag'} );
+        $Data::Dumper::Indent = 0;
+        $self->_log_data( 'remove_source:' . Dumper( $r_args ) );
     }
 
     return;
@@ -141,13 +141,14 @@ sub _log_remove_source {
 
 sub _log_add_option {
     my $self        = shift;
-    my %args        = @_;
+    my $r_args      = shift;
 
-    if ( defined( $args{'parse'} ) ) {
-        $self->_raw_add_option( $args{'tag'} );
+    if ( defined( $r_args->{'parse'} ) ) {
+        $self->_raw_add_option( $r_args->{'tag'} );
     }
     else {
-        $self->_log_data( 'add_option:' . $args{'tag'} );
+        $Data::Dumper::Indent = 0;
+        $self->_log_data( 'add_option:' . Dumper( $r_args ) );
     }
 
     return;
@@ -157,13 +158,14 @@ sub _log_add_option {
 
 sub _log_remove_option {
     my $self        = shift;
-    my %args        = @_;
+    my $r_args      = shift;
 
-    if ( defined( $args{'parse'} ) ) {
-        $self->_raw_remove_option( $args{'tag'} );
+    if ( defined( $r_args->{'parse'} ) ) {
+        $self->_raw_remove_option( $r_args->{'tag'} );
     }
     else {
-        $self->_log_data( 'remove_option:' . $args{'tag'} );
+        $Data::Dumper::Indent = 0;
+        $self->_log_data( 'remove_option:' . Dumper( $r_args ) );
     }
 
     return;
@@ -173,13 +175,14 @@ sub _log_remove_option {
 
 sub _log_add_player {
     my $self        = shift;
-    my %args        = @_;
+    my $r_args      = shift;
 
-    if ( defined( $args{'parse'} ) ) {
-        $self->_raw_add_player( $args{'data'} );
+    if ( defined( $r_args->{'parse'} ) ) {
+        $self->_raw_add_player( $r_args->{'player_id'} );
     }
     else {
-        $self->_log_data( 'add_player:' . $args{'player_id'} );
+        $Data::Dumper::Indent = 0;
+        $self->_log_data( 'add_player:' . Dumper( $r_args ) );
     }
 
     return;
@@ -189,13 +192,14 @@ sub _log_add_player {
 
 sub _log_remove_player {
     my $self        = shift;
-    my %args        = @_;
+    my $r_args      = shift;
 
-    if ( defined( $args{'parse'} ) ) {
-        $self->_raw_remove_player( $args{'data'} );
+    if ( defined( $r_args->{'parse'} ) ) {
+        $self->_raw_remove_player( $r_args->{'player_id'} );
     }
     else {
-        $self->_log_data( 'remove_player:' . $args{'player_id'} );
+        $Data::Dumper::Indent = 0;
+        $self->_log_data( 'remove_player:' . Dumper( $r_args ) );
     }
 
     return;
@@ -205,13 +209,67 @@ sub _log_remove_player {
 
 sub _log_begin {
     my $self        = shift;
-    my %args        = @_;
+    my $r_args      = shift; $r_args = {}                       unless defined( $r_args );
 
-    if ( defined( $args{'parse'} ) ) {
+    if ( defined( $r_args->{'parse'} ) ) {
         $self->_raw_begin();
     }
     else {
+        $Data::Dumper::Indent = 0;
         $self->_log_data( 'begin' );
+    }
+
+    return;
+}
+
+#############################################################################
+
+sub _log_player_order {
+    my $self        = shift;
+    my $r_args      = shift;
+
+    if ( defined( $r_args->{'parse'} ) ) {
+        $self->_raw_set_player_order( @{ $r_args->{'player_order'} } );
+    }
+    else {
+        $Data::Dumper::Indent = 0;
+        $self->_log_data( 'player_order:' . Dumper( $r_args ) );
+    }
+
+    return;
+}
+
+#############################################################################
+
+sub _log_tile_stack {
+    my $self        = shift;
+    my $r_args      = shift;
+
+    if ( defined( $r_args->{'parse'} ) ) {
+        $self->_raw_create_tile_stack( $r_args->{'stack_id'}, @{ $r_args->{'values'} } );
+    }
+
+    else {
+        $Data::Dumper::Indent = 0;
+        $self->_log_data( 'tile_stack:' . Dumper( $r_args ) );
+    }
+
+    return;
+}
+
+#############################################################################
+
+sub _log_development_stack {
+    my $self        = shift;
+    my $r_args      = shift;
+
+    if ( defined( $r_args->{'parse'} ) ) {
+        $self->_raw_create_development_stack( @{ $r_args->{'values'} } );
+    }
+
+    else {
+        $Data::Dumper::Indent = 0;
+        $self->_log_data( 'development_stack:' . Dumper( $r_args ) );
     }
 
     return;

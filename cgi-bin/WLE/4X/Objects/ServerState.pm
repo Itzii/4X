@@ -3,8 +3,15 @@ package WLE::4X::Objects::Server;
 use strict;
 use warnings;
 
-use WLE::4X::Methods::Simple;
 
+#############################################################################
+
+sub _does_log_exist {
+    my $self        = shift;
+    my $log_id      = shift;
+
+    return ( -e $self->_state_file( $log_id ) );
+}
 
 #############################################################################
 
@@ -157,12 +164,7 @@ sub _read_state {
     # tiles
 #    print STDERR "\n  tiles ... ";
 
-    $self->{'TILE_STACK_1'} = $VAR1->{'TILE_STACK_1'};
-    $self->{'TILE_STACK_2'} = $VAR1->{'TILE_STACK_2'};
-    $self->{'TILE_STACK_3'} = $VAR1->{'TILE_STACK_3'};
-
     $self->{'TILES'} = {};
-
     $self->{'BOARD'} = $VAR1->{'BOARD'};
 
 #    print STDERR "\nReading Tiles ... ";
@@ -182,10 +184,12 @@ sub _read_state {
         }
     }
 
+    $self->{'TILE_STACKS'} = $VAR1->{'TILE_STACKS'};
+
     # developments
 #    print STDERR "\n  developments ... ";
 
-    $self->{'DEVELOPMENTS'} = [];
+    $self->{'DEVELOPMENTS'} = {};
 
     foreach my $dev_key ( keys( %{ $VAR1->{'DEVELOPMENTS'} } ) ) {
 
@@ -196,9 +200,14 @@ sub _read_state {
         );
 
         if ( defined( $development ) ) {
-            push( @{ $self->{'DEVELOPMENTS'} }, $development );
+            $self->{'DEVELOPMENTS'}->{ $dev_key } = $development;
         }
     }
+
+    $self->{'DEVELOPMENT_STACK'} = [ @{ $VAR1->{'DEVELOPMENT_STACK'} } ];
+
+
+    # settings
 
     $self->{'SETTINGS'} = $VAR1->{'SETTINGS'};
 
@@ -308,9 +317,7 @@ sub _save_state {
             $self->{'TILES'}->{ $key }->to_hash( $data{'TILES'}->{ $key } );
         }
 
-        $data{'TILE_STACK_1'} = $self->{'TILE_STACK_1'};
-        $data{'TILE_STACK_2'} = $self->{'TILE_STACK_2'};
-        $data{'TILE_STACK_3'} = $self->{'TILE_STACK_3'};
+        $data{'TILE_STACKS'} = $self->{'TILE_STACKS'};
 
         $data{'BOARD'} = {};
         $self->{'BOARD'}->to_hash( $data{'BOARD'} );
@@ -318,12 +325,13 @@ sub _save_state {
         # developments
 
         my @developments = ();
-        foreach my $development ( @{ $self->{'DEVELOPMENTS'} } ) {
-            my $dev_hash = {};
-            $development->to_hash( $dev_hash );
-            push( @developments, $dev_hash );
+        foreach my $key ( keys( %{ $self->{'DEVELOPMENTS'} } ) ) {
+            my %dev_hash = ();
+            $self->{'DEVELOPMENTS'}->{ $key }->to_hash( \%dev_hash );
+            $data{'DEVELOPMENTS'}->{ $key } = \%dev_hash;
         }
-        $data{'DEVELOPMENTS'} = \@developments;
+
+        $data{'DEVELOPMENT_STACK'} = [ $self->{'DEVELOPMENT_STACK'} ];
 
         # ship templates
 #        print STDERR "\n saving ship_templates ... ";

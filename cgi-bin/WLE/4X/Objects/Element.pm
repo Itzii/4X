@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 
-use WLE::4X::Methods::Simple;
+use WLE::Methods::Simple;
 
 #############################################################################
 # constructor args

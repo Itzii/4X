@@ -4,8 +4,7 @@ use strict;
 use warnings;
 
 
-use WLE::4X::Methods::Simple;
-
+use parent 'WLE::4X::Objects::Element';
 #############################################################################
 # constructor args
 #

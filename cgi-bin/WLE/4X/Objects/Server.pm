@@ -8,7 +8,7 @@ use Fcntl ':flock';
 #use Storable qw(nstore store_fd nstore_fd freeze thaw dclone);
 #use XML::Bare;
 
-use WLE::4X::Methods::Simple;
+use WLE::Methods::Simple;
 
 use WLE::4X::Objects::MetaActions;
 use WLE::4X::Objects::RawActions;
@@ -85,7 +85,8 @@ sub _init {
     $self->{'ENV'}->{'DIR_STATE_FILES'} =~ s{ /$ }{}xs;
     $self->{'ENV'}->{'DIR_LOG_FILES'} =~ s{ /$ }{}xs;
 
-    $self->{'ENV'}->{'CURRENT_USER'} = '';
+    $self->{'ENV'}->{'CURRENT_USER'} = -1;
+    $self->{'ENV'}->{'LOG_ID'} = '';
 
 
     unless ( -e $self->_file_resources() ) {
@@ -125,6 +126,84 @@ sub _init {
 
 
     return $self;
+}
+
+#############################################################################
+
+sub do {
+    my $self        = shift;
+    my %args        = @_;
+
+    unless ( defined( $args{'action'} ) ) {
+        return ( 'success' => 0, 'message' => "Missing 'action' element." );
+    }
+
+    unless ( defined( $args{'log_id'} ) ) {
+        return ( 'success' => 0, 'message' => "Missing 'log_id' element.")
+    }
+
+    unless ( defined( $args{'user'} ) ) {
+        return ( 'success' => 0, 'message' => "Missing 'user' element." );
+    }
+
+    $self->{'ENV'}->{'CURRENT_USER'} = -1;
+    my $user_id = 0;
+    foreach my $player_id ( $self->player_ids() ) {
+        if ( $args{'user'} eq $player_id ) {
+            $self->{'ENV'}->{'CURRENT_USER'} = $user_id;
+        }
+        $user_id++;
+    }
+
+    my $action = lc( $args{'action'} );
+    delete( $args{'action'} );
+
+    my %actions = (
+
+        'status'            => { 'flag_prestart' => 0, 'flag_owner_only' => 0, 'flag_player_phase' => 0, 'method' => \&status },
+
+        'create_game'       => { 'flag_prestart' => 0, 'flag_owner_only' => 0, 'flag_player_phase' => 0, 'method' => \&action_create_game },
+        'add_source'        => { 'flag_prestart' => 1, 'flag_owner_only' => 1, 'flag_player_phase' => 0, 'method' => \&action_add_source },
+        'remove_source'     => { 'flag_prestart' => 1, 'flag_owner_only' => 1, 'flag_player_phase' => 0, 'method' => \&action_remove_source },
+        'add_option'        => { 'flag_prestart' => 1, 'flag_owner_only' => 1, 'flag_player_phase' => 0, 'method' => \&action_add_option },
+        'remove_option'     => { 'flag_prestart' => 1, 'flag_owner_only' => 1, 'flag_player_phase' => 0, 'method' => \&action_remove_option },
+        'add_player'        => { 'flag_prestart' => 1, 'flag_owner_only' => 1, 'flag_player_phase' => 0, 'method' => \&action_add_player },
+        'remove_player'     => { 'flag_prestart' => 1, 'flag_owner_only' => 1, 'flag_player_phase' => 0, 'method' => \&action_remove_player },
+        'begin'             => { 'flag_prestart' => 1, 'flag_owner_only' => 1, 'flag_player_phase' => 0, 'method' => \&action_begin },
+
+
+
+    );
+
+    unless ( defined( $actions{ $action } ) ) {
+        return ( 'success' => 0, 'message' => "Invalid 'action' element." );
+    }
+
+    if ( $actions{ $action }->{'flag_prestart'} && $self->status() ne '0' ) {
+        return ( 'success' => 0, 'message' => 'Unable to perform action on game in progress.' );
+    }
+
+    if ( $actions{ $action }->{'flag_owner_only'} && $self->user_is_owner() == 0 )  {
+        return ( 'success' => 0, 'message' => 'Action is allowed by game owner only.' );
+    }
+
+    if ( $actions{ $action }->{'flag_player_phase'} ) {
+        my $waiting_on = $self->waiting_on_player_id();
+
+        if ( $waiting_on == -1 || ( $waiting_on > -1 && $waiting_on != $self->current_user() ) ) {
+            return ( 'success' => 0, 'message' => 'Action is not allowed by this player at this time.' );
+        }
+    }
+
+    my %response = (
+        'success' => 0,
+        'message' => '',
+    );
+
+    $response{'success'} = $actions{ $action }->{'method'}->( $self, %args );
+    $response{'message'} = $self->last_error();
+
+    return %response;
 }
 
 #############################################################################
@@ -190,7 +269,7 @@ sub current_user {
 sub user_is_owner {
     my $self        = shift;
 
-    return ( $self->current_user() eq $self->_owner_id() );
+    return ( $self->current_user() == 0 );
 }
 
 #############################################################################
@@ -236,6 +315,14 @@ sub status_parts {
     my $self        = shift;
 
     return split( /:/, $self->status() );
+}
+
+#############################################################################
+
+sub waiting_on_player_id {
+    my $self        = shift;
+
+    return ( $self->status_parts() )[ 1 ];
 }
 
 #############################################################################
@@ -311,35 +398,6 @@ sub _set_log_id {
 
 #############################################################################
 
-sub _owner_id {
-    my $self        = shift;
-
-    return $self->{'SETTINGS'}->{'OWNER_ID'};
-}
-
-#############################################################################
-
-sub _set_owner_id {
-    my $self        = shift;
-    my $value       = shift;
-
-    if ( defined( $value ) ) {
-        if ( looks_like_number( $value ) ) {
-            $self->{'SETTINGS'}->{'OWNER_ID'} = $value;
-            return 1;
-        }
-    }
-    else {
-        $self->set_error( 'Missing Owner ID' );
-        return 0;
-    }
-
-    $self->set_error( 'Invalid Owner ID: ' . $value );
-    return 0;
-}
-
-#############################################################################
-
 sub _file_resources {
     my $self        = shift;
 
@@ -374,83 +432,10 @@ sub _log_file {
 
 sub _state_file {
     my $self        = shift;
+    my $log_id      = shift; $log_id = $self->log_id()          unless ( defined( $log_id ) );
 
-    return $self->_dir_state_files() . '/' . $self->log_id() . '.state';
+    return $self->_dir_state_files() . '/' . $log_id . '.state';
 }
-
-#############################################################################
-
-sub do {
-    my $self        = shift;
-    my %args        = @_;
-
-    unless ( defined( $args{'action'} ) ) {
-        return ( 'success' => 0, 'message' => "Missing 'action' element" );
-    }
-
-    unless ( defined( $args{'user'} ) ) {
-        return ( 'success' => 0, 'message' => "Missing 'user' element" );
-    }
-
-    my $action = lc( $args{'action'} );
-    delete( $args{'action'} );
-
-    my %actions = (
-
-        'status'    => { 'flag_prestart' => 0, 'flag_owner_only' => 0, 'flag_player_phase' => 0, 'method' => \&status },
-
-
-
-    );
-
-    unless ( defined( $actions{ $action } ) ) {
-        return ( 'success' => 0, 'message' => "Invalid 'action' element." );
-    }
-
-    if ( $actions{ $action }->{'flag_prestart'} && $self->status() ne '0' ) {
-        return ( 'success' => 0, 'message' => 'Unable to perform action on game in progress.' );
-    }
-
-    if ( $actions{ $action }->{'flag_owner_only'} && $self->user_is_owner() == 0 )  {
-        return ( 'success' => 0, 'message' => 'Action is allowed by game owner only.' );
-    }
-
-
-
-
-    my %response = (
-        'success' => 0,
-        'message' => '',
-    );
-
-
-
-
-
-
-
-    if ( $action eq 'add_source' ) {
-        $response{'success'} = $self->action_add_source( %args );
-        $response{'message'} = $self->last_error();
-        return %response;
-    }
-
-
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 #############################################################################

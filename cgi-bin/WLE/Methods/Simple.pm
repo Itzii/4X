@@ -3,7 +3,7 @@ package WLE::4X::Methods::Simple;
 use strict;
 use warnings;
 
-our @ISA       = qw(Exporter);
+our @ISA       = qw( Exporter );
 our @EXPORT    = qw(
 
     looks_like_number

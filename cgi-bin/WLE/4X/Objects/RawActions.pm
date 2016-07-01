@@ -3,9 +3,6 @@ package WLE::4X::Objects::Server;
 use strict;
 use warnings;
 
-use WLE::4X::Methods::Simple;
-
-
 
 #############################################################################
 
@@ -139,10 +136,6 @@ sub _raw_begin {
         return 0;
     }
 
-    $self->{'PLAYERS_DONE'} = [];
-    $self->{'PLAYERS_PENDING'} = [ 1 .. scalar( $self->player_ids() ) ];
-    shuffle_in_place( $self->{'PLAYERS_PENDING'} );
-
     unless ( $self->has_source( $settings->{'SOURCE_TAG'} ) ) {
         $self->set_error( 'Invalid player count for chosen sources: ' . scalar( $self->player_ids() ) );
         # print STDERR $self->{'LAST_ERROR'};
@@ -150,6 +143,7 @@ sub _raw_begin {
     }
 
     $self->{'TECH_DRAW_COUNT'} = $settings->{'ROUND_TECH_COUNT'};
+
 
 
     # ancient ships
@@ -226,8 +220,6 @@ sub _raw_begin {
         }
     }
 
-    shuffle_in_place( \@tech_bag );
-
     $self->{'TECH_BAG'} = \@tech_bag;
 
     # draw beginning tech tiles
@@ -252,8 +244,6 @@ sub _raw_begin {
             }
         }
     }
-
-    shuffle_in_place( $self->{'VP_BAG'} );
 
     # discoveries
 #    print STDERR "\n  discoveries ... ";
@@ -285,8 +275,6 @@ sub _raw_begin {
             }
         }
     }
-
-    shuffle_in_place( \@discovery_bag );
 
     $self->{'DISCOVERY_BAG'} = \@discovery_bag;
 
@@ -341,25 +329,23 @@ sub _raw_begin {
         }
     }
 
-    shuffle_in_place( $self->{'TILE_STACK_1'} );
-    shuffle_in_place( $self->{'TILE_STACK_2'} );
-    shuffle_in_place( $self->{'TILE_STACK_3'} );
-
-    foreach my $count ( 2 .. 3 ) {
+    foreach my $count ( 1 .. 3 ) {
         if ( defined( $settings->{'SECTOR_LIMIT_' . $count } ) ) {
             if ( looks_like_number( $settings->{'SECTOR_LIMIT_' . $count } ) ) {
-                while ( scalar( @{ $self->{'TILE_STACK_' . $count } } ) > $settings->{'SECTOR_LIMIT_' . $count } ) {
-                    my $tag = shift( @{ $self->{'TILE_STACK_' . $count} } );
-                    delete( $self->{'TILES'}->{ $tag } );
-                }
+                $self->{'SETTINGS'}->{'TILE_STACK_LIMIT_' . $count } = $settings->{'SECTOR_LIMIT_' . $count };
             }
         }
     }
 
+
     # developments
 #    print STDERR "\n  developments ... ";
 
-    my @developments = ();
+    $self->{'DEVELOPMENTS'} = {};
+    $self->{'SETTINGS'}->{'DEVELOPMENT_LIMIT'} = -1;
+    if ( looks_like_number( $settings->{'DEVELOPMENTS'} ) ) {
+        $self->{'SETTINGS'}->{'DEVELOPMENT_LIMIT'} = $settings->{'DEVELOPMENTS'};
+    }
 
     foreach my $dev_key ( keys( %{ $VAR1->{'DEVELOPMENTS'} } ) ) {
 
@@ -375,21 +361,11 @@ sub _raw_begin {
                     $development->required_option() eq ''
                     || matches_any( $development->required_option(), $self->option_tags() )
                 ) {
-                    push( @developments, $development );
+                    $self->{'DEVELOPMENTS'}->{ $dev_key } = $development;
                 }
             }
         }
     }
-
-    shuffle_in_place( \@developments );
-
-    if ( looks_like_number( $settings->{'DEVELOPMENTS'} ) ) {
-        while ( scalar( @developments ) > $settings->{'DEVELOPMENTS'} ) {
-            shift( @developments );
-        }
-    }
-
-    $self->{'DEVELOPMENTS'} = \@developments;
 
     # ship templates
 
@@ -446,11 +422,45 @@ sub _raw_begin {
         }
     }
 
+    return;
+}
 
-    $self->{'SETTINGS'}->{'STATUS'} = '0:' . $self->{'PLAYERS_PENDING'}->[ 0 ];
+#############################################################################
+
+sub _raw_set_player_order {
+    my $self            = shift;
+    my @new_order_ids   = @_;
+
+    $self->{'SETTINGS'}->{'PLAYERS_DONE'} = [];
+    $self->{'SETTINGS'}->{'PLAYERS_PENDING'} = [ @new_order_ids ];
 
     return;
 }
+
+#############################################################################
+
+sub _raw_create_tile_stack {
+    my $self            = shift;
+    my $stack_id        = shift;
+    my @values          = shift;
+
+    $self->{'TILE_STACKS'}->{ $stack_id }->{'DRAW'} = [ @values ];
+    $self->{'TILE_STACKS'}->{ $stack_id }->{'DISCARD'} = [];
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_create_development_stack {
+    my $self            = shift;
+    my @values          = shift;
+
+    $self->{'DEVELOPMENT_STACK'} = [ @values ];
+
+    return;
+}
+
 
 
 #############################################################################

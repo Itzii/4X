@@ -3,6 +3,7 @@ package WLE::4X::Objects::Server;
 use strict;
 use warnings;
 
+use WLE::4X::Enums::Basic;
 
 #############################################################################
 
@@ -475,22 +476,97 @@ sub _raw_select_race_and_location {
     my $location_y      = shift;
     my $warp_gates      = shift;
 
-    $self->races()->{ $race_tag }->set_owner_id( $self->current_user() );
+    my $race = $self->races()->{ $race_tag };
+
+    $race->set_owner_id( $self->current_user() );
 
     unless ( $self->has_option( 'all_races' ) ) {
-        my $backing_race = $self->races()->{ $race_tag }->excludes();
-        delete ( $self->races()->{ $race_tag } );
+        my $backing_race = $race->excludes();
+        delete ( $self->races()->{ $backing_race } );
     }
 
+    my $start_hex_tag = $race->home();
+
+    my $start_hex = $self->tiles()->{ $start_hex_tag };
+
+    $start_hex->set_warps( $warp_gates );
+
+    $self->server()->board()->place_tile( $location_x, $location_y, $start_hex_tag );
+
+    $self->_raw_influence_tile( $race_tag, $start_hex_tag );
 
 
+    # place cubes on available spots
 
+    my @types = (
+        [ $RES_SCIENCE, 'tech_advanced_labs' ],
+        [ $RES_MONEY, 'tech_advanced_economy' ],
+        [ $RES_MINERALS, 'tech_advanced_mining' ],
+    );
 
+    foreach my $type ( @types ) {
+        my $open_slots = $start_hex->available_resource_spots( $type->[ 0 ], 0 );
+
+        while ( $open_slots > 0 ) {
+            $self->_raw_place_cube_on_tile( $race_tag, $start_hex_tag, $type->[ 0 ], 0 );
+        }
+
+        if ( $race->has_technology( $type->[ 1 ] ) ) {
+            $open_slots = $start_hex->available_resource_spots( $type->[ 0 ], 1 );
+
+            while ( $open_slots > 0 ) {
+                $race->remove_cube( $type->[ 0 ] );
+                $self->_raw_place_cube_on_tile( $race_tag, $start_hex_tag, $type->[ 0 ], 1 );
+            }
+        }
+    }
+
+    # build and place initial ships
+
+    foreach my $ship_class ( $race->starting_ships() ) {
+        my $ship = $race->create_ship_of_class( $ship_class );
+
+        if ( defined( $ship ) ) {
+            push( @{ $start_hex->ships() }, $ship->tag() );
+        }
+    }
 
     return;
-
-
 }
+
+#############################################################################
+
+sub _raw_place_cube_on_tile {
+    my $self            = shift;
+    my $race_tag        = shift;
+    my $tile_tag        = shift;
+    my $type            = shift;
+    my $flag_advanced   = shift; $flag_advanced = 0             unless defined( $flag_advanced );
+
+    my $race = $self->races()->{ $race_tag };
+    my $tile = $self->tiles()->{ $tile_tag };
+
+    $tile->add_cube( $race->owner_id(), $type, $flag_advanced );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_influence_tile {
+    my $self        = shift;
+    my $race_tag    = shift;
+    my $tile_tag    = shift;
+
+    my $race = $self->races()->{ $race_tag };
+
+    $race->remove_cube( $RES_INFLUENCE );
+
+    $self->tiles()->{ $tile_tag }->set_owner_id( $race->owner_id() );
+
+    return;
+}
+
 
 #############################################################################
 #############################################################################

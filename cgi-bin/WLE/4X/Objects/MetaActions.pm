@@ -461,9 +461,7 @@ sub action_select_race_and_location {
         $self->{'SETTINGS'}->{'STATUS'} = '0:' . $self->waiting_on_player_id();
     }
     else {
-
-
-        $self->{'SETTINGS'}->{'STATUS'} = '1:' .
+        $self->start_next_round();
     }
 
 

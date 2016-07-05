@@ -3,6 +3,7 @@ package WLE::4X::Objects::Tile;
 use strict;
 use warnings;
 
+use WLE::4X::Enums::Basic;
 
 use parent 'WLE::4X::Objects::Element';
 
@@ -49,6 +50,8 @@ sub _init {
     $self->{'ANCIENTS'} = 0;
     $self->{'GCDS'} = 0;
     $self->{'DESTROYER'} = 0;
+
+    $self->{'SHIPS'} = [];
 
 
     $self->{'RESOURCE_SLOTS'} = [];
@@ -169,6 +172,146 @@ sub destroyer_count {
 
 #############################################################################
 
+sub warps {
+    my $self        = shift;
+
+    return $self->{'WARPS'};
+}
+
+#############################################################################
+
+sub set_warps {
+    my $self        = shift;
+    my $values      = shift;
+
+    $self->{'WARPS'} = $values;
+
+    return;
+}
+
+#############################################################################
+
+sub ships {
+    my $self        = shift;
+
+    return @{ $self->{'SHIPS'} };
+}
+
+#############################################################################
+
+sub available_resource_spots {
+    my $self            = shift;
+    my $res_type        = shift;
+    my $flag_advanced   = shift; $flag_advanced = 0             unless defined( $flag_advanced );
+
+    my $type_text = text_from_resource_enum( $res_type );
+
+    my $count = 0;
+
+    foreach my $slot ( @{ $self->{'RESOURCE_SLOTS'} } ) {
+        unless ( $slot->{'TYPE'} eq $type_text ) {
+            next;
+        }
+
+        if ( $flag_advanced ) {
+            unless ( defined( $slot->{'ADVANCED'} ) ) {
+                next;
+            }
+            unless ( $slot->{'ADVANCED'} eq '1' ) {
+                next;
+            }
+        }
+
+        if ( defined( $slot->{'OWNER'} ) ) {
+            unless ( $slot->{'OWNER'} eq '-1' ) {
+                next;
+            }
+        }
+
+        $count++;
+    }
+
+    return $count;
+}
+
+#############################################################################
+
+sub add_cube {
+    my $self            = shift;
+    my $owner_id        = shift;
+    my $type_enum       = shift;
+    my $flag_advanced   = shift;
+
+    my $type_text = text_from_resource_enum( $type_enum );
+
+    foreach my $slot ( @{ $self->{'RESOURCE_SLOTS'} } ) {
+        unless ( $slot->{'TYPE'} eq $type_text ) {
+            next;
+        }
+
+        if ( $flag_advanced ) {
+            unless ( defined( $slot->{'ADVANCED'} ) ) {
+                next;
+            }
+            unless ( $slot->{'ADVANCED'} eq '1' ) {
+                next;
+            }
+        }
+
+        if ( defined( $slot->{'OWNER'} ) ) {
+            unless ( $slot->{'OWNER'} eq '-1' ) {
+                next;
+            }
+        }
+
+        $slot->{'OWNER'} = $owner_id;
+        return 1;
+    }
+
+    return 0;
+}
+
+#############################################################################
+
+sub remove_cube {
+    my $self            = shift;
+    my $type_enum       = shift;
+    my $flag_advanced   = shift;
+
+    my $type_text = text_from_resource_enum( $type_enum );
+
+    foreach my $slot ( @{ $self->{'RESOURCE_SLOTS'} } ) {
+        unless ( $slot->{'TYPE'} eq $type_text ) {
+            next;
+        }
+
+        if ( $flag_advanced ) {
+            unless ( defined( $slot->{'ADVANCED'} ) ) {
+                next;
+            }
+            unless ( $slot->{'ADVANCED'} eq '1' ) {
+                next;
+            }
+        }
+
+        unless ( defined( $slot->{'OWNER'} ) ) {
+            $slot->{'OWNER'} = -1;
+            return 1;
+        }
+
+        if ( $slot->{'OWNER'} eq '-1' ) {
+            next;
+        }
+
+        $slot->{'OWNER'} = -1;
+        return 1;
+    }
+
+    return 0;
+}
+
+#############################################################################
+
 sub has_warp_on_side {
     my $self        = shift;
     my $direction   = shift;
@@ -259,6 +402,14 @@ sub from_hash {
         }
     }
 
+    my @ships = ();
+
+    if ( defined( $r_hash->{'SHIPS'} ) ) {
+        @ships = @{ $r_hash->{'SHIPS'} };
+    }
+
+    $self->{'SHIPS'} = \@ships;
+
     return 1;
 }
 
@@ -278,7 +429,7 @@ sub to_hash {
 
     $r_hash->{'STACK'} = $self->{'STACK'};
 
-    foreach my $tag ( 'VP', 'ANCIENT_LINK', 'HIVE', 'DISCOVERY', 'ORBITAL', 'MONOLITH', 'ANCIENTS', 'GCDS', 'DESTROYER' ) {
+    foreach my $tag ( 'VP', 'ANCIENT_LINK', 'HIVE', 'DISCOVERY', 'ORBITAL', 'MONOLITH', 'ANCIENTS', 'GCDS', 'DESTROYER', 'SHIPS' ) {
         $r_hash->{ $tag } = $self->{ $tag };
     }
 

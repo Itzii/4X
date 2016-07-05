@@ -52,10 +52,22 @@ sub _init {
 
 #############################################################################
 
+sub create_from_template {
+    my $self        = shift;
+    my $owner_id    = shift;
+    my $template    = shift;
+
+    $self->set_owner_id( $owner_id );
+
+    $self->{'TEMPLATE_TAG'} = $template->tag();
+}
+
+#############################################################################
+
 sub template {
     my $self        = shift;
 
-    return $self->templates( $self->{'TEMPLATE_TAG'} );
+    return $self->server()->templates( $self->{'TEMPLATE_TAG'} );
 }
 
 #############################################################################

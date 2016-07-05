@@ -16,6 +16,8 @@ my %actions = (
     'development_stack' => \&_log_development_stack,
     'status'            => \&_log_status,
 
+    'influence_tile'    => \&_log_influence_tile,
+
 );
 
 
@@ -287,6 +289,22 @@ sub _log_status {
     }
     else {
         $self->_log_data( 'status:' . Dumper( $r_args ) );
+    }
+
+    return;
+}
+
+#############################################################################
+
+sub _log_influence_tile {
+    my $self        = shift;
+    my $r_args      = shift;
+
+    if ( defined( $r_args->{'parse'} ) ) {
+        $self->_raw_influence_tile( $r_args->{'race_tag'}, $r_args->{'tile_tag'} );
+    }
+    else {
+        $self->_log_data( 'influence_tile:' . Dumper( $r_args ) );
     }
 
     return;

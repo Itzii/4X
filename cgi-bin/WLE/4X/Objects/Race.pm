@@ -3,6 +3,7 @@ package WLE::4X::Objects::Race;
 use strict;
 use warnings;
 
+use WLE::4X::Enums::Basic;
 
 use parent 'WLE::4X::Objects::Element';
 #############################################################################
@@ -37,6 +38,7 @@ sub _init {
 
     $self->{'COLONY_COUNT'} = 3;
     $self->{'EXCHANGE'} = 2;
+    $self->{'SHIP_INDEX'} = 1;
 
     $self->{'ACTIONS'} = {
         'EXPLORE' => 1,
@@ -55,10 +57,22 @@ sub _init {
     };
 
     $self->{'TRACKS'} = {
-        'INFLUENCE' => [ -30, -25, -21, -17, -13, -10, -7, -5, -3, -2, -1, 0, 0 ],
-        'MONEY' => [ 28, 24, 21, 18, 15, 12, 10, 8, 6, 4, 3, 2 ],
-        'SCIENCE' => [ 28, 24, 21, 18, 15, 12, 10, 8, 6, 4, 3, 2 ],
-        'MINERALS' => [ 28, 24, 21, 18, 15, 12, 10, 8, 6, 4, 3, 2 ],
+        'INFLUENCE' => {
+            'PROGRESSION' => [ -30, -25, -21, -17, -13, -10, -7, -5, -3, -2, -1, 0, 0, 0 ],
+            'COUNT' => 13,
+        },
+        'MONEY' => {
+            'PROGRESSION' => [ 28, 24, 21, 18, 15, 12, 10, 8, 6, 4, 3, 2, 0 ],
+            'COUNT' => 11,
+        },
+        'SCIENCE' => {
+            'PROGRESSION' => [ 28, 24, 21, 18, 15, 12, 10, 8, 6, 4, 3, 2, 0 ],
+            'COUNT' => 11,
+        },
+        'MINERALS' => {
+            'PROGRESSION' => [ 28, 24, 21, 18, 15, 12, 10, 8, 6, 4, 3, 2, 0 ],
+            'COUNT' => 11,
+        },
     };
 
     $self->{'TECH'} = {
@@ -105,95 +119,10 @@ sub _init {
 
 #############################################################################
 
-sub server {
+sub home_tile {
     my $self        = shift;
 
-    return $self->{'SERVER'};
-}
-
-#############################################################################
-
-sub tag {
-    my $self        = shift;
-
-    return $self->{'TAG'};
-}
-
-#############################################################################
-
-sub source_tag {
-    my $self        = shift;
-
-    return $self->{'SOURCE_TAG'};
-}
-
-#############################################################################
-
-sub long_name {
-    my $self        = shift;
-
-    return $self->{'LONG_NAME'};
-}
-
-#############################################################################
-
-sub owner_id {
-    my $self        = shift;
-
-    return $self->{'OWNER_ID'};
-}
-
-#############################################################################
-
-sub set_owner_id {
-    my $self        = shift;
-    my $value       = shift;
-
-    $self->{'OWNER_ID'} = $value;
-}
-#############################################################################
-
-sub required_option {
-    my $self        = shift;
-
-    return $self->{'REQUIRED_OPTION'};
-}
-
-#############################################################################
-
-sub count {
-    my $self        = shift;
-
-    return $self->{'COUNT'};
-}
-
-#############################################################################
-
-sub provides {
-    my $self        = shift;
-
-    return @{ $self->{'PROVIDES'} };
-}
-
-#############################################################################
-
-sub does_provide {
-    my $self        = shift;
-    my $value       = shift;
-
-    if ( $value eq '' ) {
-        return 1;
-    }
-
-    return matches_any( $value, $self->provides() );
-}
-
-#############################################################################
-
-sub type {
-    my $self        = shift;
-
-    return $self->{'TYPE'};
+    return $self->{'HOME'};
 }
 
 #############################################################################
@@ -202,6 +131,175 @@ sub excludes {
     my $self        = shift;
 
     return $self->{'EXCLUDE_RACE'};
+}
+
+#############################################################################
+
+sub starting_ships {
+    my $self        = shift;
+
+    return @{ $self->{'STARTING_SHIPS'} };
+}
+
+#############################################################################
+
+sub template_of_class {
+    my $self        = shift;
+    my $class       = shift;
+
+    foreach my $template_tag ( $self->{'SHIP_TEMPLATES'} ) {
+        my $template = $self->server()->templates()->{ $template_tag };
+
+        if ( defined( $template ) ) {
+            if ( $template->class() eq $class ) {
+                return $template;
+            }
+        }
+    }
+
+    return undef;
+}
+
+#############################################################################
+
+sub create_ship_of_class {
+    my $self        = shift;
+    my $class       = shift;
+
+    my $template = $self->template_of_class( $class );
+
+    unless ( defined( $template ) ) {
+        return undef;
+    }
+
+    my $ship = WLE::4X::Objects::Ship->new( 'server' => $self->server() );
+
+    $ship->create_from_template( $self->owner_id(), $template );
+
+    $ship->set_tag( 'ship_' . $self->owner_id() . '_' . $self->{'SHIP_INDEX'} );
+
+    $self->{'SHIP_INDEX'}++;
+
+    $self->server()->ships()->{ $ship->tag() } = $ship;
+
+    return $ship;
+}
+
+#############################################################################
+
+sub cube_count {
+    my $self        = shift;
+    my $type_enum   = shift;
+
+    my $type_text = text_from_resource_enum( $type_enum );
+
+    if ( $type_text == $RES_UNKNOWN ) {
+        return 0;
+    }
+
+    unless ( defined( $self->{'TRACKS'}->{ $type_text } ) ) {
+        return 0;
+    }
+
+    return $self->{'TRACKS'}->{ $type_text }->{'COUNT'};
+}
+
+#############################################################################
+
+sub cube_count_is_max {
+    my $self        = shift;
+    my $type_enum   = shift;
+
+    my $type_text = text_from_resource_enum( $type_enum );
+
+    if ( $type_text == $RES_UNKNOWN ) {
+        return 1;
+    }
+
+    unless ( defined( $self->{'TRACKS'}->{ $type_text } ) ) {
+        return 1;
+    }
+
+    my $max = scalar( @{ $self->{'TRACKS'}->{ $type_text }->{'PROGRESSION'} } ) - 1;
+    my $current = $self->{'TRACKS'}->{ $type_text }->{'COUNT'};
+
+    return ( $current >= $max );
+}
+
+#############################################################################
+
+sub remove_cube {
+    my $self        = shift;
+    my $type_enum   = shift;
+
+    unless ( $self->cube_count( $type_enum ) > 0 ) {
+        return 0;
+    }
+
+    my $type_text = text_from_resource_enum( $type_enum );
+
+    $self->{'TRACKS'}->{ $type_text }->{'COUNT'} --;
+
+    return 1;
+}
+
+#############################################################################
+
+sub add_cube {
+    my $self        = shift;
+    my $type_enum   = shift;
+
+    if ( $self->cube_count_is_max( $type_enum ) ) {
+        return 0;
+    }
+
+    my $type_text = text_from_resource_enum( $type_enum );
+
+    $self->{'TRACKS'}->{ $type_text }->{'COUNT'} ++;
+
+    return 1;
+}
+
+#############################################################################
+
+sub cube_income {
+    my $self        = shift;
+    my $type_enum   = shift;
+
+    my $type_text = text_from_resource_enum( $type_enum );
+
+    if ( $type_text == $RES_UNKNOWN ) {
+        return 0;
+    }
+
+    unless ( defined( $self->{'TRACKS'}->{ $type_text } ) ) {
+        return 0;
+    }
+
+    return $self->{'TRACKS'}->{ $type_text }->{'PROGRESSION'}->[ $self->{'TRACKS'}->{ $type_text }->{'COUNT'} ];
+}
+
+#############################################################################
+
+sub has_technology {
+    my $self        = shift;
+    my $tech_tag    = shift;
+
+    foreach my $section_tag ( 'MILITARY', 'GRID', 'NANO' ) {
+        if ( defined( $self->{'TECH'}->{ $section_tag }->{'POSSESS'} ) ) {
+            foreach my $race_tech_tag ( @{ $self->{'TECH'}->{ $section_tag }->{'POSSESS'} } ) {
+                my $tech = $self->server()->technology()->{ $race_tech_tag };
+
+                if ( defined( $tech ) ) {
+                    if ( $tech->provides( $tech_tag ) ) {
+                        return 1;
+                    }
+                }
+            }
+        }
+    }
+
+    return 0;
 }
 
 #############################################################################
@@ -230,6 +328,10 @@ sub from_hash {
 
     if ( defined( $r_hash->{'EXCHANGE'} ) ) {
         $self->{'EXCHANGE'} = $r_hash->{'EXCHANGE'};
+    }
+
+    if ( defined( $r_hash->{'SHIP_INDEX'} ) ) {
+        $self->{'SHIP_INDEX'} = $r_hash->{'SHIP_INDEX'};
     }
 
     if ( defined( $r_hash->{'ACTIONS'} ) ) {
@@ -345,7 +447,7 @@ sub to_hash {
         return 0;
     }
 
-    foreach my $tag ( 'HOME', 'EXCLUDE_RACE', 'COLONY_COUNT', 'EXCHANGE', 'COST_ORBITAL', 'COST_MONUMENT' ) {
+    foreach my $tag ( 'HOME', 'EXCLUDE_RACE', 'COLONY_COUNT', 'EXCHANGE', 'COST_ORBITAL', 'COST_MONUMENT', 'SHIP_INDEX' ) {
         $r_hash->{ $tag } = $self->{ $tag };
     }
 

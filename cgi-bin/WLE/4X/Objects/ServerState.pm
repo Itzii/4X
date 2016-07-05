@@ -238,6 +238,23 @@ sub _read_state {
         }
     }
 
+    # ships
+
+    $self->{'SHIPS'} = {};
+
+    foreach my $ship_key ( keys( %{ $VAR1->{'SHIPS'} } ) ) {
+
+        my $ship = WLE::4X::Objects::Ship->new(
+            'server' => $self,
+            'tag' => $ship_key,
+            'hash' => $VAR1->{'SHIPS'}->{ $ship_key },
+        );
+
+        if ( defined( $ship ) ) {
+            $self->{'SHIPS'}->{ $ship->tag() } = $ship;
+        }
+    }
+
 
     # races
 
@@ -354,6 +371,17 @@ sub _save_state {
                 $self->{'SHIP_TEMPLATES'}->{ $template_tag }->to_hash( \%template_hash );
 
                 $data{'SHIP_TEMPLATES'}->{ $template_tag } = \%template_hash;
+            }
+        }
+
+        $data{'SHIPS'} = {};
+        foreach my $ship_tag ( keys( %{ $self->{'SHIPS'} } ) ) {
+
+            if ( defined( $self->{'SHIPS'}->{ $ship_tag } ) ) {
+                my %ship_hash = ();
+                $self->{'SHIPS'}->{ $ship_tag }->to_hash( \%ship_hash );
+
+                $data{'SHIPS'}->{ $ship_tag } = \%ship_hash;
             }
         }
 

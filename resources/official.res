@@ -544,6 +544,12 @@ $VAR1 = {
                 'SCIENCE' => 2,
                 'MINERALS' => 4,
             },
+            'TRACKS' => {
+                'INFLUENCE' => {
+                    'PROGRESSION' => [ -30, -25, -21, -17, -13, -10, -7, -5, -3, -2, -1, 0, 0, 0 ],
+                    'COUNT' => 11,
+                },
+            },
             'TECH' => {
                 'MILITARY' => {
                     'POSSESS' => [ 'tech_plasma_cannon' ],

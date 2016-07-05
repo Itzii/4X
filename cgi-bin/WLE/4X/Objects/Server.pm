@@ -123,6 +123,7 @@ sub _init {
 
     $self->{'RACES'} = {};
     $self->{'SHIP_TEMPLATES'} = {};
+    $self->{'SHIPS'} = {};
 
 
     return $self;
@@ -281,7 +282,17 @@ sub tick_player {
 
     push( @{ $self->{'SETTINGS'}->{'PLAYERS_DONE'} }, $done_player );
 
-    return ( scalar( ) > 0 ) ? 1 : 0;
+    return ( scalar( @{ $self->{'SETTINGS'}->{'PLAYERS_PENDING'} } ) > 0 ) ? 1 : 0;
+}
+
+#############################################################################
+
+sub start_next_round {
+    my $self        = shift;
+
+
+
+
 }
 
 #############################################################################
@@ -363,10 +374,26 @@ sub templates {
 
 #############################################################################
 
+sub ships {
+    my $self        = shift;
+
+    return $self->{'SHIPS'};
+}
+
+#############################################################################
+
 sub ship_components {
     my $self        = shift;
 
     return $self->{'COMPONENTS'};
+}
+
+#############################################################################
+
+sub technology {
+    my $self        = shift;
+
+    return $self->{'TECHNOLOGY'};
 }
 
 #############################################################################

@@ -14,6 +14,7 @@ my %actions = (
     'player_order'      => \&_log_player_order,
     'tile_stack'        => \&_log_tile_stack,
     'development_stack' => \&_log_development_stack,
+    'status'            => \&_log_status,
 
 );
 
@@ -270,6 +271,22 @@ sub _log_development_stack {
     else {
         $Data::Dumper::Indent = 0;
         $self->_log_data( 'development_stack:' . Dumper( $r_args ) );
+    }
+
+    return;
+}
+
+#############################################################################
+
+sub _log_status {
+    my $self        = shift;
+    my $r_args      = shift;
+
+    if ( defined( $r_args->{'parse'} ) ) {
+        $self->{'SETTINGS'}->{'STATUS'} = $r_args->{'status'};
+    }
+    else {
+        $self->_log_data( 'status:' . Dumper( $r_args ) );
     }
 
     return;

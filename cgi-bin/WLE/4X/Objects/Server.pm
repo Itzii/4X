@@ -274,6 +274,18 @@ sub user_is_owner {
 
 #############################################################################
 
+sub tick_player {
+    my $self        = shift;
+
+    my $done_player = shift( @{ $self->{'SETTINGS'}->{'PLAYERS_PENDING'} } );
+
+    push( @{ $self->{'SETTINGS'}->{'PLAYERS_DONE'} }, $done_player );
+
+    return ( scalar( ) > 0 ) ? 1 : 0;
+}
+
+#############################################################################
+
 sub last_error {
     my $self        = shift;
 

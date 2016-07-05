@@ -3,7 +3,7 @@ package WLE::4X::Objects::Server;
 use strict;
 use warnings;
 
-use WLE::Methods::Simple;
+use WLE::Methods::Simple qw( matches_any );
 
 use WLE::4X::Objects::Element;
 use WLE::4X::Objects::ShipComponent;
@@ -87,7 +87,7 @@ sub action_add_source {
         return 0;
     }
 
-    if ( matches_any( $args{'source_tag'}, $self->source_tags() ) ) {
+    if ( WLE::Methods::Simple::matches_any( $args{'source_tag'}, $self->source_tags() ) ) {
         $self->set_error( 'Source Tag Already Exists' );
         return 0;
     }
@@ -334,7 +334,7 @@ sub action_begin {
     # randomize player order
 
     my @new_player_order = ( 0 .. scalar( $self->player_ids() ) - 1 );
-    shuffle_in_place( \@new_player_order );
+    WLE::Methods::Simple::shuffle_in_place( \@new_player_order );
 
     $self->_raw_set_player_order( @new_player_order );
     $self->_log_player_order( { 'player_order' => [ @new_player_order ] } );
@@ -345,7 +345,7 @@ sub action_begin {
 
         my @stack = @{ $self->{'TILE_STACK_' . $count } };
 
-        shuffle_in_place( \@stack );
+        WLE::Methods::Simple::shuffle_in_place( \@stack );
 
         if ( defined( $self->{'SETTINGS'}->{'TILE_STACK_LIMIT_' . $count } ) ) {
             while ( scalar( @stack ) > $self->{'SETTINGS'}->{'TILE_STACK_LIMIT_' . $count } ) {
@@ -364,7 +364,7 @@ sub action_begin {
 
     my @developments = keys( %{ $self->{'DEVELOPMENTS'} } );
 
-    shuffle_in_place( \@developments );
+    WLE::Methods::Simple::shuffle_in_place( \@developments );
 
     if ( $self->{'SETTINGS'}->{'DEVELOPMENT_LIMIT'} > -1 ) {
         while ( scalar( @developments ) > $self->{'SETTINGS'}->{'DEVELOPMENT_LIMIT'} ) {
@@ -373,10 +373,11 @@ sub action_begin {
     }
 
     $self->_raw_create_development_stack( @developments );
-    $self->_log_development_stack( 'values' => \@developments );
+    $self->_log_development_stack( { 'values' => \@developments } );
 
 
-    $self->{'SETTINGS'}->{'STATUS'} = '0:' . $self->{'PLAYERS_PENDING'}->[ 0 ];
+    $self->{'SETTINGS'}->{'STATUS'} = '0:' . $self->{'SETTINGS'}->{'PLAYERS_PENDING'}->[ 0 ];
+    $self->_log_status( { 'status' => $self->{'SETTINGS'}->{'STATUS'} } );
 
     $self->_save_state();
 
@@ -385,6 +386,89 @@ sub action_begin {
     return 1;
 }
 
+#############################################################################
+
+sub action_select_race_and_location {
+    my $self            = shift;
+    my %args            = @_;
+
+    unless ( $self->_open_for_writing( $self->log_id() ) ) {
+        return 0;
+    }
+
+    unless ( defined( $args{'race_tag'} ) ) {
+        $self->set_error( 'Missing Race Tag' );
+        return 0;
+    }
+
+    unless ( defined( $self->races()->{ $args{'race_tag'} } ) ) {
+        $self->set_error( 'Invalid Race Tag' );
+        return 0;
+    }
+
+    if ( $self->races()->{ $args{'race_tag'} }->owner_id() > -1 ) {
+        $self->set_error( 'Race has already been selected.' );
+        return 0;
+    }
+
+    unless (
+        WLE::Methods::Simple::looks_like_number( $args{'location_x'} )
+        && WLE::Methods::Simple::looks_like_number( $args{'location_y'} )
+    ) {
+        $self->set_error( 'Invalid location data.' );
+        return 0;
+    }
+
+    my $valid_location = 0;
+    my $location_warps = undef;
+
+    foreach my $location ( @{ $self->{'STARTING_LOCATIONS'} } ) {
+        my ( $x, $y ) = split( ',', $location->{'SPACE'} );
+
+        if ( $args{'location_x'} == $x && $args{'location_y'} == $y ) {
+            $valid_location = 1;
+            if ( defined( $location->{'WARPS'} ) ) {
+                $location_warps = $location->{'WARPS'};
+            }
+        }
+    }
+
+    unless ( $valid_location ) {
+        $self->set_error( 'Location is not available for starting.' );
+        return 0;
+    }
+
+    unless ( defined( $location_warps ) ) {
+        $location_warps = $args{'warps'};
+    }
+
+    unless ( WLE::Methods::Simple::looks_like_number( $location_warps ) ) {
+        $self->set_error( "Invalid 'warps' argument." );
+        return 0;
+    }
+
+    $self->_raw_select_race_and_location( $args{'race_tag'}, $args{'location_x'}, $args{'location_y'}, $location_warps );
+
+
+
+
+
+
+
+
+
+    if ( $self->tick_player() ) {
+        $self->{'SETTINGS'}->{'STATUS'} = '0:' . $self->waiting_on_player_id();
+    }
+    else {
+
+
+        $self->{'SETTINGS'}->{'STATUS'} = '1:' .
+    }
+
+
+    return 1;
+}
 
 
 #############################################################################

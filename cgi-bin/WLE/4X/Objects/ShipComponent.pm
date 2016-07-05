@@ -160,7 +160,7 @@ sub from_hash {
     }
 
     foreach my $tag ( 'INITIATIVE', 'ENERGY', 'HULL_POINTS', 'COMPUTER', 'MOVEMENT', 'SHIELD', 'ATTACK_COUNT', 'ATTACK_DAMAGE', 'IS_MISSILE' ) {
-        if ( looks_like_number( $r_hash->{ $tag } ) ) {
+        if ( WLE::Methods::Simple::looks_like_number( $r_hash->{ $tag } ) ) {
             $self->{ $tag } = $r_hash->{ $tag };
         }
     }

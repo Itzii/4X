@@ -53,7 +53,7 @@ sub place_tile {
         return 0;
     }
 
-    unless ( looks_like_number( $x_pos ) && looks_like_number( $y_pos ) ) {
+    unless ( WLE::Methods::Simple::looks_like_number( $x_pos ) && WLE::Methods::Simple::looks_like_number( $y_pos ) ) {
         return 0;
     }
 

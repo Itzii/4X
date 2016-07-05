@@ -198,83 +198,10 @@ sub type {
 
 #############################################################################
 
-sub parent_tag {
+sub excludes {
     my $self        = shift;
 
-    return $self->{'PARENT_TAG'};
-}
-
-#############################################################################
-
-sub set_parent_tag {
-    my $self        = shift;
-    my $value       = shift;
-
-    unless ( $value = $self->tag() ) {
-        $self->{'PARENT_TAG'} = $value;
-    }
-
-    return;
-}
-
-#############################################################################
-
-sub child_tags {
-    my $self        = shift;
-
-    return @{ $self->{'CHILD_TAGS'} };
-}
-
-#############################################################################
-
-sub add_child {
-    my $self        = shift;
-    my $tag         = shift;
-    my $position    = shift; $position = -1                 unless defined( $position );
-
-    if ( $tag eq $self->tag() ) {
-        return;
-    }
-
-    if ( matches_any( $tag, $self->child_tags() ) ) {
-        return;
-    }
-
-    if ( $position >= scalar( @{ $self->{'CHILD_TAGS'} } ) ) {
-        $position = -1;
-    }
-
-    if ( $position == 0 ) {
-        unshift( @{ $self->['CHILD_TAGS'] }, $tag );
-        return;
-    }
-
-    if ( $position == -1 ) {
-        push( @{ $self->['CHILD_TAGS'] }, $tag );
-        return;
-    }
-
-    splice( @{ $self->{'CHILD_TAGS'} }, $position, 0, $tag );
-
-    return;
-}
-
-#############################################################################
-
-sub remove_child {
-    my $self        = shift;
-    my $tag         = shift;
-
-    my @children = @{ $self->{'CHILD_TAGS'} };
-    $self->{'CHILD_TAGS'} = [];
-
-    foreach my $child ( @children ) {
-        unless ( $child eq $tag ) {
-            push( @{ $self->{'CHILD_TAGS'} }, $child );
-        }
-    }
-
-    return;
+    return $self->{'EXCLUDE_RACE'};
 }
 
 #############################################################################
@@ -307,7 +234,7 @@ sub from_hash {
 
     if ( defined( $r_hash->{'ACTIONS'} ) ) {
         foreach my $action_tag ( 'EXPLORE', 'INFLUENCE_INF', 'INFLUENCE_COLONY', 'RESEARCH', 'UPGRADE', 'BUILD', 'MOVE' ) {
-            if ( looks_like_number( $r_hash->{'ACTIONS'}->{ $action_tag } ) ) {
+            if ( WLE::Methods::Simple::looks_like_number( $r_hash->{'ACTIONS'}->{ $action_tag } ) ) {
                 $self->{'ACTIONS'}->{ $action_tag } = $r_hash->{'ACTIONS'}->{ $action_tag };
             }
         }
@@ -315,7 +242,7 @@ sub from_hash {
 
     if ( defined( $r_hash->{'RESOURCES'} ) ) {
         foreach my $resource_tag ( 'MONEY', 'SCIENCE', 'MINERALS' ) {
-            if ( looks_like_number( $r_hash->{'ACTIONS'}->{ $resource_tag } ) ) {
+            if ( WLE::Methods::Simple::looks_like_number( $r_hash->{'ACTIONS'}->{ $resource_tag } ) ) {
                 $self->{'RESOURCES'}->{ $resource_tag } = $r_hash->{'RESOURCES'}->{ $resource_tag };
             }
         }
@@ -348,14 +275,14 @@ sub from_hash {
 
     if ( defined( $r_hash->{'VP_SLOTS'} ) ) {
         foreach my $section_tag ( 'AMBASSADOR', 'BATTLE', 'ANY' ) {
-            if ( looks_like_number( $r_hash->{'VP_SLOTS'}->{ $section_tag } ) ) {
+            if ( WLE::Methods::Simple::looks_like_number( $r_hash->{'VP_SLOTS'}->{ $section_tag } ) ) {
                 $self->{'VP_SLOTS'}->{ $section_tag } = $r_hash->{'VP_SLOTS'}->{ $section_tag };
             }
         }
     }
 
     foreach my $tag ( 'COST_ORBITAL', 'COST_MONUMENT' ) {
-        if ( looks_like_number( $r_hash->{ $tag } ) ) {
+        if ( WLE::Methods::Simple::looks_like_number( $r_hash->{ $tag } ) ) {
             $self->{ $tag } = $r_hash->{ $tag };
         }
     }

@@ -84,11 +84,11 @@ sub from_hash {
         $self->{'CATEGORY'} = $r_hash->{'CATEGORY'};
     }
 
-    if ( looks_like_number( $r_hash->{'BASE_COST'} ) ) {
+    if ( WLE::Methods::Simple::looks_like_number( $r_hash->{'BASE_COST'} ) ) {
         $self->{'BASE_COST'} = $r_hash->{'BASE_COST'};
     }
 
-    if ( looks_like_number( $r_hash->{'MIN_COST'} ) ) {
+    if ( WLE::Methods::Simple::looks_like_number( $r_hash->{'MIN_COST'} ) ) {
         $self->{'MIN_COST'} = $r_hash->{'MIN_COST'};
     }
 

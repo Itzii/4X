@@ -1,4 +1,4 @@
-package WLE::4X::Methods::Simple;
+package WLE::Methods::Simple;
 
 use strict;
 use warnings;

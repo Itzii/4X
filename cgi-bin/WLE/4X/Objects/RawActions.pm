@@ -144,6 +144,11 @@ sub _raw_begin {
 
     $self->{'TECH_DRAW_COUNT'} = $settings->{'ROUND_TECH_COUNT'};
 
+    $self->{'STARTING_LOCATIONS'} = $settings->{'POSITIONS'};
+
+
+
+
 
 
     # ancient ships
@@ -461,7 +466,31 @@ sub _raw_create_development_stack {
     return;
 }
 
+#############################################################################
 
+sub _raw_select_race_and_location {
+    my $self            = shift;
+    my $race_tag        = shift;
+    my $location_x      = shift;
+    my $location_y      = shift;
+    my $warp_gates      = shift;
+
+    $self->races()->{ $race_tag }->set_owner_id( $self->current_user() );
+
+    unless ( $self->has_option( 'all_races' ) ) {
+        my $backing_race = $self->races()->{ $race_tag }->excludes();
+        delete ( $self->races()->{ $race_tag } );
+    }
+
+
+
+
+
+
+    return;
+
+
+}
 
 #############################################################################
 #############################################################################

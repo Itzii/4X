@@ -222,7 +222,7 @@ sub from_hash {
 
     foreach my $tag ( 'VP', 'ANCIENT_LINK', 'HIVE', 'DISCOVERY', 'ORBITAL', 'MONOLITH', 'ANCIENTS', 'GCDS', 'DESTROYER' ) {
         if ( defined( $r_hash->{ $tag } ) ) {
-            if ( looks_like_number( $r_hash->{ $tag } ) ) {
+            if ( WLE::Methods::Simple::looks_like_number( $r_hash->{ $tag } ) ) {
                 $self->{ $tag } = $r_hash->{ $tag };
             }
         }
@@ -238,13 +238,13 @@ sub from_hash {
                     if ( defined( $slot->{'TYPE'} ) ) {
                         $local_slot{'TYPE'} = $slot->{'TYPE'};
                     }
-                    if ( looks_like_number( $slot->{'FILLED'} ) ) {
+                    if ( WLE::Methods::Simple::looks_like_number( $slot->{'FILLED'} ) ) {
                         $local_slot{'FILLED'} = $slot->{'FILLED'};
                     }
                     else {
                         $local_slot{'FILLED'} = 0;
                     }
-                    if ( looks_like_number( $slot->{'ADVANCED'} ) ) {
+                    if ( WLE::Methods::Simple::looks_like_number( $slot->{'ADVANCED'} ) ) {
                         $local_slot{'ADVANCED'} = $slot->{'ADVANCED'};
                     }
                     else {

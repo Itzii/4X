@@ -31,7 +31,7 @@ my %_required_modules = (
 
 my @_test_methods = (
 
-	[ 'WLE::4X::Methods::Simple'						, \&test_Methods_Simple ],
+	[ 'WLE::Methods::Simple'							, \&test_Methods_Simple ],
 
 	[ 'WLE::4X::Objects::Element'						, \&test_Object_Element ],
 	[ 'WLE::4X::Objects::ShipComponent'					, \&test_Object_ShipComponent ],
@@ -75,7 +75,7 @@ sub test_Methods_Simple {
 
 	my @test = ( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 );
 
-	WLE::4X::Methods::Simple::shuffle_in_place( \@test );
+	WLE::Methods::Simple::shuffle_in_place( \@test );
 
 	show( join( ',', @test ) );
 
@@ -229,7 +229,7 @@ sub test_Object_Server {
 		'r_option_tags' => [],
 	);
 
-	show( $response{'message'} );
+	# show( $response{'message'} );
 	ok( $response{'success'} == 1, 'create_game successful' );
 
 	%response = $server->do(

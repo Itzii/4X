@@ -527,7 +527,7 @@ sub from_hash {
 
     foreach my $tag ( 'VP_DRAW', 'INITIATIVE', 'ENERGY', 'COMPUTER', 'SHIELDS', 'SLOTS', 'HULL_POINTS', 'COST' ) {
         if ( defined( $r_hash->{ $tag } ) ) {
-            if ( looks_like_number( $r_hash->{ $tag } ) ) {
+            if ( WLE::Methods::Simple::looks_like_number( $r_hash->{ $tag } ) ) {
                 $self->{ $tag } = $r_hash->{ $tag };
             }
         }

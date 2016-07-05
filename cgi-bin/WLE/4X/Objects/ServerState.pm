@@ -87,6 +87,10 @@ sub _read_state {
 
     $self->{'TECH_DRAW_COUNT'} = $VAR1->{'ROUND_TECH_COUNT'};
 
+    if ( defined( $VAR1->{'STARTING_LOCATIONS'} ) ) {
+        $self->{'STARTING_LOCATIONS'} = $VAR1->{'STARTING_LOCATIONS'};
+    }
+
     # setup ship component tiles
     # print STDERR "\n  ship components ... ";
 
@@ -276,6 +280,12 @@ sub _save_state {
     unless ( $self->status() eq '0' ) {
 
         $data{'TECH_DRAW_COUNT'} = $self->{'TECH_DRAW_COUNT'};
+
+        if ( defined( $self->{'STARTING_LOCATIONS'} ) ) {
+            if ( scalar( @{ $self->{'STARTING_LOCATIONS'} } ) > 0 ) {
+                $data{'STARTING_LOCATIONS'} = $self->{'STARTING_LOCATIONS'};
+            }
+        }
 
         # ship components
         $data{'COMPONENTS'} = {};

@@ -204,28 +204,21 @@ sub available_resource_spots {
     my $res_type        = shift;
     my $flag_advanced   = shift; $flag_advanced = 0             unless defined( $flag_advanced );
 
-    my $type_text = text_from_resource_enum( $res_type );
+    my $type_text = WLE::4X::Enums::Basic::text_from_resource_enum( $res_type );
 
     my $count = 0;
 
     foreach my $slot ( @{ $self->{'RESOURCE_SLOTS'} } ) {
-        unless ( $slot->{'TYPE'} eq $type_text ) {
+        unless ( lc( $slot->{'TYPE'} ) eq lc( $type_text ) ) {
             next;
         }
 
-        if ( $flag_advanced ) {
-            unless ( defined( $slot->{'ADVANCED'} ) ) {
-                next;
-            }
-            unless ( $slot->{'ADVANCED'} eq '1' ) {
-                next;
-            }
+        unless ( $slot->{'ADVANCED'} == $flag_advanced ) {
+            next;
         }
 
-        if ( defined( $slot->{'OWNER'} ) ) {
-            unless ( $slot->{'OWNER'} eq '-1' ) {
-                next;
-            }
+        unless ( $slot->{'OWNER'} eq '-1' ) {
+            next;
         }
 
         $count++;
@@ -242,26 +235,19 @@ sub add_cube {
     my $type_enum       = shift;
     my $flag_advanced   = shift;
 
-    my $type_text = text_from_resource_enum( $type_enum );
+    my $type_text = WLE::4X::Enums::Basic::text_from_resource_enum( $type_enum );
 
     foreach my $slot ( @{ $self->{'RESOURCE_SLOTS'} } ) {
-        unless ( $slot->{'TYPE'} eq $type_text ) {
+        unless ( lc( $slot->{'TYPE'} ) eq lc( $type_text ) ) {
             next;
         }
 
-        if ( $flag_advanced ) {
-            unless ( defined( $slot->{'ADVANCED'} ) ) {
-                next;
-            }
-            unless ( $slot->{'ADVANCED'} eq '1' ) {
-                next;
-            }
+        unless ( $slot->{'ADVANCED'} == $flag_advanced ) {
+            next;
         }
 
-        if ( defined( $slot->{'OWNER'} ) ) {
-            unless ( $slot->{'OWNER'} eq '-1' ) {
-                next;
-            }
+        unless ( $slot->{'OWNER'} eq '-1' ) {
+            next;
         }
 
         $slot->{'OWNER'} = $owner_id;
@@ -278,25 +264,15 @@ sub remove_cube {
     my $type_enum       = shift;
     my $flag_advanced   = shift;
 
-    my $type_text = text_from_resource_enum( $type_enum );
+    my $type_text = WLE::4X::Enums::Basic::text_from_resource_enum( $type_enum );
 
     foreach my $slot ( @{ $self->{'RESOURCE_SLOTS'} } ) {
         unless ( $slot->{'TYPE'} eq $type_text ) {
             next;
         }
 
-        if ( $flag_advanced ) {
-            unless ( defined( $slot->{'ADVANCED'} ) ) {
-                next;
-            }
-            unless ( $slot->{'ADVANCED'} eq '1' ) {
-                next;
-            }
-        }
-
-        unless ( defined( $slot->{'OWNER'} ) ) {
-            $slot->{'OWNER'} = -1;
-            return 1;
+        unless ( $slot->{'ADVANCED'} == $flag_advanced ) {
+            next;
         }
 
         if ( $slot->{'OWNER'} eq '-1' ) {
@@ -316,7 +292,7 @@ sub has_warp_on_side {
     my $self        = shift;
     my $direction   = shift;
 
-    unless ( looks_like_number( $direction ) ) {
+    unless ( WLE::Methods::Simple::looks_like_number( $direction ) ) {
         return 0;
     }
 
@@ -377,21 +353,22 @@ sub from_hash {
 
             foreach my $slot ( @{ $r_hash->{'RESOURCES'} } ) {
                 if ( ref( $slot ) eq 'HASH' ) {
-                    my %local_slot = ( 'TYPE' => 'wild', 'FILLED' => 0, 'ADVANCED' => 0 );
+                    my %local_slot = ( 'TYPE' => 'wild', 'OWNER' => -1, 'ADVANCED' => 0 );
+
                     if ( defined( $slot->{'TYPE'} ) ) {
                         $local_slot{'TYPE'} = $slot->{'TYPE'};
                     }
-                    if ( WLE::Methods::Simple::looks_like_number( $slot->{'FILLED'} ) ) {
-                        $local_slot{'FILLED'} = $slot->{'FILLED'};
+
+                    if ( defined( $slot->{'OWNER'} ) ) {
+                        if ( WLE::Methods::Simple::looks_like_number( $slot->{'OWNER'} ) ) {
+                            $local_slot{'OWNER'} = $slot->{'OWNER'};
+                        }
                     }
-                    else {
-                        $local_slot{'FILLED'} = 0;
-                    }
-                    if ( WLE::Methods::Simple::looks_like_number( $slot->{'ADVANCED'} ) ) {
-                        $local_slot{'ADVANCED'} = $slot->{'ADVANCED'};
-                    }
-                    else {
-                        $local_slot{'ADVANCED'} = 0;
+
+                    if ( defined( $slot->{'ADVANCED'} ) ) {
+                        if ( WLE::Methods::Simple::looks_like_number( $slot->{'ADVANCED'} ) ) {
+                            $local_slot{'ADVANCED'} = $slot->{'ADVANCED'};
+                        }
                     }
 
                     push( @resources, \%local_slot );

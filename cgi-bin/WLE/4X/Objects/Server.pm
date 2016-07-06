@@ -10,6 +10,8 @@ use Fcntl ':flock';
 
 use WLE::Methods::Simple;
 
+use WLE::4X::Enums::Status;
+
 use WLE::4X::Objects::MetaActions;
 use WLE::4X::Objects::RawActions;
 use WLE::4X::Objects::LogActions;
@@ -25,28 +27,6 @@ use WLE::4X::Objects::Board;
 use WLE::4X::Objects::Race;
 use WLE::4X::Objects::Ship;
 use WLE::4X::Objects::ShipTemplate;
-
-
-# state breakdown
-
-# d1:dd2:dd3:dd4
-
-# d1 -
-# 0 - pre-game
-#
-# shouldn't be any more digits
-#
-# 1 - game has started - selecting races and positions
-#
-# dd2 -
-#  player index
-#
-#   dd3 -
-#    00 - waiting to select race
-#    01 - waiting to select location
-#
-# 2 - normal turn
-# 3 - game has finished
 
 
 
@@ -117,14 +97,20 @@ sub _init {
 
     $self->{'SETTINGS'}->{'LONG_NAME'} = '';
 
-    $self->{'SETTINGS'}->{'STATUS'} = '0';
-
     $self->{'SETTINGS'}->{'PLAYER_IDS'} = [];
 
     $self->{'RACES'} = {};
     $self->{'SHIP_TEMPLATES'} = {};
     $self->{'SHIPS'} = {};
+    $self->{'TILES'} = {};
 
+    $self->{'STATE'} = {
+        'STATE' => $ST_PREGAME,
+        'ROUND' => 0,
+        'PHASE' => $PH_PREPARING,
+        'PLAYER' => -1,
+        'SUBPHASE' => 0,
+    };
 
     return $self;
 }
@@ -161,16 +147,18 @@ sub do {
 
     my %actions = (
 
-        'status'            => { 'flag_prestart' => 0, 'flag_owner_only' => 0, 'flag_player_phase' => 0, 'method' => \&status },
+        'status'            => { 'method' => \&action_status },
 
-        'create_game'       => { 'flag_prestart' => 0, 'flag_owner_only' => 0, 'flag_player_phase' => 0, 'method' => \&action_create_game },
-        'add_source'        => { 'flag_prestart' => 1, 'flag_owner_only' => 1, 'flag_player_phase' => 0, 'method' => \&action_add_source },
-        'remove_source'     => { 'flag_prestart' => 1, 'flag_owner_only' => 1, 'flag_player_phase' => 0, 'method' => \&action_remove_source },
-        'add_option'        => { 'flag_prestart' => 1, 'flag_owner_only' => 1, 'flag_player_phase' => 0, 'method' => \&action_add_option },
-        'remove_option'     => { 'flag_prestart' => 1, 'flag_owner_only' => 1, 'flag_player_phase' => 0, 'method' => \&action_remove_option },
-        'add_player'        => { 'flag_prestart' => 1, 'flag_owner_only' => 1, 'flag_player_phase' => 0, 'method' => \&action_add_player },
-        'remove_player'     => { 'flag_prestart' => 1, 'flag_owner_only' => 1, 'flag_player_phase' => 0, 'method' => \&action_remove_player },
-        'begin'             => { 'flag_prestart' => 1, 'flag_owner_only' => 1, 'flag_player_phase' => 0, 'method' => \&action_begin },
+        'create_game'       => { 'flag_req_status' => $ST_PREGAME, 'method' => \&action_create_game },
+        'add_source'        => { 'flag_req_status' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_add_source },
+        'remove_source'     => { 'flag_req_status' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_remove_source },
+        'add_option'        => { 'flag_req_status' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_add_option },
+        'remove_option'     => { 'flag_req_status' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_remove_option },
+        'add_player'        => { 'flag_req_status' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_add_player },
+        'remove_player'     => { 'flag_req_status' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_remove_player },
+        'begin'             => { 'flag_req_status' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_begin },
+
+        'select_race'       => { 'flag_req_status' => $ST_RACESELECTION, 'flag_player_phase' => 1, 'method' => \&action_select_race_and_location },
 
 
 
@@ -180,15 +168,18 @@ sub do {
         return ( 'success' => 0, 'message' => "Invalid 'action' element." );
     }
 
-    if ( $actions{ $action }->{'flag_prestart'} && $self->status() ne '0' ) {
-        return ( 'success' => 0, 'message' => 'Unable to perform action on game in progress.' );
+    if ( defined( $actions{ $action }->{'flag_req_status'} ) ) {
+        if ( $self->state() != $actions{ $action }->{'flag_req_status'} ) {
+            return ( 'success' => 0, 'message' => 'Invalid status for action.' );
+        }
     }
 
-    if ( $actions{ $action }->{'flag_owner_only'} && $self->user_is_owner() == 0 )  {
+
+    if ( defined( $actions{ $action }->{'flag_owner_only'} ) && $self->user_is_owner() == 0 )  {
         return ( 'success' => 0, 'message' => 'Action is allowed by game owner only.' );
     }
 
-    if ( $actions{ $action }->{'flag_player_phase'} ) {
+    if ( defined( $actions{ $action }->{'flag_player_phase'} ) ) {
         my $waiting_on = $self->waiting_on_player_id();
 
         if ( $waiting_on == -1 || ( $waiting_on > -1 && $waiting_on != $self->current_user() ) ) {
@@ -201,8 +192,11 @@ sub do {
         'message' => '',
     );
 
+    my $data = undef;
+    $args{'__data'} = \$data;
     $response{'success'} = $actions{ $action }->{'method'}->( $self, %args );
     $response{'message'} = $self->last_error();
+    $response{'data'} = $data;
 
     return %response;
 }
@@ -275,6 +269,140 @@ sub user_is_owner {
 
 #############################################################################
 
+sub action_status {
+    my $self        = shift;
+    my %args        = @_;
+
+    my $r_data = $args{'__data'};
+
+    my $player_id = -1;
+
+    if ( $self->{'STATE'}->{'PLAYER'} > -1 ) {
+        $player_id = $self->{'SETTINGS'}->{'PLAYER_IDS'}->[ $self->{'STATE'}->{'PLAYER'} ];
+    }
+
+    $$r_data = sprintf(
+        '%i:%i:%i:%i:%i',
+        $self->{'STATE'}->{'STATE'},
+        $self->{'STATE'}->{'ROUND'},
+        $self->{'STATE'}->{'PHASE'},
+        $player_id,
+        $self->{'STATE'}->{'SUBPHASE'},
+    );
+
+    return 1;
+}
+
+#############################################################################
+
+sub status {
+    my $self        = shift;
+
+    return sprintf(
+        '%i:%i:%i:%i:%i',
+        $self->{'STATE'}->{'STATE'},
+        $self->{'STATE'}->{'ROUND'},
+        $self->{'STATE'}->{'PHASE'},
+        $self->{'STATE'}->{'PLAYER'},
+        $self->{'STATE'}->{'SUBPHASE'},
+    );
+}
+
+#############################################################################
+
+sub set_status {
+    my $self        = shift;
+    my $status      = shift;
+
+    my @values = split( /:/, $status );
+
+    $self->{'STATE'}->{'STATE'} = $values[ 0 ];
+    $self->{'STATE'}->{'ROUND'} = $values[ 1 ];
+    $self->{'STATE'}->{'PHASE'} = $values[ 2 ];
+    $self->{'STATE'}->{'PLAYER'} = $values[ 3 ];
+    $self->{'STATE'}->{'SUBPHASE'} = $values[ 4 ];
+
+    return;
+}
+
+#############################################################################
+
+sub state {
+    my $self        = shift;
+
+    return $self->{'STATE'}->{'STATE'};
+}
+
+#############################################################################
+
+sub set_state {
+    my $self        = shift;
+    my $new_state   = shift;
+
+    $self->{'STATE'}->{'STATE'} = $new_state;
+
+    return;
+}
+
+#############################################################################
+
+sub waiting_on_player_id {
+    my $self        = shift;
+
+    return $self->{'STATE'}->{'PLAYER'};
+}
+
+#############################################################################
+
+sub set_waiting_on_player_id {
+    my $self        = shift;
+    my $player_id   = shift;
+
+    $self->{'STATE'}->{'PLAYER'} = $player_id;
+
+    return;
+}
+
+#############################################################################
+
+sub round {
+    my $self        = shift;
+
+    return $self->{'STATE'}->{'ROUND'};
+}
+
+#############################################################################
+
+sub set_round {
+    my $self        = shift;
+    my $new_round   = shift;
+
+    $self->{'STATE'}->{'ROUND'} = $new_round;
+
+    return;
+}
+
+#############################################################################
+
+sub phase {
+    my $self        = shift;
+
+    return $self->{'STATE'}->{'PHASE'};
+}
+
+#############################################################################
+
+sub set_phase {
+    my $self        = shift;
+    my $new_phase   = shift;
+
+    $self->{'STATE'}->{'PHASE'} = $new_phase;
+
+    return;
+}
+
+#############################################################################
+
 sub tick_player {
     my $self        = shift;
 
@@ -282,7 +410,13 @@ sub tick_player {
 
     push( @{ $self->{'SETTINGS'}->{'PLAYERS_DONE'} }, $done_player );
 
-    return ( scalar( @{ $self->{'SETTINGS'}->{'PLAYERS_PENDING'} } ) > 0 ) ? 1 : 0;
+    if ( scalar( @{ $self->{'SETTINGS'}->{'PLAYERS_PENDING'} } ) > 0 ) {
+        $self->set_waiting_on_player_id( $self->{'SETTINGS'}->{'PLAYERS_PENDING'}->[ 0 ] );
+        return 1;
+    }
+
+    $self->set_waiting_on_player_id( -1 );
+    return 0;
 }
 
 #############################################################################
@@ -326,34 +460,18 @@ sub long_name {
 
 #############################################################################
 
-sub status {
-    my $self        = shift;
-
-    return $self->{'SETTINGS'}->{'STATUS'};
-}
-
-#############################################################################
-
-sub status_parts {
-    my $self        = shift;
-
-    return split( /:/, $self->status() );
-}
-
-#############################################################################
-
-sub waiting_on_player_id {
-    my $self        = shift;
-
-    return ( $self->status_parts() )[ 1 ];
-}
-
-#############################################################################
-
 sub board {
     my $self        = shift;
 
     return $self->{'BOARD'};
+}
+
+#############################################################################
+
+sub tiles {
+    my $self        = shift;
+
+    return $self->{'TILES'};
 }
 
 #############################################################################

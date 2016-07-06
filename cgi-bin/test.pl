@@ -177,6 +177,9 @@ sub test_Object_Server {
 		'log_files'			=> "../statefiles",
 	);
 
+	my $owner_id = 55;
+	my @user_ids = ( $owner_id, 200, 300 );
+
 	ok( defined( $server ) && ref( $server ) eq 'WLE::4X::Objects::Server', 'server object created');
 
 	ok( $server->last_error() eq '', 'no errors found' );
@@ -213,7 +216,7 @@ sub test_Object_Server {
 
 	%response = $server->do(
 		'action' 		=> 'create_game',
-		'user'			=> 55,
+		'user'			=> $owner_id,
 		'log_id'		=> $log_id,
 		'r_source_tags' => [],
 		'r_option_tags' => [],
@@ -223,7 +226,7 @@ sub test_Object_Server {
 
 	%response = $server->do(
 		'action' 		=> 'create_game',
-		'user'			=> 55,
+		'user'			=> $owner_id,
 		'log_id'		=> $log_id,
 		'r_source_tags' => [ 'src_base' ],
 		'r_option_tags' => [],
@@ -234,40 +237,87 @@ sub test_Object_Server {
 
 	%response = $server->do(
 		'action' 		=> 'add_source',
-		'user'			=> 55,
+		'user'			=> $owner_id,
 		'log_id'		=> $log_id,
 		'source_tag'	=> 'src_test',
 	);
 
 	%response = $server->do(
 		'action' 		=> 'add_option',
-		'user'			=> 55,
+		'user'			=> $owner_id,
 		'log_id'		=> $log_id,
 		'option_tag'	=> 'option_test',
 	);
 
 	%response = $server->do(
 		'action' 		=> 'add_player',
-		'user'			=> 55,
+		'user'			=> $owner_id,
 		'log_id'		=> $log_id,
-		'player_id'		=> 200,
+		'player_id'		=> $user_ids[ 1 ],
 	);
 
 	%response = $server->do(
 		'action' 		=> 'add_player',
-		'user'			=> 55,
+		'user'			=> $owner_id,
 		'log_id'		=> $log_id,
-		'player_id'		=> 300,
+		'player_id'		=> $user_ids[ 2 ],
 	);
 
 	%response = $server->do(
 		'action' 		=> 'begin',
-		'user'			=> 55,
+		'user'			=> $owner_id,
 		'log_id'		=> $log_id,
 	);
 
 
 	ok( $response{'success'} == 1, 'action_begin successful' );
+
+	%response = $server->do(
+		'action'		=> 'select_race',
+		'user'			=> 999,
+		'log_id'		=> $log_id,
+		'race_tag'		=> 'race_terran5',
+		'location_x'	=> 0,
+		'location_y'	=> -2,
+	);
+
+	ok( $response{'success'} == 0, 'select_race failed for invalid user' );
+
+	%response = $server->do(
+		'action'		=> 'status',
+		'user'			=> $owner_id,
+		'log_id'		=> $log_id,
+	);
+
+	ok( $response{'success'} == 1, 'get status completed correctly' );
+
+	my @status = split( /:/, $response{'data'} );
+	my $waiting_for = $status[ 3 ];
+
+	show( $response{'data'} );
+
+	%response = $server->do(
+		'action'		=> 'select_race',
+		'user'			=> $waiting_for,
+		'log_id'		=> $log_id,
+		'race_tag'		=> 'race_terran5',
+		'location_x'	=> 0,
+		'location_y'	=> -2,
+	);
+
+	ok( $response{'success'} == 1, 'select_race successful' );
+
+	%response = $server->do(
+		'action'		=> 'status',
+		'user'			=> $owner_id,
+		'log_id'		=> $log_id,
+	);
+
+	show( $response{'data'} );
+
+
+
+
 
 	return;
 }

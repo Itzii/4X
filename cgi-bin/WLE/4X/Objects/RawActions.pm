@@ -150,17 +150,6 @@ sub _raw_begin {
 
 
 
-
-
-    # ancient ships
-    # print STDERR "\n  ancient ships ... ";
-
-    # TODO
-
-
-
-
-
     # setup ship component tiles
     # print STDERR "\n  ship components ... ";
 
@@ -294,6 +283,7 @@ sub _raw_begin {
 
     $self->{'TILES'} = {};
 
+#    print STDERR "\nCreating Board ... ";
     $self->{'BOARD'} = WLE::4X::Objects::Board->new( 'server' => $self );
 
 #    print STDERR "\nReading Tiles ... ";
@@ -448,7 +438,7 @@ sub _raw_set_player_order {
 sub _raw_create_tile_stack {
     my $self            = shift;
     my $stack_id        = shift;
-    my @values          = shift;
+    my @values          = @_;
 
     $self->{'TILE_STACKS'}->{ $stack_id }->{'DRAW'} = [ @values ];
     $self->{'TILE_STACKS'}->{ $stack_id }->{'DISCARD'} = [];
@@ -460,7 +450,7 @@ sub _raw_create_tile_stack {
 
 sub _raw_create_development_stack {
     my $self            = shift;
-    my @values          = shift;
+    my @values          = @_;
 
     $self->{'DEVELOPMENT_STACK'} = [ @values ];
 
@@ -485,13 +475,13 @@ sub _raw_select_race_and_location {
         delete ( $self->races()->{ $backing_race } );
     }
 
-    my $start_hex_tag = $race->home();
+    my $start_hex_tag = $race->home_tile();
 
     my $start_hex = $self->tiles()->{ $start_hex_tag };
 
     $start_hex->set_warps( $warp_gates );
 
-    $self->server()->board()->place_tile( $location_x, $location_y, $start_hex_tag );
+    $self->board()->place_tile( $location_x, $location_y, $start_hex_tag );
 
     $self->_raw_influence_tile( $race_tag, $start_hex_tag );
 
@@ -507,16 +497,17 @@ sub _raw_select_race_and_location {
     foreach my $type ( @types ) {
         my $open_slots = $start_hex->available_resource_spots( $type->[ 0 ], 0 );
 
-        while ( $open_slots > 0 ) {
-            $self->_raw_place_cube_on_tile( $race_tag, $start_hex_tag, $type->[ 0 ], 0 );
+        foreach ( 1 .. $open_slots ) {
+            $start_hex->add_cube( $race->owner_id(), $type->[ 0 ], 0 )
         }
 
         if ( $race->has_technology( $type->[ 1 ] ) ) {
+
             $open_slots = $start_hex->available_resource_spots( $type->[ 0 ], 1 );
 
-            while ( $open_slots > 0 ) {
+            foreach ( 1 .. $open_slots ) {
                 $race->remove_cube( $type->[ 0 ] );
-                $self->_raw_place_cube_on_tile( $race_tag, $start_hex_tag, $type->[ 0 ], 1 );
+                $start_hex->add_cube( $race->owner_id(), $type->[ 0 ], 1 )
             }
         }
     }
@@ -527,6 +518,7 @@ sub _raw_select_race_and_location {
         my $ship = $race->create_ship_of_class( $ship_class );
 
         if ( defined( $ship ) ) {
+            print STDERR "\nPlacing Ship: " . $ship->tag();
             push( @{ $start_hex->ships() }, $ship->tag() );
         }
     }

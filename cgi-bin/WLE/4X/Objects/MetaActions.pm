@@ -375,9 +375,11 @@ sub action_begin {
     $self->_raw_create_development_stack( @developments );
     $self->_log_development_stack( { 'values' => \@developments } );
 
+    $self->set_state( $ST_RACESELECTION );
+    $self->set_phase( $PH_PREPARING );
+    $self->set_waiting_on_player_id( $self->{'SETTINGS'}->{'PLAYERS_PENDING'}->[ 0 ] );
 
-    $self->{'SETTINGS'}->{'STATUS'} = '0:' . $self->{'SETTINGS'}->{'PLAYERS_PENDING'}->[ 0 ];
-    $self->_log_status( { 'status' => $self->{'SETTINGS'}->{'STATUS'} } );
+    $self->_log_status( { 'status' => $self->status() } );
 
     $self->_save_state();
 
@@ -391,6 +393,10 @@ sub action_begin {
 sub action_select_race_and_location {
     my $self            = shift;
     my %args            = @_;
+
+    unless ( $self->round() == 0 ) {
+
+    }
 
     unless ( $self->_open_for_writing( $self->log_id() ) ) {
         return 0;
@@ -406,9 +412,11 @@ sub action_select_race_and_location {
         return 0;
     }
 
-    if ( $self->races()->{ $args{'race_tag'} }->owner_id() > -1 ) {
-        $self->set_error( 'Race has already been selected.' );
-        return 0;
+    if ( $self->races()->{ $args{'race_tag'} }->owner_id() ne '' ) {
+        if ( $self->races()->{ $args{'race_tag'} }->owner_id() > -1 ) {
+            $self->set_error( 'Race has already been selected.' );
+            return 0;
+        }
     }
 
     unless (
@@ -457,13 +465,13 @@ sub action_select_race_and_location {
 
 
 
-    if ( $self->tick_player() ) {
-        $self->{'SETTINGS'}->{'STATUS'} = '0:' . $self->waiting_on_player_id();
-    }
-    else {
+    unless ( $self->tick_player() ) {
         $self->start_next_round();
     }
 
+    $self->_save_state();
+
+    $self->_close_all();
 
     return 1;
 }

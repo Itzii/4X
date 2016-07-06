@@ -29,6 +29,8 @@ sub _init {
     my $self		= shift;
     my %args		= @_;
 
+    $self->set_owner_id( -1 );
+
     unless ( $self->WLE::4X::Objects::Element::_init( %args ) ) {
         return undef;
     }
@@ -150,7 +152,11 @@ sub template_of_class {
     foreach my $template_tag ( $self->{'SHIP_TEMPLATES'} ) {
         my $template = $self->server()->templates()->{ $template_tag };
 
+        print STDERR "\n  checking template: " . $template->tag();
+
         if ( defined( $template ) ) {
+            print STDERR $template->class() . ' ';
+
             if ( $template->class() eq $class ) {
                 return $template;
             }
@@ -169,6 +175,7 @@ sub create_ship_of_class {
     my $template = $self->template_of_class( $class );
 
     unless ( defined( $template ) ) {
+        print "\nFailed to locate template for class: " . $class;
         return undef;
     }
 
@@ -191,11 +198,7 @@ sub cube_count {
     my $self        = shift;
     my $type_enum   = shift;
 
-    my $type_text = text_from_resource_enum( $type_enum );
-
-    if ( $type_text == $RES_UNKNOWN ) {
-        return 0;
-    }
+    my $type_text = WLE::4X::Enums::Basic::text_from_resource_enum( $type_enum );
 
     unless ( defined( $self->{'TRACKS'}->{ $type_text } ) ) {
         return 0;
@@ -210,11 +213,7 @@ sub cube_count_is_max {
     my $self        = shift;
     my $type_enum   = shift;
 
-    my $type_text = text_from_resource_enum( $type_enum );
-
-    if ( $type_text == $RES_UNKNOWN ) {
-        return 1;
-    }
+    my $type_text = WLE::4X::Enums::Basic::text_from_resource_enum( $type_enum );
 
     unless ( defined( $self->{'TRACKS'}->{ $type_text } ) ) {
         return 1;
@@ -236,7 +235,7 @@ sub remove_cube {
         return 0;
     }
 
-    my $type_text = text_from_resource_enum( $type_enum );
+    my $type_text = WLE::4X::Enums::Basic::text_from_resource_enum( $type_enum );
 
     $self->{'TRACKS'}->{ $type_text }->{'COUNT'} --;
 
@@ -253,7 +252,7 @@ sub add_cube {
         return 0;
     }
 
-    my $type_text = text_from_resource_enum( $type_enum );
+    my $type_text = WLE::4X::Enums::Basic::text_from_resource_enum( $type_enum );
 
     $self->{'TRACKS'}->{ $type_text }->{'COUNT'} ++;
 
@@ -266,7 +265,7 @@ sub cube_income {
     my $self        = shift;
     my $type_enum   = shift;
 
-    my $type_text = text_from_resource_enum( $type_enum );
+    my $type_text = WLE::4X::Enums::Basic::text_from_resource_enum( $type_enum );
 
     if ( $type_text == $RES_UNKNOWN ) {
         return 0;
@@ -463,8 +462,8 @@ sub to_hash {
 
     $r_hash->{'TRACKS'} = {};
     foreach my $track_tag ( 'INFLUENCE', 'MONEY', 'SCIENCE', 'MINERALS' ) {
-        my @values = @{ $self->{'TRACKS'}->{ $track_tag } };
-        $r_hash->{'TRACKS'}->{ $track_tag } = \@values;
+        my %values = %{ $self->{'TRACKS'}->{ $track_tag } };
+        $r_hash->{'TRACKS'}->{ $track_tag } = \%values;
     }
 
     $r_hash->{'TECH'} = {};

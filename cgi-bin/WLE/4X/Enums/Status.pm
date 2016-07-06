@@ -8,40 +8,66 @@ our @ISA	= qw( Exporter );
 our @EXPORT_OK = qw(
 );
 
-# WW::XX::YYY::ZZ
+my $notes = <<'END';
+
+V::WW::XX::YYY::ZZ
+
+    V - state
+
+        $ST_PREGAME - in pre_game mode - selecting options, adding players, etc ...
+        $ST_RACESELECTION - race selection mode
+        $ST_NORMAL - normal turns
+        $ST_FINISHED - game is finished
+
+    WW - round - will always be a two-digit number
+
+    XX - phase
+
+        $PH_PREPARING - in pre-game round or race selection ...
+
+        in normal round ...
+
+        $PH_ACTION
+        $PH_COMBAT
+        $PH_UPKEEP
+        $PH_CLEANUP
+
+    YYY -
+        in pre-game indicates current player id
+
+        in normal round
+            action phase - player id
+
+            combat phase - tile id
+
+            upkeep phase - player id
+
+END
 
 our @EXPORT = qw(
 
-# WW - round - will always be a two-digit number - 00 indicates pre-game round, 99 indicates the game is finished
-
-# XX - phase
-#   in pre-game round ...
+    $ST_PREGAME
+    $ST_RACESELECTION
+    $ST_NORMAL
+    $ST_FINISHED
 
     $PH_PREPARING
-
-#   in normal round ...
 
     $PH_ACTION
     $PH_COMBAT
     $PH_UPKEEP
     $PH_CLEANUP
 
-# YYY -
-#      in pre-game indicates current player id
-#
-#      in normal round
-#           action phase - player id
-#
-#           combat phase - tile id
-#
-#           upkeep phase - player id
-
-
-
-
 );
 
 my $i = 0;
+
+our $ST_PREGAME         = $i++;
+our $ST_RACESELECTION   = $i++;
+our $ST_NORMAL          = $i++;
+our $ST_FINISHED        = $i++;
+
+$i = 0;
 
 our $PH_PREPARING       = $i++;
 our $PH_ACTION          = $i++;

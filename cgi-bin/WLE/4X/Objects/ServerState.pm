@@ -85,6 +85,8 @@ sub _read_state {
     my $single_line = join( '', @data );
     eval $single_line; warn $@ if $@;
 
+    $self->{'STATE'} = $VAR1->{'STATE'};
+
     $self->{'TECH_DRAW_COUNT'} = $VAR1->{'ROUND_TECH_COUNT'};
 
     if ( defined( $VAR1->{'STARTING_LOCATIONS'} ) ) {
@@ -293,6 +295,7 @@ sub _save_state {
     my %data = ();
 
     $data{'SETTINGS'} = $self->{'SETTINGS'};
+    $data{'STATE'} = $self->{'STATE'};
 
     unless ( $self->status() eq '0' ) {
 
@@ -346,8 +349,11 @@ sub _save_state {
 
         $data{'TILE_STACKS'} = $self->{'TILE_STACKS'};
 
-        $data{'BOARD'} = {};
-        $self->{'BOARD'}->to_hash( $data{'BOARD'} );
+        if ( defined( $self->{'BOARD'} ) ) {
+            my %board = ();
+            $self->{'BOARD'}->to_hash( \%board );
+            $data{'BOARD'} = \%board;
+        }
 
         # developments
 
@@ -402,6 +408,7 @@ sub _save_state {
 
     truncate( $self->{'FH_STATE'}, 0 );
 
+    $Data::Dumper::Indent = 1;
     print { $self->{'FH_STATE'} } Dumper( \%data );
 
     # using Storable

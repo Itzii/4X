@@ -6,18 +6,18 @@ $VAR1 = {
             'LONG_NAME' => 'New Dawn for the Galaxy',
         },
         {
-            'TAG' => 'src_rift',
-            'SOURCE_TAG' => 'src_rift',
+            'TAG' => 'src_exp3',
+            'SOURCE_TAG' => 'src_exp3',
             'LONG_NAME' => 'Shadow of the Rift',
         },
         {
-            'TAG' => 'src_rise',
-            'SOURCE_TAG' => 'src_rise',
+            'TAG' => 'src_exp1',
+            'SOURCE_TAG' => 'src_exp1',
             'LONG_NAME' => 'Rise of the Ancients',
         },
         {
-            'TAG' => 'src_ship1',
-            'SOURCE_TAG' => 'src_ship1',
+            'TAG' => 'src_exp2',
+            'SOURCE_TAG' => 'src_exp2',
             'LONG_NAME' => 'Ship Pack One',
         },
 
@@ -287,9 +287,9 @@ $VAR1 = {
 
     'RACES' => {
 
-        'race_terran1' =>    {
+        'race_human1' =>    {
             'SOURCE_TAG' => 'src_base',
-            'EXCLUDE_RACE' => 'race_eridani',
+            'EXCLUDE_RACE' => 'race_oldrace',
             'LONG_NAME' => 'Terran Directorate',
             'FLAVOR' => 'The Directorate governs the Procyon sector with a strong hand. A seat in the Inner Circle is only given to the very best, carefully chosen (and rumouredly even genetically programmed) to continue the line of the Directors. While there may be power struggles behind the scenes, the Directorate is determined to lead the rather well-off civilization toward a great future.',
             'HOME' => 'tile_221',
@@ -300,31 +300,31 @@ $VAR1 = {
             },
             'SHIP_TEMPLATES' => [
                 {
-                    'TAG' => 'shiptemplate_interceptor_terran',
+                    'TAG' => 'shiptemplate_interceptor_human',
                     'LONG_NAME' => 'Explorer',
                     'COST' => 3,
                 },
                 {
-                    'TAG' => 'shiptemplate_cruiser_terran',
+                    'TAG' => 'shiptemplate_cruiser_human',
                     'LONG_NAME' => 'Conqueror',
                     'COST' => 5,
                 },
                 {
-                    'TAG' => 'shiptemplate_dreadnought_terran',
+                    'TAG' => 'shiptemplate_dreadnought_human',
                     'LONG_NAME' => 'Vanquisher',
                     'COST' => 8,
                 },
                 {
-                    'TAG' => 'shiptemplate_starbase_terran',
+                    'TAG' => 'shiptemplate_starbase_human',
                     'LONG_NAME' => 'Defender',
                     'COST' => 3,
                 },
             ],
         },
 
-        'race_terran2' => {
+        'race_human2' => {
             'SOURCE_TAG' => 'src_base',
-            'EXCLUDE_RACE' => 'race_hydran',
+            'EXCLUDE_RACE' => 'race_water',
             'LONG_NAME' => 'Terran Federation',
             'FLAVOR' => 'Terran Federation consists of numerous state systems with relatively similar ideals and histories. The Altair system is considered to be the most important of them, and it houses the Federal Parliament. The state systems enjoy quite a lot of freedom in their government, but in time of need they work efficiently together to protect the Federation.',
             'HOME' => 'tile_223',
@@ -335,30 +335,30 @@ $VAR1 = {
             },
             'SHIP_TEMPLATES' => [
                 {
-                    'TAG' => 'shiptemplate_interceptor_terran',
+                    'TAG' => 'shiptemplate_interceptor_human',
                     'LONG_NAME' => 'Laika',
                     'COST' => 3,
                 },
                 {
-                    'TAG' => 'shiptemplate_cruiser_terran',
+                    'TAG' => 'shiptemplate_cruiser_human',
                     'LONG_NAME' => 'Gagarin',
                     'COST' => 5,
                 },
                 {
-                    'TAG' => 'shiptemplate_dreadnought_terran',
+                    'TAG' => 'shiptemplate_dreadnought_human',
                     'LONG_NAME' => 'Armstrong',
                     'COST' => 8,
                 },
                 {
-                    'TAG' => 'shiptemplate_starbase_terran',
+                    'TAG' => 'shiptemplate_starbase_human',
                     'LONG_NAME' => 'Yang',
                     'COST' => 3,
                 },
             ],
         },
-        'race_terran3' => {
+        'race_human3' => {
             'SOURCE_TAG' => 'src_base',
-            'EXCLUDE_RACE' => 'race_planta',
+            'EXCLUDE_RACE' => 'race_plants',
             'LONG_NAME' => 'Terran Union',
             'FLAVOR' => 'After the long diaspora, the Terran Union settled in the Eta Cassiopeiae system. Despite occasional internal struggles, the Union has stood tall during hard times, often through strong diplomatic efforts and by staying carefully neutral. This may soon change, however, as the home system will not be able to provide for the whole civilization.',
             'HOME' => 'tile_225',
@@ -369,30 +369,30 @@ $VAR1 = {
             },
             'SHIP_TEMPLATES' => [
                 {
-                    'TAG' => 'shiptemplate_interceptor_terran',
+                    'TAG' => 'shiptemplate_interceptor_human',
                     'LONG_NAME' => 'Falcon',
                     'COST' => 3,
                 },
                 {
-                    'TAG' => 'shiptemplate_cruiser_terran',
+                    'TAG' => 'shiptemplate_cruiser_human',
                     'LONG_NAME' => 'Hawk',
                     'COST' => 5,
                 },
                 {
-                    'TAG' => 'shiptemplate_dreadnought_terran',
+                    'TAG' => 'shiptemplate_dreadnought_human',
                     'LONG_NAME' => 'Eagle',
                     'COST' => 8,
                 },
                 {
-                    'TAG' => 'shiptemplate_starbase_terran',
+                    'TAG' => 'shiptemplate_starbase_human',
                     'LONG_NAME' => 'Eyrie',
                     'COST' => 3,
                 },
             ],
         },
-        'race_terran4' => {
+        'race_human4' => {
             'SOURCE_TAG' => 'src_base',
-            'EXCLUDE_RACE' => 'race_draco',
+            'EXCLUDE_RACE' => 'race_descendants',
             'LONG_NAME' => 'Terran Republic',
             'FLAVOR' => 'After having set their home in the Sirius system and doing their part in the Hegemony war, the people of the Terran Republic have built a democratically ruled society, enjoying a relatively stable and prosperous life.',
             'HOME' => 'tile_227',
@@ -403,30 +403,30 @@ $VAR1 = {
             },
             'SHIP_TEMPLATES' => [
                 {
-                    'TAG' => 'shiptemplate_interceptor_terran',
+                    'TAG' => 'shiptemplate_interceptor_human',
                     'LONG_NAME' => 'Horus',
                     'COST' => 3,
                 },
                 {
-                    'TAG' => 'shiptemplate_cruiser_terran',
+                    'TAG' => 'shiptemplate_cruiser_human',
                     'LONG_NAME' => 'Ares',
                     'COST' => 5,
                 },
                 {
-                    'TAG' => 'shiptemplate_dreadnought_terran',
+                    'TAG' => 'shiptemplate_dreadnought_human',
                     'LONG_NAME' => 'Mars',
                     'COST' => 8,
                 },
                 {
-                    'TAG' => 'shiptemplate_starbase_terran',
+                    'TAG' => 'shiptemplate_starbase_human',
                     'LONG_NAME' => 'Kali',
                     'COST' => 3,
                 },
             ],
         },
-        'race_terran5' => {
+        'race_human5' => {
             'SOURCE_TAG' => 'src_base',
-            'EXCLUDE_RACE' => 'race_mechanema',
+            'EXCLUDE_RACE' => 'race_cyborgs',
             'LONG_NAME' => 'Terran Conglomerate',
             'FLAVOR' => 'Unlike the other Terran factions, the Conglomerate was originally fully backed by corporations eager to invest in the deep space colonies. This is still reflected in the society all the way from the Board, the highest governmental body of the Conglomerate, to the most mundane details of life in the Tau Ceti system. The Conglomerate is a financial powerhouse and one of the key players in the Galactic Center business.',
             'HOME' => 'tile_229',
@@ -437,30 +437,30 @@ $VAR1 = {
             },
             'SHIP_TEMPLATES' => [
                 {
-                    'TAG' => 'shiptemplate_interceptor_terran',
+                    'TAG' => 'shiptemplate_interceptor_human',
                     'LONG_NAME' => 'Cobra',
                     'COST' => 3,
                 },
                 {
-                    'TAG' => 'shiptemplate_cruiser_terran',
+                    'TAG' => 'shiptemplate_cruiser_human',
                     'LONG_NAME' => 'Lion',
                     'COST' => 5,
                 },
                 {
-                    'TAG' => 'shiptemplate_dreadnought_terran',
+                    'TAG' => 'shiptemplate_dreadnought_human',
                     'LONG_NAME' => 'Elephant',
                     'COST' => 8,
                 },
                 {
-                    'TAG' => 'shiptemplate_starbase_terran',
+                    'TAG' => 'shiptemplate_starbase_human',
                     'LONG_NAME' => 'Rhino',
                     'COST' => 3,
                 },
             ],
         },
-        'race_terran6' => {
+        'race_human6' => {
             'SOURCE_TAG' => 'src_base',
-            'EXCLUDE_RACE' => 'race_hegemony',
+            'EXCLUDE_RACE' => 'race_warriors',
             'LONG_NAME' => 'Terran Alliance',
             'FLAVOR' => 'The Alliance was a major force in the Terran-Hegemony War, after the already dissolving faction united against the common enemy. After the decisive victory in the Battle of Delta Pavonis (33.142) and driving the Hegemony fleet out of the sector, the Alliance made Delta Pavonis their home system. They have come a long way since then, but the old treaties are still in effect and the Alliance holds strong.',
             'HOME' => 'tile_231',
@@ -471,31 +471,31 @@ $VAR1 = {
             },
             'SHIP_TEMPLATES' => [
                 {
-                    'TAG' => 'shiptemplate_interceptor_terran',
+                    'TAG' => 'shiptemplate_interceptor_human',
                     'LONG_NAME' => 'Shuriken',
                     'COST' => 3,
                 },
                 {
-                    'TAG' => 'shiptemplate_cruiser_terran',
+                    'TAG' => 'shiptemplate_cruiser_human',
                     'LONG_NAME' => 'Wakizashi',
                     'COST' => 5,
                 },
                 {
-                    'TAG' => 'shiptemplate_dreadnought_terran',
+                    'TAG' => 'shiptemplate_dreadnought_human',
                     'LONG_NAME' => 'Katana',
                     'COST' => 8,
                 },
                 {
-                    'TAG' => 'shiptemplate_starbase_terran',
+                    'TAG' => 'shiptemplate_starbase_human',
                     'LONG_NAME' => 'Naginata',
                     'COST' => 3,
                 },
             ],
         },
 
-        'race_terran7' =>    {
-                'SOURCE_TAG' => 'src_ship1',
-                'EXCLUDE_RACE' => 'race_guardians_of_mag',
+        'race_human7' =>    {
+                'SOURCE_TAG' => 'src_exp2',
+                'EXCLUDE_RACE' => 'race_guards1',
                 'LONG_NAME' => 'Terran Separatists',
                 'FLAVOR' => 'The Separatists started originally as a small rebel movement against the ruthless Directorate. Despite the Directorate\'s swift acts to take down any insurgence, a strong faction emerged to stand against the Inner Circle. After a long Civil War, the Terran Separatists finally managed to leave the Procyon oppression and were joined by like-minded forces from other Terran factions (and rumoredly even some alien ones). They have now settled in the Mu Arae system to start anew.',
                 'HOME' => 'tile_240',
@@ -506,32 +506,32 @@ $VAR1 = {
                 },
                 'SHIP_TEMPLATES' => [
                     {
-                        'TAG' => 'shiptemplate_interceptor_terran',
+                        'TAG' => 'shiptemplate_interceptor_human',
                         'LONG_NAME' => 'Wasp',
                         'COST' => 3,
                     },
                     {
-                        'TAG' => 'shiptemplate_cruiser_terran',
+                        'TAG' => 'shiptemplate_cruiser_human',
                         'LONG_NAME' => 'Crow',
                         'COST' => 5,
                     },
                     {
-                        'TAG' => 'shiptemplate_dreadnought_terran',
+                        'TAG' => 'shiptemplate_dreadnought_human',
                         'LONG_NAME' => 'Glass',
                         'COST' => 8,
                     },
                     {
-                        'TAG' => 'shiptemplate_starbase_terran',
+                        'TAG' => 'shiptemplate_starbase_human',
                         'LONG_NAME' => 'Quarry',
                         'COST' => 3,
                     },
                 ],
             },
 
-        'race_eridani' => {
+        'race_oldrace' => {
             'SOURCE_TAG' => 'src_base',
             'REQUIRED_OPTION' => 'alien_races',
-            'EXCLUDE_RACE' => 'race_terran1',
+            'EXCLUDE_RACE' => 'race_human1',
             'LONG_NAME' => 'Eridani Empire',
             'FLAVOR' => 'Epsilon Eridani, the capital system of the Empire in its heyday, was a sight yet unrivalled: whole moons - some records claim even planets - were shaped to celebrate the might and wisdom of the Forever Emperor. Their wealth was beyond anything ever documented. Yet, after surviving through what they call the Silent Era, the Empire has been reduced to rubble. The resources of the capital system have been depleted and most of their power disintegrated, yet the Heirs have not given up hope. The new dawn may rise in the uncharted systems.',
             'HOME' => 'tile_222',
@@ -552,15 +552,15 @@ $VAR1 = {
             },
             'TECH' => {
                 'MILITARY' => {
-                    'POSSESS' => [ 'tech_plasma_cannon' ],
+                    'POSSESS' => [ 'tech_beam2' ],
                 },
                 'GRID' => {
-                    'POSSESS' => [ 'tech_gauss_shield' ],
+                    'POSSESS' => [ 'tech_shield1' ],
                 },
                 'NANO' => {
                     'COST' => [ 0, -1, -2, -3, -4, -6, -8, 0 ],
                     'VP' => [ 0, 0, 0, 0, 1, 2, 3, 5 ],
-                    'POSSESS' => [ 'tech_fusion_drive' ],
+                    'POSSESS' => [ 'tech_drive2' ],
                 },
             },
             'STARTING_SHIPS' => [
@@ -573,32 +573,32 @@ $VAR1 = {
             },
             'SHIP_TEMPLATES' => [
                 {
-                    'TAG' => 'shiptemplate_interceptor_terran',
+                    'TAG' => 'shiptemplate_interceptor_human',
                     'LONG_NAME' => 'Gladius',
                     'COST' => 3,
                 },
                 {
-                    'TAG' => 'shiptemplate_cruiser_terran',
+                    'TAG' => 'shiptemplate_cruiser_human',
                     'LONG_NAME' => 'Pilum',
                     'COST' => 5,
                 },
                 {
-                    'TAG' => 'shiptemplate_dreadnought_terran',
+                    'TAG' => 'shiptemplate_dreadnought_human',
                     'LONG_NAME' => 'Ballista',
                     'COST' => 8,
                 },
                 {
-                    'TAG' => 'shiptemplate_starbase_terran',
+                    'TAG' => 'shiptemplate_starbase_human',
                     'LONG_NAME' => 'Scutum',
                     'COST' => 3,
                 },
             ],
             'PROVIDES' => 'spec_eridani',
         },
-        'race_hydran' => {
+        'race_water' => {
             'SOURCE_TAG' => 'src_base',
             'REQUIRED_OPTION' => 'alien_races',
-            'EXCLUDE_RACE' => 'race_terran2',
+            'EXCLUDE_RACE' => 'race_human2',
             'LONG_NAME' => 'Hydran Progress',
             'FLAVOR' => 'Never satisfied, never complete - the Progress are ever striving further. The Hydrans have long since embraced technology as their main interest, constantly evolving and augmenting their society and even themselves with new inventions. The speed of their technological progress in unparalleled among the Seven. Although very difficult to access by the layman, the universities and laboratories of Beta Hydri are held in very high esteem by the scientists species-wide.',
             'HOME' => 'tile_224',
@@ -614,7 +614,7 @@ $VAR1 = {
             },
             'TECH' => {
                 'NANO' => {
-                    'POSSESS' => [ 'tech_advanced_labs' ],
+                    'POSSESS' => [ 'tech_advanced_science' ],
                 },
             },
             'VP_SLOTS' => {
@@ -624,31 +624,31 @@ $VAR1 = {
             },
             'SHIP_TEMPLATES' => [
                 {
-                    'TAG' => 'shiptemplate_interceptor_terran',
+                    'TAG' => 'shiptemplate_interceptor_human',
                     'LONG_NAME' => 'Advance',
                     'COST' => 3,
                 },
                 {
-                    'TAG' => 'shiptemplate_cruiser_terran',
+                    'TAG' => 'shiptemplate_cruiser_human',
                     'LONG_NAME' => 'Discovery',
                     'COST' => 5,
                 },
                 {
-                    'TAG' => 'shiptemplate_dreadnought_terran',
+                    'TAG' => 'shiptemplate_dreadnought_human',
                     'LONG_NAME' => 'Achievement',
                     'COST' => 8,
                 },
                 {
-                    'TAG' => 'shiptemplate_starbase_terran',
+                    'TAG' => 'shiptemplate_starbase_human',
                     'LONG_NAME' => 'Knowledge',
                     'COST' => 3,
                 },
             ],
         },
-        'race_planta' => {
+        'race_plants' => {
             'SOURCE_TAG' => 'src_base',
             'REQUIRED_OPTION' => 'alien_races',
-            'EXCLUDE_RACE' => 'race_terran3',
+            'EXCLUDE_RACE' => 'race_human3',
             'LONG_NAME' => 'Planta',
             'FLAVOR' => 'Even though they are by far the most different species of the Seven, the Planta have long been a steady Council member. Being a moss-like species with a distributed sentience, their intentions are sometimes difficult to decipher. After overgrowing most of the planets and moons in the Cygnus system, they seem to be content in just expanding their lush growth in new systems, fully co-operating with the other species, who mostly regard them as harmless companions. The Planta are phenomenal navigators which makes them very respected in interspecies trading vessels.',
             'HOME' => 'tile_226',
@@ -678,32 +678,32 @@ $VAR1 = {
             },
             'SHIP_TEMPLATES' => [
                 {
-                    'TAG' => 'shiptemplate_interceptor_planta',
+                    'TAG' => 'shiptemplate_interceptor_plants',
                     'LONG_NAME' => 'Seed',
                     'COST' => 3,
                 },
                 {
-                    'TAG' => 'shiptemplate_cruiser_planta',
+                    'TAG' => 'shiptemplate_cruiser_plants',
                     'LONG_NAME' => 'Leaf',
                     'COST' => 5,
                 },
                 {
-                    'TAG' => 'shiptemplate_dreadnought_planta',
+                    'TAG' => 'shiptemplate_dreadnought_plants',
                     'LONG_NAME' => 'Branch',
                     'COST' => 8,
                 },
                 {
-                    'TAG' => 'shiptemplate_starbase_planta',
+                    'TAG' => 'shiptemplate_starbase_plants',
                     'LONG_NAME' => 'Root',
                     'COST' => 3,
                 },
             ],
             'PROVIDES' => 'spec_planta',
         },
-        'race_draco' => {
+        'race_descendants' => {
             'SOURCE_TAG' => 'src_base',
             'REQUIRED_OPTION' => 'alien_races',
-            'EXCLUDE_RACE' => 'race_terran4',
+            'EXCLUDE_RACE' => 'race_human4',
             'LONG_NAME' => 'Descendants of Draco',
             'FLAVOR' => 'The Descendants are rumored to be directly related to the Ancients. While there is no concrete proof on this, the statistics show that the survival ration in the Descendant-Ancient contact is significantly higher for the Descendants than the other Seven. Hailing from the Draco system, the Descendants are a somewhat elusive species. While they are a fully recognized member of the Galactic Council, their Ambassadors still often cause discomfort among the other species.',
             'HOME' => 'tile_228',
@@ -723,32 +723,32 @@ $VAR1 = {
             },
             'SHIP_TEMPLATES' => [
                 {
-                    'TAG' => 'shiptemplate_interceptor_terran',
+                    'TAG' => 'shiptemplate_interceptor_human',
                     'LONG_NAME' => 'Wight',
                     'COST' => 3,
                 },
                 {
-                    'TAG' => 'shiptemplate_cruiser_terran',
+                    'TAG' => 'shiptemplate_cruiser_human',
                     'LONG_NAME' => 'Banshee',
                     'COST' => 5,
                 },
                 {
-                    'TAG' => 'shiptemplate_dreadnought_terran',
+                    'TAG' => 'shiptemplate_dreadnought_human',
                     'LONG_NAME' => 'Wraith',
                     'COST' => 8,
                 },
                 {
-                    'TAG' => 'shiptemplate_starbase_terran',
+                    'TAG' => 'shiptemplate_starbase_human',
                     'LONG_NAME' => 'Revenant',
                     'COST' => 3,
                 },
             ],
             'PROVIDES' => 'spec_draco',
         },
-        'race_mechanema' => {
+        'race_cyborgs' => {
             'SOURCE_TAG' => 'src_base',
             'REQUIRED_OPTION' => 'alien_races',
-            'EXCLUDE_RACE' => 'race_terran5',
+            'EXCLUDE_RACE' => 'race_human5',
             'LONG_NAME' => 'Mechanema',
             'FLAVOR' => 'After along and difficult process, the Mechanema have only recently been accepted as a full member of the Council. Although they have been proven sentient in every legal way defined by the other Seven, and the Auriga system has been assigned as their sovereignty by the Council, there are still occasional disputes on the matter. The birth of the species dates back in the early days of the Galactic Center, when the artificial intelligences of various species were allowed to integrate. The Mechanema are quites respected for their technological advancements - in fact, the basic Ship types now commonly used among the spacefaring races were originally designed by them.',
             'HOME' => 'tile_230',
@@ -765,7 +765,7 @@ $VAR1 = {
             },
             'TECH' => {
                 'GRID' => {
-                    'POSSESS' => [ 'tech_positron_computer' ],
+                    'POSSESS' => [ 'tech_computer2' ],
                 },
             },
             'VP_SLOTS' => {
@@ -777,31 +777,31 @@ $VAR1 = {
             'COST_MONUMENT' => 8,
             'SHIP_TEMPLATES' => [
                 {
-                    'TAG' => 'shiptemplate_interceptor_terran',
+                    'TAG' => 'shiptemplate_interceptor_human',
                     'LONG_NAME' => 'Gamma',
                     'COST' => 2,
                 },
                 {
-                    'TAG' => 'shiptemplate_cruiser_terran',
+                    'TAG' => 'shiptemplate_cruiser_human',
                     'LONG_NAME' => 'Beta',
                     'COST' => 4,
                 },
                 {
-                    'TAG' => 'shiptemplate_dreadnought_terran',
+                    'TAG' => 'shiptemplate_dreadnought_human',
                     'LONG_NAME' => 'Alpha',
                     'COST' => 7,
                 },
                 {
-                    'TAG' => 'shiptemplate_starbase_terran',
+                    'TAG' => 'shiptemplate_starbase_human',
                     'LONG_NAME' => 'Delta',
                     'COST' => 2,
                 },
             ],
         },
-        'race_hegemony' => {
+        'race_warriors' => {
             'SOURCE_TAG' => 'src_base',
             'REQUIRED_OPTION' => 'alien_races',
-            'EXCLUDE_RACE' => 'race_terran6',
+            'EXCLUDE_RACE' => 'race_human6',
             'LONG_NAME' => 'Orion Hegemony',
             'FLAVOR' => 'The Hegemony originally hails from the Orion system, but their fleets are known to have actively patrolled the general volume since the early times. The tragedy that fell upon the Terran Federation Dreadnought "Juri Gagarin" and its accompanying fleet may well have been due to a grave misunderstanding in interspecies communication - plausible enough in a mutual First Contact. The long war that followed and their seemingly overwhelming military power gave the Hegemony their commonly used name. After the peace was established and the interspecies collaboration took its first steps with the creation of the original Galactic Center, the Hegemony has now been recognized as a benevolent species, and their past as a ruthlessly efficient war machine has been reduced to a historical side note.',
             'HOME' => 'tile_232',
@@ -816,10 +816,10 @@ $VAR1 = {
             },
             'TECH' => {
                 'MILITARY' => {
-                    'POSSESS' => [ 'tech_neutron_bombs' ],
+                    'POSSESS' => [ 'tech_bombs' ],
                 },
                 'GRID' => {
-                    'POSSESS' => [ 'tech_gauss_shield' ],
+                    'POSSESS' => [ 'tech_shield1' ],
                 },
             },
             'STARTING_SHIPS' => [
@@ -832,22 +832,22 @@ $VAR1 = {
             },
             'SHIP_TEMPLATES' => [
                 {
-                    'TAG' => 'shiptemplate_interceptor_hegemony',
+                    'TAG' => 'shiptemplate_interceptor_warriors',
                     'LONG_NAME' => 'Contact',
                     'COST' => 3,
                 },
                 {
-                    'TAG' => 'shiptemplate_cruiser_hegemony',
+                    'TAG' => 'shiptemplate_cruiser_warriors',
                     'LONG_NAME' => 'Control',
                     'COST' => 5,
                 },
                 {
-                    'TAG' => 'shiptemplate_dreadnought_hegemony',
+                    'TAG' => 'shiptemplate_dreadnought_warriors',
                     'LONG_NAME' => 'Dominate',
                     'COST' => 8,
                 },
                 {
-                    'TAG' => 'shiptemplate_starbase_hegemony',
+                    'TAG' => 'shiptemplate_starbase_warriors',
                     'LONG_NAME' => 'Protect',
                     'COST' => 3,
                 },
@@ -855,9 +855,9 @@ $VAR1 = {
             'PROVIDES' => 'spec_hegemony',
         },
 
-        'race_guardians_of_mag' =>    {
-            'SOURCE_TAG' => 'src_ship1',
-            'EXCLUDE_RACE' => 'race_terran7',
+        'race_guards1' =>    {
+            'SOURCE_TAG' => 'src_exp2',
+            'EXCLUDE_RACE' => 'race_human7',
             'LONG_NAME' => 'Guardians of Magellan',
             'FLAVOR' => 'Oldest of the known Magellan factions, the Guardians are thought to be the one with the greatest wisdom and determination. They ponder their plans thoroughly but seldom diverge from them once fully committed. Whether the reason is the high Ancient activity or the continuing power struggle in our galaxy, the High Guardians have now launched the mobilization and the worldships are closing in ... ',
             'HOME' => 'tile_239',
@@ -872,7 +872,7 @@ $VAR1 = {
             },
             'TECH' => {
                 'GRID' => {
-                    'POSSESS' => [ 'tech_fusion_source' ],
+                    'POSSESS' => [ 'tech_energy6' ],
                 },
             },
             'VP_SLOTS' => {
@@ -882,22 +882,22 @@ $VAR1 = {
             },
             'SHIP_TEMPLATES' => [
                 {
-                    'TAG' => 'shiptemplate_interceptor_terran',
+                    'TAG' => 'shiptemplate_interceptor_human',
                     'LONG_NAME' => 'Consideration',
                     'COST' => 3,
                 },
                 {
-                    'TAG' => 'shiptemplate_cruiser_terran',
+                    'TAG' => 'shiptemplate_cruiser_human',
                     'LONG_NAME' => 'Inversion',
                     'COST' => 5,
                 },
                 {
-                    'TAG' => 'shiptemplate_dreadnought_terran',
+                    'TAG' => 'shiptemplate_dreadnought_human',
                     'LONG_NAME' => 'Excession',
                     'COST' => 8,
                 },
                 {
-                    'TAG' => 'shiptemplate_starbase_terran',
+                    'TAG' => 'shiptemplate_starbase_human',
                     'LONG_NAME' => 'Transition',
                     'COST' => 3,
                 },
@@ -905,10 +905,10 @@ $VAR1 = {
             'PROVIDES' => 'spec_magellan',
         },
 
-        'race_keepers_of_mag' =>    {
-            'SOURCE_TAG' => 'src_rise',
+        'race_guards2' =>    {
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'alien_races',
-            'EXCLUDE_RACE' => 'race_rho_indi',
+            'EXCLUDE_RACE' => 'race_pirates',
             'LONG_NAME' => 'Keepers of Magellan',
             'HOME' => 'tile_235',
             'EXCHANGE' => 3,
@@ -922,7 +922,7 @@ $VAR1 = {
             },
             'TECH' => {
                 'GRID' => {
-                    'POSSESS' => [ 'tech_fusion_source' ],
+                    'POSSESS' => [ 'tech_energy6' ],
                 },
             },
             'VP_SLOTS' => {
@@ -932,22 +932,22 @@ $VAR1 = {
             },
             'SHIP_TEMPLATES' => [
                 {
-                    'TAG' => 'shiptemplate_interceptor_terran',
+                    'TAG' => 'shiptemplate_interceptor_human',
                     'LONG_NAME' => 'Sapphire',
                     'COST' => 3,
                 },
                 {
-                    'TAG' => 'shiptemplate_cruiser_terran',
+                    'TAG' => 'shiptemplate_cruiser_human',
                     'LONG_NAME' => 'Ruby',
                     'COST' => 5,
                 },
                 {
-                    'TAG' => 'shiptemplate_dreadnought_terran',
+                    'TAG' => 'shiptemplate_dreadnought_human',
                     'LONG_NAME' => 'Diamond',
                     'COST' => 8,
                 },
                 {
-                    'TAG' => 'shiptemplate_starbase_terran',
+                    'TAG' => 'shiptemplate_starbase_human',
                     'LONG_NAME' => 'Crystal',
                     'COST' => 3,
                 },
@@ -955,10 +955,10 @@ $VAR1 = {
             'PROVIDES' => 'spec_magellan',
         },
 
-        'race_rho_indi' =>    {
-            'SOURCE_TAG' => 'src_rise',
+        'race_pirates' =>    {
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'alien_races',
-            'EXCLUDE_RACE' => 'race_keepers_of_mag',
+            'EXCLUDE_RACE' => 'race_guards2',
             'LONG_NAME' => 'Rho Indi Syndicate',
             'HOME' => 'tile_236',
             'COLONY_COUNT' => 2,
@@ -976,7 +976,7 @@ $VAR1 = {
                     'POSSESS' => [ 'tech_starbase' ],
                 },
                 'GRID' => {
-                    'POSSESS' => [ 'tech_gauss_shield' ],
+                    'POSSESS' => [ 'tech_shield1' ],
                 },
             },
             'STARTING_SHIPS' => [
@@ -990,17 +990,17 @@ $VAR1 = {
             },
             'SHIP_TEMPLATES' => [
                 {
-                    'TAG' => 'shiptemplate_interceptor_rho_indi',
+                    'TAG' => 'shiptemplate_interceptor_pirates',
                     'LONG_NAME' => 'Privateer',
                     'COST' => 3,
                 },
                 {
-                    'TAG' => 'shiptemplate_cruiser_rho_indi',
+                    'TAG' => 'shiptemplate_cruiser_pirates',
                     'LONG_NAME' => 'Corsair',
                     'COST' => 5,
                 },
                 {
-                    'TAG' => 'shiptemplate_starbase_rho_indi',
+                    'TAG' => 'shiptemplate_starbase_pirates',
                     'LONG_NAME' => 'Marauder',
                     'COST' => 3,
                 },
@@ -1008,10 +1008,10 @@ $VAR1 = {
             'PROVIDES' => 'spec_rho_indi',
         },
 
-        'race_wardens_of_mag' =>    {
-            'SOURCE_TAG' => 'src_rise',
+        'race_guard3' =>    {
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'alien_races',
-            'EXCLUDE_RACE' => 'race_exiles',
+            'EXCLUDE_RACE' => 'race_outsiders',
             'LONG_NAME' => 'Wardens of Magellan',
             'HOME' => 'tile_233',
             'EXCHANGE' => 3,
@@ -1025,7 +1025,7 @@ $VAR1 = {
             },
             'TECH' => {
                 'GRID' => {
-                    'POSSESS' => [ 'tech_fusion_source' ],
+                    'POSSESS' => [ 'tech_energy6' ],
                 },
             },
             'VP_SLOTS' => {
@@ -1035,22 +1035,22 @@ $VAR1 = {
             },
             'SHIP_TEMPLATES' => [
                 {
-                    'TAG' => 'shiptemplate_interceptor_terran',
+                    'TAG' => 'shiptemplate_interceptor_human',
                     'LONG_NAME' => 'Mercury',
                     'COST' => 3,
                 },
                 {
-                    'TAG' => 'shiptemplate_cruiser_terran',
+                    'TAG' => 'shiptemplate_cruiser_human',
                     'LONG_NAME' => 'Xenon',
                     'COST' => 5,
                 },
                 {
-                    'TAG' => 'shiptemplate_dreadnought_terran',
+                    'TAG' => 'shiptemplate_dreadnought_human',
                     'LONG_NAME' => 'Krypton',
                     'COST' => 8,
                 },
                 {
-                    'TAG' => 'shiptemplate_starbase_terran',
+                    'TAG' => 'shiptemplate_starbase_human',
                     'LONG_NAME' => 'Rhodium',
                     'COST' => 3,
                 },
@@ -1058,10 +1058,10 @@ $VAR1 = {
             'PROVIDES' => 'spec_magellan',
         },
 
-        'race_exiles' =>    {
-            'SOURCE_TAG' => 'src_rise',
+        'race_outsiders' =>    {
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'alien_races',
-            'EXCLUDE_RACE' => 'race_wardens_of_mag',
+            'EXCLUDE_RACE' => 'race_guard3',
             'LONG_NAME' => 'Exiles',
             'HOME' => 'tile_234',
             'EXCHANGE' => 3,
@@ -1081,7 +1081,7 @@ $VAR1 = {
             },
             'TECH' => {
                 'NANO' => {
-                    'POSSESS' => [ 'tech_orbital' ],
+                    'POSSESS' => [ 'tech_ring' ],
                 },
             },
             'VP_SLOTS' => {
@@ -1092,22 +1092,22 @@ $VAR1 = {
             'COST_ORBITAL' => 0,
             'SHIP_TEMPLATES' => [
                 {
-                    'TAG' => 'shiptemplate_interceptor_terran',
+                    'TAG' => 'shiptemplate_interceptor_human',
                     'LONG_NAME' => 'Bronze',
                     'COST' => 3,
                 },
                 {
-                    'TAG' => 'shiptemplate_cruiser_terran',
+                    'TAG' => 'shiptemplate_cruiser_human',
                     'LONG_NAME' => 'Silver',
                     'COST' => 5,
                 },
                 {
-                    'TAG' => 'shiptemplate_dreadnought_terran',
+                    'TAG' => 'shiptemplate_dreadnought_human',
                     'LONG_NAME' => 'Gold',
                     'COST' => 8,
                 },
                 {
-                    'TAG' => 'shiptemplate_starbase_exiles',
+                    'TAG' => 'shiptemplate_starbase_outsiders',
                     'LONG_NAME' => 'Steel',
                     'COST' => 6,
                 },
@@ -1115,10 +1115,10 @@ $VAR1 = {
             'PROVIDES' => 'spec_exiles',
         },
 
-        'race_sentinels_of_mag' =>    {
-            'SOURCE_TAG' => 'src_rise',
+        'race_guard4' =>    {
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'alien_races',
-            'EXCLUDE_RACE' => 'race_enlightened',
+            'EXCLUDE_RACE' => 'race_knowledgable',
             'LONG_NAME' => 'Sentinels of Magellan',
             'HOME' => 'tile_237',
             'EXCHANGE' => 3,
@@ -1132,7 +1132,7 @@ $VAR1 = {
             },
             'TECH' => {
                 'GRID' => {
-                    'POSSESS' => [ 'tech_fusion_source' ],
+                    'POSSESS' => [ 'tech_energy6' ],
                 },
             },
             'VP_SLOTS' => {
@@ -1142,22 +1142,22 @@ $VAR1 = {
             },
             'SHIP_TEMPLATES' => [
                 {
-                    'TAG' => 'shiptemplate_interceptor_terran',
+                    'TAG' => 'shiptemplate_interceptor_human',
                     'LONG_NAME' => 'Sentry',
                     'COST' => 3,
                 },
                 {
-                    'TAG' => 'shiptemplate_cruiser_terran',
+                    'TAG' => 'shiptemplate_cruiser_human',
                     'LONG_NAME' => 'Warlord',
                     'COST' => 5,
                 },
                 {
-                    'TAG' => 'shiptemplate_dreadnought_terran',
+                    'TAG' => 'shiptemplate_dreadnought_human',
                     'LONG_NAME' => 'Executor',
                     'COST' => 8,
                 },
                 {
-                    'TAG' => 'shiptemplate_starbase_terran',
+                    'TAG' => 'shiptemplate_starbase_human',
                     'LONG_NAME' => 'Steward',
                     'COST' => 3,
                 },
@@ -1165,10 +1165,10 @@ $VAR1 = {
             'PROVIDES' => 'spec_magellan',
         },
 
-        'race_enlightened' =>    {
-            'SOURCE_TAG' => 'src_rise',
+        'race_knowledgable' =>    {
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'alien_races',
-            'EXCLUDE_RACE' => 'race_sentinels_of_mag',
+            'EXCLUDE_RACE' => 'race_guard4',
             'LONG_NAME' => 'Enlightened of Lyra',
             'HOME' => 'tile_238',
             'EXCHANGE' => 3,
@@ -1182,7 +1182,7 @@ $VAR1 = {
             },
             'TECH' => {
                 'GRID' => {
-                    'POSSESS' => [ 'tech_fusion_source' ],
+                    'POSSESS' => [ 'tech_energy6' ],
                 },
             },
             'VP_SLOTS' => {
@@ -1192,22 +1192,22 @@ $VAR1 = {
             },
             'SHIP_TEMPLATES' => [
                 {
-                    'TAG' => 'shiptemplate_interceptor_terran',
+                    'TAG' => 'shiptemplate_interceptor_human',
                     'LONG_NAME' => 'Satori',
                     'COST' => 3,
                 },
                 {
-                    'TAG' => 'shiptemplate_cruiser_terran',
+                    'TAG' => 'shiptemplate_cruiser_human',
                     'LONG_NAME' => 'Bodhi',
                     'COST' => 5,
                 },
                 {
-                    'TAG' => 'shiptemplate_dreadnought_terran',
+                    'TAG' => 'shiptemplate_dreadnought_human',
                     'LONG_NAME' => 'Nirvana',
                     'COST' => 8,
                 },
                 {
-                    'TAG' => 'shiptemplate_starbase_terran',
+                    'TAG' => 'shiptemplate_starbase_human',
                     'LONG_NAME' => 'Void',
                     'COST' => 3,
                 },
@@ -1219,7 +1219,7 @@ $VAR1 = {
 
     'SHIP_TEMPLATES' => {
 
-        'shiptemplate_interceptor_terran' => {
+        'shiptemplate_interceptor_human' => {
             'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_interceptor',
             'INTIATIVE' => 2,
@@ -1235,7 +1235,7 @@ $VAR1 = {
             'VP_DRAW' => 1,
             'REQUIRES' => 'ship_drive',
         },
-        'shiptemplate_cruiser_terran' => {
+        'shiptemplate_cruiser_human' => {
             'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_cruiser',
             'INTIATIVE' => 1,
@@ -1253,7 +1253,7 @@ $VAR1 = {
             'VP_DRAW' => 2,
             'REQUIRES' => 'ship_drive',
         },
-        'shiptemplate_dreadnought_terran' => {
+        'shiptemplate_dreadnought_human' => {
             'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_dreadnought',
             'INTIATIVE' => 0,
@@ -1273,7 +1273,7 @@ $VAR1 = {
             'VP_DRAW' => 3,
             'REQUIRES' => 'ship_drive',
         },
-        'shiptemplate_starbase_terran' => {
+        'shiptemplate_starbase_human' => {
             'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_starbase',
             'INTIATIVE' => 4,
@@ -1290,7 +1290,7 @@ $VAR1 = {
             'VP_DRAW' => 1,
             'EXCLUDE' => 'ship_drive',
         },
-        'shiptemplate_interceptor_planta' => {
+        'shiptemplate_interceptor_plants' => {
             'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_interceptor',
             'INTIATIVE' => 0,
@@ -1306,7 +1306,7 @@ $VAR1 = {
             'VP_DRAW' => 1,
             'REQUIRES' => 'ship_drive',
         },
-        'shiptemplate_cruiser_planta' => {
+        'shiptemplate_cruiser_plants' => {
             'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_cruiser',
             'INTIATIVE' => 0,
@@ -1323,7 +1323,7 @@ $VAR1 = {
             'VP_DRAW' => 2,
             'REQUIRES' => 'ship_drive',
         },
-        'shiptemplate_dreadnought_planta' => {
+        'shiptemplate_dreadnought_plants' => {
             'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_dreadnought',
             'INTIATIVE' => 0,
@@ -1342,7 +1342,7 @@ $VAR1 = {
             'VP_DRAW' => 3,
             'REQUIRES' => 'ship_drive',
         },
-        'shiptemplate_starbase_planta' => {
+        'shiptemplate_starbase_plants' => {
             'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_starbase',
             'INTIATIVE' => 2,
@@ -1359,7 +1359,7 @@ $VAR1 = {
             'VP_DRAW' => 1,
             'EXCLUDE' => 'ship_drive',
         },
-        'shiptemplate_interceptor_hegemony' => {
+        'shiptemplate_interceptor_warriors' => {
             'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_interceptor',
             'INTIATIVE' => 3,
@@ -1376,7 +1376,7 @@ $VAR1 = {
             'VP_DRAW' => 1,
             'REQUIRES' => 'ship_drive',
         },
-        'shiptemplate_cruiser_hegemony' => {
+        'shiptemplate_cruiser_warriors' => {
             'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_cruiser',
             'INTIATIVE' => 2,
@@ -1395,7 +1395,7 @@ $VAR1 = {
             'VP_DRAW' => 2,
             'REQUIRES' => 'ship_drive',
         },
-        'shiptemplate_dreadnought_hegemony' => {
+        'shiptemplate_dreadnought_warriors' => {
             'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_dreadnought',
             'INTIATIVE' => 1,
@@ -1416,7 +1416,7 @@ $VAR1 = {
             'VP_DRAW' => 3,
             'REQUIRES' => 'ship_drive',
         },
-        'shiptemplate_starbase_hegemony' => {
+        'shiptemplate_starbase_warriors' => {
             'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_starbase',
             'INTIATIVE' => 5,
@@ -1435,7 +1435,7 @@ $VAR1 = {
             'EXCLUDE' => 'ship_drive',
         },
 
-        'shiptemplate_interceptor_rho_indi' => {
+        'shiptemplate_interceptor_pirates' => {
             'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_interceptor',
             'INTIATIVE' => 3,
@@ -1451,7 +1451,7 @@ $VAR1 = {
             'VP_DRAW' => 1,
             'REQUIRES' => 'ship_drive',
         },
-        'shiptemplate_cruiser_rho_indi' => {
+        'shiptemplate_cruiser_pirates' => {
             'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_cruiser',
             'INTIATIVE' => 2,
@@ -1470,7 +1470,7 @@ $VAR1 = {
             'REQUIRES' => 'ship_drive',
         },
 
-        'shiptemplate_starbase_rho_indi' => {
+        'shiptemplate_starbase_pirates' => {
             'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_starbase',
             'INTIATIVE' => 4,
@@ -1488,8 +1488,8 @@ $VAR1 = {
             'EXCLUDE' => 'ship_drive',
         },
 
-        'shiptemplate_starbase_exiles' => {
-            'SOURCE_TAG' => 'src_rise',
+        'shiptemplate_starbase_outsiders' => {
+            'SOURCE_TAG' => 'src_exp1',
             'CLASS' => 'class_starbase',
             'INTIATIVE' => 0,
             'ENERGY' => 4,
@@ -1519,7 +1519,7 @@ $VAR1 = {
             'VP_DRAW' => 1,
         },
         'shiptemplate_ancient2' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'ancient_homeworlds',
             'CLASS' => 'class_ancient_destroyer',
             'INTIATIVE' => 1,
@@ -1534,12 +1534,12 @@ $VAR1 = {
             'VP' => 1,
         },
         'shiptemplate_ancient3' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'ancient_homeworlds',
             'CLASS' => 'class_ancient_destroyer',
             'INTIATIVE' => 0,
             'COMPONENTS' => [
-                'comp_antimatter_cannon',
+                'comp_beam4',
                 'comp_improved_hull',
                 'comp_improved_hull',
                 'comp_gluon_computer',
@@ -1548,7 +1548,7 @@ $VAR1 = {
             'VP' => 1,
         },
         'shiptemplate_ancient4' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'ancient_homeworlds',
             'CLASS' => 'class_ancient_destroyer',
             'INTIATIVE' => 3,
@@ -1562,7 +1562,7 @@ $VAR1 = {
             'VP' => 1,
         },
         'shiptemplate_ancient5' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'ancient_homeworlds',
             'CLASS' => 'class_ancient_destroyer',
             'INTIATIVE' => 0,
@@ -1579,7 +1579,7 @@ $VAR1 = {
             'VP' => 1,
         },
         'shiptemplate_ancient6' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'ancient_homeworlds',
             'CLASS' => 'class_ancient_destroyer',
             'INTIATIVE' => 0,
@@ -1596,7 +1596,7 @@ $VAR1 = {
             'VP' => 1,
         },
         'shiptemplate_ancient7' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'ancient_homeworlds',
             'CLASS' => 'class_ancient_destroyer',
             'INTIATIVE' => 4,
@@ -1611,7 +1611,7 @@ $VAR1 = {
             'VP' => 1,
         },
         'shiptemplate_ancient8' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'ancient_homeworlds',
             'CLASS' => 'class_ancient_destroyer',
             'INTIATIVE' => 2,
@@ -1629,7 +1629,7 @@ $VAR1 = {
             'VP' => 1,
         },
         'shiptemplate_ancient9' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'ancient_homeworlds',
             'CLASS' => 'class_ancient_destroyer',
             'INTIATIVE' => 0,
@@ -1645,7 +1645,7 @@ $VAR1 = {
             'VP_DRAW' => 2,
             'VP' => 1,
         },
-        'shiptemplate_gcds1' => {
+        'shiptemplate_defense1' => {
             'SOURCE_TAG' => 'src_base',
             'CLASS' => 'class_gcds',
             'INTIATIVE' => 0,
@@ -1663,8 +1663,8 @@ $VAR1 = {
             'VP_DRAW' => 3,
             'VP' => 0,
         },
-        'shiptemplate_gcds2' => {
-            'SOURCE_TAG' => 'src_ship1',
+        'shiptemplate_defense2' => {
+            'SOURCE_TAG' => 'src_exp2',
             'REQUIRED_OPTION' => 'advanced_gcds',
             'CLASS' => 'class_advanced_gcds',
             'INTIATIVE' => 4,
@@ -1679,14 +1679,14 @@ $VAR1 = {
             'VP_DRAW' => 3,
             'VP' => 0,
         },
-        'shiptemplate_gcds3' => {
-            'SOURCE_TAG' => 'src_ship1',
+        'shiptemplate_defense3' => {
+            'SOURCE_TAG' => 'src_exp2',
             'REQUIRED_OPTION' => 'advanced_gcds',
             'CLASS' => 'class_advanced_gcds',
             'INTIATIVE' => 4,
             'COMPONENTS' => [
-                'comp_antimatter_cannon',
-                'comp_antimatter_cannon',
+                'comp_beam4',
+                'comp_beam4',
                 'comp_electron_computer',
                 'comp_phase_shield',
                 'comp_improved_hull',
@@ -1695,8 +1695,8 @@ $VAR1 = {
             'VP_DRAW' => 3,
             'VP' => 0,
         },
-        'shiptemplate_gcds4' => {
-            'SOURCE_TAG' => 'src_rise',
+        'shiptemplate_defense4' => {
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'ancient_dreadnought',
             'CLASS' => 'class_ancient_dreadnought',
             'INTIATIVE' => 3,
@@ -1712,15 +1712,15 @@ $VAR1 = {
             'VP_DRAW' => 3,
             'VP' => 1,
         },
-        'shiptemplate_gcds5' => {
-            'SOURCE_TAG' => 'src_rise',
+        'shiptemplate_defense5' => {
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'ancient_dreadnought',
             'CLASS' => 'class_ancient_dreadnought',
             'INTIATIVE' => 4,
             'COMPONENTS' => [
                 'comp_flux_missile',
                 'comp_flux_missile',
-                'comp_antimatter_cannon',
+                'comp_beam4',
                 'comp_positron_computer',
                 'comp_improved_hull',
                 'comp_hull',
@@ -2005,7 +2005,7 @@ $VAR1 = {
             ],
         },
         'tile_212' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'hive_worlds',
             'ID' => '212',
             'LONG_NAME' => 'Lambda Fornacis',
@@ -2023,7 +2023,7 @@ $VAR1 = {
             ],
         },
         'tile_213' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'ID' => '213',
             'LONG_NAME' => 'Iota Bootis',
             'STACK' => 2,
@@ -2219,7 +2219,7 @@ $VAR1 = {
             ],
         },
         'tile_233' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'ID' => '233',
             'LONG_NAME' => '47 Ursae Majoris',
             'STACK' => 4,
@@ -2235,7 +2235,7 @@ $VAR1 = {
             ],
         },
         'tile_234' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'ID' => '234',
             'LONG_NAME' => 'Eta Geminorum',
             'STACK' => 4,
@@ -2250,7 +2250,7 @@ $VAR1 = {
             ],
         },
         'tile_235' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'ID' => '235',
             'LONG_NAME' => 'Mu Arae',
             'STACK' => 4,
@@ -2266,7 +2266,7 @@ $VAR1 = {
             ],
         },
         'tile_236' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'ID' => '236',
             'LONG_NAME' => 'Rho Indi',
             'STACK' => 4,
@@ -2314,7 +2314,7 @@ $VAR1 = {
             ],
         },
         'tile_239' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'ID' => '239',
             'LONG_NAME' => 'Kappa Volantis',
             'STACK' => 4,
@@ -2345,7 +2345,7 @@ $VAR1 = {
             ],
         },
         'tile_271' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'ancient_homeworlds',
             'ID' => '271',
             'LONG_NAME' => 'Omega Fornacis',
@@ -2363,7 +2363,7 @@ $VAR1 = {
             ],
         },
         'tile_272' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'ancient_homeworlds',
             'ID' => '272',
             'LONG_NAME' => 'Sigma Hydrae',
@@ -2381,7 +2381,7 @@ $VAR1 = {
             ],
         },
         'tile_273' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'ancient_homeworlds',
             'ID' => '273',
             'LONG_NAME' => 'Theta Ophiuchi',
@@ -2399,7 +2399,7 @@ $VAR1 = {
             ],
         },
         'tile_274' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'ancient_homeworlds',
             'ID' => '274',
             'LONG_NAME' => 'Alpha Lyncis',
@@ -2417,7 +2417,7 @@ $VAR1 = {
             ],
         },
         'tile_281' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'ID' => '281',
             'LONG_NAME' => 'Delta Corvi',
             'STACK' => 2,
@@ -2655,7 +2655,7 @@ $VAR1 = {
             ],
         },
         'tile_319' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'hive_worlds',
             'ID' => '319',
             'LONG_NAME' => 'Upsilon Hydrae',
@@ -2673,7 +2673,7 @@ $VAR1 = {
             ],
         },
         'tile_320' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'ID' => '320',
             'LONG_NAME' => 'Nu Ophiuchi',
             'STACK' => 3,
@@ -2687,7 +2687,7 @@ $VAR1 = {
             ],
         },
         'tile_321' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'ID' => '321',
             'LONG_NAME' => 'Beta Delphini',
             'STACK' => 3,
@@ -2699,7 +2699,7 @@ $VAR1 = {
             ],
         },
         'tile_322' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'ID' => '322',
             'LONG_NAME' => 'Lambda Tauri',
             'STACK' => 3,
@@ -2711,7 +2711,7 @@ $VAR1 = {
             ],
         },
         'tile_323' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'ID' => '323',
             'LONG_NAME' => 'Zeta Andromedae',
             'STACK' => 3,
@@ -2722,7 +2722,7 @@ $VAR1 = {
             ],
         },
         'tile_324' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'ID' => '324',
             'LONG_NAME' => 'Epsilon Carinae',
             'STACK' => 3,
@@ -2734,7 +2734,7 @@ $VAR1 = {
             ],
         },
         'tile_325' => {
-            'SOURCE_TAG' => 'src_ship1',
+            'SOURCE_TAG' => 'src_exp2',
             'ID' => '325',
             'LONG_NAME' => 'Tau Librae',
             'STACK' => 3,
@@ -2748,7 +2748,7 @@ $VAR1 = {
             ],
         },
         'tile_381' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'ID' => '381',
             'LONG_NAME' => 'Beta Sextantis',
             'STACK' => 3,
@@ -2761,7 +2761,7 @@ $VAR1 = {
             ],
         },
         'tile_382' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'ID' => '382',
             'LONG_NAME' => 'Zeta Chamaeleontis',
             'STACK' => 3,
@@ -2776,427 +2776,427 @@ $VAR1 = {
 
     'TECHNOLOGY' => {
 
-        'tech_advanced_economy' => {
+        'tech_advanced_money' => {
             'SOURCE_TAG' => 'src_base',
             'CATEGORY' => 'grid',
             'LONG_NAME' => 'Advanced Economy',
             'BASE_COST' => 10,
             'MIN_COST' => 6,
             'COUNT' => 4,
-            'PROVIDES' => 'tech_advanced_economy',
+            'PROVIDES' => 'tech_advanced_money',
         },
-        'tech_advanced_economy_79' => {
-            'SOURCE_TAG' => 'src_rise',
+        'tech_advanced_money_79' => {
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => '79player',
             'CATEGORY' => 'grid',
             'LONG_NAME' => 'Advanced Economy',
             'BASE_COST' => 10,
             'MIN_COST' => 6,
             'COUNT' => 1,
-            'PROVIDES' => 'tech_advanced_economy',
+            'PROVIDES' => 'tech_advanced_money',
         },
-        'tech_advanced_labs' => {
+        'tech_advanced_science' => {
             'SOURCE_TAG' => 'src_base',
             'CATEGORY' => 'nano',
             'LONG_NAME' => 'Advanced Labs',
             'BASE_COST' => 10,
             'MIN_COST' => 6,
             'COUNT' => 4,
-            'PROVIDES' => 'tech_advanced_labs',
+            'PROVIDES' => 'tech_advanced_science',
         },
-        'tech_advanced_lab_79' => {
-            'SOURCE_TAG' => 'src_rise',
+        'tech_advanced_science_79' => {
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => '79player',
             'CATEGORY' => 'nano',
             'LONG_NAME' => 'Advanced Labs',
             'BASE_COST' => 10,
             'MIN_COST' => 6,
             'COUNT' => 1,
-            'PROVIDES' => 'tech_advanced_labs',
+            'PROVIDES' => 'tech_advanced_science',
         },
-        'tech_advanced_mining' => {
+        'tech_advanced_minerals' => {
             'SOURCE_TAG' => 'src_base',
             'CATEGORY' => 'military',
             'LONG_NAME' => 'Advanced Mining',
             'BASE_COST' => 10,
             'MIN_COST' => 6,
             'COUNT' => 4,
-            'PROVIDES' => 'tech_advanced_mining',
+            'PROVIDES' => 'tech_advanced_minerals',
         },
-        'tech_advanced_mining_79' => {
-            'SOURCE_TAG' => 'src_rise',
+        'tech_advanced_minerals_79' => {
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => '79player',
             'CATEGORY' => 'military',
             'LONG_NAME' => 'Advanced Mining',
             'BASE_COST' => 10,
             'MIN_COST' => 6,
             'COUNT' => 1,
-            'PROVIDES' => 'tech_advanced_mining',
+            'PROVIDES' => 'tech_advanced_minerals',
         },
-        'tech_advanced_robotics' => {
+        'tech_advanced_build' => {
             'SOURCE_TAG' => 'src_base',
             'CATEGORY' => 'nano',
             'LONG_NAME' => 'Advanced Robotics',
             'BASE_COST' => 6,
             'MIN_COST' => 4,
             'COUNT' => 5,
-            'PROVIDES' => 'tech_advanced_robotics',
+            'PROVIDES' => 'tech_advanced_build',
         },
-        'tech_advanced_robotics_79' => {
-            'SOURCE_TAG' => 'src_rise',
+        'tech_advanced_build_79' => {
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => '79player',
             'CATEGORY' => 'nano',
             'LONG_NAME' => 'Advanced Robotics',
             'BASE_COST' => 6,
             'MIN_COST' => 4,
             'COUNT' => 1,
-            'PROVIDES' => 'tech_advanced_robotics',
+            'PROVIDES' => 'tech_advanced_build',
         },
-        'tech_antimatter_cannon' => {
+        'tech_beam4' => {
             'SOURCE_TAG' => 'src_base',
             'CATEGORY' => 'grid',
             'LONG_NAME' => 'Antimatter Cannon',
             'BASE_COST' => 14,
             'MIN_COST' => 7,
             'COUNT' => 3,
-            'PROVIDES' => 'tech_antimatter_cannon',
+            'PROVIDES' => 'tech_beam4',
         },
-        'tech_antimatter_cannon_79' => {
-            'SOURCE_TAG' => 'src_rise',
+        'tech_beam4_79' => {
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => '79player',
             'CATEGORY' => 'grid',
             'LONG_NAME' => 'Antimatter Cannon',
             'BASE_COST' => 14,
             'MIN_COST' => 7,
             'COUNT' => 1,
-            'PROVIDES' => 'tech_antimatter_cannon',
+            'PROVIDES' => 'tech_beam4',
         },
-        'tech_antimatter_splitter' => {
-            'SOURCE_TAG' => 'src_rise',
+        'tech_beam_splitter' => {
+            'SOURCE_TAG' => 'src_exp1',
             'CATEGORY' => 'special',
             'LONG_NAME' => 'Antimatter Splitter',
             'BASE_COST' => 5,
             'MIN_COST' => 5,
             'COUNT' => 1,
-            'PROVIDES' => 'tech_antimatter_splitter',
+            'PROVIDES' => 'tech_beam_splitter',
         },
-        'tech_artifact_key' => {
+        'tech_artifact_reader' => {
             'SOURCE_TAG' => 'src_base',
             'CATEGORY' => 'nano',
             'LONG_NAME' => 'Artifact Key',
             'BASE_COST' => 14,
             'MIN_COST' => 7,
             'COUNT' => 3,
-            'PROVIDES' => 'tech_artifact_key',
+            'PROVIDES' => 'tech_artifact_reader',
         },
-        'tech_cloaking_device' => {
+        'tech_stealth' => {
             'SOURCE_TAG' => 'src_base',
             'CATEGORY' => 'special',
             'LONG_NAME' => 'Cloaking Device',
             'BASE_COST' => 7,
             'MIN_COST' => 6,
             'COUNT' => 1,
-            'PROVIDES' => 'tech_cloaking_device',
+            'PROVIDES' => 'tech_stealth',
         },
-        'tech_conifold_field' => {
-            'SOURCE_TAG' => 'src_rise',
+        'tech_hull3' => {
+            'SOURCE_TAG' => 'src_exp1',
             'CATEGORY' => 'special',
             'LONG_NAME' => 'Conifold Field',
             'BASE_COST' => 5,
             'MIN_COST' => 5,
             'COUNT' => 1,
-            'PROVIDES' => 'tech_conifold_field',
+            'PROVIDES' => 'tech_hull3',
         },
-        'tech_distortion_shield' => {
-            'SOURCE_TAG' => 'src_rise',
+        'tech_missile_shield2' => {
+            'SOURCE_TAG' => 'src_exp1',
             'CATEGORY' => 'special',
             'LONG_NAME' => 'Distortion Shield',
             'BASE_COST' => 7,
             'MIN_COST' => 6,
             'COUNT' => 1,
-            'PROVIDES' => 'tech_distortion_shield',
+            'PROVIDES' => 'tech_missile_shield2',
         },
-        'tech_flux_missile' => {
-            'SOURCE_TAG' => 'src_rise',
+        'tech_missile1' => {
+            'SOURCE_TAG' => 'src_exp1',
             'CATEGORY' => 'special',
             'LONG_NAME' => 'Flux Missile',
             'BASE_COST' => 11,
             'MIN_COST' => 8,
             'COUNT' => 1,
-            'PROVIDES' => 'tech_flux_missiles',
+            'PROVIDES' => 'tech_missile1',
         },
-        'tech_fusion_drive' => {
+        'tech_drive2' => {
             'SOURCE_TAG' => 'src_base',
             'CATEGORY' => 'grid',
             'LONG_NAME' => 'Fusion Drive',
             'BASE_COST' => 4,
             'MIN_COST' => 3,
             'COUNT' => 5,
-            'PROVIDES' => 'tech_fusion_drive',
+            'PROVIDES' => 'tech_drive2',
         },
-        'tech_fusion_drive_79' => {
-            'SOURCE_TAG' => 'src_rise',
+        'tech_drive2_79' => {
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => '79player',
             'CATEGORY' => 'grid',
             'LONG_NAME' => 'Fusion Drive',
             'BASE_COST' => 4,
             'MIN_COST' => 3,
             'COUNT' => 1,
-            'PROVIDES' => 'tech_fusion_drive',
+            'PROVIDES' => 'tech_drive2',
         },
-        'tech_fusion_source' => {
+        'tech_energy6' => {
             'SOURCE_TAG' => 'src_base',
             'CATEGORY' => 'grid',
             'LONG_NAME' => 'Fusion Source',
             'BASE_COST' => 10,
             'MIN_COST' => 6,
             'COUNT' => 5,
-            'PROVIDES' => 'tech_fusion_source',
+            'PROVIDES' => 'tech_energy6',
         },
-        'tech_fusion_source_79' => {
-            'SOURCE_TAG' => 'src_rise',
+        'tech_energy6_79' => {
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => '79player',
             'CATEGORY' => 'grid',
             'LONG_NAME' => 'Fusion Source',
             'BASE_COST' => 10,
             'MIN_COST' => 6,
             'COUNT' => 1,
-            'PROVIDES' => 'tech_fusion_source',
+            'PROVIDES' => 'tech_energy6',
         },
-        'tech_gauss_shield' => {
+        'tech_shield1' => {
             'SOURCE_TAG' => 'src_base',
             'CATEGORY' => 'grid',
             'LONG_NAME' => 'Gauss Shield',
             'BASE_COST' => 2,
             'MIN_COST' => 2,
             'COUNT' => 5,
-            'PROVIDES' => 'tech_gauss_shield',
+            'PROVIDES' => 'tech_shield1',
         },
-        'tech_gluon_computer' => {
+        'tech_computer3' => {
             'SOURCE_TAG' => 'src_base',
             'CATEGORY' => 'military',
             'LONG_NAME' => 'Gluon Computer',
             'BASE_COST' => 16,
             'MIN_COST' => 8,
             'COUNT' => 3,
-            'PROVIDES' => 'tech_gluon_computer',
+            'PROVIDES' => 'tech_computer3',
         },
-        'tech_gluon_computer_79' => {
-            'SOURCE_TAG' => 'src_rise',
+        'tech_computer3_79' => {
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => '79player',
             'CATEGORY' => 'military',
             'LONG_NAME' => 'Gluon Computer',
             'BASE_COST' => 16,
             'MIN_COST' => 8,
             'COUNT' => 1,
-            'PROVIDES' => 'tech_gluon_computer',
+            'PROVIDES' => 'tech_computer3',
         },
-        'tech_improved_hull' => {
+        'tech_hull2' => {
             'SOURCE_TAG' => 'src_base',
             'CATEGORY' => 'grid',
             'LONG_NAME' => 'Improved Hull',
             'BASE_COST' => 4,
             'MIN_COST' => 3,
             'COUNT' => 5,
-            'PROVIDES' => 'tech_improved_hull',
+            'PROVIDES' => 'tech_hull2',
         },
-        'tech_improved_hull_79' => {
-            'SOURCE_TAG' => 'src_rise',
+        'tech_hull2_79' => {
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => '79player',
             'CATEGORY' => 'grid',
             'LONG_NAME' => 'Improved Hull',
             'BASE_COST' => 4,
             'MIN_COST' => 3,
             'COUNT' => 1,
-            'PROVIDES' => 'tech_improved_hull',
+            'PROVIDES' => 'tech_hull2',
         },
-        'tech_interceptor_bay' => {
-            'SOURCE_TAG' => 'src_rise',
+        'tech_carrier_bay' => {
+            'SOURCE_TAG' => 'src_exp1',
             'CATEGORY' => 'special',
             'LONG_NAME' => 'Interceptor Bay',
             'BASE_COST' => 9,
             'MIN_COST' => 7,
             'COUNT' => 1,
-            'PROVIDES' => 'tech_interceptor_bay',
+            'PROVIDES' => 'tech_carrier_bay',
         },
-        'tech_monolith' => {
+        'tech_obilisk' => {
             'SOURCE_TAG' => 'src_base',
             'CATEGORY' => 'nano',
             'LONG_NAME' => 'Monolith',
             'BASE_COST' => 12,
             'MIN_COST' => 6,
             'COUNT' => 3,
-            'PROVIDES' => 'tech_monolith',
+            'PROVIDES' => 'tech_obilisk',
         },
-        'tech_monolith_79' => {
-            'SOURCE_TAG' => 'src_rise',
+        'tech_obilisk_79' => {
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => '79player',
             'CATEGORY' => 'nano',
             'LONG_NAME' => 'Monolith',
             'BASE_COST' => 12,
             'MIN_COST' => 6,
             'COUNT' => 1,
-            'PROVIDES' => 'tech_monolith',
+            'PROVIDES' => 'tech_obilisk',
         },
-        'tech_nanorobots' => {
+        'tech_advanced_build' => {
             'SOURCE_TAG' => 'src_base',
             'CATEGORY' => 'nano',
             'LONG_NAME' => 'Nanorobots',
             'BASE_COST' => 2,
             'MIN_COST' => 2,
             'COUNT' => 5,
-            'PROVIDES' => 'tech_nanorobots',
+            'PROVIDES' => 'tech_advanced_build',
         },
-        'tech_neutron_absorb' => {
-            'TAG' => 'tech_neutron_absorb',
-            'SOURCE_TAG' => 'src_rise',
+        'tech_bomb_shield' => {
+            'TAG' => 'tech_bomb_shield',
+            'SOURCE_TAG' => 'src_exp1',
             'CATEGORY' => 'special',
             'LONG_NAME' => 'Neutron Absorber',
             'BASE_COST' => 5,
             'MIN_COST' => 5,
             'COUNT' => 1,
-            'PROVIDES' => 'tech_neutron_absorber',
+            'PROVIDES' => 'tech_bomb_shield',
         },
-        'tech_neutron_bombs' => {
+        'tech_bombs' => {
             'SOURCE_TAG' => 'src_base',
             'CATEGORY' => 'military',
             'LONG_NAME' => 'Neutron Bombs',
             'BASE_COST' => 2,
             'MIN_COST' => 2,
             'COUNT' => 5,
-            'PROVIDES' => 'tech_neutron_bombs',
+            'PROVIDES' => 'tech_bombs',
         },
-        'tech_orbital' => {
+        'tech_ring' => {
             'SOURCE_TAG' => 'src_base',
             'CATEGORY' => 'nano',
             'LONG_NAME' => 'Orbital',
             'BASE_COST' => 8,
             'MIN_COST' => 5,
             'COUNT' => 4,
-            'PROVIDES' => 'tech_orbital',
+            'PROVIDES' => 'tech_ring',
         },
-        'tech_orbital_79' => {
-            'SOURCE_TAG' => 'src_rise',
+        'tech_ring_79' => {
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => '79player',
             'CATEGORY' => 'nano',
             'LONG_NAME' => 'Orbital',
             'BASE_COST' => 8,
             'MIN_COST' => 5,
             'COUNT' => 1,
-            'PROVIDES' => 'tech_orbital',
+            'PROVIDES' => 'tech_ring',
         },
-        'tech_phase_shield' => {
+        'tech_shield2' => {
             'SOURCE_TAG' => 'src_base',
             'CATEGORY' => 'military',
             'LONG_NAME' => 'Phase Shield',
             'BASE_COST' => 8,
             'MIN_COST' => 5,
             'COUNT' => 4,
-            'PROVIDES' => 'tech_phase_shield',
+            'PROVIDES' => 'tech_shield2',
         },
-        'tech_phase_shield_79' => {
-            'SOURCE_TAG' => 'src_rise',
+        'tech_shield2_79' => {
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => '79player',
             'CATEGORY' => 'military',
             'LONG_NAME' => 'Phase Shield',
             'BASE_COST' => 8,
             'MIN_COST' => 5,
             'COUNT' => 1,
-            'PROVIDES' => 'tech_phase_shield',
+            'PROVIDES' => 'tech_shield2',
         },
-        'tech_plasma_cannon' => {
+        'tech_beam2' => {
             'SOURCE_TAG' => 'src_base',
             'CATEGORY' => 'military',
             'LONG_NAME' => 'Plasma Cannon',
             'BASE_COST' => 6,
             'MIN_COST' => 4,
             'COUNT' => 5,
-            'PROVIDES' => 'tech_plasma_cannon',
+            'PROVIDES' => 'tech_beam2',
         },
-        'tech_plasma_cannon_79' => {
-            'SOURCE_TAG' => 'src_rise',
+        'tech_beam2_79' => {
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => '79player',
             'CATEGORY' => 'military',
             'LONG_NAME' => 'Plasma Cannon',
             'BASE_COST' => 6,
             'MIN_COST' => 4,
             'COUNT' => 1,
-            'PROVIDES' => 'tech_plasma_cannon',
+            'PROVIDES' => 'tech_beam2',
         },
-        'tech_plasma_missile' => {
+        'tech_missile2' => {
             'SOURCE_TAG' => 'src_base',
             'CATEGORY' => 'military',
             'LONG_NAME' => 'Plasma Missile',
             'BASE_COST' => 14,
             'MIN_COST' => 7,
             'COUNT' => 3,
-            'PROVIDES' => 'tech_plasma_missile',
+            'PROVIDES' => 'tech_missile2',
         },
-        'tech_plasma_missile_79' => {
-            'SOURCE_TAG' => 'src_rise',
+        'tech_missile2_79' => {
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => '79player',
             'CATEGORY' => 'military',
             'LONG_NAME' => 'Plasma Missile',
             'BASE_COST' => 14,
             'MIN_COST' => 7,
             'COUNT' => 1,
-            'PROVIDES' => 'tech_plasma_missile',
+            'PROVIDES' => 'tech_missile2',
         },
-        'tech_point_defense' => {
-            'SOURCE_TAG' => 'src_rise',
+        'tech_missile_defense' => {
+            'SOURCE_TAG' => 'src_exp1',
             'CATEGORY' => 'special',
             'LONG_NAME' => 'Point Defense',
             'BASE_COST' => 11,
             'MIN_COST' => 8,
             'COUNT' => 1,
-            'PROVIDES' => 'tech_point_defense',
+            'PROVIDES' => 'tech_missile_defense',
         },
-        'tech_positron_computer' => {
+        'tech_computer2' => {
             'SOURCE_TAG' => 'src_base',
             'CATEGORY' => 'grid',
             'LONG_NAME' => 'Positron Computer',
             'BASE_COST' => 8,
             'MIN_COST' => 5,
             'COUNT' => 4,
-            'PROVIDES' => 'tech_positron_computer',
+            'PROVIDES' => 'tech_computer2',
         },
-        'tech_positron_computer_79' => {
-            'SOURCE_TAG' => 'src_rise',
+        'tech_computer2_79' => {
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => '79player',
             'CATEGORY' => 'grid',
             'LONG_NAME' => 'Positron Computer',
             'BASE_COST' => 8,
             'MIN_COST' => 5,
             'COUNT' => 1,
-            'PROVIDES' => 'tech_positron_computer',
+            'PROVIDES' => 'tech_computer2',
         },
-        'tech_quantum_grid' => {
+        'tech_influence2' => {
             'SOURCE_TAG' => 'src_base',
             'CATEGORY' => 'grid',
             'LONG_NAME' => 'Quantum Grid',
             'BASE_COST' => 16,
             'MIN_COST' => 8,
             'COUNT' => 3,
-            'PROVIDES' => 'tech_quantum_grid',
+            'PROVIDES' => 'tech_influence2',
         },
-        'tech_quantum_grid_79' => {
-            'SOURCE_TAG' => 'src_rise',
+        'tech_influence2_79' => {
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => '79player',
             'CATEGORY' => 'grid',
             'LONG_NAME' => 'Quantum Grid',
             'BASE_COST' => 16,
             'MIN_COST' => 8,
             'COUNT' => 1,
-            'PROVIDES' => 'tech_quantum_grid',
+            'PROVIDES' => 'tech_influence2',
         },
-        'tech_sentient_hull' => {
-            'SOURCE_TAG' => 'src_rise',
+        'tech_hull_shield' => {
+            'SOURCE_TAG' => 'src_exp1',
             'CATEGORY' => 'special',
             'LONG_NAME' => 'Sentient Hull',
             'BASE_COST' => 5,
             'MIN_COST' => 5,
             'COUNT' => 1,
-            'PROVIDES' => 'tech_sentient_hull',
+            'PROVIDES' => 'tech_hull_shield',
         },
         'tech_starbase' => {
             'SOURCE_TAG' => 'src_base',
@@ -3207,36 +3207,36 @@ $VAR1 = {
             'COUNT' => 5,
             'PROVIDES' => 'tech_starbase',
         },
-        'tech_tachyon_drive' => {
+        'tech_drive3' => {
             'SOURCE_TAG' => 'src_base',
             'CATEGORY' => 'grid',
             'LONG_NAME' => 'Tachyon Drive',
             'BASE_COST' => 12,
             'MIN_COST' => 6,
             'COUNT' => 3,
-            'PROVIDES' => 'tech_tachyon_drive',
+            'PROVIDES' => 'tech_drive3',
         },
-        'tech_tachyon_source' => {
+        'tech_energy9' => {
             'SOURCE_TAG' => 'src_base',
             'CATEGORY' => 'military',
             'LONG_NAME' => 'Tachyon Source',
             'BASE_COST' => 12,
             'MIN_COST' => 6,
             'COUNT' => 3,
-            'PROVIDES' => 'tech_tachyon_source',
+            'PROVIDES' => 'tech_energy9',
         },
-        'tech_tachyon_source_79' => {
-            'SOURCE_TAG' => 'src_rise',
+        'tech_energy9_79' => {
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => '79player',
             'CATEGORY' => 'military',
             'LONG_NAME' => 'Tachyon Source',
             'BASE_COST' => 12,
             'MIN_COST' => 6,
             'COUNT' => 1,
-            'PROVIDES' => 'tech_tachyon_source',
+            'PROVIDES' => 'tech_energy9',
         },
-        'tech_tractor_beam_ship1' => {
-            'SOURCE_TAG' => 'src_ship1',
+        'tech_tractor_beam_exp2' => {
+            'SOURCE_TAG' => 'src_exp2',
             'CATEGORY' => 'special',
             'LONG_NAME' => 'Tractor Beam',
             'BASE_COST' => 3,
@@ -3244,8 +3244,8 @@ $VAR1 = {
             'COUNT' => 1,
             'PROVIDES' => 'tech_tractor_beam',
         },
-        'tech_tractor_beam_rise' => {
-            'SOURCE_TAG' => 'src_rise',
+        'tech_tractor_beam_exp1' => {
+            'SOURCE_TAG' => 'src_exp1',
             'CATEGORY' => 'special',
             'LONG_NAME' => 'Tractor Beam',
             'BASE_COST' => 3,
@@ -3263,7 +3263,7 @@ $VAR1 = {
             'PROVIDES' => 'tech_wormhole_generator',
         },
         'tech_wormhole_generator_79' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => '79player',
             'CATEGORY' => 'nano',
             'LONG_NAME' => 'Wormhole Generator',
@@ -3272,22 +3272,22 @@ $VAR1 = {
             'COUNT' => 1,
             'PROVIDES' => 'tech_wormhole_generator',
         },
-        'tech_zero_point_source' => {
-            'SOURCE_TAG' => 'src_rise',
+        'tech_energy12' => {
+            'SOURCE_TAG' => 'src_exp1',
             'CATEGORY' => 'special',
             'LONG_NAME' => 'Zero-Point Source',
             'BASE_COST' => 15,
             'MIN_COST' => 10,
             'COUNT' => 1,
-            'PROVIDES' => 'tech_zero_point_source',
+            'PROVIDES' => 'tech_energy12',
         },
     },
 
     'COMPONENTS' => {
-        'comp_antimatter_cannon' => {
+        'comp_beam4' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Antimatter Cannon',
-            'REQUIRES' => 'tech_antimatter_cannon',
+            'REQUIRES' => 'tech_beam4',
             'ENERGY_USE' => 4,
             'INITIATIVE' => 0,
             'ENERGY' => 0,
@@ -3301,7 +3301,7 @@ $VAR1 = {
             'PROVIDES' => '',
         },
         'comp_antimatter_missile' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'LONG_NAME' => 'Antimatter Missile',
             'REQUIRES' => 'tech_antimatter_missile',
             'ENERGY_USE' => 0,
@@ -3333,9 +3333,9 @@ $VAR1 = {
             'PROVIDES' => '',
         },
         'comp_conifold_field' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'LONG_NAME' => 'Conifold Field',
-            'REQUIRES' => 'tech_conifold_field',
+            'REQUIRES' => 'tech_hull3',
             'ENERGY_USE' => 2,
             'INITIATIVE' => 0,
             'ENERGY' => 0,
@@ -3381,9 +3381,9 @@ $VAR1 = {
             'PROVIDES' => '',
         },
         'comp_flux_missile' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'LONG_NAME' => 'Flux Missiles',
-            'REQUIRES' => 'tech_flux_missile',
+            'REQUIRES' => 'tech_missile1',
             'ENERGY_USE' => 0,
             'INITIATIVE' => 2,
             'ENERGY' => 0,
@@ -3415,7 +3415,7 @@ $VAR1 = {
         'comp_fusion_drive' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Fusion Drive',
-            'REQUIRES' => 'tech_fusion_drive',
+            'REQUIRES' => 'tech_drive2',
             'ENERGY_USE' => 2,
             'INITIATIVE' => 2,
             'ENERGY' => 0,
@@ -3431,7 +3431,7 @@ $VAR1 = {
         'comp_fusion_source' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Fusion Source',
-            'REQUIRES' => 'tech_fusion_source',
+            'REQUIRES' => 'tech_energy6',
             'ENERGY_USE' => 0,
             'INITIATIVE' => 0,
             'ENERGY' => 6,
@@ -3447,7 +3447,7 @@ $VAR1 = {
         'comp_gauss_shield' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Gauss Shield',
-            'REQUIRES' => 'tech_gauss_shield',
+            'REQUIRES' => 'tech_shield1',
             'ENERGY_USE' => 0,
             'INITIATIVE' => 0,
             'ENERGY' => 0,
@@ -3463,7 +3463,7 @@ $VAR1 = {
         'comp_gluon_computer' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Gluon Computer',
-            'REQUIRES' => 'tech_gluon_computer',
+            'REQUIRES' => 'tech_computer3',
             'ENERGY_USE' => 2,
             'INITIATIVE' => 2,
             'ENERGY' => 0,
@@ -3511,7 +3511,7 @@ $VAR1 = {
         'comp_imp_hull' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Improved Hull',
-            'REQUIRES' => 'tech_improved_hull',
+            'REQUIRES' => 'tech_hull2',
             'ENERGY_USE' => 0,
             'INITIATIVE' => 0,
             'ENERGY' => 0,
@@ -3525,9 +3525,9 @@ $VAR1 = {
             'PROVIDES' => '',
         },
         'comp_interceptor_bay' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'LONG_NAME' => 'Interceptor Bay',
-            'REQUIRES' => 'tech_interceptor_bay',
+            'REQUIRES' => 'tech_carrier_bay',
             'ENERGY_USE' => 2,
             'INITIATIVE' => 0,
             'ENERGY' => 0,
@@ -3674,7 +3674,7 @@ $VAR1 = {
         'comp_phase_shield' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Phase Shield',
-            'REQUIRES' => 'tech_phase_shield',
+            'REQUIRES' => 'tech_shield2',
             'ENERGY_USE' => 1,
             'INITIATIVE' => 0,
             'ENERGY' => 0,
@@ -3690,7 +3690,7 @@ $VAR1 = {
         'comp_plasma_cannon' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Plasma Cannon',
-            'REQUIRES' => 'tech_plasma_cannon',
+            'REQUIRES' => 'tech_beam2',
             'ENERGY_USE' => 2,
             'INITIATIVE' => 0,
             'ENERGY' => 0,
@@ -3706,7 +3706,7 @@ $VAR1 = {
         'comp_plasma_missile' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Plasma Missiles',
-            'REQUIRES' => 'tech_plasma_missile',
+            'REQUIRES' => 'tech_missile2',
             'ENERGY_USE' => 0,
             'INITIATIVE' => 0,
             'ENERGY' => 0,
@@ -3722,7 +3722,7 @@ $VAR1 = {
         'comp_positron_computer' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Positron Computer',
-            'REQUIRES' => 'tech_positron_computer',
+            'REQUIRES' => 'tech_computer2',
             'ENERGY_USE' => 1,
             'INITIATIVE' => 1,
             'ENERGY' => 0,
@@ -3736,9 +3736,9 @@ $VAR1 = {
             'PROVIDES' => '',
         },
         'comp_sentient_hull' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'LONG_NAME' => 'Sentient Hull',
-            'REQUIRES' => 'tech_sentient_hull',
+            'REQUIRES' => 'tech_hull_shield',
             'ENERGY_USE' => 0,
             'INITIATIVE' => 0,
             'ENERGY' => 0,
@@ -3770,7 +3770,7 @@ $VAR1 = {
         'comp_tachyon_drive' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Tachyon Drive',
-            'REQUIRES' => 'tech_tachyon_drive',
+            'REQUIRES' => 'tech_drive3',
             'ENERGY_USE' => 3,
             'INITIATIVE' => 3,
             'ENERGY' => 0,
@@ -3786,7 +3786,7 @@ $VAR1 = {
         'comp_tachyon_source' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Tachyon Source',
-            'REQUIRES' => 'tech_tachyon_source',
+            'REQUIRES' => 'tech_energy9',
             'ENERGY_USE' => 0,
             'INITIATIVE' => 0,
             'ENERGY' => 9,
@@ -3800,9 +3800,9 @@ $VAR1 = {
             'PROVIDES' => '',
         },
         'comp_zero_point_source' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'LONG_NAME' => 'Zero-Point Source',
-            'REQUIRES' => 'tech_zero_point_source',
+            'REQUIRES' => 'tech_energy12',
             'ENERGY_USE' => 0,
             'INITIATIVE' => 0,
             'ENERGY' => 12,
@@ -3844,7 +3844,7 @@ $VAR1 = {
             'COMPONENT' => 'comp_hypergrid',
         },
         'disc_interceptors' => {
-            'SOURCE_TAG' => 'src_ship1',
+            'SOURCE_TAG' => 'src_exp2',
             'LONG_NAME' => 'Free Interceptors',
             'PROVIDES' => 'disc_interceptors',
             'COUNT' => 2,
@@ -3891,13 +3891,13 @@ $VAR1 = {
             'COMPONENT' => 'comp_muon_source',
         },
         'disc_orbital' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'LONG_NAME' => 'Orbital with Ancient Link',
             'PROVIDES' => 'disc_orbital',
             'COUNT' => 2,
         },
         'disc_resources' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'LONG_NAME' => '3 Credits, 2 Minerals, 2 Science',
             'RESOURCES' => {
                 'SCIENCE' => 2,
@@ -3925,7 +3925,7 @@ $VAR1 = {
             'PROVIDES' => 'disc_technology',
         },
         'disc_wormhole' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'LONG_NAME' => 'Wormhole',
             'COMPONENT' => 'disc_wormhole',
         },
@@ -3933,7 +3933,7 @@ $VAR1 = {
 
     'DEVELOPMENTS' => {
         'dev_ancient_monument' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'developments',
             'RESOURCES' => {
                 'MONEY' => 13,
@@ -3941,7 +3941,7 @@ $VAR1 = {
             'PROVIDES' => 'dev_ancient_monument',
         },
         'dev_mining_colony' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'developments',
             'RESOURCES' => {
                 'SCIENCE' => 5,
@@ -3950,7 +3950,7 @@ $VAR1 = {
             'PROVIDES' => 'dev_mining_colony',
         },
         'dev_diplomatic_fleet' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'developments',
             'RESOURCES' => {
                 'MINERALS' => 6,
@@ -3958,7 +3958,7 @@ $VAR1 = {
             'PROVIDES' => 'dev_diplomatic_fleet',
         },
         'dev_trade_fleet' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'developments',
             'RESOURCES' => {
                 'SCIENCE' => 5,
@@ -3967,7 +3967,7 @@ $VAR1 = {
             'PROVIDES' => 'dev_trade_fleet',
         },
         'dev_research_station' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'developments',
             'RESOURCES' => {
                 'MINERALS' => 5,
@@ -3976,7 +3976,7 @@ $VAR1 = {
             'PROVIDES' => 'dev_research_station',
         },
         'dev_warp_portal' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'developments',
             'RESOURCES' => {
                 'MINERALS' => 8,
@@ -3984,7 +3984,7 @@ $VAR1 = {
             'PROVIDES' => 'dev_warp_portal',
         },
         'dev_shell_world' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'developments',
             'RESOURCES' => {
                 'MINERALS' => 20,
@@ -3992,7 +3992,7 @@ $VAR1 = {
             'PROVIDES' => 'dev_shell_world',
         },
         'dev_artifact_link' => {
-            'SOURCE_TAG' => 'src_rise',
+            'SOURCE_TAG' => 'src_exp1',
             'REQUIRED_OPTION' => 'developments',
             'RESOURCES' => {
                 'SCIENCE' => 7,
@@ -4001,7 +4001,7 @@ $VAR1 = {
             'PROVIDES' => 'dev_artifact_link',
         },
         'dev_security_council' => {
-            'SOURCE_TAG' => 'src_ship1',
+            'SOURCE_TAG' => 'src_exp2',
             'REQUIRED_OPTION' => 'developments',
             'RESOURCES' => {
                 'SCIENCE' => 2,

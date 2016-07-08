@@ -64,7 +64,7 @@ $VAR1 = {
                     'WARPS' => 45,
                 },
                 {
-                    'SPACE' => '2,0',
+                    'SPACE' => '-2,2',
                     'WARPS' => 54,
                 },
             ],
@@ -1540,8 +1540,8 @@ $VAR1 = {
             'INTIATIVE' => 0,
             'COMPONENTS' => [
                 'comp_beam4',
-                'comp_improved_hull',
-                'comp_improved_hull',
+                'comp_hull2',
+                'comp_hull2',
                 'comp_computer3',
             ],
             'VP_DRAW' => 2,
@@ -1555,7 +1555,7 @@ $VAR1 = {
             'COMPONENTS' => [
                 'comp_beam2',
                 'comp_beam2',
-                'comp_improved_hull',
+                'comp_hull2',
                 'comp_computer1',
             ],
             'VP_DRAW' => 2,
@@ -1570,7 +1570,7 @@ $VAR1 = {
                 'comp_beam1',
                 'comp_beam1',
                 'comp_beam1',
-                'comp_improved_hull',
+                'comp_hull2',
                 'comp_computer1',
                 'comp_shield1',
                 'comp_shield2'
@@ -1588,7 +1588,7 @@ $VAR1 = {
                 'comp_beam1',
                 'comp_beam1',
                 'comp_beam1',
-                'comp_improved_hull',
+                'comp_hull2',
                 'comp_computer1',
                 'comp_shield1',
             ],
@@ -1604,7 +1604,7 @@ $VAR1 = {
                 'comp_beam1',
                 'comp_beam1',
                 'comp_beam1',
-                'comp_improved_hull',
+                'comp_hull2',
                 'comp_computer2',
             ],
             'VP_DRAW' => 2,
@@ -1618,8 +1618,8 @@ $VAR1 = {
             'COMPONENTS' => [
                 'comp_beam1',
                 'comp_beam1',
-                'comp_improved_hull',
-                'comp_improved_hull',
+                'comp_hull2',
+                'comp_hull2',
                 'comp_computer2',
             ],
             'PROVIDES' => [
@@ -1647,7 +1647,7 @@ $VAR1 = {
         },
         'shiptemplate_defense1' => {
             'SOURCE_TAG' => 'src_base',
-            'CLASS' => 'class_gcds',
+            'CLASS' => 'class_defense',
             'INTIATIVE' => 0,
             'COMPONENTS' => [
                 'comp_beam1',
@@ -1655,42 +1655,42 @@ $VAR1 = {
                 'comp_beam1',
                 'comp_beam1',
                 'comp_computer1',
-                'comp_improved_hull',
-                'comp_improved_hull',
-                'comp_improved_hull',
-                'comp_improved_hull',
+                'comp_hull2',
+                'comp_hull2',
+                'comp_hull2',
+                'comp_hull2',
             ],
             'VP_DRAW' => 3,
             'VP' => 0,
         },
         'shiptemplate_defense2' => {
             'SOURCE_TAG' => 'src_exp2',
-            'REQUIRED_OPTION' => 'advanced_gcds',
-            'CLASS' => 'class_advanced_gcds',
+            'REQUIRED_OPTION' => 'advanced_defense',
+            'CLASS' => 'class_defense',
             'INTIATIVE' => 4,
             'COMPONENTS' => [
                 'comp_beam2',
                 'comp_beam2',
                 'comp_beam2',
                 'comp_computer2',
-                'comp_improved_hull',
-                'comp_improved_hull',
+                'comp_hull2',
+                'comp_hull2',
             ],
             'VP_DRAW' => 3,
             'VP' => 0,
         },
         'shiptemplate_defense3' => {
             'SOURCE_TAG' => 'src_exp2',
-            'REQUIRED_OPTION' => 'advanced_gcds',
-            'CLASS' => 'class_advanced_gcds',
+            'REQUIRED_OPTION' => 'advanced_defense',
+            'CLASS' => 'class_defense',
             'INTIATIVE' => 4,
             'COMPONENTS' => [
                 'comp_beam4',
                 'comp_beam4',
                 'comp_computer1',
                 'comp_shield2',
-                'comp_improved_hull',
-                'comp_improved_hull',
+                'comp_hull2',
+                'comp_hull2',
             ],
             'VP_DRAW' => 3,
             'VP' => 0,
@@ -1705,8 +1705,8 @@ $VAR1 = {
                 'comp_beam2',
                 'comp_shield_1b',
                 'comp_shield1',
-                'comp_improved_hull',
-                'comp_improved_hull',
+                'comp_hull2',
+                'comp_hull2',
                 'comp_hull1',
             ],
             'VP_DRAW' => 3,
@@ -1722,7 +1722,7 @@ $VAR1 = {
                 'comp_missile1',
                 'comp_beam4',
                 'comp_computer2',
-                'comp_improved_hull',
+                'comp_hull2',
                 'comp_hull1',
             ],
             'VP_DRAW' => 3,
@@ -1738,9 +1738,11 @@ $VAR1 = {
             'STACK' => 0,
             'WARPS' => 64,
             'DISCOVERY' => 1,
-            'GCDS' => 1,
             'VP' => 4,
             'ANCIENT_LINK' => 1,
+            'STARTING_SHIPS' => [
+                'class_defense'
+            ],
             'RESOURCES' => [
                 { 'TYPE' => 'science', },
                 { 'TYPE' => 'science', 'ADVANCED' => 1 },
@@ -1757,8 +1759,10 @@ $VAR1 = {
             'STACK' => 1,
             'WARPS' => 63,
             'DISCOVERY' => 1,
-            'ANCIENTS' => 1,
             'VP' => 2,
+            'STARTING_SHIPS' => [
+                'class_ancient_cruiser'
+            ],
             'RESOURCES' => [
                 { 'TYPE' => 'minerals', },
                 { 'TYPE' => 'minerals', 'ADVANCED' => 1 },
@@ -1797,8 +1801,11 @@ $VAR1 = {
             'STACK' => 1,
             'WARPS' => 28,
             'DISCOVERY' => 1,
-            'ANCIENTS' => 2,
             'VP' => 2,
+            'STARTING_SHIPS' => [
+                'class_ancient_cruiser',
+                'class_ancient_cruiser',
+            ],
             'RESOURCES' => [
                 { 'TYPE' => 'science', },
                 { 'TYPE' => 'science', 'ADVANCED' => 1 },
@@ -1813,9 +1820,11 @@ $VAR1 = {
             'STACK' => 1,
             'WARPS' => 60,
             'DISCOVERY' => 1,
-            'ANCIENTS' => 1,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
+            'STARTING_SHIPS' => [
+                'class_ancient_cruiser',
+            ],
             'RESOURCES' => [
                 { 'TYPE' => 'science', },
                 { 'TYPE' => 'minerals', 'ADVANCED' => 1 },
@@ -1854,8 +1863,10 @@ $VAR1 = {
             'STACK' => 1,
             'WARPS' => 28,
             'DISCOVERY' => 1,
-            'ANCIENTS' => 1,
             'VP' => 2,
+            'STARTING_SHIPS' => [
+                'class_ancient_cruiser',
+            ],
             'RESOURCES' => [
                 { 'TYPE' => 'science', },
                 { 'TYPE' => 'money', 'ADVANCED' => 1 },
@@ -1893,8 +1904,11 @@ $VAR1 = {
             'STACK' => 2,
             'WARPS' => 43,
             'DISCOVERY' => 1,
-            'ANCIENTS' => 2,
             'VP' => 1,
+            'STARTING_SHIPS' => [
+                'class_ancient_cruiser',
+                'class_ancient_cruiser',
+            ],
             'RESOURCES' => [
                 { 'TYPE' => 'science', },
                 { 'TYPE' => 'minerals', },
@@ -1908,9 +1922,11 @@ $VAR1 = {
             'STACK' => 2,
             'WARPS' => 43,
             'DISCOVERY' => 1,
-            'ANCIENTS' => 1,
             'VP' => 2,
             'ANCIENT_LINK' => 1,
+            'STARTING_SHIPS' => [
+                'class_ancient_cruiser',
+            ],
             'RESOURCES' => [
                 { 'TYPE' => 'minerals', 'ADVANCED' => 1 },
                 { 'TYPE' => 'money', 'ADVANCED' => 1 },
@@ -1995,9 +2011,11 @@ $VAR1 = {
             'STACK' => 2,
             'WARPS' => 16,
             'DISCOVERY' => 1,
-            'ANCIENTS' => 1,
             'VP' => 2,
             'ANCIENT_LINK' => 1,
+            'STARTING_SHIPS' => [
+                'class_ancient_cruiser',
+            ],
             'RESOURCES' => [
                 { 'TYPE' => 'minerals', 'ADVANCED' => 1 },
                 { 'TYPE' => 'money', },
@@ -2012,9 +2030,13 @@ $VAR1 = {
             'STACK' => 2,
             'WARPS' => 64,
             'DISCOVERY' => 1,
-            'ANCIENTS' => 3,
             'HIVE' => 1,
             'VP' => 2,
+            'STARTING_SHIPS' => [
+                'class_ancient_cruiser',
+                'class_ancient_cruiser',
+                'class_ancient_cruiser',
+            ],
             'RESOURCES' => [
                 { 'TYPE' => 'science', 'ADVANCED' => 1 },
                 { 'TYPE' => 'minerals', },
@@ -2352,10 +2374,11 @@ $VAR1 = {
             'STACK' => 4,
             'WARPS' => 27,
             'DISCOVERY' => 1,
-            'ANCIENTS' => 1,
-            'DESTROYER' => 1,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
+            'STARTING_SHIPS' => [
+                'class_ancient_destroyer',
+            ],
             'RESOURCES' => [
                 { 'TYPE' => 'science', },
                 { 'TYPE' => 'minerals', 'ADVANCED' => 1 },
@@ -2370,10 +2393,11 @@ $VAR1 = {
             'STACK' => 4,
             'WARPS' => 27,
             'DISCOVERY' => 1,
-            'ANCIENTS' => 1,
-            'DESTROYER' => 1,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
+            'STARTING_SHIPS' => [
+                'class_ancient_destroyer',
+            ],
             'RESOURCES' => [
                 { 'TYPE' => 'science', 'ADVANCED' => 1 },
                 { 'TYPE' => 'minerals', },
@@ -2388,10 +2412,11 @@ $VAR1 = {
             'STACK' => 4,
             'WARPS' => 27,
             'DISCOVERY' => 1,
-            'DESTROYER' => 1,
-            'ANCIENTS' => 1,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
+            'STARTING_SHIPS' => [
+                'class_ancient_destroyer',
+            ],
             'RESOURCES' => [
                 { 'TYPE' => 'minerals', },
                 { 'TYPE' => 'minerals', 'ADVANCED' => 1 },
@@ -2406,10 +2431,11 @@ $VAR1 = {
             'STACK' => 4,
             'WARPS' => 27,
             'DISCOVERY' => 1,
-            'ANCIENTS' => 1,
-            'DESTROYER' => 1,
             'VP' => 3,
             'ANCIENT_LINK' => 1,
+            'STARTING_SHIPS' => [
+                'class_ancient_destroyer',
+            ],
             'RESOURCES' => [
                 { 'TYPE' => 'science', },
                 { 'TYPE' => 'science', 'ADVANCED' => 1 },
@@ -2436,9 +2462,12 @@ $VAR1 = {
             'STACK' => 3,
             'WARPS' => 13,
             'DISCOVERY' => 1,
-            'ANCIENTS' => 2,
             'VP' => 2,
             'ANCIENT_LINK' => 1,
+            'STARTING_SHIPS' => [
+                'class_ancient_cruiser',
+                'class_ancient_cruiser',
+            ],
             'RESOURCES' => [
                 { 'TYPE' => 'science', },
                 { 'TYPE' => 'minerals', 'ADVANCED' => 1 },
@@ -2452,9 +2481,11 @@ $VAR1 = {
             'STACK' => 3,
             'WARPS' => 25,
             'DISCOVERY' => 1,
-            'ANCIENTS' => 1,
             'VP' => 2,
             'ANCIENT_LINK' => 1,
+            'STARTING_SHIPS' => [
+                'class_ancient_cruiser',
+            ],
             'RESOURCES' => [
                 { 'TYPE' => 'minerals', },
                 { 'TYPE' => 'money', 'ADVANCED' => 1 },
@@ -2467,9 +2498,11 @@ $VAR1 = {
             'STACK' => 3,
             'WARPS' => 40,
             'DISCOVERY' => 1,
-            'ANCIENTS' => 1,
             'VP' => 2,
             'ANCIENT_LINK' => 1,
+            'STARTING_SHIPS' => [
+                'class_ancient_cruiser',
+            ],
             'RESOURCES' => [
                 { 'TYPE' => 'wild' },
             ],
@@ -2493,8 +2526,10 @@ $VAR1 = {
             'STACK' => 3,
             'WARPS' => 11,
             'DISCOVERY' => 1,
-            'ANCIENTS' => 1,
             'VP' => 1,
+            'STARTING_SHIPS' => [
+                'class_ancient_cruiser',
+            ],
             'RESOURCES' => [
                 { 'TYPE' => 'science', },
                 { 'TYPE' => 'minerals', },
@@ -2662,9 +2697,13 @@ $VAR1 = {
             'STACK' => 3,
             'WARPS' => 64,
             'DISCOVERY' => 1,
-            'ANCIENTS' => 3,
             'VP' => 2,
             'HIVE' => 1,
+            'STARTING_SHIPS' => [
+                'class_ancient_cruiser',
+                'class_ancient_cruiser',
+                'class_ancient_cruiser',
+            ],
             'RESOURCES' => [
                 { 'TYPE' => 'science', },
                 { 'TYPE' => 'minerals', },
@@ -2679,8 +2718,10 @@ $VAR1 = {
             'STACK' => 3,
             'WARPS' => 28,
             'DISCOVERY' => 1,
-            'ANCIENTS' => 1,
             'VP' => 1,
+            'STARTING_SHIPS' => [
+                'class_ancient_cruiser',
+            ],
             'RESOURCES' => [
                 { 'TYPE' => 'science', },
                 { 'TYPE' => 'money', },

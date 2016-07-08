@@ -280,6 +280,7 @@ sub _raw_begin {
     $self->{'TILE_STACK_1'} = [];
     $self->{'TILE_STACK_2'} = [];
     $self->{'TILE_STACK_3'} = [];
+    $self->{'TILE_STACK_4'} = [];
 
     $self->{'TILES'} = {};
 
@@ -319,6 +320,9 @@ sub _raw_begin {
                     }
                     elsif ( $tile->which_stack() == 3 ) {
                         push( @{ $self->{'TILE_STACK_3'} }, $tile->tag() );
+                    }
+                    elsif ( $tile->which_stack() == 4 ) {
+                        push( @{ $self->{'TILE_STACK_4' } }, $tile->tag() );
                     }
                 }
             }
@@ -367,11 +371,12 @@ sub _raw_begin {
 
 #    print STDERR "\n  ship templates ... ";
 
-    $self->{'SHIP_TEMPLATES'} = {};
+    my %base_templates = ();
 
     foreach my $template_key ( keys( %{ $VAR1->{'SHIP_TEMPLATES'} } ) ) {
 
 #        print STDERR Dumper( $VAR1->{'SHIP_TEMPLATES'}->{ $template_key } );
+#        print STDERR "\n  creating template for key " . $template_key;
 
 
         my $template = WLE::4X::Objects::ShipTemplate->new(
@@ -381,7 +386,7 @@ sub _raw_begin {
         );
 
         if ( defined( $template ) ) {
-            $self->{'SHIP_TEMPLATES'}->{ $template->tag() } = $template;
+            $base_templates{ $template->tag() } = $template;
         }
     }
 
@@ -397,11 +402,14 @@ sub _raw_begin {
             'server' => $self,
             'tag' => $race_key,
             'hash' => $VAR1->{'RACES'}->{ $race_key },
+            'base_templates' => \%base_templates,
         );
 
 #        print STDERR "\nRace: " . $race->tag();
 
         if ( defined( $race ) ) {
+
+            my $flag_added_race = 0;
 
             my %race_hash = ();
             $race->to_hash( \%race_hash );
@@ -413,7 +421,30 @@ sub _raw_begin {
                     || matches_any( $race->required_option(), $self->option_tags() )
                 ) {
                     $self->{'RACES'}->{ $race->tag() } = $race;
+                    $flag_added_race = 1;
                 }
+                else {
+
+                }
+            }
+
+            unless ( $flag_added_race ) {
+                foreach my $template_tag ( $race->ship_templates() ) {
+                    delete ( $self->templates()->{ $template_tag } );
+                }
+            }
+        }
+
+        # other ship templates
+    #    print STDERR "\n  other ship templates ... ";
+
+        foreach my $template_key ( keys( %base_templates ) ) {
+
+            my $ship_template = $base_templates{ $template_key };
+
+            unless ( WLE::Methods::Simple::matches_any( $ship_template->class(), 'class_interceptor', 'class_cruiser', 'class_dreadnought', 'class_starbase' ) ) {
+                $ship_template->set_owner_id( -1 );
+                $self->templates()->{ $template_key } = $ship_template;
             }
         }
     }
@@ -481,6 +512,7 @@ sub _raw_select_race_and_location {
 
     $start_hex->set_warps( $warp_gates );
 
+    $self->board()->remove_from_stack( 4, $start_hex_tag );
     $self->board()->place_tile( $location_x, $location_y, $start_hex_tag );
 
     $self->_raw_influence_tile( $race_tag, $start_hex_tag );
@@ -518,7 +550,7 @@ sub _raw_select_race_and_location {
         my $ship = $race->create_ship_of_class( $ship_class );
 
         if ( defined( $ship ) ) {
-            print STDERR "\nPlacing Ship: " . $ship->tag();
+#            print STDERR "\nPlacing Ship: " . $ship->tag();
             $start_hex->add_ship( $ship->tag() );
         }
     }
@@ -559,6 +591,30 @@ sub _raw_influence_tile {
     return;
 }
 
+#############################################################################
+
+sub _raw_remove_non_playing_races {
+    my $self        = shift;
+
+    foreach my $race_tag ( keys( %{ $self->races() } ) ) {
+        my $race = $self->races()->{ $race_tag };
+
+        if ( $race->owner_id() eq '' ) {
+
+            foreach my $template_tag ( $race->ship_templates() ) {
+                delete ( $self->templates()->{ $template_tag } );
+            }
+
+            my $home_tile = $race->home_tile();
+            $self->board()->remove_from_stack( 4, $home_tile );
+            delete ( $self->tiles()->{ $home_tile } );
+
+            delete ( $self->races()->{ $race_tag } );
+        }
+    }
+
+    return;
+}
 
 #############################################################################
 #############################################################################

@@ -35,6 +35,11 @@ sub _init {
         return undef;
     }
 
+    $self->{'BASE_TEMPLATES'} = {};
+    if ( defined( $args{'base_templates'} ) ) {
+        $self->{'BASE_TEMPLATES'} = $args{'base_templates'};
+    }
+
     $self->{'EXCLUDE_RACE'} = '';
     $self->{'HOME'} = '';
 
@@ -145,19 +150,23 @@ sub starting_ships {
 
 #############################################################################
 
+sub ship_templates {
+    my $self        = shift;
+
+    return @{ $self->{'SHIP_TEMPLATES'} };
+}
+
+#############################################################################
+
 sub template_of_class {
     my $self        = shift;
     my $class       = shift;
 
-    foreach my $template_tag ( @{ $self->{'SHIP_TEMPLATES'} } ) {
+    foreach my $template_tag ( $self->ship_templates() ) {
 
         my $template = $self->server()->templates()->{ $template_tag };
 
-        print STDERR "\n  checking template: " . $template_tag . ' ... ';
-
         if ( defined( $template ) ) {
-            print STDERR $template->class() . ' ';
-
             if ( $template->class() eq $class ) {
                 return $template;
             }
@@ -408,7 +417,7 @@ sub from_hash {
                     if ( defined( $template_section->{'COST'} ) ) {
                         my $tag = 'shiptemplate_' . $self->tag() . '_' . $template_index;
 
-                        my $original_template = $self->server()->templates()->{ $template_section->{'TAG'} };
+                        my $original_template = $self->{'BASE_TEMPLATES'}->{ $template_section->{'TAG'} };
                         if ( defined( $original_template ) ) {
                             my $template = $original_template->copy_of( $tag );
 

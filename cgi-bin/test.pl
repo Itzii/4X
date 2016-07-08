@@ -294,7 +294,7 @@ sub test_Object_Server {
 	my @status = split( /:/, $response{'data'} );
 	my $waiting_for = $status[ 3 ];
 
-	show( $response{'data'} );
+#	show( $response{'data'} );
 
 	%response = $server->do(
 		'action'		=> 'select_race',
@@ -306,7 +306,6 @@ sub test_Object_Server {
 	);
 
 	ok( $response{'success'} == 1, 'select_race successful' );
-	show( $response{'message'} );
 
 	%response = $server->do(
 		'action'		=> 'status',
@@ -314,10 +313,37 @@ sub test_Object_Server {
 		'log_id'		=> $log_id,
 	);
 
-	show( $response{'data'} );
+	@status = split( /:/, $response{'data'} );
+	$waiting_for = $status[ 3 ];
 
 
+	%response = $server->do(
+		'action'		=> 'select_race',
+		'user'			=> $waiting_for,
+		'log_id'		=> $log_id,
+		'race_tag'		=> 'race_human2',
+		'location_x'	=> 2,
+		'location_y'	=> 0,
+	);
 
+	%response = $server->do(
+		'action'		=> 'status',
+		'user'			=> $owner_id,
+		'log_id'		=> $log_id,
+	);
+
+	@status = split( /:/, $response{'data'} );
+	$waiting_for = $status[ 3 ];
+
+
+	%response = $server->do(
+		'action'		=> 'select_race',
+		'user'			=> $waiting_for,
+		'log_id'		=> $log_id,
+		'race_tag'		=> 'race_human1',
+		'location_x'	=> -2,
+		'location_y'	=> 2,
+	);
 
 
 	return;

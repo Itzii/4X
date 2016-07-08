@@ -466,6 +466,23 @@ sub action_select_race_and_location {
 
 
     unless ( $self->tick_player() ) {
+
+        $self->_raw_remove_non_playing_races();
+
+        if ( $self->has_option( 'ancient_homeworlds' ) ) {
+
+            # place ancient homeworld tiles
+
+            
+
+
+
+        }
+
+
+
+
+
         $self->start_next_round();
     }
 

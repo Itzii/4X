@@ -46,10 +46,7 @@ sub _init {
     $self->{'DISCOVERY'} = 0;
     $self->{'ORBITAL'} = 0;
     $self->{'MONOLITH'} = 0;
-
-    $self->{'ANCIENTS'} = 0;
-    $self->{'GCDS'} = 0;
-    $self->{'DESTROYER'} = 0;
+    $self->{'STARTING_SHIPS'} = [];
 
     $self->{'SHIPS'} = [];
 
@@ -148,30 +145,6 @@ sub monolith_count {
 
 #############################################################################
 
-sub ancient_count {
-    my $self        = shift;
-
-    return $self->{'ANCIENTS'};
-}
-
-#############################################################################
-
-sub gcds_count {
-    my $self        = shift;
-
-    return $self->{'GCDS'};
-}
-
-#############################################################################
-
-sub destroyer_count {
-    my $self        = shift;
-
-    return $self->{'DESTROYER'};
-}
-
-#############################################################################
-
 sub warps {
     my $self        = shift;
 
@@ -187,6 +160,14 @@ sub set_warps {
     $self->{'WARPS'} = $values;
 
     return;
+}
+
+#############################################################################
+
+sub starting_ships {
+    my $self        = shift;
+
+    return @{ $self->{'STARTING_SHIPS'} };
 }
 
 #############################################################################
@@ -371,12 +352,17 @@ sub from_hash {
 
     $self->{'STACK'} = $r_hash->{'STACK'};
 
-    foreach my $tag ( 'VP', 'ANCIENT_LINK', 'HIVE', 'DISCOVERY', 'ORBITAL', 'MONOLITH', 'ANCIENTS', 'GCDS', 'DESTROYER' ) {
+    foreach my $tag ( 'VP', 'ANCIENT_LINK', 'HIVE', 'DISCOVERY', 'ORBITAL', 'MONOLITH' ) {
         if ( defined( $r_hash->{ $tag } ) ) {
             if ( WLE::Methods::Simple::looks_like_number( $r_hash->{ $tag } ) ) {
                 $self->{ $tag } = $r_hash->{ $tag };
             }
         }
+    }
+
+    if ( defined( $r_hash->{'STARTING_SHIPS'} ) ) {
+        my @starting = @{ $r_hash->{'STARTING_SHIPS'} };
+        $self->{'STARTING_SHIPS'} = \@starting;
     }
 
     if ( defined( $r_hash->{'RESOURCES'} ) ) {
@@ -438,9 +424,11 @@ sub to_hash {
 
     $r_hash->{'STACK'} = $self->{'STACK'};
 
-    foreach my $tag ( 'VP', 'ANCIENT_LINK', 'HIVE', 'DISCOVERY', 'ORBITAL', 'MONOLITH', 'ANCIENTS', 'GCDS', 'DESTROYER', 'SHIPS' ) {
+    foreach my $tag ( 'VP', 'ANCIENT_LINK', 'HIVE', 'DISCOVERY', 'ORBITAL', 'MONOLITH', 'SHIPS' ) {
         $r_hash->{ $tag } = $self->{ $tag };
     }
+
+    $r_hash->{'STARTING_SHIPS'} = $self->{'STARTING_SHIPS'};
 
     $r_hash->{'RESOURCES'} = $self->{'RESOURCE_SLOTS'};
 
@@ -469,7 +457,7 @@ sub as_ascii {
 
     my $id = sprintf( '%03i', $self->tile_id() );
     my $name = substr( sprintf( '%-15s', $self->long_name() ), 0, 15 );
-    my $ancient_count = $self->ancient_count();
+#    my $ancient_count = $self->ancient_count();
     my $disc_count = $self->discovery_count();
 
     foreach $_ ( @display ) {
@@ -495,12 +483,12 @@ sub as_ascii {
             $_ =~ s{ORB}{   }xs;
         }
 
-        if ( $ancient_count > 0 ) {
-            $_ =~ s{ANC\s}{ANC$ancient_count}xs;
-        }
-        else {
-            $_ =~ s{ANC\s}{    }xs;
-        }
+#        if ( $ancient_count > 0 ) {
+#            $_ =~ s{ANC\s}{ANC$ancient_count}xs;
+#        }
+#        else {
+#            $_ =~ s{ANC\s}{    }xs;
+#        }
 
         unless ( $disc_count > 0 ) {
             $_ =~ s{DISC}{    }xs;

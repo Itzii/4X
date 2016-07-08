@@ -339,11 +339,11 @@ sub action_begin {
     $self->_raw_set_player_order( @new_player_order );
     $self->_log_player_order( { 'player_order' => [ @new_player_order ] } );
 
-    # fill tile stacks with rrandom tiles
+    # fill tile stacks with random tiles
 
-    foreach my $count ( 1 .. 3 ) {
+    foreach my $stack_tag ( keys( %{ $self->{'TILE_STACKS'} } ) ) {
 
-        my @stack = @{ $self->{'TILE_STACK_' . $count } };
+        my @stack = @{ $self->{'TILE_STACKS'}->{ $stack_tag } };
 
         WLE::Methods::Simple::shuffle_in_place( \@stack );
 
@@ -354,11 +354,23 @@ sub action_begin {
             }
         }
 
-        $self->_raw_create_tile_stack( $count, @stack );
-        $self->_log_tile_stack( { 'stack_id' => $count, 'values' => \@stack } );
+        delete( $self->{'TILE_STACKS'}->{ $stack_tag } );
 
-        delete( $self->{'TILE_STACK_' . $count } );
+        $self->_raw_create_tile_stack( $stack_tag, @stack );
+        $self->_log_tile_stack( { 'stack_id' => $stack_tag, 'values' => \@stack } );
     }
+
+    # add discoveries to tiles
+
+    my @discovery_tags = @{ $self->{'DISCOVERY_BAG'} };
+    WLE::Methods::Simple::shuffle_in_place( \@discovery_tags );
+
+    foreach my $tile ( values( %{ $self->tiles() } ) ) {
+        foreach ( 1 .. $tile->discovery_count() ) {
+            $self->_raw_add_discovery_to_tile( $tile->tag(), shift( @discovery_tags ) );
+        }
+    }
+    $self->{'DISCOVERY_BAG'} = \@discovery_tags;
 
     # draw random developments
 
@@ -434,9 +446,11 @@ sub action_select_race_and_location {
         my ( $x, $y ) = split( ',', $location->{'SPACE'} );
 
         if ( $args{'location_x'} == $x && $args{'location_y'} == $y ) {
-            $valid_location = 1;
-            if ( defined( $location->{'WARPS'} ) ) {
-                $location_warps = $location->{'WARPS'};
+            unless ( defined( $location->{'NPC'} ) ) {
+                $valid_location = 1;
+                if ( defined( $location->{'WARPS'} ) ) {
+                    $location_warps = $location->{'WARPS'};
+                }
             }
         }
     }
@@ -457,26 +471,66 @@ sub action_select_race_and_location {
 
     $self->_raw_select_race_and_location( $args{'race_tag'}, $args{'location_x'}, $args{'location_y'}, $location_warps );
 
-
-
-
-
-
-
-
-
     unless ( $self->tick_player() ) {
 
         $self->_raw_remove_non_playing_races();
 
         if ( $self->has_option( 'ancient_homeworlds' ) ) {
 
+            # get templates for defenders
+
+            my @defenders = ();
+            foreach my $ship_template ( values( %{ $self->templates() } ) ) {
+                if ( $ship_template->class() eq 'class_ancient_destroyer' ) {
+                    push( @defenders, $ship_template->tag() );
+                }
+            }
+
             # place ancient homeworld tiles
 
-            
+            my @homeworlds = @{ $self->{'TILE_STACKS'}->{ 'ancient_homeworlds' }->{'DRAW'} };
+            WLE::Methods::Simple::shuffle_in_place( \@homeworlds );
 
+            my $index = 1;
 
+            foreach my $location ( @{ $self->{'STARTING_LOCATIONS'} } ) {
+                if ( defined( $location->{'NPC'} ) ) {
+                    my ( $x, $y ) = split( ',', $location->{'SPACE'} );
+                    my $location_warps = $location->{'WARPS'};
+                    my $tile_tag = shift( @homeworlds );
 
+                    $self->_raw_remove_tile_from_stack( $tile_tag );
+                    $self->_raw_place_tile_on_board( $tile_tag, $x, $y );
+
+                    foreach my $ship_class ( $self->tiles()->{ $tile_tag }->starting_ships() ) {
+
+                        my @templates_of_class = ();
+                        foreach my $template ( values( %{ $self->templates() } ) ) {
+                            if ( $template->class() eq $ship_class ) {
+                                if ( $template->count() > 0 || $template->count() == -1 ) {
+                                    push( @templates_of_class, $ship->tag() );
+                                }
+                            }
+                        }
+
+                        WLE::Methods::Simple::shuffle_in_place( \@ships_of_class );
+                        my $ship_tag = shift( @ships_of_class );
+
+                        $self->_raw_create_ship_on_tile(
+                            $tile_tag,
+                            $ship_tag,
+                            -1,
+                            'ship_' . $template->tag() . '_npc_' . $index,
+                        );
+
+                        $index++;
+
+                        if ( $template->count() > 0 ) {
+                            $template->set_count( $template->count() - 1 );
+                        }
+                    }
+                }
+            }
         }
 
 

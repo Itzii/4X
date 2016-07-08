@@ -43,10 +43,11 @@ sub _init {
     $self->{'ANCIENT_LINK'} = 0;
     $self->{'WORMHOLE'} = 0;
     $self->{'HIVE'} = 0;
-    $self->{'DISCOVERY'} = 0;
+    $self->{'DISCOVERY_COUNT'} = 0;
     $self->{'ORBITAL'} = 0;
     $self->{'MONOLITH'} = 0;
     $self->{'STARTING_SHIPS'} = [];
+    $self->{'DISCOVERIES'} = [];
 
     $self->{'SHIPS'} = [];
 
@@ -124,7 +125,47 @@ sub is_hive {
 sub discovery_count {
     my $self        = shift;
 
-    return $self->{'DISCOVERY'};
+    return $self->{'DISCOVERY_COUNT'};
+}
+
+#############################################################################
+
+sub discoveries {
+    my $self        = shift;
+
+    return @{ $self->{'DISCOVERIES'} };
+}
+
+#############################################################################
+
+sub add_discovery {
+    my $self        = shift;
+    my $value       = shift;
+
+    $self->remove_discovery( $value );
+
+    push( @{ $self->{'DISCOVERIES'} }, $value );
+
+    return;
+}
+
+#############################################################################
+
+sub remove_discovery {
+    my $self        = shift;
+    my $value       = shift;
+
+    my @holder = ();
+
+    foreach my $tag ( $self->discoveries() ) {
+        unless ( $tag eq $value ) {
+            push( @holder, $tag );
+        }
+    }
+
+    $self->{'DISCOVERIES'} = \@holder;
+
+    return;
 }
 
 #############################################################################
@@ -352,7 +393,7 @@ sub from_hash {
 
     $self->{'STACK'} = $r_hash->{'STACK'};
 
-    foreach my $tag ( 'VP', 'ANCIENT_LINK', 'HIVE', 'DISCOVERY', 'ORBITAL', 'MONOLITH' ) {
+    foreach my $tag ( 'VP', 'ANCIENT_LINK', 'HIVE', 'DISCOVERY_COUNT', 'ORBITAL', 'MONOLITH' ) {
         if ( defined( $r_hash->{ $tag } ) ) {
             if ( WLE::Methods::Simple::looks_like_number( $r_hash->{ $tag } ) ) {
                 $self->{ $tag } = $r_hash->{ $tag };
@@ -363,6 +404,11 @@ sub from_hash {
     if ( defined( $r_hash->{'STARTING_SHIPS'} ) ) {
         my @starting = @{ $r_hash->{'STARTING_SHIPS'} };
         $self->{'STARTING_SHIPS'} = \@starting;
+    }
+
+    if ( defined( $r_hash->{'DISCOVERIES'} ) ) {
+        my @starting = @{ $r_hash->{'DISCOVERIES'} };
+        $self->{'DISCOVERIES'} = \@starting;
     }
 
     if ( defined( $r_hash->{'RESOURCES'} ) ) {
@@ -424,11 +470,13 @@ sub to_hash {
 
     $r_hash->{'STACK'} = $self->{'STACK'};
 
-    foreach my $tag ( 'VP', 'ANCIENT_LINK', 'HIVE', 'DISCOVERY', 'ORBITAL', 'MONOLITH', 'SHIPS' ) {
+    foreach my $tag ( 'VP', 'ANCIENT_LINK', 'HIVE', 'DISCOVERY_COUNT', 'ORBITAL', 'MONOLITH', 'SHIPS' ) {
         $r_hash->{ $tag } = $self->{ $tag };
     }
 
     $r_hash->{'STARTING_SHIPS'} = $self->{'STARTING_SHIPS'};
+
+    $r_hash->{'DISCOVERIES'} = $self->{'DISCOVERIES'};
 
     $r_hash->{'RESOURCES'} = $self->{'RESOURCE_SLOTS'};
 

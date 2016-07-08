@@ -181,27 +181,6 @@ sub stack_from_location {
 
 #############################################################################
 
-sub remove_from_stack {
-    my $self        = shift;
-    my $stack       = shift;
-    my $tile_tag    = shift;
-
-    my $stack_tag = 'TILE_STACK_' . $stack;
-
-    my @new_stack = ();
-    foreach my $tag ( @{ $self->{ $stack_tag } } ) {
-        unless ( $tag eq $tile_tag ) {
-            push( @new_stack, $tag );
-        }
-    }
-
-    $self->{ $stack_tag } = \@new_stack;
-
-    return;
-}
-
-#############################################################################
-
 sub from_hash {
     my $self        = shift;
     my $r_hash      = shift;

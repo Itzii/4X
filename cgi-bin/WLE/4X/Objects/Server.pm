@@ -102,6 +102,7 @@ sub _init {
     $self->{'RACES'} = {};
     $self->{'SHIP_TEMPLATES'} = {};
     $self->{'SHIPS'} = {};
+    $self->{'SHIP_POOL'} = {};
     $self->{'TILES'} = {};
 
     $self->{'STATE'} = {
@@ -500,6 +501,14 @@ sub ships {
 
 #############################################################################
 
+sub ship_pool {
+    my $self        = shift;
+
+    return $self->{'SHIP_POOL'};
+}
+
+#############################################################################
+
 sub ship_components {
     my $self        = shift;
 
@@ -512,6 +521,14 @@ sub technology {
     my $self        = shift;
 
     return $self->{'TECHNOLOGY'};
+}
+
+#############################################################################
+
+sub discoveries {
+    my $self        = shift;
+
+    return $self->{'DISCOVERIES'};
 }
 
 #############################################################################

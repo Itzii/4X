@@ -5,11 +5,42 @@ use warnings;
 
 use WLE::4X::Enums::Basic;
 
+my %actions = (
+    'add_source'                    => \&_raw_add_source,
+    'remove_source'                 => \&_raw_remove_source,
+    'add_option'                    => \&_raw_add_option,
+    'remove_option'                 => \&_raw_remove_option,
+    'add_player'                    => \&_raw_add_player,
+    'remove_player'                 => \&_raw_remove_player,
+    'begin'                         => \&_raw_begin,
+    'set_player_order'              => \&_raw_set_player_order,
+    'create_tile_stack'             => \&_raw_create_tile_stack,
+    'remove_tile_from_stack'        => \&_raw_remove_tile_from_stack,
+    'place_tile_on_board'           => \&_raw_place_tile_on_board,
+    'discard_tile'                  => \&_raw_discard_tile,
+    'create_development_stack'      => \&_raw_create_development_stack,
+    'select_race_and_location'      => \&_raw_select_race_and_location,
+    'place_cube_on_tile'            => \&_raw_place_cube_on_tile,
+    'influence_tile'                => \&_raw_influence_tile,
+    'remove_non_playing_races'      => \&_raw_remove_non_playing_races,
+    'create_ship_on_tile'           => \&_raw_create_ship_on_tile,
+    'add_discovery_to_tile'         => \&_raw_add_discovery_to_tile,
+    'remove_discovery_from_tile'    => \&_raw_remove_discovery_from_tile,
+
+
+);
+
+
 #############################################################################
 
 sub _raw_add_source {
     my $self        = shift;
-    my $tag         = shift;
+    my $flag_log    = shift;
+    my @args        = @_;
+
+    if ( $flag_log ) { $self->_log_data( 'add_source:' . Dumper( \@args ) ); }
+
+    my $tag         = shift( @args );
 
     push( @{ $self->{'SETTINGS'}->{'SOURCE_TAGS'} }, $tag );
 
@@ -20,7 +51,12 @@ sub _raw_add_source {
 
 sub _raw_remove_source {
     my $self        = shift;
-    my $tag         = shift;
+    my $flag_log    = shift;
+    my @args        = @_;
+
+    if ( $flag_log ) { $self->_log_data( 'remove_source:' . Dumper( \@args ) ); }
+
+    my $tag         = shift( @args );
 
     my @current_tags = $self->source_tags();
     $self->{'SETTINGS'}->{'SOURCE_TAGS'} = [];
@@ -38,7 +74,12 @@ sub _raw_remove_source {
 
 sub _raw_add_option {
     my $self        = shift;
-    my $tag         = shift;
+    my $flag_log    = shift;
+    my @args        = @_;
+
+    if ( $flag_log ) { $self->_log_data( 'add_option:' . Dumper( \@args ) ); }
+
+    my $tag         = shift( @args );
 
     push( @{ $self->{'SETTINGS'}->{'OPTION_TAGS'} }, $tag );
 
@@ -49,7 +90,12 @@ sub _raw_add_option {
 
 sub _raw_remove_option {
     my $self        = shift;
-    my $tag         = shift;
+    my $flag_log    = shift;
+    my @args        = @_;
+
+    if ( $flag_log ) { $self->_log_data( 'remove_option:' . Dumper( \@args ) ); }
+
+    my $tag         = shift( @args );
 
     my @current_tags = $self->source_tags();
     $self->{'SETTINGS'}->{'OPTION_TAGS'} = [];
@@ -68,7 +114,12 @@ sub _raw_remove_option {
 
 sub _raw_add_player {
     my $self        = shift;
-    my $player_id   = shift;
+    my $flag_log    = shift;
+    my @args        = @_;
+
+    if ( $flag_log ) { $self->_log_data( 'add_player:' . Dumper( \@args ) ); }
+
+    my $player_id   = shift( @args );
 
     push( @{ $self->{'SETTINGS'}->{'PLAYER_IDS'} }, $player_id );
 
@@ -80,7 +131,12 @@ sub _raw_add_player {
 
 sub _raw_remove_player {
     my $self        = shift;
-    my $player_id   = shift;
+    my $flag_log    = shift;
+    my @args        = @_;
+
+    if ( $flag_log ) { $self->_log_data( 'remove_player:' . Dumper( \@args ) ); }
+
+    my $player_id   = shift( @args );
 
     my @current_ids = $self->player_ids();
     $self->{'SETTINGS'}->{'PLAYER_IDS'} = [];
@@ -98,6 +154,10 @@ sub _raw_remove_player {
 
 sub _raw_begin {
     my $self       = shift;
+    my $flag_log    = shift;
+    my @args        = @_;
+
+    if ( $flag_log ) { $self->_log_data( 'begin:' . Dumper( \@args ) ); }
 
     my $fh = undef;
 
@@ -145,7 +205,13 @@ sub _raw_begin {
 
     $self->{'TECH_DRAW_COUNT'} = $settings->{'ROUND_TECH_COUNT'};
 
-    $self->{'STARTING_LOCATIONS'} = $settings->{'POSITIONS'};
+    if ( $self->has_option( 'ancient_homeworlds') ) {
+        $self->{'STARTING_LOCATIONS'} = $settings->{'POSITIONS_W_NPC'};
+    }
+    else {
+        $self->{'STARTING_LOCATIONS'} = $settings->{'POSITIONS'};
+    }
+
 
 
 
@@ -276,11 +342,13 @@ sub _raw_begin {
     # tiles
 #    print STDERR "\n  tiles ... ";
 
-
-    $self->{'TILE_STACK_1'} = [];
-    $self->{'TILE_STACK_2'} = [];
-    $self->{'TILE_STACK_3'} = [];
-    $self->{'TILE_STACK_4'} = [];
+    $self->{'TILE_STACKS'} = {
+        '1'                     => [],
+        '2'                     => [],
+        '3'                     => [],
+        'homeworlds'            => [],
+        'ancient_homeworlds'    => [],
+    }
 
     $self->{'TILES'} = {};
 
@@ -312,17 +380,8 @@ sub _raw_begin {
                     if ( $tile->which_stack() == 0 ) {
                         $self->board()->place_tile( 0, 0, $tile->tag() );
                     }
-                    elsif ( $tile->which_stack() == 1 ) {
-                        push( @{ $self->{'TILE_STACK_1'} }, $tile->tag() );
-                    }
-                    elsif ( $tile->which_stack() == 2 ) {
-                        push( @{ $self->{'TILE_STACK_2'} }, $tile->tag() );
-                    }
-                    elsif ( $tile->which_stack() == 3 ) {
-                        push( @{ $self->{'TILE_STACK_3'} }, $tile->tag() );
-                    }
-                    elsif ( $tile->which_stack() == 4 ) {
-                        push( @{ $self->{'TILE_STACK_4' } }, $tile->tag() );
+                    else {
+                        push( @{ $self->{'TILE_STACKS'}->{ $tile->which_stack() } }, $tile->tag() );
                     }
                 }
             }
@@ -434,18 +493,29 @@ sub _raw_begin {
                 }
             }
         }
+    }
 
-        # other ship templates
-    #    print STDERR "\n  other ship templates ... ";
+    # other ship templates
+#    print STDERR "\n  other ship templates ... ";
 
-        foreach my $template_key ( keys( %base_templates ) ) {
+    foreach my $template_key ( keys( %base_templates ) ) {
 
-            my $ship_template = $base_templates{ $template_key };
+        my $ship_template = $base_templates{ $template_key };
 
-            unless ( WLE::Methods::Simple::matches_any( $ship_template->class(), 'class_interceptor', 'class_cruiser', 'class_dreadnought', 'class_starbase' ) ) {
-                $ship_template->set_owner_id( -1 );
-                $self->templates()->{ $template_key } = $ship_template;
-            }
+        unless ( WLE::Methods::Simple::matches_any( $ship_template->class(), 'class_interceptor', 'class_cruiser', 'class_dreadnought', 'class_starbase' ) ) {
+            $ship_template->set_owner_id( -1 );
+            $self->templates()->{ $template_key } = $ship_template;
+
+            my $tag = 'ship_' . $template_key;
+
+            my $ship = WLE::4X::Objects::Ship->new(
+                'server' => $self,
+                'template' => $ship_template,
+                'owner_id' => -1,
+                'tag' => $tag,
+            );
+
+            $self->ship_pool()->{ $tag } = $ship;
         }
     }
 
@@ -456,7 +526,12 @@ sub _raw_begin {
 
 sub _raw_set_player_order {
     my $self            = shift;
-    my @new_order_ids   = @_;
+    my $flag_log        = shift;
+    my @args            = @_;
+
+    if ( $flag_log ) { $self->_log_data( 'set_player_order:' . Dumper( \@args ) ); }
+
+    my @new_order_ids   = @args;
 
     $self->{'SETTINGS'}->{'PLAYERS_DONE'} = [];
     $self->{'SETTINGS'}->{'PLAYERS_PENDING'} = [ @new_order_ids ];
@@ -468,8 +543,13 @@ sub _raw_set_player_order {
 
 sub _raw_create_tile_stack {
     my $self            = shift;
-    my $stack_id        = shift;
-    my @values          = @_;
+    my $flag_log    = shift;
+    my @args        = @_;
+
+    if ( $flag_log ) { $self->_log_data( 'create_tile_stack:' . Dumper( \@args ) ); }
+
+    my $stack_id        = shift( @args );
+    my @values          = @args;
 
     $self->{'TILE_STACKS'}->{ $stack_id }->{'DRAW'} = [ @values ];
     $self->{'TILE_STACKS'}->{ $stack_id }->{'DISCARD'} = [];
@@ -479,9 +559,77 @@ sub _raw_create_tile_stack {
 
 #############################################################################
 
+sub _raw_remove_tile_from_stack {
+    my $self            = shift;
+    my $flag_log        = shift;
+    my @args            = @_;
+
+    if ( $flag_log ) { $self->_log_data( 'remove_tile_from_stack:' . Dumper( \@args ) ); }
+
+    my $tile_tag        = shift( @args );
+
+    my $stack_id = $self->tiles()->{ $tile_tag }->which_stack();
+
+    my @new_stack = ();
+
+    foreach my $current_tag ( @{ $self->{'TILE_STACKS'}->{ $stack_id }->{'DRAW'} } ) {
+        unless ( $current_tag eq $tile_tag ) {
+            push( @new_stack, $current_tag );
+        }
+    }
+
+    $self->{'TILE_STACKS'}->{ $stack_id }->{'DRAW'} = \@new_stack;
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_place_tile_on_board {
+    my $self            = shift;
+    my $flag_log    = shift;
+    my @args        = @_;
+
+    if ( $flag_log ) { $self->_log_data( 'place_tile_on_board:' . Dumper( \@args ) ); }
+
+    my $tile_tag        = shift( @args );
+    my $location_x      = shift( @args );
+    my $location_y      = shift( @args );
+
+    $self->board()->place_tile( $location_x, $location_y, $tile_tag );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_discard_tile {
+    my $self            = shift;
+    my $flag_log        = shift;
+    my @args            = @_;
+
+    if ( $flag_log ) { $self->_log_data( 'discard_tile:' . Dumper( \@args ) ); }
+
+    my $tile_tag        = shift( @args );
+
+    my $stack_id = $self->tiles()->{ $tile_tag }->which_stack();
+
+    push( @{ $self->{'TILE_STACKS'}->{ $stack_id }->{'DISCARD'} }, $tile_tag );
+
+    return;
+}
+
+
+#############################################################################
+
 sub _raw_create_development_stack {
     my $self            = shift;
-    my @values          = @_;
+    my $flag_log        = shift;
+    my @args            = @_;
+
+    if ( $flag_log ) { $self->_log_data( 'create_development_stack:' . Dumper( \@args ) ); }
+
+    my @values          = @args;
 
     $self->{'DEVELOPMENT_STACK'} = [ @values ];
 
@@ -492,10 +640,15 @@ sub _raw_create_development_stack {
 
 sub _raw_select_race_and_location {
     my $self            = shift;
-    my $race_tag        = shift;
-    my $location_x      = shift;
-    my $location_y      = shift;
-    my $warp_gates      = shift;
+    my $flag_log        = shift;
+    my @args            = @_;
+
+    if ( $flag_log ) { $self->_log_data( 'select_race_and_location:' . Dumper( \@args ) ); }
+
+    my $race_tag        = shift( @args );
+    my $location_x      = shift( @args );
+    my $location_y      = shift( @args );
+    my $warp_gates      = shift( @args );
 
     my $race = $self->races()->{ $race_tag };
 
@@ -512,10 +665,9 @@ sub _raw_select_race_and_location {
 
     $start_hex->set_warps( $warp_gates );
 
-    $self->board()->remove_from_stack( 4, $start_hex_tag );
-    $self->board()->place_tile( $location_x, $location_y, $start_hex_tag );
-
-    $self->_raw_influence_tile( $race_tag, $start_hex_tag );
+    $self->_raw_remove_tile_from_stack( 0, $start_hex_tag );
+    $self->_raw_place_tile_on_board( 0, $start_hex_tag, $location_x, $location_y );
+    $self->_raw_influence_tile( 0, $race_tag, $start_hex_tag );
 
 
     # place cubes on available spots
@@ -562,10 +714,15 @@ sub _raw_select_race_and_location {
 
 sub _raw_place_cube_on_tile {
     my $self            = shift;
-    my $race_tag        = shift;
-    my $tile_tag        = shift;
-    my $type            = shift;
-    my $flag_advanced   = shift; $flag_advanced = 0             unless defined( $flag_advanced );
+    my $flag_log        = shift;
+    my @args            = @_;
+
+    if ( $flag_log ) { $self->_log_data( 'place_cube_on_tile:' . Dumper( \@args ) ); }
+
+    my $race_tag        = shift( @args );
+    my $tile_tag        = shift( @args );
+    my $type            = shift( @args );
+    my $flag_advanced   = shift( @args ); $flag_advanced = 0             unless defined( $flag_advanced );
 
     my $race = $self->races()->{ $race_tag };
     my $tile = $self->tiles()->{ $tile_tag };
@@ -579,8 +736,13 @@ sub _raw_place_cube_on_tile {
 
 sub _raw_influence_tile {
     my $self        = shift;
-    my $race_tag    = shift;
-    my $tile_tag    = shift;
+    my $flag_log    = shift;
+    my @args        = @_;
+
+    if ( $flag_log ) { $self->_log_data( 'influence_tile:' . Dumper( \@args ) ); }
+
+    my $race_tag    = shift( @args );
+    my $tile_tag    = shift( @args );
 
     my $race = $self->races()->{ $race_tag };
 
@@ -595,6 +757,10 @@ sub _raw_influence_tile {
 
 sub _raw_remove_non_playing_races {
     my $self        = shift;
+    my $flag_log    = shift;
+    my @args        = @_;
+
+    if ( $flag_log ) { $self->_log_data( 'remove_non_playing_races:' . Dumper( \@args ) ); }
 
     foreach my $race_tag ( keys( %{ $self->races() } ) ) {
         my $race = $self->races()->{ $race_tag };
@@ -614,6 +780,154 @@ sub _raw_remove_non_playing_races {
     }
 
     return;
+}
+
+#############################################################################
+
+sub _raw_create_ship_on_tile {
+    my $self            = shift;
+    my $flag_log        = shift;
+    my @args            = @_;
+
+    if ( $flag_log ) { $self->_log_data( 'create_ship_on_tile:' . Dumper( \@args ) ); }
+
+    my $tile_tag        = shift( @args );
+    my $template_tag    = shift( @args );
+    my $owner_id        = shift( @args );
+    my $ship_tag        = shift( @args );
+
+    my $template = $self->templates()->{ $template_tag };
+
+    my $ship = WLE::4X::Objects::Ship->new(
+        'server'        => $self,
+        'template'      => $template,
+        'owner_id'      => $owner_id,
+        'tag'           => $ship_tag,
+    );
+
+    $self->ships()->{ $ship->tag() } = $ship;
+
+    my $tile = $self->tiles()->{ $tile_tag };
+    $tile->add_ship( $ship->tag() );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_add_discovery_to_tile {
+    my $self            = shift;
+    my $flag_log        = shift;
+    my @args            = @_;
+
+    if ( $flag_log ) { $self->_log_data( 'add_discovery_to_tile:' . Dumper( \@args ) ); }
+
+    my $tile_tag        = shift( @args );
+    my $discovery_tag   = shift( @args );
+
+    $self->tiles()->{ $tile_tag }->add_discovery( $discovery_tag );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_remove_discovery_from_tile {
+    my $self            = shift;
+    my $flag_log        = shift;
+    my @args            = @_;
+
+    if ( $flag_log ) { $self->_log_data( 'remove_discovery_from_tile:' . Dumper( \@args ) ); }
+
+    my $tile_tag        = shift( @args );
+    my $discovery_tag   = shift( @args );
+
+    $self->tiles()->{ $tile_tag }->remove_discovery( $discovery_tag );
+
+    return;
+}
+
+#############################################################################
+#
+# action_parse_state_from_log - args
+#
+# log_id        : required - 8-20 character unique indentifier [a-zA-Z0-9]
+#
+
+sub action_parse_state_from_log {
+    my $self        = shift;
+    my %args        = @_;
+
+    $self->set_error( '' );
+
+    unless ( $self->set_log_id( $args{'log_id'} ) ) {
+        $self->set_error( 'Invalid Log ID: ' . $args{'log_id'} );
+        return 0;
+    }
+
+    my $fh_state;
+    my $fh_log;
+
+    unless ( open( $fh_state, '>', $self->_state_file() ) ) {
+        $self->set_error( 'Failed to write state file: ' . $self->_state_file() );
+        return 0;
+    }
+
+    unless( flock( $fh_state, LOCK_EX ) ) {
+        $self->set_error( 'Failed to lock state file: ' . $self->_state_file() );
+        return 0;
+    }
+
+    unless ( open( $fh_log, '<', $self->_log_file() ) ) {
+        $self->set_error( 'Unable to open log file: ' . $self->_log_file() );
+        return 0;
+    }
+
+    flock( $fh_log, LOCK_SH );
+
+    $self->{'DATA'}->{'LONG_NAME'} = <$fh_log>;
+
+    $self->{'DATA'}->{'SOURCE_TAGS'} = split( /,/, <$fh_log> );
+
+    if ( scalar( @{ $self->{'DATA'}->{'SOURCE_TAGS'} } ) == 0 ) {
+        $self->set_error( 'Missing source tags' );
+        return 0;
+    }
+
+    $self->{'DATA'}->{'OPTION_TAGS'} = split( /,/, <$fh_log> );
+
+    my $line = <$fh_log>;
+
+    while ( defined( $line ) ) {
+
+        my ( $action, $data ) = split( /:/, $line, 2 );
+        my $VAR1;
+
+        eval $data; warn $@ if $@;
+
+        if ( defined( $actions{ $action } ) ) {
+            $actions{ $action }->( $self, 0, $data );
+        }
+        else {
+            $self->set_error( 'Invalid Action In Log: ' . $action );
+        }
+
+        $line = <$fh_log>;
+    }
+
+    # using Data::Dumper
+
+    print $fh_state Dumper( $self->{'DATA'} );
+
+    # using Storable
+
+#    store_fd( $self->{'DATA'}, $fh_state );
+
+    close( $fh_state );
+
+    close( $fh_log );
+
+    return 1;
 }
 
 #############################################################################

@@ -199,6 +199,38 @@ sub ships {
 
 #############################################################################
 
+sub add_ship {
+    my $self        = shift;
+    my $ship_tag    = shift;
+
+    unless ( WLE::Methods::Simple::matches_any( $ship_tag, @{ $self->{'SHIPS'} } ) ) {
+        push( @{ $self->{'SHIPS'} }, $ship_tag );
+    }
+
+    return;
+}
+
+#############################################################################
+
+sub remove_ship {
+    my $self        = shift;
+    my $ship_tag    = shift;
+
+    my @holder = ();
+
+    foreach my $current_tag ( $self->ships() ) {
+        unless ( $current_tag eq $ship_tag ) {
+            push( @holder, $current_tag );
+        }
+    }
+
+    $self->{'SHIPS'} = \@holder;
+
+    return;
+}
+
+#############################################################################
+
 sub available_resource_spots {
     my $self            = shift;
     my $res_type        = shift;

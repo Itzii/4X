@@ -149,10 +149,11 @@ sub template_of_class {
     my $self        = shift;
     my $class       = shift;
 
-    foreach my $template_tag ( $self->{'SHIP_TEMPLATES'} ) {
+    foreach my $template_tag ( @{ $self->{'SHIP_TEMPLATES'} } ) {
+
         my $template = $self->server()->templates()->{ $template_tag };
 
-        print STDERR "\n  checking template: " . $template->tag();
+        print STDERR "\n  checking template: " . $template_tag . ' ... ';
 
         if ( defined( $template ) ) {
             print STDERR $template->class() . ' ';
@@ -179,11 +180,16 @@ sub create_ship_of_class {
         return undef;
     }
 
-    my $ship = WLE::4X::Objects::Ship->new( 'server' => $self->server() );
+    my $ship = WLE::4X::Objects::Ship->new(
+        'server' => $self->server(),
+        'template' => $template,
+        'tag' => 'ship_' . $self->owner_id() . '_' . $self->{'SHIP_INDEX'},
+        'owner_id' => $self->owner_id(),
+    );
 
-    $ship->create_from_template( $self->owner_id(), $template );
-
-    $ship->set_tag( 'ship_' . $self->owner_id() . '_' . $self->{'SHIP_INDEX'} );
+    unless ( defined( $ship ) ) {
+        return undef;
+    }
 
     $self->{'SHIP_INDEX'}++;
 
@@ -400,9 +406,7 @@ sub from_hash {
                 if ( ref( $template_section ) eq 'HASH' ) {
 
                     if ( defined( $template_section->{'COST'} ) ) {
-                        my $tag = $self->long_name();
-                        $tag =~ s{ \W }{_}xsi;
-                        $tag = 'shiptemplate_' . $tag . '_' . $template_index;
+                        my $tag = 'shiptemplate_' . $self->tag() . '_' . $template_index;
 
                         my $original_template = $self->server()->templates()->{ $template_section->{'TAG'} };
                         if ( defined( $original_template ) ) {

@@ -32,11 +32,13 @@ sub _init {
         return undef;
     }
 
-    unless ( defined( $args{'template_tag'} ) ) {
+    unless ( defined( $args{'template'} ) ) {
         return undef;
     }
 
-    $self->{'TEMPLATE_TAG'} = $args{'TEMPLATE_TAG'};
+    $self->set_owner_id( $args{'owner_id'} );
+
+    $self->{'TEMPLATE_TAG'} = $args{'template'}->tag();
 
     $self->{'DAMAGE'} = 0;
 

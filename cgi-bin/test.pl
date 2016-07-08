@@ -300,12 +300,13 @@ sub test_Object_Server {
 		'action'		=> 'select_race',
 		'user'			=> $waiting_for,
 		'log_id'		=> $log_id,
-		'race_tag'		=> 'race_terran5',
+		'race_tag'		=> 'race_human5',
 		'location_x'	=> 0,
 		'location_y'	=> -2,
 	);
 
 	ok( $response{'success'} == 1, 'select_race successful' );
+	show( $response{'message'} );
 
 	%response = $server->do(
 		'action'		=> 'status',

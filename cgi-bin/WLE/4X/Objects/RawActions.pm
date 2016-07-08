@@ -519,7 +519,7 @@ sub _raw_select_race_and_location {
 
         if ( defined( $ship ) ) {
             print STDERR "\nPlacing Ship: " . $ship->tag();
-            push( @{ $start_hex->ships() }, $ship->tag() );
+            $start_hex->add_ship( $ship->tag() );
         }
     }
 

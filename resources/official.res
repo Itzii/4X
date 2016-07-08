@@ -1228,9 +1228,9 @@ $VAR1 = {
             'SHIELD' => 0,
             'SLOTS' => 4,
             'COMPONENTS' => [
-                'comp_ion_cannon',
-                'comp_nuclear_source',
-                'comp_nuclear_drive',
+                'comp_beam1',
+                'comp_energy3',
+                'comp_drive1',
             ],
             'VP_DRAW' => 1,
             'REQUIRES' => 'ship_drive',
@@ -1244,11 +1244,11 @@ $VAR1 = {
             'SHIELD' => 0,
             'SLOTS' => 6,
             'COMPONENTS' => [
-                'comp_ion_cannon',
-                'comp_nuclear_source',
-                'comp_nuclear_drive',
-                'comp_electron_computer',
-                'comp_hull',
+                'comp_beam1',
+                'comp_energy3',
+                'comp_drive1',
+                'comp_computer1',
+                'comp_hull1',
             ],
             'VP_DRAW' => 2,
             'REQUIRES' => 'ship_drive',
@@ -1262,13 +1262,13 @@ $VAR1 = {
             'SHIELD' => 0,
             'SLOTS' => 8,
             'COMPONENTS' => [
-                'comp_ion_cannon',
-                'comp_ion_cannon',
-                'comp_nuclear_source',
-                'comp_nuclear_drive',
-                'comp_electron_computer',
-                'comp_hull',
-                'comp_hull',
+                'comp_beam1',
+                'comp_beam1',
+                'comp_energy3',
+                'comp_drive1',
+                'comp_computer1',
+                'comp_hull1',
+                'comp_hull1',
             ],
             'VP_DRAW' => 3,
             'REQUIRES' => 'ship_drive',
@@ -1282,10 +1282,10 @@ $VAR1 = {
             'SHIELD' => 0,
             'SLOTS' => 5,
             'COMPONENTS' => [
-                'comp_ion_cannon',
-                'comp_electron_computer',
-                'comp_hull',
-                'comp_hull',
+                'comp_beam1',
+                'comp_computer1',
+                'comp_hull1',
+                'comp_hull1',
             ],
             'VP_DRAW' => 1,
             'EXCLUDE' => 'ship_drive',
@@ -1299,9 +1299,9 @@ $VAR1 = {
             'SHIELD' => 0,
             'SLOTS' => 3,
             'COMPONENTS' => [
-                'comp_ion_cannon',
-                'comp_nuclear_source',
-                'comp_nuclear_drive',
+                'comp_beam1',
+                'comp_energy3',
+                'comp_drive1',
             ],
             'VP_DRAW' => 1,
             'REQUIRES' => 'ship_drive',
@@ -1315,10 +1315,10 @@ $VAR1 = {
             'SHIELD' => 0,
             'SLOTS' => 5,
             'COMPONENTS' => [
-                'comp_ion_cannon',
-                'comp_nuclear_source',
-                'comp_nuclear_drive',
-                'comp_hull',
+                'comp_beam1',
+                'comp_energy3',
+                'comp_drive1',
+                'comp_hull1',
             ],
             'VP_DRAW' => 2,
             'REQUIRES' => 'ship_drive',
@@ -1332,12 +1332,12 @@ $VAR1 = {
             'SHIELD' => 0,
             'SLOTS' => 7,
             'COMPONENTS' => [
-                'comp_ion_cannon',
-                'comp_ion_cannon',
-                'comp_nuclear_source',
-                'comp_nuclear_drive',
-                'comp_hull',
-                'comp_hull',
+                'comp_beam1',
+                'comp_beam1',
+                'comp_energy3',
+                'comp_drive1',
+                'comp_hull1',
+                'comp_hull1',
             ],
             'VP_DRAW' => 3,
             'REQUIRES' => 'ship_drive',
@@ -1351,10 +1351,10 @@ $VAR1 = {
             'SHIELD' => 0,
             'SLOTS' => 4,
             'COMPONENTS' => [
-                'comp_ion_cannon',
-                'comp_electron_computer',
-                'comp_hull',
-                'comp_hull',
+                'comp_beam1',
+                'comp_computer1',
+                'comp_hull1',
+                'comp_hull1',
             ],
             'VP_DRAW' => 1,
             'EXCLUDE' => 'ship_drive',
@@ -1368,10 +1368,10 @@ $VAR1 = {
             'SHIELD' => 0,
             'SLOTS' => 4,
             'COMPONENTS' => [
-                'comp_ion_cannon',
-                'comp_nuclear_source',
-                'comp_nuclear_drive',
-                'comp_gauss_shield',
+                'comp_beam1',
+                'comp_energy3',
+                'comp_drive1',
+                'comp_shield1',
             ],
             'VP_DRAW' => 1,
             'REQUIRES' => 'ship_drive',
@@ -1385,12 +1385,12 @@ $VAR1 = {
             'SHIELD' => 0,
             'SLOTS' => 6,
             'COMPONENTS' => [
-                'comp_ion_cannon',
-                'comp_nuclear_source',
-                'comp_nuclear_drive',
-                'comp_electron_computer',
-                'comp_hull',
-                'comp_gauss_shield',
+                'comp_beam1',
+                'comp_energy3',
+                'comp_drive1',
+                'comp_computer1',
+                'comp_hull1',
+                'comp_shield1',
             ],
             'VP_DRAW' => 2,
             'REQUIRES' => 'ship_drive',
@@ -1404,14 +1404,14 @@ $VAR1 = {
             'SHIELD' => 0,
             'SLOTS' => 8,
             'COMPONENTS' => [
-                'comp_ion_cannon',
-                'comp_ion_cannon',
-                'comp_nuclear_source',
-                'comp_nuclear_drive',
-                'comp_electron_computer',
-                'comp_gauss_shield',
-                'comp_hull',
-                'comp_hull',
+                'comp_beam1',
+                'comp_beam1',
+                'comp_energy3',
+                'comp_drive1',
+                'comp_computer1',
+                'comp_shield1',
+                'comp_hull1',
+                'comp_hull1',
             ],
             'VP_DRAW' => 3,
             'REQUIRES' => 'ship_drive',
@@ -1425,11 +1425,11 @@ $VAR1 = {
             'SHIELD' => 0,
             'SLOTS' => 5,
             'COMPONENTS' => [
-                'comp_ion_cannon',
-                'comp_electron_computer',
-                'comp_gauss_shield',
-                'comp_hull',
-                'comp_hull',
+                'comp_beam1',
+                'comp_computer1',
+                'comp_shield1',
+                'comp_hull1',
+                'comp_hull1',
             ],
             'VP_DRAW' => 1,
             'EXCLUDE' => 'ship_drive',
@@ -1444,9 +1444,9 @@ $VAR1 = {
             'SHIELD' => 1,
             'SLOTS' => 4,
             'COMPONENTS' => [
-                'comp_ion_cannon',
-                'comp_nuclear_source',
-                'comp_nuclear_drive',
+                'comp_beam1',
+                'comp_energy3',
+                'comp_drive1',
             ],
             'VP_DRAW' => 1,
             'REQUIRES' => 'ship_drive',
@@ -1460,11 +1460,11 @@ $VAR1 = {
             'SHIELD' => 1,
             'SLOTS' => 6,
             'COMPONENTS' => [
-                'comp_ion_cannon',
-                'comp_nuclear_source',
-                'comp_nuclear_drive',
-                'comp_electron_computer',
-                'comp_hull',
+                'comp_beam1',
+                'comp_energy3',
+                'comp_drive1',
+                'comp_computer1',
+                'comp_hull1',
             ],
             'VP_DRAW' => 2,
             'REQUIRES' => 'ship_drive',
@@ -1479,10 +1479,10 @@ $VAR1 = {
             'SHIELD' => 1,
             'SLOTS' => 5,
             'COMPONENTS' => [
-                'comp_ion_cannon',
-                'comp_electron_computer',
-                'comp_hull',
-                'comp_hull',
+                'comp_beam1',
+                'comp_computer1',
+                'comp_hull1',
+                'comp_hull1',
             ],
             'VP_DRAW' => 1,
             'EXCLUDE' => 'ship_drive',
@@ -1498,9 +1498,9 @@ $VAR1 = {
             'HULL_POINTS' => 1,
             'SLOTS' => 3,
             'COMPONENTS' => [
-                'comp_ion_turret',
-                'comp_hull',
-                'comp_hull',
+                'comp_turret1',
+                'comp_hull1',
+                'comp_hull1',
             ],
             'VP_DRAW' => 1,
             'EXCLUDE' => 'ship_drive',
@@ -1511,10 +1511,10 @@ $VAR1 = {
             'CLASS' => 'class_ancient_cruiser',
             'INTIATIVE' => 2,
             'COMPONENTS' => [
-                'comp_ion_cannon',
-                'comp_ion_cannon',
-                'comp_hull',
-                'comp_electron_computer',
+                'comp_beam1',
+                'comp_beam1',
+                'comp_hull1',
+                'comp_computer1',
             ],
             'VP_DRAW' => 1,
         },
@@ -1524,11 +1524,11 @@ $VAR1 = {
             'CLASS' => 'class_ancient_destroyer',
             'INTIATIVE' => 1,
             'COMPONENTS' => [
-                'comp_ion_cannon',
-                'comp_ion_cannon',
-                'comp_plasma_missile',
-                'comp_hull',
-                'comp_electron_computer',
+                'comp_beam1',
+                'comp_beam1',
+                'comp_missile2',
+                'comp_hull1',
+                'comp_computer1',
             ],
             'VP_DRAW' => 2,
             'VP' => 1,
@@ -1542,7 +1542,7 @@ $VAR1 = {
                 'comp_beam4',
                 'comp_improved_hull',
                 'comp_improved_hull',
-                'comp_gluon_computer',
+                'comp_computer3',
             ],
             'VP_DRAW' => 2,
             'VP' => 1,
@@ -1553,10 +1553,10 @@ $VAR1 = {
             'CLASS' => 'class_ancient_destroyer',
             'INTIATIVE' => 3,
             'COMPONENTS' => [
-                'comp_plasma_cannon',
-                'comp_plasma_cannon',
+                'comp_beam2',
+                'comp_beam2',
                 'comp_improved_hull',
-                'comp_electron_computer',
+                'comp_computer1',
             ],
             'VP_DRAW' => 2,
             'VP' => 1,
@@ -1567,13 +1567,13 @@ $VAR1 = {
             'CLASS' => 'class_ancient_destroyer',
             'INTIATIVE' => 0,
             'COMPONENTS' => [
-                'comp_ion_cannon',
-                'comp_ion_cannon',
-                'comp_ion_cannon',
+                'comp_beam1',
+                'comp_beam1',
+                'comp_beam1',
                 'comp_improved_hull',
-                'comp_electron_computer',
-                'comp_gauss_shield',
-                'comp_phase_shield'
+                'comp_computer1',
+                'comp_shield1',
+                'comp_shield2'
             ],
             'VP_DRAW' => 2,
             'VP' => 1,
@@ -1584,13 +1584,13 @@ $VAR1 = {
             'CLASS' => 'class_ancient_destroyer',
             'INTIATIVE' => 0,
             'COMPONENTS' => [
-                'comp_ion_cannon',
-                'comp_ion_cannon',
-                'comp_ion_cannon',
-                'comp_ion_cannon',
+                'comp_beam1',
+                'comp_beam1',
+                'comp_beam1',
+                'comp_beam1',
                 'comp_improved_hull',
-                'comp_electron_computer',
-                'comp_gauss_shield',
+                'comp_computer1',
+                'comp_shield1',
             ],
             'VP_DRAW' => 2,
             'VP' => 1,
@@ -1601,11 +1601,11 @@ $VAR1 = {
             'CLASS' => 'class_ancient_destroyer',
             'INTIATIVE' => 4,
             'COMPONENTS' => [
-                'comp_ion_cannon',
-                'comp_ion_cannon',
-                'comp_ion_cannon',
+                'comp_beam1',
+                'comp_beam1',
+                'comp_beam1',
                 'comp_improved_hull',
-                'comp_positron_computer',
+                'comp_computer2',
             ],
             'VP_DRAW' => 2,
             'VP' => 1,
@@ -1616,11 +1616,11 @@ $VAR1 = {
             'CLASS' => 'class_ancient_destroyer',
             'INTIATIVE' => 2,
             'COMPONENTS' => [
-                'comp_ion_cannon',
-                'comp_ion_cannon',
+                'comp_beam1',
+                'comp_beam1',
                 'comp_improved_hull',
                 'comp_improved_hull',
-                'comp_positron_computer',
+                'comp_computer2',
             ],
             'PROVIDES' => [
                 'point_defense',
@@ -1634,10 +1634,10 @@ $VAR1 = {
             'CLASS' => 'class_ancient_destroyer',
             'INTIATIVE' => 0,
             'COMPONENTS' => [
-                'comp_plasma_cannon',
-                'comp_positron_computer',
+                'comp_beam2',
+                'comp_computer2',
                 'comp_missile4',
-                'comp_hull',
+                'comp_hull1',
             ],
             'PROVIDES' => [
                 'distortion_shield',
@@ -1650,11 +1650,11 @@ $VAR1 = {
             'CLASS' => 'class_gcds',
             'INTIATIVE' => 0,
             'COMPONENTS' => [
-                'comp_ion_cannon',
-                'comp_ion_cannon',
-                'comp_ion_cannon',
-                'comp_ion_cannon',
-                'comp_electron_computer',
+                'comp_beam1',
+                'comp_beam1',
+                'comp_beam1',
+                'comp_beam1',
+                'comp_computer1',
                 'comp_improved_hull',
                 'comp_improved_hull',
                 'comp_improved_hull',
@@ -1669,10 +1669,10 @@ $VAR1 = {
             'CLASS' => 'class_advanced_gcds',
             'INTIATIVE' => 4,
             'COMPONENTS' => [
-                'comp_plasma_cannon',
-                'comp_plasma_cannon',
-                'comp_plasma_cannon',
-                'comp_positron_computer',
+                'comp_beam2',
+                'comp_beam2',
+                'comp_beam2',
+                'comp_computer2',
                 'comp_improved_hull',
                 'comp_improved_hull',
             ],
@@ -1687,8 +1687,8 @@ $VAR1 = {
             'COMPONENTS' => [
                 'comp_beam4',
                 'comp_beam4',
-                'comp_electron_computer',
-                'comp_phase_shield',
+                'comp_computer1',
+                'comp_shield2',
                 'comp_improved_hull',
                 'comp_improved_hull',
             ],
@@ -1701,13 +1701,13 @@ $VAR1 = {
             'CLASS' => 'class_ancient_dreadnought',
             'INTIATIVE' => 3,
             'COMPONENTS' => [
-                'comp_plasma_cannon',
-                'comp_plasma_cannon',
-                'comp_morph_shield',
-                'comp_gauss_shield',
+                'comp_beam2',
+                'comp_beam2',
+                'comp_shield_1b',
+                'comp_shield1',
                 'comp_improved_hull',
                 'comp_improved_hull',
-                'comp_hull',
+                'comp_hull1',
             ],
             'VP_DRAW' => 3,
             'VP' => 1,
@@ -1718,12 +1718,12 @@ $VAR1 = {
             'CLASS' => 'class_ancient_dreadnought',
             'INTIATIVE' => 4,
             'COMPONENTS' => [
-                'comp_flux_missile',
-                'comp_flux_missile',
+                'comp_missile1',
+                'comp_missile1',
                 'comp_beam4',
-                'comp_positron_computer',
+                'comp_computer2',
                 'comp_improved_hull',
-                'comp_hull',
+                'comp_hull1',
             ],
             'VP_DRAW' => 3,
             'VP' => 1,
@@ -3316,7 +3316,7 @@ $VAR1 = {
             'IS_MISSILE' => 1,
             'PROVIDES' => '',
         },
-        'comp_axion_computer' => {
+        'comp_computer3' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Axion Computer',
             'REQUIRES' => 'discovery',
@@ -3332,7 +3332,7 @@ $VAR1 = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        'comp_conifold_field' => {
+        'comp_hull3' => {
             'SOURCE_TAG' => 'src_exp1',
             'LONG_NAME' => 'Conifold Field',
             'REQUIRES' => 'tech_hull3',
@@ -3348,7 +3348,7 @@ $VAR1 = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        'comp_coniformal_drive' => {
+        'comp_drive4' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Coniformal Drive',
             'REQUIRES' => 'discovery',
@@ -3364,7 +3364,7 @@ $VAR1 = {
             'IS_MISSILE' => 0,
             'PROVIDES' => 'ship_drive',
         },
-        'comp_electron_computer' => {
+        'comp_computer1' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Electron Computer',
             'REQUIRES' => '',
@@ -3380,7 +3380,7 @@ $VAR1 = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        'comp_flux_missile' => {
+        'comp_missile1' => {
             'SOURCE_TAG' => 'src_exp1',
             'LONG_NAME' => 'Flux Missiles',
             'REQUIRES' => 'tech_missile1',
@@ -3396,7 +3396,7 @@ $VAR1 = {
             'IS_MISSILE' => 1,
             'PROVIDES' => '',
         },
-        'comp_flux_shield' => {
+        'comp_shield3' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Flux Shield',
             'REQUIRES' => 'discovery',
@@ -3412,7 +3412,7 @@ $VAR1 = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        'comp_fusion_drive' => {
+        'comp_drive2' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Fusion Drive',
             'REQUIRES' => 'tech_drive2',
@@ -3428,7 +3428,7 @@ $VAR1 = {
             'IS_MISSILE' => 0,
             'PROVIDES' => 'ship_drive',
         },
-        'comp_fusion_source' => {
+        'comp_energy6' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Fusion Source',
             'REQUIRES' => 'tech_energy6',
@@ -3444,7 +3444,7 @@ $VAR1 = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        'comp_gauss_shield' => {
+        'comp_shield1' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Gauss Shield',
             'REQUIRES' => 'tech_shield1',
@@ -3460,7 +3460,7 @@ $VAR1 = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        'comp_gluon_computer' => {
+        'comp_computer3' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Gluon Computer',
             'REQUIRES' => 'tech_computer3',
@@ -3476,7 +3476,7 @@ $VAR1 = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        'comp_hull' => {
+        'comp_hull1' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Hull',
             'REQUIRES' => '',
@@ -3492,7 +3492,7 @@ $VAR1 = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        'comp_hypergrid_source' => {
+        'comp_energy11' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Hypergrid Source',
             'REQUIRES' => 'discovery',
@@ -3508,7 +3508,7 @@ $VAR1 = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        'comp_imp_hull' => {
+        'comp_hull2' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Improved Hull',
             'REQUIRES' => 'tech_hull2',
@@ -3524,7 +3524,7 @@ $VAR1 = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        'comp_interceptor_bay' => {
+        'comp_carrier_bay' => {
             'SOURCE_TAG' => 'src_exp1',
             'LONG_NAME' => 'Interceptor Bay',
             'REQUIRES' => 'tech_carrier_bay',
@@ -3540,7 +3540,7 @@ $VAR1 = {
             'IS_MISSILE' => 0,
             'PROVIDES' => 'interceptor_bay',
         },
-        'comp_ion_cannon' => {
+        'comp_beam1' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Ion Cannon',
             'REQUIRES' => '',
@@ -3556,7 +3556,7 @@ $VAR1 = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        'comp_ion_disruptor' => {
+        'comp_disrupter' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Ion Disruptor',
             'REQUIRES' => 'discovery',
@@ -3572,7 +3572,7 @@ $VAR1 = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        'comp_ion_turret' => {
+        'comp_turret1' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Ion Turret',
             'REQUIRES' => 'discovery',
@@ -3588,7 +3588,7 @@ $VAR1 = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        'comp_jump_drive' => {
+        'comp_hyper_drive' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Jump Drive',
             'REQUIRES' => 'discovery',
@@ -3607,7 +3607,7 @@ $VAR1 = {
                 'ship_drive',
             ],
         },
-        'comp_morph_shield' => {
+        'comp_shield_1b' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Morph Shield',
             'REQUIRES' => 'discovery',
@@ -3623,7 +3623,7 @@ $VAR1 = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        'comp_muon_source' => {
+        'comp_energy2' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Muon Source',
             'REQUIRES' => 'discovery',
@@ -3639,7 +3639,7 @@ $VAR1 = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        'comp_nuclear_drive' => {
+        'comp_drive1' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Nuclear Drive',
             'REQUIRES' => '',
@@ -3655,7 +3655,7 @@ $VAR1 = {
             'IS_MISSILE' => 0,
             'PROVIDES' => 'ship_drive',
         },
-        'comp_nuclear_source' => {
+        'comp_energy3' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Nuclear Source',
             'REQUIRES' => '',
@@ -3671,7 +3671,7 @@ $VAR1 = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        'comp_phase_shield' => {
+        'comp_shield2' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Phase Shield',
             'REQUIRES' => 'tech_shield2',
@@ -3687,7 +3687,7 @@ $VAR1 = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        'comp_plasma_cannon' => {
+        'comp_beam2' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Plasma Cannon',
             'REQUIRES' => 'tech_beam2',
@@ -3703,7 +3703,7 @@ $VAR1 = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        'comp_plasma_missile' => {
+        'comp_missile2' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Plasma Missiles',
             'REQUIRES' => 'tech_missile2',
@@ -3719,7 +3719,7 @@ $VAR1 = {
             'IS_MISSILE' => 1,
             'PROVIDES' => '',
         },
-        'comp_positron_computer' => {
+        'comp_computer2' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Positron Computer',
             'REQUIRES' => 'tech_computer2',
@@ -3735,7 +3735,7 @@ $VAR1 = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        'comp_sentient_hull' => {
+        'comp_hull_shield' => {
             'SOURCE_TAG' => 'src_exp1',
             'LONG_NAME' => 'Sentient Hull',
             'REQUIRES' => 'tech_hull_shield',
@@ -3751,7 +3751,7 @@ $VAR1 = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        'comp_shard_hull' => {
+        'comp_hull3b' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Shard Hull',
             'REQUIRES' => 'discovery',
@@ -3767,7 +3767,7 @@ $VAR1 = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        'comp_tachyon_drive' => {
+        'comp_drive3' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Tachyon Drive',
             'REQUIRES' => 'tech_drive3',
@@ -3783,7 +3783,7 @@ $VAR1 = {
             'IS_MISSILE' => 0,
             'PROVIDES' => 'ship_drive',
         },
-        'comp_tachyon_source' => {
+        'comp_energy9' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Tachyon Source',
             'REQUIRES' => 'tech_energy9',
@@ -3799,7 +3799,7 @@ $VAR1 = {
             'IS_MISSILE' => 0,
             'PROVIDES' => '',
         },
-        'comp_zero_point_source' => {
+        'comp_energy12' => {
             'SOURCE_TAG' => 'src_exp1',
             'LONG_NAME' => 'Zero-Point Source',
             'REQUIRES' => 'tech_energy12',
@@ -3817,15 +3817,15 @@ $VAR1 = {
         },
     },
     'DISCOVERIES' => {
-        'disc_axion_computer' => {
+        'disc_computer3' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Component - Axion Computer',
-            'COMPONENT' => 'comp_axion_computer',
+            'COMPONENT' => 'comp_computer3',
         },
-        'disc_conformal_drive' => {
+        'disc_drive4' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Component - Conformal Drive',
-            'COMPONENT' => 'comp_conformal_drive',
+            'COMPONENT' => 'comp_drive4',
         },
         'disc_cruiser' => {
             'SOURCE_TAG' => 'src_base',
@@ -3833,15 +3833,15 @@ $VAR1 = {
             'PROVIDES' => 'disc_cruiser',
             'COUNT' => 3,
         },
-        'disc_flux_shield' => {
+        'disc_shield3' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Component - Flux Shield',
-            'COMPONENT' => 'comp_flux_shield',
+            'COMPONENT' => 'comp_shield3',
         },
-        'disc_hypergrid' => {
+        'disc_energy11' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Component - Hypergrid',
-            'COMPONENT' => 'comp_hypergrid',
+            'COMPONENT' => 'comp_energy11',
         },
         'disc_interceptors' => {
             'SOURCE_TAG' => 'src_exp2',
@@ -3849,20 +3849,20 @@ $VAR1 = {
             'PROVIDES' => 'disc_interceptors',
             'COUNT' => 2,
         },
-        'disc_ion_disrupter' => {
+        'disc_disrupter' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Component - Ion Disrupter',
-            'COMPONENT' => 'comp_ion_disrupter',
+            'COMPONENT' => 'comp_disrupter',
         },
-        'disc_ion_turret' => {
+        'disc_turret1' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Component - Ion Turret',
-            'COMPONENT' => 'comp_ion_turret',
+            'COMPONENT' => 'comp_turret1',
         },
-        'disc_jump_drive' => {
+        'disc_hyper_drive' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Component - Jump Drive',
-            'COMPONENT' => 'comp_jump_drive',
+            'COMPONENT' => 'comp_hyper_drive',
         },
         'disc_minerals' => {
             'SOURCE_TAG' => 'src_base',
@@ -3883,17 +3883,17 @@ $VAR1 = {
         'disc_morph_shield' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Component - Morph Shield',
-            'COMPONENT' => 'comp_morph_shield',
+            'COMPONENT' => 'comp_shield_1b',
         },
         'disc_muon_source' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Component - Muon Source',
-            'COMPONENT' => 'comp_muon_source',
+            'COMPONENT' => 'comp_energy2',
         },
-        'disc_orbital' => {
+        'disc_ring' => {
             'SOURCE_TAG' => 'src_exp1',
             'LONG_NAME' => 'Orbital with Ancient Link',
-            'PROVIDES' => 'disc_orbital',
+            'PROVIDES' => 'disc_ring',
             'COUNT' => 2,
         },
         'disc_resources' => {
@@ -3914,10 +3914,10 @@ $VAR1 = {
             },
             'COUNT' => 3,
         },
-        'disc_shard_hull' => {
+        'disc_hull3b' => {
             'SOURCE_TAG' => 'src_base',
             'LONG_NAME' => 'Component - Shard Hull',
-            'COMPONENT' => 'comp_shard_hull',
+            'COMPONENT' => 'comp_hull3b',
         },
         'disc_technology' => {
             'SOURCE_TAG' => 'src_base',

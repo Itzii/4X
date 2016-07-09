@@ -246,6 +246,24 @@ sub option_tags {
 
 #############################################################################
 
+sub item_is_allowed_in_game {
+    my $self        = shift;
+    my $element     = shift;
+
+    if ( matches_any( $element->source_tag(), $self->source_tags() ) ) {
+        if (
+            $element->required_option() eq ''
+            || matches_any( $element->required_option(), $self->option_tags() )
+        ) {
+            return 1;
+        }
+    }
+
+    return 0;    
+}
+
+#############################################################################
+
 sub player_ids {
     my $self        = shift;
 

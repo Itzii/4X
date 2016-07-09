@@ -35,9 +35,7 @@ sub action_create_game {
         return 0;
     }
 
-    $self->{'SETTINGS'}->{'SOURCE_TAGS'} = [ @{ $args{'r_source_tags'} } ];
-
-    if ( scalar( @{ $self->{'SETTINGS'}->{'SOURCE_TAGS'} } ) == 0 ) {
+    if ( scalar( @{ $args{'r_source_tags'} } ) == 0 ) {
         $self->set_error( 'Must have at least one source tag.' );
         return 0;
     }
@@ -46,14 +44,13 @@ sub action_create_game {
         return 0;
     }
 
-    $self->{'SETTINGS'}->{'OPTION_TAGS'} = [ @{ $args{'r_option_tags'} } ];
-
-    $self->{'SETTINGS'}->{'PLAYER_IDS'} = [ $args{'user'} ];
-
-
-    $self->_log_data( $self->long_name() );
-    $self->_log_data( join( ',', @{ $self->{'SETTINGS'}->{'SOURCE_TAGS'} } ) );
-    $self->_log_data( join( ',', @{ $self->{'SETTINGS'}->{'OPTION_TAGS'} } ) );
+    $self->_raw_create_game(
+        1,
+        $args{'user'},
+        $args{'long_name'},
+        $args{'r_source_tags'},
+        $args{'r_option_tags'},
+    );
 
     $self->_save_state();
 
@@ -92,10 +89,7 @@ sub action_add_source {
         return 0;
     }
 
-    $self->_raw_add_source( $args{'source_tag'} );
-
-    $self->_log_add_source( { 'tag' => $args{'source_tag'} } );
-
+    $self->_raw_add_source( 1, $args{'source_tag'} );
     $self->_save_state();
 
     $self->_close_all();
@@ -134,9 +128,7 @@ sub action_remove_source {
         return 0;
     }
 
-    $self->_raw_remove_source( $args{'source_tag'} );
-
-    $self->_log_remove_source( { 'tag' => $args{'source_tag'} } );
+    $self->_raw_remove_source( 1, $args{'source_tag'} );
 
     $self->_save_state();
 
@@ -176,9 +168,7 @@ sub action_add_option {
         return 0;
     }
 
-    $self->_raw_add_option( $args{'option_tag'} );
-
-    $self->_log_add_option( { 'tag' => $args{'option_tag'} } );
+    $self->_raw_add_option( 1, $args{'option_tag'} );
 
     $self->_save_state();
 
@@ -223,9 +213,7 @@ sub action_remove_option {
         return 0;
     }
 
-    $self->_raw_remove_option( $args{'option_tag'} );
-
-    $self->_log_remove_option( { 'tag' => $args{'option_tag'} } );
+    $self->_raw_remove_option( 1, $args{'option_tag'} );
 
     $self->_save_state();
 
@@ -264,9 +252,7 @@ sub action_add_player {
         return 0;
     }
 
-    $self->_raw_add_player( $args{'player_id'} );
-
-    $self->_log_add_player( { 'player_id' => $args{'player_id'} } );
+    $self->_raw_add_player( 1, $args{'player_id'} );
 
     $self->_save_state();
 
@@ -305,9 +291,7 @@ sub action_remove_player {
         return 0;
     }
 
-    $self->_raw_remove_player( $args{'player_id'} );
-
-    $self->_log_remove_player( { 'player_id' => $args{'player_id'} } );
+    $self->_raw_remove_player( 1, $args{'player_id'} );
 
     $self->_save_state();
 
@@ -328,16 +312,14 @@ sub action_begin {
 
     # create the base item set
 
-    $self->_raw_begin();
-    $self->_log_begin();
+    $self->_raw_begin( 1 );
 
     # randomize player order
 
     my @new_player_order = ( 0 .. scalar( $self->player_ids() ) - 1 );
     WLE::Methods::Simple::shuffle_in_place( \@new_player_order );
 
-    $self->_raw_set_player_order( @new_player_order );
-    $self->_log_player_order( { 'player_order' => [ @new_player_order ] } );
+    $self->_raw_set_player_order( 1, @new_player_order );
 
     # fill tile stacks with random tiles
 
@@ -347,8 +329,8 @@ sub action_begin {
 
         WLE::Methods::Simple::shuffle_in_place( \@stack );
 
-        if ( defined( $self->{'SETTINGS'}->{'TILE_STACK_LIMIT_' . $count } ) ) {
-            while ( scalar( @stack ) > $self->{'SETTINGS'}->{'TILE_STACK_LIMIT_' . $count } ) {
+        if ( defined( $self->{'SETTINGS'}->{'TILE_STACK_LIMIT_' . $stack_tag } ) ) {
+            while ( scalar( @stack ) > $self->{'SETTINGS'}->{'TILE_STACK_LIMIT_' . $stack_tag } ) {
                 my $tag = shift( @stack );
                 delete( $self->{'TILES'}->{ $tag } );
             }
@@ -356,9 +338,17 @@ sub action_begin {
 
         delete( $self->{'TILE_STACKS'}->{ $stack_tag } );
 
-        $self->_raw_create_tile_stack( $stack_tag, @stack );
-        $self->_log_tile_stack( { 'stack_id' => $stack_tag, 'values' => \@stack } );
+        $self->_raw_create_tile_stack( 1, $stack_tag, @stack );
     }
+
+    # place galactic center
+
+    my @stack = @{ $self->{'TILE_STACKS'}->{ 0 }->{'DRAW'} };
+    WLE::Methods::Simple::shuffle_in_place( \@stack );
+
+    $self->_raw_remove_tile_from_stack( 0, $stack[ 0 ] );
+    $self->_raw_place_tile_on_board( 0, $stack[ 0 ], 0, 0 );
+
 
     # add discoveries to tiles
 
@@ -367,7 +357,7 @@ sub action_begin {
 
     foreach my $tile ( values( %{ $self->tiles() } ) ) {
         foreach ( 1 .. $tile->discovery_count() ) {
-            $self->_raw_add_discovery_to_tile( $tile->tag(), shift( @discovery_tags ) );
+            $self->_raw_add_discovery_to_tile( 1, $tile->tag(), shift( @discovery_tags ) );
         }
     }
     $self->{'DISCOVERY_BAG'} = \@discovery_tags;
@@ -384,8 +374,22 @@ sub action_begin {
         }
     }
 
-    $self->_raw_create_development_stack( @developments );
-    $self->_log_development_stack( { 'values' => \@developments } );
+    $self->_raw_create_development_stack( 1, @developments );
+
+    # draw beginning tech tiles
+
+    my @tech_bag = @{ $self->{'TECH_BAG'} };
+    my @available_tech = ();
+    WLE::Methods::Simple::shuffle_in_place( \@tech_bag );
+
+    foreach ( 1 .. $self->{'START_TECH_COUNT'} ) {
+        push( @available_tech, shift( @tech_bag ) );
+    }
+
+    $self->_raw_remove_from_tech_bag( 1, @available_tech );
+    $self->_raw_add_to_available_tech( 1, @available_tech );
+
+
 
     $self->set_state( $ST_RACESELECTION );
     $self->set_phase( $PH_PREPARING );
@@ -469,11 +473,48 @@ sub action_select_race_and_location {
         return 0;
     }
 
-    $self->_raw_select_race_and_location( $args{'race_tag'}, $args{'location_x'}, $args{'location_y'}, $location_warps );
+    $self->_raw_select_race_and_location( 1, $args{'race_tag'}, $args{'location_x'}, $args{'location_y'}, $location_warps );
 
     unless ( $self->tick_player() ) {
 
-        $self->_raw_remove_non_playing_races();
+        $self->_raw_remove_non_playing_races( 1 );
+
+        my $index = 1;
+
+        # place galactic defense
+
+        my $tile = $self->board()->tile_at_location( 0, 0 );
+
+        foreach my $ship_class ( $tile->starting_ships() ) {
+
+            my @templates_of_class = ();
+            foreach my $template ( values( %{ $self->templates() } ) ) {
+                if ( $template->class() eq $ship_class ) {
+                    if ( $template->count() > 0 || $template->count() == -1 ) {
+                        push( @templates_of_class, $template->tag() );
+                    }
+                }
+            }
+
+            WLE::Methods::Simple::shuffle_in_place( \@templates_of_class );
+            my $template_tag = shift( @templates_of_class );
+
+            $self->_raw_create_ship_on_tile(
+                1,
+                $tile->tag(),
+                $template_tag,
+                -1,
+                'ship_' . $template_tag . '_npc_' . $index,
+            );
+
+            $index++;
+
+            my $template = $self->templates()->{ $template_tag };
+
+            if ( $template->count() > 0 ) {
+                $template->set_count( $template->count() - 1 );
+            }
+        }
 
         if ( $self->has_option( 'ancient_homeworlds' ) ) {
 
@@ -491,16 +532,14 @@ sub action_select_race_and_location {
             my @homeworlds = @{ $self->{'TILE_STACKS'}->{ 'ancient_homeworlds' }->{'DRAW'} };
             WLE::Methods::Simple::shuffle_in_place( \@homeworlds );
 
-            my $index = 1;
-
             foreach my $location ( @{ $self->{'STARTING_LOCATIONS'} } ) {
                 if ( defined( $location->{'NPC'} ) ) {
                     my ( $x, $y ) = split( ',', $location->{'SPACE'} );
                     my $location_warps = $location->{'WARPS'};
                     my $tile_tag = shift( @homeworlds );
 
-                    $self->_raw_remove_tile_from_stack( $tile_tag );
-                    $self->_raw_place_tile_on_board( $tile_tag, $x, $y );
+                    $self->_raw_remove_tile_from_stack( 1, $tile_tag );
+                    $self->_raw_place_tile_on_board( 1, $tile_tag, $x, $y );
 
                     foreach my $ship_class ( $self->tiles()->{ $tile_tag }->starting_ships() ) {
 
@@ -508,22 +547,25 @@ sub action_select_race_and_location {
                         foreach my $template ( values( %{ $self->templates() } ) ) {
                             if ( $template->class() eq $ship_class ) {
                                 if ( $template->count() > 0 || $template->count() == -1 ) {
-                                    push( @templates_of_class, $ship->tag() );
+                                    push( @templates_of_class, $template->tag() );
                                 }
                             }
                         }
 
-                        WLE::Methods::Simple::shuffle_in_place( \@ships_of_class );
-                        my $ship_tag = shift( @ships_of_class );
+                        WLE::Methods::Simple::shuffle_in_place( \@templates_of_class );
+                        my $template_tag = shift( @templates_of_class );
 
                         $self->_raw_create_ship_on_tile(
+                            1,
                             $tile_tag,
-                            $ship_tag,
+                            $template_tag,
                             -1,
-                            'ship_' . $template->tag() . '_npc_' . $index,
+                            'ship_' . $template_tag . '_npc_' . $index,
                         );
 
                         $index++;
+
+                        my $template = $self->templates()->{ $template_tag };
 
                         if ( $template->count() > 0 ) {
                             $template->set_count( $template->count() - 1 );
@@ -532,9 +574,6 @@ sub action_select_race_and_location {
                 }
             }
         }
-
-
-
 
 
         $self->start_next_round();

@@ -259,7 +259,7 @@ sub item_is_allowed_in_game {
         }
     }
 
-    return 0;    
+    return 0;
 }
 
 #############################################################################
@@ -284,6 +284,24 @@ sub user_is_owner {
     my $self        = shift;
 
     return ( $self->current_user() == 0 );
+}
+
+#############################################################################
+
+sub race_tag_of_current_user {
+    my $self        = shift;
+
+    if ( $self->current_user() == -1 ) {
+        return '';
+    }
+
+    foreach my $race_tag ( keys( %{ $server->{'RACES'} } ) ) {
+        if ( $server->{'RACES'}->{ $race_tag }->owner_id() == $self->current_user() ) {
+            return $race_tag;
+        }
+    }
+
+    return '';
 }
 
 #############################################################################
@@ -443,9 +461,13 @@ sub tick_player {
 sub start_next_round {
     my $self        = shift;
 
+    my @ready = @{ $self->{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} };
+    $self->{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} = [];
+    $self->{'SETTINGS'}->{'PLAYERS_DONE'} = [];
 
+    $self->{'SETTINGS'}->{'PLAYERS_PENDING'} = \@ready;
 
-
+    return;
 }
 
 #############################################################################

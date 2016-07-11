@@ -14,7 +14,6 @@ use WLE::4X::Enums::Status;
 
 use WLE::4X::Objects::MetaActions;
 use WLE::4X::Objects::RawActions;
-use WLE::4X::Objects::LogActions;
 use WLE::4X::Objects::ServerState;
 
 use WLE::4X::Objects::Element;
@@ -91,6 +90,7 @@ sub _init {
 
     $self->{'SETTINGS'}->{'LOG_ID'} = '';
     $self->{'SETTINGS'}->{'OWNER_ID'} = 0;
+    $self->{'SETTINGS'}->{'SHIP_INDEX'} = 1;
 
     $self->{'SETTINGS'}->{'SOURCE_TAGS'} = [];
     $self->{'SETTINGS'}->{'OPTION_TAGS'} = [];
@@ -104,6 +104,7 @@ sub _init {
     $self->{'SHIPS'} = {};
     $self->{'SHIP_POOL'} = {};
     $self->{'TILES'} = {};
+
 
     $self->{'STATE'} = {
         'STATE' => $ST_PREGAME,
@@ -259,7 +260,7 @@ sub item_is_allowed_in_game {
         }
     }
 
-    return 0;    
+    return 0;
 }
 
 #############################################################################
@@ -325,23 +326,6 @@ sub status {
         $self->{'STATE'}->{'PLAYER'},
         $self->{'STATE'}->{'SUBPHASE'},
     );
-}
-
-#############################################################################
-
-sub set_status {
-    my $self        = shift;
-    my $status      = shift;
-
-    my @values = split( /:/, $status );
-
-    $self->{'STATE'}->{'STATE'} = $values[ 0 ];
-    $self->{'STATE'}->{'ROUND'} = $values[ 1 ];
-    $self->{'STATE'}->{'PHASE'} = $values[ 2 ];
-    $self->{'STATE'}->{'PLAYER'} = $values[ 3 ];
-    $self->{'STATE'}->{'SUBPHASE'} = $values[ 4 ];
-
-    return;
 }
 
 #############################################################################
@@ -436,6 +420,17 @@ sub tick_player {
 
     $self->set_waiting_on_player_id( -1 );
     return 0;
+}
+
+#############################################################################
+
+sub next_ship_index {
+    my $self        = shift;
+
+    my $index = $self->{'SETTINGS'}->{'SHIP_INDEX'};
+    $self->{'SETTINGS'}->{'SHIP_INDEX'}++;
+
+    return $index;
 }
 
 #############################################################################

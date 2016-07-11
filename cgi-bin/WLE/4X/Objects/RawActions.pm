@@ -9,6 +9,7 @@ use WLE::4X::Enums::Basic;
 
 my %actions = (
     \&_raw_create_game                  => 'create',
+    \&_raw_set_status                   => 'status',
     \&_raw_add_source                   => 'add_source',
     \&_raw_remove_source                => 'remove_source',
     \&_raw_add_option                   => 'add_option',
@@ -51,6 +52,26 @@ sub _raw_create_game {
     $self->{'SETTINGS'}->{'SOURCE_TAGS'} = [ @{ $r_source_tags } ];
     $self->{'SETTINGS'}->{'OPTION_TAGS'} = [ @{ $r_option_tags } ];
     $self->{'SETTINGS'}->{'PLAYER_IDS'} = [ $owner_id ];
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_set_status {
+    my $self        = shift;
+
+    my @args = $self->_log_if_needed( shift( @_ ), __SUB__, @_ );
+
+    my $status = shift( @args );
+
+    my @values = split( /:/, $status );
+
+    $self->{'STATE'}->{'STATE'} = $values[ 0 ];
+    $self->{'STATE'}->{'ROUND'} = $values[ 1 ];
+    $self->{'STATE'}->{'PHASE'} = $values[ 2 ];
+    $self->{'STATE'}->{'PLAYER'} = $values[ 3 ];
+    $self->{'STATE'}->{'SUBPHASE'} = $values[ 4 ];
 
     return;
 }
@@ -844,11 +865,11 @@ sub _raw_add_to_available_tech {
 
 sub _log_if_needed {
     my $self            = shift;
-    my $flag_to_log     = shift;
+    my $event_type      = shift;
     my $ref_to_method   = shift;
     my @args            = @_;
 
-    unless ( $flag_to_log ) {
+    unless ( $event_type == $EV_FROM_INTERFACE ) {
         return @args;
     }
 

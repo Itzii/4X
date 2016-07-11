@@ -58,6 +58,11 @@ our @EXPORT = qw(
     $PH_UPKEEP
     $PH_CLEANUP
 
+
+    $EV_FROM_INTERFACE
+    $EV_FROM_LOG
+    $EV_FOR_DISPLAY
+
 );
 
 my $i = 0;
@@ -75,6 +80,11 @@ our $PH_COMBAT          = $i++;
 our $PH_UPKEEP          = $i++;
 our $PH_CLEANUP         = $i++;
 
+$i = 0;
+
+our $EV_FROM_INTERFACE      = $i++;
+our $EV_FROM_LOG            = $i++;
+our $EV_FROM_FOR_DISPLAY    = $i++;
 
 #############################################################################
 #############################################################################

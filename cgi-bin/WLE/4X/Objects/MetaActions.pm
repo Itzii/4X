@@ -395,7 +395,7 @@ sub action_begin {
     $self->set_phase( $PH_PREPARING );
     $self->set_waiting_on_player_id( $self->{'SETTINGS'}->{'PLAYERS_PENDING'}->[ 0 ] );
 
-    $self->_log_status( { 'status' => $self->status() } );
+    $self->_raw_set_status( 1, $self->status() );
 
     $self->_save_state();
 
@@ -476,105 +476,7 @@ sub action_select_race_and_location {
     $self->_raw_select_race_and_location( 1, $args{'race_tag'}, $args{'location_x'}, $args{'location_y'}, $location_warps );
 
     unless ( $self->tick_player() ) {
-
-        $self->_raw_remove_non_playing_races( 1 );
-
-        my $index = 1;
-
-        # place galactic defense
-
-        my $tile = $self->board()->tile_at_location( 0, 0 );
-
-        foreach my $ship_class ( $tile->starting_ships() ) {
-
-            my @templates_of_class = ();
-            foreach my $template ( values( %{ $self->templates() } ) ) {
-                if ( $template->class() eq $ship_class ) {
-                    if ( $template->count() > 0 || $template->count() == -1 ) {
-                        push( @templates_of_class, $template->tag() );
-                    }
-                }
-            }
-
-            WLE::Methods::Simple::shuffle_in_place( \@templates_of_class );
-            my $template_tag = shift( @templates_of_class );
-
-            $self->_raw_create_ship_on_tile(
-                1,
-                $tile->tag(),
-                $template_tag,
-                -1,
-                'ship_' . $template_tag . '_npc_' . $index,
-            );
-
-            $index++;
-
-            my $template = $self->templates()->{ $template_tag };
-
-            if ( $template->count() > 0 ) {
-                $template->set_count( $template->count() - 1 );
-            }
-        }
-
-        if ( $self->has_option( 'ancient_homeworlds' ) ) {
-
-            # get templates for defenders
-
-            my @defenders = ();
-            foreach my $ship_template ( values( %{ $self->templates() } ) ) {
-                if ( $ship_template->class() eq 'class_ancient_destroyer' ) {
-                    push( @defenders, $ship_template->tag() );
-                }
-            }
-
-            # place ancient homeworld tiles
-
-            my @homeworlds = @{ $self->{'TILE_STACKS'}->{ 'ancient_homeworlds' }->{'DRAW'} };
-            WLE::Methods::Simple::shuffle_in_place( \@homeworlds );
-
-            foreach my $location ( @{ $self->{'STARTING_LOCATIONS'} } ) {
-                if ( defined( $location->{'NPC'} ) ) {
-                    my ( $x, $y ) = split( ',', $location->{'SPACE'} );
-                    my $location_warps = $location->{'WARPS'};
-                    my $tile_tag = shift( @homeworlds );
-
-                    $self->_raw_remove_tile_from_stack( 1, $tile_tag );
-                    $self->_raw_place_tile_on_board( 1, $tile_tag, $x, $y );
-
-                    foreach my $ship_class ( $self->tiles()->{ $tile_tag }->starting_ships() ) {
-
-                        my @templates_of_class = ();
-                        foreach my $template ( values( %{ $self->templates() } ) ) {
-                            if ( $template->class() eq $ship_class ) {
-                                if ( $template->count() > 0 || $template->count() == -1 ) {
-                                    push( @templates_of_class, $template->tag() );
-                                }
-                            }
-                        }
-
-                        WLE::Methods::Simple::shuffle_in_place( \@templates_of_class );
-                        my $template_tag = shift( @templates_of_class );
-
-                        $self->_raw_create_ship_on_tile(
-                            1,
-                            $tile_tag,
-                            $template_tag,
-                            -1,
-                            'ship_' . $template_tag . '_npc_' . $index,
-                        );
-
-                        $index++;
-
-                        my $template = $self->templates()->{ $template_tag };
-
-                        if ( $template->count() > 0 ) {
-                            $template->set_count( $template->count() - 1 );
-                        }
-                    }
-                }
-            }
-        }
-
+        $self->_prepare_for_first_round();
 
         $self->start_next_round();
     }
@@ -586,6 +488,43 @@ sub action_select_race_and_location {
     return 1;
 }
 
+#############################################################################
+
+sub _prepare_for_first_round {
+    my $self            = shift;
+
+    $self->_raw_remove_non_playing_races( 1 );
+
+    # place galactic defense
+
+    my $tile = $self->board()->tile_at_location( 0, 0 );
+    $tile->add_starting_ships();
+
+
+    if ( $self->has_option( 'ancient_homeworlds' ) ) {
+
+        # place ancient homeworld tiles
+
+        my @homeworlds = @{ $self->{'TILE_STACKS'}->{ 'ancient_homeworlds' }->{'DRAW'} };
+        WLE::Methods::Simple::shuffle_in_place( \@homeworlds );
+
+        foreach my $location ( @{ $self->{'STARTING_LOCATIONS'} } ) {
+            if ( defined( $location->{'NPC'} ) ) {
+                my ( $x, $y ) = split( ',', $location->{'SPACE'} );
+                my $location_warps = $location->{'WARPS'};
+                my $tile_tag = shift( @homeworlds );
+                my $tile = $self->tiles()->{ $tile_tag };
+
+                $self->_raw_remove_tile_from_stack( 1, $tile_tag );
+                $self->_raw_place_tile_on_board( 1, $tile_tag, $x, $y );
+
+                $tile->add_starting_ships();
+            }
+        }
+    }
+
+    return;
+}
 
 #############################################################################
 #############################################################################

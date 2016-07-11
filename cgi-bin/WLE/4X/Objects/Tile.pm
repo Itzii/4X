@@ -253,6 +253,43 @@ sub remove_ship {
 
 #############################################################################
 
+sub add_starting_ships {
+    my $self        = shift;
+
+    foreach my $ship_class ( $self->starting_ships() ) {
+
+        my @templates_of_class = ();
+        foreach my $template ( values( %{ $self->server()->templates() } ) ) {
+            if ( $template->class() eq $ship_class ) {
+                if ( $template->count() > 0 || $template->count() == -1 ) {
+                    push( @templates_of_class, $template->tag() );
+                }
+            }
+        }
+
+        WLE::Methods::Simple::shuffle_in_place( \@templates_of_class );
+        my $template_tag = shift( @templates_of_class );
+
+        $self->server()->_raw_create_ship_on_tile(
+            1,
+            $self->tag(),
+            $template_tag,
+            -1,
+            'ship_' . $template_tag . '_npc_' . $self->server()->next_ship_index(),
+        );
+
+        my $template = $self->server()->templates()->{ $template_tag };
+
+        if ( $template->count() > 0 ) {
+            $template->set_count( $template->count() - 1 );
+        }
+    }
+
+    return;
+}
+
+#############################################################################
+
 sub available_resource_spots {
     my $self            = shift;
     my $res_type        = shift;

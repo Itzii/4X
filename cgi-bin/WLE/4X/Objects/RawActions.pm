@@ -32,6 +32,8 @@ my %actions = (
     \&_raw_remove_discovery_from_tile   => 'remove_discovery_from_tile',
     \&_raw_remove_from_tech_bag         => 'remove_from_tech_bag',
     \&_raw_add_to_available_tech        => 'add_to_available_tech',
+    \&_raw_next_player                  => 'next_player',
+    \&_raw_start_next_round             => 'start_next_round',
 
 
 );
@@ -40,13 +42,21 @@ my %actions = (
 
 sub _raw_create_game {
     my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
 
-    my @args = $self->_log_if_needed( shift( @_ ), __SUB__, @_ );
+    if ( $source == $EV_FROM_INTERFACE ) {
+        $self->_log_event( __SUB__, @args );
+    }
 
     my $owner_id        = shift( @args );
     my $long_name       = shift( @args );
     my $r_source_tags   = shift( @args );
     my $r_option_tags   = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'game created by ' . $owner_id . '. sources used: ' . join( ',', @{ $r_source_tags } ) . '; options used: ' . join( ',', @{ $r_option_tags } );
+    }
 
     $self->{'SETTINGS'}->{'LONG_NAME'} = $long_name;
     $self->{'SETTINGS'}->{'SOURCE_TAGS'} = [ @{ $r_source_tags } ];
@@ -80,10 +90,19 @@ sub _raw_set_status {
 
 sub _raw_add_source {
     my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
 
-    my @args = $self->_log_if_needed( shift( @_ ), __SUB__, @_ );
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
 
-    my $tag         = shift( @args );
+    my $tag = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'added source: ' . $tag;
+    }
+
 
     push( @{ $self->{'SETTINGS'}->{'SOURCE_TAGS'} }, $tag );
 
@@ -94,10 +113,18 @@ sub _raw_add_source {
 
 sub _raw_remove_source {
     my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
 
-    my @args = $self->_log_if_needed( shift( @_ ), __SUB__, @_ );
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
 
-    my $tag         = shift( @args );
+    my $tag = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'source removed: ' . $tag;
+    }
 
     my @current_tags = $self->source_tags();
     $self->{'SETTINGS'}->{'SOURCE_TAGS'} = [];
@@ -115,10 +142,18 @@ sub _raw_remove_source {
 
 sub _raw_add_option {
     my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
 
-    my @args = $self->_log_if_needed( shift( @_ ), __SUB__, @_ );
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
 
-    my $tag         = shift( @args );
+    my $tag = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'added option: ' . $tag;
+    }
 
     push( @{ $self->{'SETTINGS'}->{'OPTION_TAGS'} }, $tag );
 
@@ -129,10 +164,18 @@ sub _raw_add_option {
 
 sub _raw_remove_option {
     my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
 
-    my @args = $self->_log_if_needed( shift( @_ ), __SUB__, @_ );
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
 
-    my $tag         = shift( @args );
+    my $tag = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'option removed: ' . $tag;
+    }
 
     my @current_tags = $self->source_tags();
     $self->{'SETTINGS'}->{'OPTION_TAGS'} = [];
@@ -151,10 +194,18 @@ sub _raw_remove_option {
 
 sub _raw_add_player {
     my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
 
-    my @args = $self->_log_if_needed( shift( @_ ), __SUB__, @_ );
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
 
     my $player_id   = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'added player: ' . $player_id;
+    }
 
     push( @{ $self->{'SETTINGS'}->{'PLAYER_IDS'} }, $player_id );
 
@@ -166,10 +217,18 @@ sub _raw_add_player {
 
 sub _raw_remove_player {
     my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
 
-    my @args = $self->_log_if_needed( shift( @_ ), __SUB__, @_ );
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
 
     my $player_id   = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'player removed: ' . $player_id;
+    }
 
     my @current_ids = $self->player_ids();
     $self->{'SETTINGS'}->{'PLAYER_IDS'} = [];
@@ -186,9 +245,17 @@ sub _raw_remove_player {
 #############################################################################
 
 sub _raw_begin {
-    my $self       = shift;
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
 
-    my @args = $self->_log_if_needed( shift( @_ ), __SUB__, @_ );
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'game started';
+    }
 
     my $fh = undef;
 
@@ -520,11 +587,20 @@ sub _raw_begin {
 #############################################################################
 
 sub _raw_set_player_order {
-    my $self            = shift;
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
 
-    my @args = $self->_log_if_needed( shift( @_ ), __SUB__, @_ );
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
 
     my @new_order_ids   = @args;
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'player order set: ' . join( ',', @new_order_ids );
+    }
+
 
     $self->{'SETTINGS'}->{'PLAYERS_DONE'} = [];
     $self->{'SETTINGS'}->{'PLAYERS_PENDING'} = [ @new_order_ids ];
@@ -535,12 +611,28 @@ sub _raw_set_player_order {
 #############################################################################
 
 sub _raw_create_tile_stack {
-    my $self            = shift;
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
 
-    my @args = $self->_log_if_needed( shift( @_ ), __SUB__, @_ );
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
 
     my $stack_id        = shift( @args );
     my @values          = @args;
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'tile stack ' . $stack_id . ' created with ' . scalar( @values ) . ' tiles.';
+    }
+
+    foreach my $tile_tag ( @{ $self->{'TILE_STACKS'}->{ $stack_id } } ) {
+        unless ( matches_any( $tile_tag, @values ) ) {
+            delete( $self->tiles()->{ $tile_tag } );
+        }
+    }
+
+    $self->{'TILE_STACKS'}->{ $stack_id } = {};
 
     $self->{'TILE_STACKS'}->{ $stack_id }->{'DRAW'} = [ @values ];
     $self->{'TILE_STACKS'}->{ $stack_id }->{'DISCARD'} = [];
@@ -551,13 +643,21 @@ sub _raw_create_tile_stack {
 #############################################################################
 
 sub _raw_remove_tile_from_stack {
-    my $self            = shift;
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
 
-    my @args = $self->_log_if_needed( shift( @_ ), __SUB__, @_ );
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
 
-    my $tile_tag        = shift( @args );
+    my $tile_tag = shift( @args );
 
     my $stack_id = $self->tiles()->{ $tile_tag }->which_stack();
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'tile ' . $tile_tag . ' removed from stack ' . $stack_id;
+    }
 
     my @new_stack = ();
 
@@ -575,13 +675,21 @@ sub _raw_remove_tile_from_stack {
 #############################################################################
 
 sub _raw_place_tile_on_board {
-    my $self            = shift;
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
 
-    my @args = $self->_log_if_needed( shift( @_ ), __SUB__, @_ );
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
 
     my $tile_tag        = shift( @args );
     my $location_x      = shift( @args );
     my $location_y      = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'tile ' . $tile_tag . ' placed on board at location ' . $location_x . ',' . $location_y;
+    }
 
     $self->board()->place_tile( $location_x, $location_y, $tile_tag );
 
@@ -591,11 +699,19 @@ sub _raw_place_tile_on_board {
 #############################################################################
 
 sub _raw_discard_tile {
-    my $self            = shift;
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
 
-    my @args = $self->_log_if_needed( shift( @_ ), __SUB__, @_ );
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
 
     my $tile_tag        = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'tile ' . $tile_tag . ' discarded';
+    }
 
     my $stack_id = $self->tiles()->{ $tile_tag }->which_stack();
 
@@ -604,15 +720,22 @@ sub _raw_discard_tile {
     return;
 }
 
-
 #############################################################################
 
 sub _raw_create_development_stack {
-    my $self            = shift;
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
 
-    my @args = $self->_log_if_needed( shift( @_ ), __SUB__, @_ );
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
 
-    my @values          = @args;
+    my @values = @args;
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'development stack created with ' . scalar( @values ) . ' developments';
+    }
 
     $self->{'DEVELOPMENT_STACK'} = [ @values ];
 
@@ -622,14 +745,23 @@ sub _raw_create_development_stack {
 #############################################################################
 
 sub _raw_select_race_and_location {
-    my $self            = shift;
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
 
-    my @args = $self->_log_if_needed( shift( @_ ), __SUB__, @_ );
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
 
     my $race_tag        = shift( @args );
     my $location_x      = shift( @args );
     my $location_y      = shift( @args );
     my $warp_gates      = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'player ' . $self->{'SETTINGS'}->{'PLAYER_IDS'}->[ $self->current_user() ] . ' has selected ' . $race_tag . ' as race and is beginning at location ' . $location_x . ',' . $location_y;
+    }
+
 
     my $race = $self->races()->{ $race_tag };
 
@@ -646,9 +778,9 @@ sub _raw_select_race_and_location {
 
     $start_hex->set_warps( $warp_gates );
 
-    $self->_raw_remove_tile_from_stack( 0, $start_hex_tag );
-    $self->_raw_place_tile_on_board( 0, $start_hex_tag, $location_x, $location_y );
-    $self->_raw_influence_tile( 0, $race_tag, $start_hex_tag );
+    $self->_raw_remove_tile_from_stack( $EV_SUB_ACTION, $start_hex_tag );
+    $self->_raw_place_tile_on_board( $EV_SUB_ACTION, $start_hex_tag, $location_x, $location_y );
+    $self->_raw_influence_tile( $EV_SUB_ACTION, $race_tag, $start_hex_tag );
 
 
     # place cubes on available spots
@@ -694,14 +826,25 @@ sub _raw_select_race_and_location {
 #############################################################################
 
 sub _raw_place_cube_on_tile {
-    my $self            = shift;
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
 
-    my @args = $self->_log_if_needed( shift( @_ ), __SUB__, @_ );
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
 
     my $race_tag        = shift( @args );
     my $tile_tag        = shift( @args );
     my $type            = shift( @args );
     my $flag_advanced   = shift( @args ); $flag_advanced = 0             unless defined( $flag_advanced );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        if ( $flag_advanced ) {
+            $type = '(adv) ' . $type;
+        }
+        return $race_tag ' placed ' . $type . ' cube on tile ' . $tile_tag;
+    }
 
     my $race = $self->races()->{ $race_tag };
     my $tile = $self->tiles()->{ $tile_tag };
@@ -715,11 +858,19 @@ sub _raw_place_cube_on_tile {
 
 sub _raw_influence_tile {
     my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
 
-    my @args = $self->_log_if_needed( shift( @_ ), __SUB__, @_ );
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
 
     my $race_tag    = shift( @args );
     my $tile_tag    = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return $race_tag . ' influenced tile ' . $tile_tag;
+    }
 
     my $race = $self->races()->{ $race_tag };
 
@@ -734,8 +885,16 @@ sub _raw_influence_tile {
 
 sub _raw_remove_non_playing_races {
     my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
 
-    my @args = $self->_log_if_needed( shift( @_ ), __SUB__, @_ );
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'removed non-played races and removed associated resources';
+    }
 
     foreach my $race_tag ( keys( %{ $self->races() } ) ) {
         my $race = $self->races()->{ $race_tag };
@@ -747,7 +906,7 @@ sub _raw_remove_non_playing_races {
             }
 
             my $home_tile = $race->home_tile();
-            $self->_raw_remove_tile_from_stack( 0, $home_tile );
+            $self->_raw_remove_tile_from_stack( $EV_SUB_ACTION, $home_tile );
 
             delete ( $self->tiles()->{ $home_tile } );
 
@@ -761,14 +920,27 @@ sub _raw_remove_non_playing_races {
 #############################################################################
 
 sub _raw_create_ship_on_tile {
-    my $self            = shift;
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
 
-    my @args = $self->_log_if_needed( shift( @_ ), __SUB__, @_ );
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
 
     my $tile_tag        = shift( @args );
     my $template_tag    = shift( @args );
     my $owner_id        = shift( @args );
     my $ship_tag        = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        my $race_tag = $self->race_tag_of_current_user();
+        if ( $race_tag eq '' ) {
+            $race_tag = 'game';
+        }
+
+        return $race_tag . ' placed ship ' . $ship_tag . ' on tile ' . $tile_tag;
+    }
 
     my $template = $self->templates()->{ $template_tag };
 
@@ -790,12 +962,20 @@ sub _raw_create_ship_on_tile {
 #############################################################################
 
 sub _raw_add_discovery_to_tile {
-    my $self            = shift;
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
 
-    my @args = $self->_log_if_needed( shift( @_ ), __SUB__, @_ );
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
 
     my $tile_tag        = shift( @args );
     my $discovery_tag   = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'discovery added to tile ' . $tile_tag;
+    }
 
     $self->tiles()->{ $tile_tag }->add_discovery( $discovery_tag );
 
@@ -805,12 +985,20 @@ sub _raw_add_discovery_to_tile {
 #############################################################################
 
 sub _raw_remove_discovery_from_tile {
-    my $self            = shift;
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
 
-    my @args = $self->_log_if_needed( shift( @_ ), __SUB__, @_ );
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
 
     my $tile_tag        = shift( @args );
     my $discovery_tag   = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return $discovery_tag . ' removed from tile ' . $tile_tag;
+    }
 
     $self->tiles()->{ $tile_tag }->remove_discovery( $discovery_tag );
 
@@ -820,11 +1008,20 @@ sub _raw_remove_discovery_from_tile {
 #############################################################################
 
 sub _raw_remove_from_tech_bag {
-    my $self            = shift;
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
 
-    my @args = $self->_log_if_needed( shift( @_ ), __SUB__, @_ );
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
 
     my @removed_tech = @args;
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'tech tiles removed from bag: ' . join( ',', @removed_tech );
+    }
+
 
     foreach my $tech_tag ( @removed_tech ) {
 
@@ -849,11 +1046,19 @@ sub _raw_remove_from_tech_bag {
 #############################################################################
 
 sub _raw_add_to_available_tech {
-    my $self            = shift;
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
 
-    my @args = $self->_log_if_needed( shift( @_ ), __SUB__, @_ );
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
 
     my @new_tech = @args;
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'tech tiles added to available tech: ' . join( ',', @new_tech );
+    }
 
     push( @{ $self->{'AVAILABLE_TECH'} }, @new_tech );
 
@@ -863,20 +1068,75 @@ sub _raw_add_to_available_tech {
 
 #############################################################################
 
-sub _log_if_needed {
+sub _raw_next_player {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'next player' );
+    }
+
+    my $done_player = shift( @{ $self->{'SETTINGS'}->{'PLAYERS_PENDING'} } );
+
+    push( @{ $self->{'SETTINGS'}->{'PLAYERS_DONE'} }, $done_player );
+
+    if ( scalar( @{ $self->{'SETTINGS'}->{'PLAYERS_PENDING'} } ) > 0 ) {
+        $self->{'STATE'}->{'PLAYER'} = $self->{'SETTINGS'}->{'PLAYERS_PENDING'}->[ 0 ];
+        return;
+    }
+
+    $self->{'STATE'}->{'PLAYER'} = -1;
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_start_next_round {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'starting new round' );
+    }
+
+    my @ready = @{ $self->{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} };
+    $self->{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} = [];
+    $self->{'SETTINGS'}->{'PLAYERS_DONE'} = [];
+
+    $self->{'SETTINGS'}->{'PLAYERS_PENDING'} = \@ready;
+
+    return;
+}
+
+#############################################################################
+
+sub _log_event {
     my $self            = shift;
     my $event_type      = shift;
     my $ref_to_method   = shift;
     my @args            = @_;
 
-    unless ( $event_type == $EV_FROM_INTERFACE ) {
-        return @args;
+    $Data::Dumper::Indent = 0;
+
+    if ( $event_type == $EV_FROM_INTERFACE ) {
+        $self->_log_data( $actions{ $ref_to_method } . ':' . Dumper( \@args ) );
+    }
+    elsif ( $event_type == $EV_SUB_ACTION ) {
+        $self->_log_data( '  _' . $actions{ $ref_to_method } . ':' . Dumper( \@args ) );
     }
 
-    $Data::Dumper::Indent = 0;
-    $self->_log_data( $actions{ $ref_to_method } . ':' . Dumper( \@args ) );
-
-    return @args;
+    return;
 }
 
 #############################################################################
@@ -942,7 +1202,7 @@ sub action_parse_state_from_log {
         foreach my $method ( keys( %actions ) ) {
             if ( $actions{ $method } eq $action ) {
                 $flag_found_method = 1;
-                $method->( $self, 0, $data );
+                $method->( $self, $EV_FROM_LOG, $data );
                 last;
             }
         }

@@ -45,7 +45,7 @@ sub action_create_game {
     }
 
     $self->_raw_create_game(
-        1,
+        $EV_FROM_INTERFACE,
         $args{'user'},
         $args{'long_name'},
         $args{'r_source_tags'},
@@ -89,7 +89,7 @@ sub action_add_source {
         return 0;
     }
 
-    $self->_raw_add_source( 1, $args{'source_tag'} );
+    $self->_raw_add_source( $EV_FROM_INTERFACE, $args{'source_tag'} );
     $self->_save_state();
 
     $self->_close_all();
@@ -128,7 +128,7 @@ sub action_remove_source {
         return 0;
     }
 
-    $self->_raw_remove_source( 1, $args{'source_tag'} );
+    $self->_raw_remove_source( $EV_FROM_INTERFACE, $args{'source_tag'} );
 
     $self->_save_state();
 
@@ -168,7 +168,7 @@ sub action_add_option {
         return 0;
     }
 
-    $self->_raw_add_option( 1, $args{'option_tag'} );
+    $self->_raw_add_option( $EV_FROM_INTERFACE, $args{'option_tag'} );
 
     $self->_save_state();
 
@@ -213,7 +213,7 @@ sub action_remove_option {
         return 0;
     }
 
-    $self->_raw_remove_option( 1, $args{'option_tag'} );
+    $self->_raw_remove_option( $EV_FROM_INTERFACE, $args{'option_tag'} );
 
     $self->_save_state();
 
@@ -252,7 +252,7 @@ sub action_add_player {
         return 0;
     }
 
-    $self->_raw_add_player( 1, $args{'player_id'} );
+    $self->_raw_add_player( $EV_FROM_INTERFACE, $args{'player_id'} );
 
     $self->_save_state();
 
@@ -291,7 +291,7 @@ sub action_remove_player {
         return 0;
     }
 
-    $self->_raw_remove_player( 1, $args{'player_id'} );
+    $self->_raw_remove_player( $EV_FROM_INTERFACE, $args{'player_id'} );
 
     $self->_save_state();
 
@@ -312,14 +312,14 @@ sub action_begin {
 
     # create the base item set
 
-    $self->_raw_begin( 1 );
+    $self->_raw_begin( $EV_FROM_INTERFACE );
 
     # randomize player order
 
     my @new_player_order = ( 0 .. scalar( $self->player_ids() ) - 1 );
     WLE::Methods::Simple::shuffle_in_place( \@new_player_order );
 
-    $self->_raw_set_player_order( 1, @new_player_order );
+    $self->_raw_set_player_order( $EV_FROM_INTERFACE, @new_player_order );
 
     # fill tile stacks with random tiles
 
@@ -331,14 +331,11 @@ sub action_begin {
 
         if ( defined( $self->{'SETTINGS'}->{'TILE_STACK_LIMIT_' . $stack_tag } ) ) {
             while ( scalar( @stack ) > $self->{'SETTINGS'}->{'TILE_STACK_LIMIT_' . $stack_tag } ) {
-                my $tag = shift( @stack );
-                delete( $self->{'TILES'}->{ $tag } );
+                shift( @stack );
             }
         }
 
-        delete( $self->{'TILE_STACKS'}->{ $stack_tag } );
-
-        $self->_raw_create_tile_stack( 1, $stack_tag, @stack );
+        $self->_raw_create_tile_stack( $EV_FROM_INTERFACE, $stack_tag, @stack );
     }
 
     # place galactic center
@@ -346,8 +343,8 @@ sub action_begin {
     my @stack = @{ $self->{'TILE_STACKS'}->{ 0 }->{'DRAW'} };
     WLE::Methods::Simple::shuffle_in_place( \@stack );
 
-    $self->_raw_remove_tile_from_stack( 0, $stack[ 0 ] );
-    $self->_raw_place_tile_on_board( 0, $stack[ 0 ], 0, 0 );
+    $self->_raw_remove_tile_from_stack( $EV_FROM_INTERFACE, $stack[ 0 ] );
+    $self->_raw_place_tile_on_board( $EV_FROM_INTERFACE, $stack[ 0 ], 0, 0 );
 
 
     # add discoveries to tiles
@@ -357,10 +354,9 @@ sub action_begin {
 
     foreach my $tile ( values( %{ $self->tiles() } ) ) {
         foreach ( 1 .. $tile->discovery_count() ) {
-            $self->_raw_add_discovery_to_tile( 1, $tile->tag(), shift( @discovery_tags ) );
+            $self->_raw_add_discovery_to_tile( $EV_FROM_INTERFACE, $tile->tag(), shift( @discovery_tags ) );
         }
     }
-    $self->{'DISCOVERY_BAG'} = \@discovery_tags;
 
     # draw random developments
 
@@ -374,7 +370,7 @@ sub action_begin {
         }
     }
 
-    $self->_raw_create_development_stack( 1, @developments );
+    $self->_raw_create_development_stack( $EV_FROM_INTERFACE, @developments );
 
     # draw beginning tech tiles
 
@@ -386,8 +382,8 @@ sub action_begin {
         push( @available_tech, shift( @tech_bag ) );
     }
 
-    $self->_raw_remove_from_tech_bag( 1, @available_tech );
-    $self->_raw_add_to_available_tech( 1, @available_tech );
+    $self->_raw_remove_from_tech_bag( $EV_FROM_INTERFACE, @available_tech );
+    $self->_raw_add_to_available_tech( $EV_FROM_INTERFACE, @available_tech );
 
 
 
@@ -409,10 +405,6 @@ sub action_begin {
 sub action_select_race_and_location {
     my $self            = shift;
     my %args            = @_;
-
-    unless ( $self->round() == 0 ) {
-
-    }
 
     unless ( $self->_open_for_writing( $self->log_id() ) ) {
         return 0;
@@ -473,13 +465,21 @@ sub action_select_race_and_location {
         return 0;
     }
 
-    $self->_raw_select_race_and_location( 1, $args{'race_tag'}, $args{'location_x'}, $args{'location_y'}, $location_warps );
+    $self->_raw_select_race_and_location(
+        $EV_FROM_INTERFACE,
+        $args{'race_tag'},
+        $args{'location_x'},
+        $args{'location_y'},
+        $location_warps,
+    );
 
-    unless ( $self->tick_player() ) {
+    $self->_raw_next_player();
+
+    if ( $self->waiting_on_player_id() == -1 ) {
         $self->_prepare_for_first_round();
-
-        $self->start_next_round();
+        $self->_raw_start_next_round( $EV_FROM_INTERFACE );
     }
+
 
     $self->_save_state();
 
@@ -493,13 +493,12 @@ sub action_select_race_and_location {
 sub _prepare_for_first_round {
     my $self            = shift;
 
-    $self->_raw_remove_non_playing_races( 1 );
+    $self->_raw_remove_non_playing_races( $EV_FROM_INTERFACE );
 
     # place galactic defense
 
     my $tile = $self->board()->tile_at_location( 0, 0 );
     $tile->add_starting_ships();
-
 
     if ( $self->has_option( 'ancient_homeworlds' ) ) {
 

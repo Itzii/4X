@@ -59,9 +59,11 @@ our @EXPORT = qw(
     $PH_CLEANUP
 
 
+
     $EV_FROM_INTERFACE
     $EV_FROM_LOG
-    $EV_FOR_DISPLAY
+    $EV_FROM_LOG_FOR_DISPLAY
+    $EV_SUB_ACTION
 
 );
 
@@ -82,9 +84,11 @@ our $PH_CLEANUP         = $i++;
 
 $i = 0;
 
-our $EV_FROM_INTERFACE      = $i++;
-our $EV_FROM_LOG            = $i++;
-our $EV_FROM_FOR_DISPLAY    = $i++;
+our $EV_FROM_LOG                = $i++;
+our $EV_FROM_INTERFACE          = $i++;
+our $EV_FROM_LOG_FOR_DISPLAY    = $i++;
+our $EV_SUB_ACTION              = $i++;
+
 
 #############################################################################
 #############################################################################

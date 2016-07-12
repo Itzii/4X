@@ -289,6 +289,24 @@ sub user_is_owner {
 
 #############################################################################
 
+sub race_tag_of_current_user {
+    my $self        = shift;
+
+    if ( $self->current_user() == -1 ) {
+        return '';
+    }
+
+    foreach my $race_tag ( keys( %{ $server->{'RACES'} } ) ) {
+        if ( $server->{'RACES'}->{ $race_tag }->owner_id() == $self->current_user() ) {
+            return $race_tag;
+        }
+    }
+
+    return '';
+}
+
+#############################################################################
+
 sub action_status {
     my $self        = shift;
     my %args        = @_;
@@ -357,17 +375,6 @@ sub waiting_on_player_id {
 
 #############################################################################
 
-sub set_waiting_on_player_id {
-    my $self        = shift;
-    my $player_id   = shift;
-
-    $self->{'STATE'}->{'PLAYER'} = $player_id;
-
-    return;
-}
-
-#############################################################################
-
 sub round {
     my $self        = shift;
 
@@ -402,45 +409,6 @@ sub set_phase {
     $self->{'STATE'}->{'PHASE'} = $new_phase;
 
     return;
-}
-
-#############################################################################
-
-sub tick_player {
-    my $self        = shift;
-
-    my $done_player = shift( @{ $self->{'SETTINGS'}->{'PLAYERS_PENDING'} } );
-
-    push( @{ $self->{'SETTINGS'}->{'PLAYERS_DONE'} }, $done_player );
-
-    if ( scalar( @{ $self->{'SETTINGS'}->{'PLAYERS_PENDING'} } ) > 0 ) {
-        $self->set_waiting_on_player_id( $self->{'SETTINGS'}->{'PLAYERS_PENDING'}->[ 0 ] );
-        return 1;
-    }
-
-    $self->set_waiting_on_player_id( -1 );
-    return 0;
-}
-
-#############################################################################
-
-sub next_ship_index {
-    my $self        = shift;
-
-    my $index = $self->{'SETTINGS'}->{'SHIP_INDEX'};
-    $self->{'SETTINGS'}->{'SHIP_INDEX'}++;
-
-    return $index;
-}
-
-#############################################################################
-
-sub start_next_round {
-    my $self        = shift;
-
-
-
-
 }
 
 #############################################################################

@@ -5,6 +5,7 @@ use warnings;
 
 use feature qw( current_sub );
 
+use WLE::Methods::Simple;
 use WLE::4X::Enums::Basic;
 
 my %actions = (
@@ -18,6 +19,7 @@ my %actions = (
     \&_raw_remove_player                => 'remove_player',
     \&_raw_begin                        => 'begin',
     \&_raw_set_player_order             => 'set_player_order',
+    \&_raw_add_players_to_next_round    => 'queue_next_round',
     \&_raw_create_tile_stack            => 'create_tile_stack',
     \&_raw_remove_tile_from_stack       => 'remove_tile_from_stack',
     \&_raw_place_tile_on_board          => 'place_tile_on_board',
@@ -28,6 +30,7 @@ my %actions = (
     \&_raw_influence_tile               => 'influence_tile',
     \&_raw_remove_non_playing_races     => 'remove_non_playing_races',
     \&_raw_create_ship_on_tile          => 'create_ship_on_tile',
+    \&_raw_add_ship_to_tile             => 'add_ship_to_tile',
     \&_raw_add_discovery_to_tile        => 'add_discovery_to_tile',
     \&_raw_remove_discovery_from_tile   => 'remove_discovery_from_tile',
     \&_raw_remove_from_tech_bag         => 'remove_from_tech_bag',
@@ -70,8 +73,12 @@ sub _raw_create_game {
 
 sub _raw_set_status {
     my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
 
-    my @args = $self->_log_if_needed( shift( @_ ), __SUB__, @_ );
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
 
     my $status = shift( @args );
 
@@ -123,6 +130,7 @@ sub _raw_remove_source {
     my $tag = shift( @args );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+
         return 'source removed: ' . $tag;
     }
 
@@ -470,13 +478,8 @@ sub _raw_begin {
         );
 
         if ( defined( $development ) ) {
-            if ( matches_any( $development->source_tag(), $self->source_tags() ) ) {
-                if (
-                    $development->required_option() eq ''
-                    || matches_any( $development->required_option(), $self->option_tags() )
-                ) {
-                    $self->{'DEVELOPMENTS'}->{ $dev_key } = $development;
-                }
+            if ( $self->item_is_allowed_in_game( $development ) ) {
+                $self->{'DEVELOPMENTS'}->{ $dev_key } = $development;
             }
         }
     }
@@ -500,13 +503,8 @@ sub _raw_begin {
         );
 
         if ( defined( $template ) ) {
-            if ( matches_any( $template->source_tag(), $self->source_tags() ) ) {
-                if (
-                    $template->required_option() eq ''
-                    || matches_any( $template->required_option(), $self->option_tags() )
-                ) {
-                    $base_templates{ $template->tag() } = $template;
-                }
+            if ( $self->item_is_allowed_in_game( $template ) ) {
+                $base_templates{ $template->tag() } = $template;
             }
         }
     }
@@ -530,26 +528,11 @@ sub _raw_begin {
 
         if ( defined( $race ) ) {
 
-            my $flag_added_race = 0;
-
-            my %race_hash = ();
-            $race->to_hash( \%race_hash );
-#            print STDERR "\n" . Dumper( \%race_hash );
-
-            if ( matches_any( $race->source_tag(), $self->source_tags() ) ) {
-                if (
-                    $race->required_option() eq ''
-                    || matches_any( $race->required_option(), $self->option_tags() )
-                ) {
-                    $self->{'RACES'}->{ $race->tag() } = $race;
-                    $flag_added_race = 1;
-                }
-                else {
-
-                }
+            if ( $self->item_is_allowed_in_game( $race ) ) {
+                $race->set_flag_passed( 1 );
+                $self->{'RACES'}->{ $race->tag() } = $race;
             }
-
-            unless ( $flag_added_race ) {
+            else {
                 foreach my $template_tag ( $race->ship_templates() ) {
                     delete ( $self->templates()->{ $template_tag } );
                 }
@@ -564,7 +547,7 @@ sub _raw_begin {
 
         my $ship_template = $base_templates{ $template_key };
 
-        unless ( WLE::Methods::Simple::matches_any( $ship_template->class(), 'class_interceptor', 'class_cruiser', 'class_dreadnought', 'class_starbase' ) ) {
+        unless ( matches_any( $ship_template->class(), 'class_interceptor', 'class_cruiser', 'class_dreadnought', 'class_starbase' ) ) {
             $ship_template->set_owner_id( -1 );
             $self->templates()->{ $template_key } = $ship_template;
 
@@ -604,6 +587,31 @@ sub _raw_set_player_order {
 
     $self->{'SETTINGS'}->{'PLAYERS_DONE'} = [];
     $self->{'SETTINGS'}->{'PLAYERS_PENDING'} = [ @new_order_ids ];
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_add_players_to_next_round {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my @player_ids = @args;
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'players queued for next round: ' . join( ',', @player_ids );
+    }
+
+    my @next_round_player_ids = @{ $self->{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} };
+    push( @next_round_player_ids, @player_ids );
+
+    $self->{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} = \@next_round_player_ids;
 
     return;
 }
@@ -809,15 +817,18 @@ sub _raw_select_race_and_location {
         }
     }
 
-    # build and place initial ships
+    # build and place initial racial ships
 
     foreach my $ship_class ( $race->starting_ships() ) {
-        my $ship = $race->create_ship_of_class( $ship_class );
 
-        if ( defined( $ship ) ) {
-#            print STDERR "\nPlacing Ship: " . $ship->tag();
-            $start_hex->add_ship( $ship->tag() );
-        }
+        my $template = $race->template_of_class( $ship_class );
+
+        $self->_raw_create_ship_on_tile(
+            $EV_SUB_ACTION,
+            $start_hex->tag(),
+            $template->tag(),
+            $race->owner_id(),
+        );
     }
 
     return;
@@ -843,7 +854,7 @@ sub _raw_place_cube_on_tile {
         if ( $flag_advanced ) {
             $type = '(adv) ' . $type;
         }
-        return $race_tag ' placed ' . $type . ' cube on tile ' . $tile_tag;
+        return $race_tag . ' placed ' . $type . ' cube on tile ' . $tile_tag;
     }
 
     my $race = $self->races()->{ $race_tag };
@@ -893,7 +904,7 @@ sub _raw_remove_non_playing_races {
     }
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return 'removed non-played races and removed associated resources';
+        return 'removed non-played races and associated resources';
     }
 
     foreach my $race_tag ( keys( %{ $self->races() } ) ) {
@@ -906,6 +917,7 @@ sub _raw_remove_non_playing_races {
             }
 
             my $home_tile = $race->home_tile();
+
             $self->_raw_remove_tile_from_stack( $EV_SUB_ACTION, $home_tile );
 
             delete ( $self->tiles()->{ $home_tile } );
@@ -931,7 +943,8 @@ sub _raw_create_ship_on_tile {
     my $tile_tag        = shift( @args );
     my $template_tag    = shift( @args );
     my $owner_id        = shift( @args );
-    my $ship_tag        = shift( @args );
+
+    my $ship_tag        = $self->new_ship_tag( $template_tag, $owner_id );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
         my $race_tag = $self->race_tag_of_current_user();
@@ -939,7 +952,7 @@ sub _raw_create_ship_on_tile {
             $race_tag = 'game';
         }
 
-        return $race_tag . ' placed ship ' . $ship_tag . ' on tile ' . $tile_tag;
+        return $race_tag . ' created ship ' . $ship_tag . ' on tile ' . $tile_tag;
     }
 
     my $template = $self->templates()->{ $template_tag };
@@ -953,8 +966,37 @@ sub _raw_create_ship_on_tile {
 
     $self->ships()->{ $ship->tag() } = $ship;
 
+    $self->_raw_add_ship_to_tile( $EV_SUB_ACTION, $tile_tag, $ship->tag() );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_add_ship_to_tile {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $tile_tag = shift( @args );
+    my $ship_tag = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        my $race_tag = $self->race_tag_of_current_user();
+        if ( $race_tag eq '' ) {
+            $race_tag = 'game';
+        }
+
+        return $race_tag . ' placed ship ' . $ship_tag . ' on tile ' . $tile_tag;
+    }
+
+
     my $tile = $self->tiles()->{ $tile_tag };
-    $tile->add_ship( $ship->tag() );
+    $tile->add_ship( $ship_tag );
 
     return;
 }
@@ -1078,7 +1120,7 @@ sub _raw_next_player {
     }
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return 'next player' );
+        return 'next player';
     }
 
     my $done_player = shift( @{ $self->{'SETTINGS'}->{'PLAYERS_PENDING'} } );
@@ -1090,7 +1132,13 @@ sub _raw_next_player {
         return;
     }
 
-    $self->{'STATE'}->{'PLAYER'} = -1;
+    foreach my $race ( values( %{ $self->races() } ) ) {
+        unless ( $race->has_passed() ) {
+            @{ $self->{'SETTINGS'}->{'PLAYERS_PENDING'} } = @{ $self->{'SETTINGS'}->{'PLAYERS_DONE'} };
+            $self->{'SETTINGS'}->{'PLAYERS_DONE'} = [];
+            return;
+        }
+    }
 
     return;
 }
@@ -1107,7 +1155,7 @@ sub _raw_start_next_round {
     }
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return 'starting new round' );
+        return 'starting new round';
     }
 
     my @ready = @{ $self->{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} };
@@ -1115,6 +1163,18 @@ sub _raw_start_next_round {
     $self->{'SETTINGS'}->{'PLAYERS_DONE'} = [];
 
     $self->{'SETTINGS'}->{'PLAYERS_PENDING'} = \@ready;
+
+    my $new_round = $self->{'STATE'}->{'ROUND'} + 1;
+
+    $self->{'STATE'} = {
+        'STATE' => $ST_NORMAL,
+        'ROUND' => $new_round,
+        'PHASE' => $PH_ACTION,
+        'PLAYER' => $self->{'SETTINGS'}->{'PLAYERS_PENDING'}->[ 0 ],
+        'SUBPHASE' => 0,
+    };
+
+    $self->_raw_set_status( $EV_SUB_ACTION, $self->status() );
 
     return;
 }

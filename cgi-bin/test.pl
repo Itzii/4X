@@ -273,6 +273,15 @@ sub test_Object_Server {
 	ok( $response{'success'} == 1, 'action_begin successful' );
 
 	%response = $server->do(
+		'action'		=> 'status',
+		'user'			=> $owner_id,
+		'log_id'		=> $log_id,
+	);
+
+	ok( $response{'success'} == 1, 'get status completed correctly' );
+#	show( $response{'message'} );
+
+	%response = $server->do(
 		'action'		=> 'select_race',
 		'user'			=> 999,
 		'log_id'		=> $log_id,
@@ -289,8 +298,6 @@ sub test_Object_Server {
 		'log_id'		=> $log_id,
 	);
 
-	ok( $response{'success'} == 1, 'get status completed correctly' );
-
 	my @status = split( /:/, $response{'data'} );
 	my $waiting_for = $status[ 3 ];
 
@@ -306,6 +313,8 @@ sub test_Object_Server {
 	);
 
 	ok( $response{'success'} == 1, 'select_race successful' );
+#	show( $response{'message'} );
+#	show( $server->status() );
 
 	%response = $server->do(
 		'action'		=> 'status',
@@ -334,6 +343,7 @@ sub test_Object_Server {
 
 	@status = split( /:/, $response{'data'} );
 	$waiting_for = $status[ 3 ];
+	show( $server->status() );
 
 
 	%response = $server->do(
@@ -344,6 +354,15 @@ sub test_Object_Server {
 		'location_x'	=> -2,
 		'location_y'	=> 2,
 	);
+
+
+	%response = $server->do(
+		'action'		=> 'status',
+		'user'			=> $owner_id,
+		'log_id'		=> $log_id,
+	);
+
+	show( $server->status() );
 
 
 	return;

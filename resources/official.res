@@ -997,6 +997,7 @@ $VAR1 = {
 
         'race_guards1' =>    {
             'SOURCE_TAG' => 'src_exp2',
+            'REQUIRED_OPTION' => 'alien_races',
             'EXCLUDE_RACE' => 'race_human7',
             'LONG_NAME' => 'Guardians of Magellan',
             'FLAVOR' => 'Oldest of the known Magellan factions, the Guardians are thought to be the one with the greatest wisdom and determination. They ponder their plans thoroughly but seldom diverge from them once fully committed. Whether the reason is the high Ancient activity or the continuing power struggle in our galaxy, the High Guardians have now launched the mobilization and the worldships are closing in ... ',
@@ -2237,6 +2238,7 @@ $VAR1 = {
         },
         'tile_222' => {
             'SOURCE_TAG' => 'src_base',
+            'REQUIRED_OPTION' => 'alien_races',
             'ID' => '222',
             'LONG_NAME' => 'Epsilon Eridani',
             'STACK' => 'homeworlds',
@@ -2268,6 +2270,7 @@ $VAR1 = {
         },
         'tile_224' => {
             'SOURCE_TAG' => 'src_base',
+            'REQUIRED_OPTION' => 'alien_races',
             'ID' => '224',
             'LONG_NAME' => 'Beta Hydri',
             'STACK' => 'homeworlds',
@@ -2299,6 +2302,7 @@ $VAR1 = {
         },
         'tile_226' => {
             'SOURCE_TAG' => 'src_base',
+            'REQUIRED_OPTION' => 'alien_races',
             'ID' => '226',
             'LONG_NAME' => 'S1 Cygni',
             'STACK' => 'homeworlds',
@@ -2329,6 +2333,7 @@ $VAR1 = {
         },
         'tile_228' => {
             'SOURCE_TAG' => 'src_base',
+            'REQUIRED_OPTION' => 'alien_races',
             'ID' => '228',
             'LONG_NAME' => 'Sigma Draconis',
             'STACK' => 'homeworlds',
@@ -2359,6 +2364,7 @@ $VAR1 = {
         },
         'tile_230' => {
             'SOURCE_TAG' => 'src_base',
+            'REQUIRED_OPTION' => 'alien_races',
             'ID' => '230',
             'LONG_NAME' => 'Lambda Aurigae',
             'STACK' => 'homeworlds',
@@ -2390,6 +2396,7 @@ $VAR1 = {
         },
         'tile_232' => {
             'SOURCE_TAG' => 'src_base',
+            'REQUIRED_OPTION' => 'alien_races',
             'ID' => '232',
             'LONG_NAME' => 'Rigel',
             'STACK' => 'homeworlds',
@@ -2405,6 +2412,7 @@ $VAR1 = {
         },
         'tile_233' => {
             'SOURCE_TAG' => 'src_exp1',
+            'REQUIRED_OPTION' => 'alien_races',
             'ID' => '233',
             'LONG_NAME' => '47 Ursae Majoris',
             'STACK' => 'homeworlds',
@@ -2421,6 +2429,7 @@ $VAR1 = {
         },
         'tile_234' => {
             'SOURCE_TAG' => 'src_exp1',
+            'REQUIRED_OPTION' => 'alien_races',
             'ID' => '234',
             'LONG_NAME' => 'Eta Geminorum',
             'STACK' => 'homeworlds',
@@ -2436,6 +2445,7 @@ $VAR1 = {
         },
         'tile_235' => {
             'SOURCE_TAG' => 'src_exp1',
+            'REQUIRED_OPTION' => 'alien_races',
             'ID' => '235',
             'LONG_NAME' => 'Mu Arae',
             'STACK' => 'homeworlds',
@@ -2452,6 +2462,7 @@ $VAR1 = {
         },
         'tile_236' => {
             'SOURCE_TAG' => 'src_exp1',
+            'REQUIRED_OPTION' => 'alien_races',
             'ID' => '236',
             'LONG_NAME' => 'Rho Indi',
             'STACK' => 'homeworlds',
@@ -2467,6 +2478,7 @@ $VAR1 = {
         },
         'tile_237' => {
             'SOURCE_TAG' => 'src_base',
+            'REQUIRED_OPTION' => 'alien_races',
             'ID' => '237',
             'LONG_NAME' => '55 Cancri',
             'STACK' => 'homeworlds',
@@ -2483,6 +2495,7 @@ $VAR1 = {
         },
         'tile_238' => {
             'SOURCE_TAG' => 'src_base',
+            'REQUIRED_OPTION' => 'alien_races',
             'ID' => '238',
             'LONG_NAME' => 'Beta Lyrae',
             'STACK' => 'homeworlds',
@@ -2500,6 +2513,7 @@ $VAR1 = {
         },
         'tile_239' => {
             'SOURCE_TAG' => 'src_exp1',
+            'REQUIRED_OPTION' => 'alien_races',
             'ID' => '239',
             'LONG_NAME' => 'Kappa Volantis',
             'STACK' => 'homeworlds',
@@ -2514,7 +2528,7 @@ $VAR1 = {
             ],
         },
         'tile_240' => {
-            'SOURCE_TAG' => 'src_base',
+            'SOURCE_TAG' => 'src_exp2',
             'ID' => '240',
             'LONG_NAME' => 'Mu Arae',
             'STACK' => 'homeworlds',

@@ -13,6 +13,7 @@ use WLE::Methods::Simple;
 use WLE::4X::Enums::Status;
 
 use WLE::4X::Objects::MetaActions;
+use WLE::4X::Objects::PlayerActions;
 use WLE::4X::Objects::RawActions;
 use WLE::4X::Objects::ServerState;
 
@@ -98,6 +99,9 @@ sub _init {
     $self->{'SETTINGS'}->{'LONG_NAME'} = '';
 
     $self->{'SETTINGS'}->{'PLAYER_IDS'} = [];
+    $self->{'SETTINGS'}->{'PLAYERS_PENDING'} = [];
+    $self->{'SETTINGS'}->{'PLAYERS_DONE'} = [];
+    $self->{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} = [];
 
     $self->{'RACES'} = {};
     $self->{'SHIP_TEMPLATES'} = {};
@@ -161,6 +165,8 @@ sub do {
         'begin'             => { 'flag_req_status' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_begin },
 
         'select_race'       => { 'flag_req_status' => $ST_RACESELECTION, 'flag_player_phase' => 1, 'method' => \&action_select_race_and_location },
+
+        'action_pass'       => { 'flag_req_status' => $ST_NORMAL, 'flag_player_phase' => 1, 'method' => \&action_action_pass },
 
 
 
@@ -296,8 +302,8 @@ sub race_tag_of_current_user {
         return '';
     }
 
-    foreach my $race_tag ( keys( %{ $server->{'RACES'} } ) ) {
-        if ( $server->{'RACES'}->{ $race_tag }->owner_id() == $self->current_user() ) {
+    foreach my $race_tag ( keys( %{ $self->races() } ) ) {
+        if ( $self->races()->{ $race_tag }->owner_id() == $self->current_user() ) {
             return $race_tag;
         }
     }
@@ -338,10 +344,10 @@ sub status {
 
     return sprintf(
         '%i:%i:%i:%i:%i',
-        $self->{'STATE'}->{'STATE'},
-        $self->{'STATE'}->{'ROUND'},
-        $self->{'STATE'}->{'PHASE'},
-        $self->{'STATE'}->{'PLAYER'},
+        $self->state(),
+        $self->round(),
+        $self->phase(),
+        $self->waiting_on_player_id(),
         $self->{'STATE'}->{'SUBPHASE'},
     );
 }
@@ -370,7 +376,11 @@ sub set_state {
 sub waiting_on_player_id {
     my $self        = shift;
 
-    return $self->{'STATE'}->{'PLAYER'};
+    if ( scalar( @{ $self->{'SETTINGS'}->{'PLAYERS_PENDING'} } ) > 0 ) {
+        return $self->{'SETTINGS'}->{'PLAYERS_PENDING'}->[ 0 ];
+    }
+
+    return -1;
 }
 
 #############################################################################
@@ -486,6 +496,27 @@ sub ship_pool {
     my $self        = shift;
 
     return $self->{'SHIP_POOL'};
+}
+
+#############################################################################
+
+sub new_ship_tag {
+    my $self            = shift;
+    my $template_tag    = shift;
+    my $owner_id        = shift;
+
+    if ( $owner_id eq '-1' ) {
+        $owner_id = 'npc';
+    }
+
+    my $ship_index = 0;
+    my $ship_tag;
+    do {
+        $ship_index++;
+        $ship_tag = 'ship_' . $template_tag . '_' . $owner_id . '_' . $ship_index;
+    } while ( exists( $self->ships()->{ $ship_tag } ) );
+
+    return $ship_tag;
 }
 
 #############################################################################

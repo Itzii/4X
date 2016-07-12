@@ -84,7 +84,7 @@ sub action_add_source {
         return 0;
     }
 
-    if ( WLE::Methods::Simple::matches_any( $args{'source_tag'}, $self->source_tags() ) ) {
+    if ( matches_any( $args{'source_tag'}, $self->source_tags() ) ) {
         $self->set_error( 'Source Tag Already Exists' );
         return 0;
     }
@@ -320,6 +320,7 @@ sub action_begin {
     WLE::Methods::Simple::shuffle_in_place( \@new_player_order );
 
     $self->_raw_set_player_order( $EV_FROM_INTERFACE, @new_player_order );
+    $self->_raw_add_players_to_next_round( $EV_FROM_INTERFACE, @new_player_order );
 
     # fill tile stacks with random tiles
 
@@ -389,9 +390,8 @@ sub action_begin {
 
     $self->set_state( $ST_RACESELECTION );
     $self->set_phase( $PH_PREPARING );
-    $self->set_waiting_on_player_id( $self->{'SETTINGS'}->{'PLAYERS_PENDING'}->[ 0 ] );
 
-    $self->_raw_set_status( 1, $self->status() );
+    $self->_raw_set_status( $EV_FROM_INTERFACE, $self->status() );
 
     $self->_save_state();
 
@@ -473,7 +473,7 @@ sub action_select_race_and_location {
         $location_warps,
     );
 
-    $self->_raw_next_player();
+    $self->_raw_next_player( $EV_FROM_INTERFACE );
 
     if ( $self->waiting_on_player_id() == -1 ) {
         $self->_prepare_for_first_round();
@@ -521,6 +521,10 @@ sub _prepare_for_first_round {
             }
         }
     }
+
+    $self->{'STATE'}->{'STATE'} = $ST_NORMAL;
+
+    $self->_raw_set_status( $EV_FROM_INTERFACE, $self->status() );
 
     return;
 }

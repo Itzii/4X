@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use WLE::4X::Enums::Basic;
+use WLE::4X::Enums::Status;
 
 use parent 'WLE::4X::Objects::Element';
 
@@ -270,20 +271,11 @@ sub add_starting_ships {
         WLE::Methods::Simple::shuffle_in_place( \@templates_of_class );
         my $template_tag = shift( @templates_of_class );
 
-        my $ship_index = 0;
-        my $ship_tag;
-        do {
-            $ship_index++;
-            $ship_tag = 'ship_' . $template_tag . '_npc_' . $ship_index;
-        } while ( exists( $self->ships()->{ $ship_tag } ) );
-
-
         $self->server()->_raw_create_ship_on_tile(
             $EV_FROM_INTERFACE,
             $self->tag(),
             $template_tag,
             -1,
-            $ship_tag,
         );
 
         my $template = $self->server()->templates()->{ $template_tag };

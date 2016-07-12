@@ -45,7 +45,6 @@ sub _init {
 
     $self->{'COLONY_COUNT'} = 3;
     $self->{'EXCHANGE'} = 2;
-    $self->{'SHIP_INDEX'} = 1;
 
     $self->{'ACTIONS'} = {
         'EXPLORE' => 1,
@@ -114,6 +113,8 @@ sub _init {
 
     $self->{'SHIP_TEMPLATES'} = [];
 
+    $self->{'FLAG_PASSED'} = 0;
+
     if ( defined( $args{'hash'} ) ) {
         if ( $self->from_hash( $args{'hash'} ) ) {
             return $self;
@@ -138,6 +139,25 @@ sub excludes {
     my $self        = shift;
 
     return $self->{'EXCLUDE_RACE'};
+}
+
+#############################################################################
+
+sub has_passed {
+    my $self        = shift;
+
+    return ( $self->{'FLAG_PASSED'} == 1 );
+}
+
+#############################################################################
+
+sub set_flag_passed {
+    my $self        = shift;
+    my $value       = shift;
+
+    $self->{'FLAG_PASSED'} = $value;
+
+    return;
 }
 
 #############################################################################
@@ -174,37 +194,6 @@ sub template_of_class {
     }
 
     return undef;
-}
-
-#############################################################################
-
-sub create_ship_of_class {
-    my $self        = shift;
-    my $class       = shift;
-
-    my $template = $self->template_of_class( $class );
-
-    unless ( defined( $template ) ) {
-        print "\nFailed to locate template for class: " . $class;
-        return undef;
-    }
-
-    my $ship = WLE::4X::Objects::Ship->new(
-        'server' => $self->server(),
-        'template' => $template,
-        'tag' => 'ship_' . $self->owner_id() . '_' . $self->{'SHIP_INDEX'},
-        'owner_id' => $self->owner_id(),
-    );
-
-    unless ( defined( $ship ) ) {
-        return undef;
-    }
-
-    $self->{'SHIP_INDEX'}++;
-
-    $self->server()->ships()->{ $ship->tag() } = $ship;
-
-    return $ship;
 }
 
 #############################################################################
@@ -332,6 +321,10 @@ sub from_hash {
 
     $self->{'HOME'} = $r_hash->{'HOME'};
 
+    if ( defined( $r_hash->{'FLAG_PASSED'} ) ) {
+        $self->{'FLAG_PASSED'} = $r_hash->{'FLAG_PASSED'};
+    }
+
     if ( defined( $r_hash->{'EXCLUDE_RACE'} ) ) {
         $self->{'EXCLUDE_RACE'} = $r_hash->{'EXCLUDE_RACE'};
     }
@@ -342,10 +335,6 @@ sub from_hash {
 
     if ( defined( $r_hash->{'EXCHANGE'} ) ) {
         $self->{'EXCHANGE'} = $r_hash->{'EXCHANGE'};
-    }
-
-    if ( defined( $r_hash->{'SHIP_INDEX'} ) ) {
-        $self->{'SHIP_INDEX'} = $r_hash->{'SHIP_INDEX'};
     }
 
     if ( defined( $r_hash->{'ACTIONS'} ) ) {
@@ -459,7 +448,7 @@ sub to_hash {
         return 0;
     }
 
-    foreach my $tag ( 'HOME', 'EXCLUDE_RACE', 'COLONY_COUNT', 'EXCHANGE', 'COST_ORBITAL', 'COST_MONUMENT', 'SHIP_INDEX' ) {
+    foreach my $tag ( 'HOME', 'EXCLUDE_RACE', 'COLONY_COUNT', 'EXCHANGE', 'COST_ORBITAL', 'COST_MONUMENT', 'FLAG_PASSED' ) {
         $r_hash->{ $tag } = $self->{ $tag };
     }
 

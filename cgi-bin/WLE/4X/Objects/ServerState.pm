@@ -138,7 +138,7 @@ sub _read_state {
         }
     }
 
-    $self->{'TECH_BAG'} = $VAR1->{'TECH_BAG'};
+    $self->tech_bag()->add_items( @{ $VAR1->{'TECH_BAG'} } );
 
     $self->{'AVAILABLE_TECH'} = $VAR1->{'AVAILABLE_TECH'};
 
@@ -171,7 +171,10 @@ sub _read_state {
 #    print STDERR "\n  tiles ... ";
 
     $self->{'TILES'} = {};
-    $self->{'BOARD'} = $VAR1->{'BOARD'};
+
+
+    $self->{'BOARD'} = WLE::4X::Objects::Board->new( 'server' => $self );
+    $self->{'BOARD'}->from_hash( $VAR1->{'BOARD'} );
 
 #    print STDERR "\nReading Tiles ... ";
 
@@ -189,8 +192,6 @@ sub _read_state {
             $self->{'TILES'}->{ $tile->tag() } = $tile;
         }
     }
-
-    $self->{'TILE_STACKS'} = $VAR1->{'TILE_STACKS'};
 
     # developments
 #    print STDERR "\n  developments ... ";
@@ -341,7 +342,7 @@ sub _save_state {
             $self->{'TECHNOLOGY'}->{ $key }->to_hash( $data{'TECHNOLOGY'}->{ $key } );
         }
 
-        $data{'TECH_BAG'} = $self->{'TECH_BAG'};
+        $data{'TECH_BAG'} = [ $self->tech_bag()->items() ];
         $data{'AVAILABLE_TECH'} = $self->{'AVAILABLE_TECH'};
 
         # vp tokens
@@ -357,19 +358,19 @@ sub _save_state {
 
         $data{'DISCOVERY_BAG'} = $self->{'DISCOVERY_BAG'};
 
-        # tiles
-
-        foreach my $key ( keys( %{ $self->{'TILES'} } ) ) {
-            $data{'TILES'}->{ $key } = {};
-            $self->{'TILES'}->{ $key }->to_hash( $data{'TILES'}->{ $key } );
-        }
-
-        $data{'TILE_STACKS'} = $self->{'TILE_STACKS'};
+        # board
 
         if ( defined( $self->{'BOARD'} ) ) {
             my %board = ();
             $self->{'BOARD'}->to_hash( \%board );
             $data{'BOARD'} = \%board;
+        }
+
+        # tiles
+
+        foreach my $key ( keys( %{ $self->{'TILES'} } ) ) {
+            $data{'TILES'}->{ $key } = {};
+            $self->{'TILES'}->{ $key }->to_hash( $data{'TILES'}->{ $key } );
         }
 
         # developments

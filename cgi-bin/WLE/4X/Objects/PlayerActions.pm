@@ -1,4 +1,4 @@
-package WLE::4X::Objects::PlayerActions;
+package WLE::4X::Objects::Server;
 
 use strict;
 use warnings;
@@ -35,13 +35,17 @@ sub action_pass_action {
 sub action_explore {
     my $self            = shift;
 
-
-
-
-
     unless ( $self->_open_for_writing( $self->log_id() ) ) {
         return 0;
     }
+
+
+
+
+
+
+# spec_descendants
+
 
 
 
@@ -56,6 +60,10 @@ sub action_explore {
 
 sub action_influence {
     my $self            = shift;
+
+
+
+
 
 
 

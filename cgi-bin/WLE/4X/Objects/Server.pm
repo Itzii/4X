@@ -109,6 +109,10 @@ sub _init {
     $self->{'SHIPS'} = {};
     $self->{'SHIP_POOL'} = {};
     $self->{'TILES'} = {};
+    $self->{'TECHNOLOGY'} = {};
+
+    $self->{'BOARD'} = WLE::4X::Objects::Board->new( 'server' => $self );
+    $self->{'TECH_BAG'} = WLE::Objects::Stack->new();
 
 
     $self->{'STATE'} = {
@@ -219,6 +223,7 @@ sub do {
             my $race = $self->race_of_current_user();
 
             unless ( matches_any( $action_tag, $race->allowed_actions() ) ) {
+                print STDERR "\nAllowed Actions: " . join( ',', $race->allowed_actions() );
                 return ( 'success' => 0, 'message' => 'Action is not allowed by player at this time.' );
             }
         }
@@ -505,6 +510,14 @@ sub board {
     my $self        = shift;
 
     return $self->{'BOARD'};
+}
+
+#############################################################################
+
+sub tech_bag {
+    my $self        = shift;
+
+    return $self->{'TECH_BAG'};
 }
 
 #############################################################################

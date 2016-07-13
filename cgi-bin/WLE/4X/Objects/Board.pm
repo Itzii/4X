@@ -3,6 +3,7 @@ package WLE::4X::Objects::Board;
 use strict;
 use warnings;
 
+use WLE::Objects::Stack;
 
 use WLE::4X::Objects::Tile;
 
@@ -37,8 +38,87 @@ sub _init {
 
     $self->{'SPACES'} = {};
 
+    $self->clear_all_tile_stacks();
 
     return $self;
+}
+
+#############################################################################
+
+sub tile_stack_ids {
+    my $self        = shift;
+
+    return keys( %{ $self->{'STACKS'} } );
+}
+
+#############################################################################
+
+sub clear_all_tile_stacks {
+    my $self        = shift;
+
+    $self->{'STACKS'} = {};
+
+    foreach ( '0', '1', '2', '3', 'homeworlds', 'ancient_homeworlds' ) {
+        $self->clear_tile_stack( $_ );
+    }
+
+    return;
+}
+
+#############################################################################
+
+sub clear_tile_stack {
+    my $self        = shift;
+    my $stack_id    = shift;
+
+    $self->{'STACKS'}->{ $stack_id } = {
+        'DRAW' => WLE::Objects::Stack->new( 'flag_exclusive' => 1 ),
+        'DISCARD' => WLE::Objects::Stack->new( 'flag_exclusive' => 1 ),
+    };
+
+    return;
+}
+
+#############################################################################
+
+sub add_to_draw_stack {
+    my $self        = shift;
+    my $stack_id    = shift;
+    my @tile_tags   = @_;
+
+    unless ( defined( $self->{'STACKS'}->{ $stack_id } ) ) {
+        return;
+    }
+
+    $self->{'STACKS'}->{ $stack_id }->{'DRAW'}->add_items( @tile_tags );
+
+    return;
+}
+
+#############################################################################
+
+sub tile_draw_stack {
+    my $self        = shift;
+    my $stack_id    = shift;
+
+    unless ( defined( $self->{'STACKS'}->{ $stack_id } ) ) {
+        return undef;
+    }
+
+    return $self->{'STACKS'}->{ $stack_id }->{'DRAW'};
+}
+
+#############################################################################
+
+sub tile_discard_stack {
+    my $self        = shift;
+    my $stack_id    = shift;
+
+    unless ( defined( $self->{'STACKS'}->{ $stack_id } ) ) {
+        return undef;
+    }
+
+    return $self->{'STACKS'}->{ $stack_id }->{'DISCARD'};
 }
 
 #############################################################################
@@ -78,6 +158,73 @@ sub place_tile {
     $self->{'SPACES'}->{ $x_pos }->{ $y_pos } = $tile_tag;
 
     return 1;
+}
+
+#############################################################################
+
+sub explorable_spaces_for_race {
+    my $self        = shift;
+
+    my %explorable = ();
+
+    foreach my $column ( keys( %{ $self->{'SPACES'} } ) ) {
+        foreach my $row ( keys( %{ $self->{'SPACES'}->{ $column } } ) ) {
+
+            foreach my $adjacent_location ( $self->_explorable_from_location( $column, $row ) ) {
+                $explorable{ $adjacent_location } = 1;
+            }
+        }
+    }
+
+    return keys( %explorable );
+}
+
+#############################################################################
+
+sub _explorable_from_location {
+    my $self        = shift;
+    my $x_pos       = shift;
+    my $y_pos       = shift;
+
+    my $tile = $self->tile_at_location( $x_pos, $y_pos );
+
+    my $flag_explorer_available = 0;
+
+    if ( $tile->owner_id() == $self->server()->current_user() ) {
+        $flag_explorer_available = 1;
+    }
+    elsif ( $tile->unpinned_ship_count() > 0 ) {
+        $flag_explorer_available = 1;
+    }
+
+    unless ( $flag_explorer_available ) {
+        return ();
+    }
+
+    my @adjacents = ();
+
+    my $has_wormhole = $self->server()->race_of_current_user()->has_technology( 'tech_wormhole_generator' );
+
+    foreach my $direction ( 0 .. 5 ) {
+        if ( $has_wormhole || $tile->has_warp_on_side( $direction ) ) {
+            my $remote_tile = $self->tile_in_direction( $x_pos, $y_pos, $direction );
+            unless ( defined( $remote_tile ) ) {
+                my ( $adj_x, $adj_y ) = $self->location_in_direction( $direction );
+
+                my $stack_id = $self->stack_from_location( $adj_x, $adj_y );
+
+                if ( $self->tile_draw_stack( $stack_id )->count() > 0 ) {
+                    push( @adjacents, $adj_x . ':' . $adj_y );
+                }
+                elsif ( $self->tile_discard_stack( $stack_id )->count() > 0 ) {
+                    push( @adjacents, $adj_x . ':' . $adj_y );
+                }
+            }
+        }
+
+    }
+
+    return @adjacents;
 }
 
 #############################################################################
@@ -203,6 +350,24 @@ sub from_hash {
 
     $self->{'SPACES'} = $r_hash->{'SPACES'};
 
+    $self->clear_all_tile_stacks();
+
+    if ( defined( $r_hash->{'STACKS'} ) ) {
+
+        foreach my $stack_id ( keys( %{ $r_hash->{'STACKS'} } ) ) {
+
+            my $stack = $self->tile_draw_stack( $stack_id );
+            if ( defined( $stack ) ) {
+                $stack->add_items( @{ $r_hash->{'STACKS'}->{ $stack_id }->{'DRAW'} } );
+            }
+
+            $stack = $self->tile_discard_stack( $stack_id );
+            if ( defined( $stack ) ) {
+                $stack->add_items( @{ $r_hash->{'STACKS'}->{ $stack_id }->{'DISCARD'} } );
+            }
+        }
+    }
+
     return 1;
 }
 
@@ -217,6 +382,18 @@ sub to_hash {
     }
 
     $r_hash->{'SPACES'} = $self->{'SPACES'};
+    $r_hash->{'TILE_STACKS'} = {};
+
+    foreach my $stack_id ( $self->tile_stack_ids() ) {
+        my @items = $self->tile_draw_stack( $stack_id )->items();
+        $r_hash->{'TILE_STACKS'}->{ $stack_id }->{'DRAW'} = [ @items ];
+#        print STDERR "\nsaving $stack_id draw : " . join( ',', @items );
+
+        @items = $self->tile_discard_stack( $stack_id )->items();
+        $r_hash->{'TILE_STACKS'}->{ $stack_id }->{'DISCARD'} = [ @items ];
+#        print STDERR "\nsaving $stack_id discard : " . join( ',', @items );
+
+    }
 
     return 1;
 }

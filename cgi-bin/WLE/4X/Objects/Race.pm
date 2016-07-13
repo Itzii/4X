@@ -44,6 +44,7 @@ sub _init {
     $self->{'HOME'} = '';
 
     $self->{'COLONY_COUNT'} = 3;
+    $self->{'COLONY_USED'} = 0;
     $self->{'EXCHANGE'} = 2;
 
     $self->{'ACTIONS'} = {
@@ -55,6 +56,8 @@ sub _init {
         'BUILD' => 2,
         'MOVE' => 3,
     };
+
+    $self->{'ACTION_COUNT'} = 0;
 
     $self->{'ALLOWED_ACTIONS'} = [];
 
@@ -183,12 +186,68 @@ sub set_allowed_actions {
 
 #############################################################################
 
+sub action_count {
+    my $self        = shift;
+
+    return $self->{'ACTION_COUNT'};
+}
+
+#############################################################################
+
+sub set_action_count {
+    my $self        = shift;
+    my $value       = shift;
+
+    $self->{'ACTION_COUNT'} = $value;
+
+    return;
+}
+
+#############################################################################
+
+sub total_colony_ships {
+    my $self        = shift;
+
+    return $self->{'COLONY_COUNT'};
+}
+
+#############################################################################
+
+sub colony_ships_used {
+    my $self        = shift;
+
+    return $self->{'COLONY_USED'};
+}
+
+#############################################################################
+
+sub set_colony_ships_used {
+    my $self        = shift;
+    my $value       = shift;
+
+    $self->{'COLONY_USED'} = $value;
+
+    return;
+}
+
+#############################################################################
+
+sub colony_ships_available {
+    my $self        = shift;
+
+    return $self->total_colony_ships() - $self->colony_ships_used();
+}
+
+#############################################################################
+
 sub start_turn {
     my $self        = shift;
 
+    $self->{'ACTION_COUNT'} = 0;
+
     if ( $self->has_passed() ) {
         $self->set_allowed_actions(
-            'action_pass_action',
+            'action_pass',
             'action_react_upgrade',
             'action_react_build',
             'action_react_move',
@@ -196,7 +255,7 @@ sub start_turn {
     }
     else {
         $self->set_allowed_actions(
-            'action_pass_action',
+            'action_pass',
             'action_explore',
             'action_influence',
             'action_research',
@@ -392,8 +451,16 @@ sub from_hash {
         $self->{'COLONY_COUNT'} = $r_hash->{'COLONY_COUNT'};
     }
 
+    if ( defined( $r_hash->{'COLONY_USED'} ) ) {
+        $self->{'COLONY_USED'} = $r_hash->{'COLONY_USED'};
+    }
+
     if ( defined( $r_hash->{'EXCHANGE'} ) ) {
         $self->{'EXCHANGE'} = $r_hash->{'EXCHANGE'};
+    }
+
+    if ( defined( $r_hash->{'ACTION_COUNT'} ) ) {
+        $self->{'ACTION_COUNT'} = $r_hash->{'ACTION_COUNT'};
     }
 
     if ( defined( $r_hash->{'ACTIONS'} ) ) {
@@ -511,7 +578,7 @@ sub to_hash {
         return 0;
     }
 
-    foreach my $tag ( 'HOME', 'EXCLUDE_RACE', 'COLONY_COUNT', 'EXCHANGE', 'COST_ORBITAL', 'COST_MONUMENT', 'FLAG_PASSED' ) {
+    foreach my $tag ( 'HOME', 'EXCLUDE_RACE', 'COLONY_COUNT', 'COLONY_USED', 'EXCHANGE', 'COST_ORBITAL', 'COST_MONUMENT', 'FLAG_PASSED', 'ACTION_COUNT' ) {
         $r_hash->{ $tag } = $self->{ $tag };
     }
 

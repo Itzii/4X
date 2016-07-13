@@ -222,6 +222,45 @@ sub ships {
 
 #############################################################################
 
+sub unpinned_ship_count {
+    my $self        = shift;
+    my $user_id     = shift;
+
+    my $enemy_count = 0;
+    my $friendly_count = 0;
+
+    foreach my $ship_tag ( $self->ships() ) {
+        my $ship = $self->server()->ships()->{ $ship_tag };
+
+        if ( $ship->class() eq 'class_defense' ) {
+            return 0;
+        }
+
+        if ( $ship->owner_id() == $user_id ) {
+            $friendly_count++;
+        }
+        else {
+            $enemy_count++;
+        }
+    }
+
+    if ( $enemy_count == 0 ) {
+        return $friendly_count;
+    }
+
+    if ( $self->server()->race_of_current_user()->has_technology( 'tech_stealth' ) ) {
+        $enemy_count = int( $enemy_count / 2 );
+    }
+
+    if ( $enemy_count >= $friendly_count ) {
+        return 0;
+    }
+
+    return $friendly_count - $enemy_count;
+}
+
+#############################################################################
+
 sub add_ship {
     my $self        = shift;
     my $ship_tag    = shift;

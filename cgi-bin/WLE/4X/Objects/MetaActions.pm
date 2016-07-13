@@ -324,14 +324,16 @@ sub action_begin {
 
     # fill tile stacks with random tiles
 
-    foreach my $stack_tag ( keys( %{ $self->{'TILE_STACKS'} } ) ) {
+    foreach my $stack_tag ( $self->board()->tile_stack_ids() ) {
 
-        my @stack = @{ $self->{'TILE_STACKS'}->{ $stack_tag } };
+        my @stack = $self->board()->tile_draw_stack( $stack_tag )->items();
 
-        WLE::Methods::Simple::shuffle_in_place( \@stack );
+        shuffle_in_place( \@stack );
 
-        if ( defined( $self->{'SETTINGS'}->{'TILE_STACK_LIMIT_' . $stack_tag } ) ) {
-            while ( scalar( @stack ) > $self->{'SETTINGS'}->{'TILE_STACK_LIMIT_' . $stack_tag } ) {
+        my $stack_limit = $self->{'SETTINGS'}->{'TILE_STACK_LIMIT_' . $stack_tag };
+
+        if ( defined( $stack_limit ) ) {
+            while ( scalar( @stack ) > $stack_limit ) {
                 shift( @stack );
             }
         }
@@ -341,11 +343,10 @@ sub action_begin {
 
     # place galactic center
 
-    my @stack = @{ $self->{'TILE_STACKS'}->{ 0 }->{'DRAW'} };
-    WLE::Methods::Simple::shuffle_in_place( \@stack );
+    my $start_tile = $self->board()->tile_draw_stack( '0' )->select_random_item();
 
-    $self->_raw_remove_tile_from_stack( $EV_FROM_INTERFACE, $stack[ 0 ] );
-    $self->_raw_place_tile_on_board( $EV_FROM_INTERFACE, $stack[ 0 ], 0, 0 );
+    $self->_raw_remove_tile_from_stack( $EV_FROM_INTERFACE, $start_tile );
+    $self->_raw_place_tile_on_board( $EV_FROM_INTERFACE, $start_tile, 0, 0 );
 
 
     # add discoveries to tiles
@@ -375,17 +376,13 @@ sub action_begin {
 
     # draw beginning tech tiles
 
-    my @tech_bag = @{ $self->{'TECH_BAG'} };
     my @available_tech = ();
-    WLE::Methods::Simple::shuffle_in_place( \@tech_bag );
 
     foreach ( 1 .. $self->{'START_TECH_COUNT'} ) {
-        push( @available_tech, shift( @tech_bag ) );
+        my $tech = $self->tech_bag()->select_random_item();
+        $self->_raw_remove_from_tech_bag( $EV_FROM_INTERFACE, $tech );
+        $self->_raw_add_to_available_tech( $EV_FROM_INTERFACE, $tech );
     }
-
-    $self->_raw_remove_from_tech_bag( $EV_FROM_INTERFACE, @available_tech );
-    $self->_raw_add_to_available_tech( $EV_FROM_INTERFACE, @available_tech );
-
 
 
     $self->set_state( $ST_RACESELECTION );
@@ -504,14 +501,13 @@ sub _prepare_for_first_round {
 
         # place ancient homeworld tiles
 
-        my @homeworlds = @{ $self->{'TILE_STACKS'}->{ 'ancient_homeworlds' }->{'DRAW'} };
-        WLE::Methods::Simple::shuffle_in_place( \@homeworlds );
-
         foreach my $location ( @{ $self->{'STARTING_LOCATIONS'} } ) {
             if ( defined( $location->{'NPC'} ) ) {
                 my ( $x, $y ) = split( ',', $location->{'SPACE'} );
                 my $location_warps = $location->{'WARPS'};
-                my $tile_tag = shift( @homeworlds );
+
+                my $tile_tag = $self->board()->tile_draw_stack( 'ancient_homeworlds' )->select_random_item();
+
                 my $tile = $self->tiles()->{ $tile_tag };
 
                 $self->_raw_remove_tile_from_stack( 1, $tile_tag );

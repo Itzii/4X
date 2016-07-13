@@ -39,6 +39,7 @@ my %actions = (
     \&_raw_start_next_round             => 'start_next_round',
     \&_raw_set_allowed_race_actions     => 'set_allowed_actions',
 
+    \&_raw_increment_race_action        => 'inc_race_action',
     \&_raw_player_pass_action           => 'player_pass',
 
 
@@ -354,9 +355,6 @@ sub _raw_begin {
         return 0;
     }
 
-    $self->{'TECHNOLOGY'} = {};
-    my @tech_bag = ();
-
     foreach my $tech_key ( keys( %{ $VAR1->{'TECHNOLOGY'} } ) ) {
 
         my $technology = WLE::4X::Objects::Technology->new(
@@ -368,16 +366,14 @@ sub _raw_begin {
         if ( defined( $technology ) ) {
             if ( $self->item_is_allowed_in_game( $technology ) ) {
 
-                $self->{'TECHNOLOGY'}->{ $technology->tag() } = $technology;
+                $self->technology()->{ $technology->tag() } = $technology;
 
                 foreach ( 1 .. $technology->count() ) {
-                    push( @tech_bag, $technology->tag() );
+                    $self->tech_bag()->add_items( $technology->tag() );
                 }
             }
         }
     }
-
-    $self->{'TECH_BAG'} = \@tech_bag;
 
     # vp tokens
     # print STDERR "\n  vp tokens ... ";
@@ -423,14 +419,6 @@ sub _raw_begin {
     # tiles
 #    print STDERR "\n  tiles ... ";
 
-    $self->{'TILE_STACKS'} = {
-        '1'                     => [],
-        '2'                     => [],
-        '3'                     => [],
-        'homeworlds'            => [],
-        'ancient_homeworlds'    => [],
-    };
-
     $self->{'TILES'} = {};
 
 #    print STDERR "\nCreating Board ... ";
@@ -451,7 +439,7 @@ sub _raw_begin {
         if ( defined( $tile ) ) {
             if ( $self->item_is_allowed_in_game( $tile ) ) {
                 $self->{'TILES'}->{ $tile->tag() } = $tile;
-                push( @{ $self->{'TILE_STACKS'}->{ $tile->which_stack() } }, $tile->tag() );
+                $self->{'BOARD'}->add_to_draw_stack( $tile->which_stack(), $tile->tag() );
             }
         }
     }
@@ -675,16 +663,8 @@ sub _raw_create_tile_stack {
         return 'tile stack ' . $stack_id . ' created with ' . scalar( @values ) . ' tiles.';
     }
 
-    foreach my $tile_tag ( @{ $self->{'TILE_STACKS'}->{ $stack_id } } ) {
-        unless ( matches_any( $tile_tag, @values ) ) {
-            delete( $self->tiles()->{ $tile_tag } );
-        }
-    }
-
-    $self->{'TILE_STACKS'}->{ $stack_id } = {};
-
-    $self->{'TILE_STACKS'}->{ $stack_id }->{'DRAW'} = [ @values ];
-    $self->{'TILE_STACKS'}->{ $stack_id }->{'DISCARD'} = [];
+    $self->board()->clear_tile_stack( $stack_id );
+    $self->board()->add_to_draw_stack( $stack_id, @values );
 
     return;
 }
@@ -704,19 +684,18 @@ sub _raw_remove_tile_from_stack {
 
     my $stack_id = $self->tiles()->{ $tile_tag }->which_stack();
 
+
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
         return 'tile ' . $tile_tag . ' removed from stack ' . $stack_id;
     }
 
-    my @new_stack = ();
+    my $stack = $self->board()->tile_draw_stack( $stack_id );
 
-    foreach my $current_tag ( @{ $self->{'TILE_STACKS'}->{ $stack_id }->{'DRAW'} } ) {
-        unless ( $current_tag eq $tile_tag ) {
-            push( @new_stack, $current_tag );
-        }
+    unless ( defined( $stack ) ) {
+        return;
     }
 
-    $self->{'TILE_STACKS'}->{ $stack_id }->{'DRAW'} = \@new_stack;
+    $stack->remove_item( $tile_tag );
 
     return;
 }
@@ -764,7 +743,13 @@ sub _raw_discard_tile {
 
     my $stack_id = $self->tiles()->{ $tile_tag }->which_stack();
 
-    push( @{ $self->{'TILE_STACKS'}->{ $stack_id }->{'DISCARD'} }, $tile_tag );
+    my $stack = $self->board()->tile_discard_stack( $stack_id );
+
+    unless ( defined( $stack ) ) {
+        return;
+    }
+
+    $stack->add_items( $tile_tag );
 
     return;
 }
@@ -1126,21 +1111,8 @@ sub _raw_remove_from_tech_bag {
         return 'tech tiles removed from bag: ' . join( ',', @removed_tech );
     }
 
-
     foreach my $tech_tag ( @removed_tech ) {
-
-        my @holder = ();
-
-        foreach my $old_tech ( @{ $self->{'TECH_BAG'} } ) {
-            if ( $old_tech eq $tech_tag ) {
-                $tech_tag = '';
-            }
-            else {
-                push( @holder, $old_tech );
-            }
-        }
-
-        $self->{'TECH_BAG'} = \@holder;
+        $self->tech_bag()->remove_item( $tech_tag );
     }
 
     return;
@@ -1165,6 +1137,24 @@ sub _raw_add_to_available_tech {
     }
 
     push( @{ $self->{'AVAILABLE_TECH'} }, @new_tech );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_increment_race_action {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $race = $self->race_of_current_user();
+
+    $race->set_action_count( $self->action_count() + 1 );
 
     return;
 }

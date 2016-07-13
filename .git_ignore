@@ -1,1 +1,2 @@
-statefiles/*
+*.log
+*.state

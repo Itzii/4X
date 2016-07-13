@@ -1,1600 +1,3029 @@
 $VAR1 = {
-  'BOARD' => {
-    'SPACES' => {
-      '-2' => {
-        '2' => 'tile_221'
+  'SHIP_POOL' => {
+    'ship_shiptemplate_ancient1' => {
+      'DAMAGE' => 0,
+      'OWNER_ID' => -1,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'TAG' => 'ship_shiptemplate_ancient1',
+      'TEMPLATE_TAG' => 'shiptemplate_ancient1',
+      'COUNT' => 1,
+      'SOURCE_TAG' => undef,
+      'LONG_NAME' => ''
+    },
+    'ship_shiptemplate_defense1' => {
+      'SOURCE_TAG' => undef,
+      'LONG_NAME' => '',
+      'TEMPLATE_TAG' => 'shiptemplate_defense1',
+      'COUNT' => 1,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'TAG' => 'ship_shiptemplate_defense1',
+      'OWNER_ID' => -1,
+      'DAMAGE' => 0
+    }
+  },
+  'RACES' => {
+    'race_human1' => {
+      'OWNER_ID' => 2,
+      'FLAG_PASSED' => 1,
+      'VP_SLOTS' => {
+        'ANY' => 4,
+        'AMBASSADOR' => 1,
+        'BATTLE' => 0
       },
-      '0' => {
-        '0' => 'tile_001',
-        '-2' => 'tile_229'
+      'HOME' => 'tile_221',
+      'COST_MONUMENT' => undef,
+      'EXCLUDE_RACE' => 'race_oldrace',
+      'COST_ORBITAL' => undef,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'COLONY_USED' => 0,
+      'ALLOWED_ACTIONS' => [],
+      'ACTION_COUNT' => 0,
+      'ACTION' => {
+        'EXPLORE' => 1,
+        'UPGRADE' => 2,
+        'RESEARCH' => 1,
+        'BUILD' => 2,
+        'MOVE' => 3,
+        'INFLUENCE_COLONY' => 2,
+        'INFLUENCE_INF' => 2
       },
-      '2' => {
-        '0' => 'tile_223'
+      'TRACKS' => {
+        'MINERALS' => {
+          'COUNT' => 11,
+          'PROGRESSION' => [
+            28,
+            24,
+            21,
+            18,
+            15,
+            12,
+            10,
+            8,
+            6,
+            4,
+            3,
+            2,
+            0
+          ]
+        },
+        'INFLUENCE' => {
+          'COUNT' => 12,
+          'PROGRESSION' => [
+            -30,
+            -25,
+            -21,
+            -17,
+            -13,
+            -10,
+            -7,
+            -5,
+            -3,
+            -2,
+            -1,
+            0,
+            0,
+            0
+          ]
+        },
+        'MONEY' => {
+          'COUNT' => 11,
+          'PROGRESSION' => [
+            28,
+            24,
+            21,
+            18,
+            15,
+            12,
+            10,
+            8,
+            6,
+            4,
+            3,
+            2,
+            0
+          ]
+        },
+        'SCIENCE' => {
+          'PROGRESSION' => [
+            28,
+            24,
+            21,
+            18,
+            15,
+            12,
+            10,
+            8,
+            6,
+            4,
+            3,
+            2,
+            0
+          ],
+          'COUNT' => 11
+        }
+      },
+      'STARTING_SHIPS' => [
+        'class_interceptor'
+      ],
+      'ACTIONS' => {},
+      'EXCHANGE' => 2,
+      'TECH' => {
+        'NANO' => {
+          'POSSESS' => [],
+          'VP' => [
+            0,
+            0,
+            0,
+            0,
+            1,
+            2,
+            3,
+            5
+          ],
+          'COST' => [
+            0,
+            -1,
+            -2,
+            -3,
+            -4,
+            -6,
+            -8,
+            0
+          ]
+        },
+        'MILITARY' => {
+          'POSSESS' => [
+            'tech_starbase'
+          ],
+          'VP' => [
+            0,
+            0,
+            0,
+            0,
+            1,
+            2,
+            3,
+            5
+          ],
+          'COST' => [
+            0,
+            -1,
+            -2,
+            -3,
+            -4,
+            -6,
+            -8,
+            0
+          ]
+        },
+        'GRID' => {
+          'COST' => [
+            0,
+            -1,
+            -2,
+            -3,
+            -4,
+            -6,
+            -8,
+            0
+          ],
+          'VP' => [
+            0,
+            0,
+            0,
+            0,
+            1,
+            2,
+            3,
+            5
+          ],
+          'POSSESS' => []
+        }
+      },
+      'LONG_NAME' => 'Terran Directorate',
+      'COLONY_COUNT' => 3,
+      'SOURCE_TAG' => 'src_base',
+      'SHIP_TEMPLATES' => [
+        'shiptemplate_race_human1_1',
+        'shiptemplate_race_human1_2',
+        'shiptemplate_race_human1_3',
+        'shiptemplate_race_human1_4'
+      ],
+      'COUNT' => 1,
+      'TAG' => 'race_human1',
+      'RESOURCES' => {
+        'MINERALS' => 3,
+        'MONEY' => 2,
+        'SCIENCE' => 3
       }
     },
+    'race_human2' => {
+      'COST_MONUMENT' => undef,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'EXCLUDE_RACE' => 'race_water',
+      'COST_ORBITAL' => undef,
+      'FLAG_PASSED' => 1,
+      'OWNER_ID' => 0,
+      'HOME' => 'tile_223',
+      'VP_SLOTS' => {
+        'ANY' => 4,
+        'BATTLE' => 0,
+        'AMBASSADOR' => 1
+      },
+      'SHIP_TEMPLATES' => [
+        'shiptemplate_race_human2_1',
+        'shiptemplate_race_human2_2',
+        'shiptemplate_race_human2_3',
+        'shiptemplate_race_human2_4'
+      ],
+      'EXCHANGE' => 2,
+      'TECH' => {
+        'MILITARY' => {
+          'POSSESS' => [
+            'tech_starbase'
+          ],
+          'COST' => [
+            0,
+            -1,
+            -2,
+            -3,
+            -4,
+            -6,
+            -8,
+            0
+          ],
+          'VP' => [
+            0,
+            0,
+            0,
+            0,
+            1,
+            2,
+            3,
+            5
+          ]
+        },
+        'NANO' => {
+          'COST' => [
+            0,
+            -1,
+            -2,
+            -3,
+            -4,
+            -6,
+            -8,
+            0
+          ],
+          'VP' => [
+            0,
+            0,
+            0,
+            0,
+            1,
+            2,
+            3,
+            5
+          ],
+          'POSSESS' => []
+        },
+        'GRID' => {
+          'POSSESS' => [],
+          'COST' => [
+            0,
+            -1,
+            -2,
+            -3,
+            -4,
+            -6,
+            -8,
+            0
+          ],
+          'VP' => [
+            0,
+            0,
+            0,
+            0,
+            1,
+            2,
+            3,
+            5
+          ]
+        }
+      },
+      'COLONY_COUNT' => 3,
+      'LONG_NAME' => 'Terran Federation',
+      'SOURCE_TAG' => 'src_base',
+      'TAG' => 'race_human2',
+      'RESOURCES' => {
+        'SCIENCE' => 3,
+        'MINERALS' => 3,
+        'MONEY' => 2
+      },
+      'COUNT' => 1,
+      'ACTION_COUNT' => 0,
+      'ALLOWED_ACTIONS' => [
+        'action_pass',
+        'action_react_upgrade',
+        'action_react_build',
+        'action_react_move'
+      ],
+      'COLONY_USED' => 0,
+      'STARTING_SHIPS' => [
+        'class_interceptor'
+      ],
+      'TRACKS' => {
+        'MINERALS' => {
+          'COUNT' => 11,
+          'PROGRESSION' => [
+            28,
+            24,
+            21,
+            18,
+            15,
+            12,
+            10,
+            8,
+            6,
+            4,
+            3,
+            2,
+            0
+          ]
+        },
+        'INFLUENCE' => {
+          'COUNT' => 12,
+          'PROGRESSION' => [
+            -30,
+            -25,
+            -21,
+            -17,
+            -13,
+            -10,
+            -7,
+            -5,
+            -3,
+            -2,
+            -1,
+            0,
+            0,
+            0
+          ]
+        },
+        'MONEY' => {
+          'COUNT' => 11,
+          'PROGRESSION' => [
+            28,
+            24,
+            21,
+            18,
+            15,
+            12,
+            10,
+            8,
+            6,
+            4,
+            3,
+            2,
+            0
+          ]
+        },
+        'SCIENCE' => {
+          'COUNT' => 11,
+          'PROGRESSION' => [
+            28,
+            24,
+            21,
+            18,
+            15,
+            12,
+            10,
+            8,
+            6,
+            4,
+            3,
+            2,
+            0
+          ]
+        }
+      },
+      'ACTIONS' => {},
+      'ACTION' => {
+        'EXPLORE' => 1,
+        'UPGRADE' => 2,
+        'BUILD' => 2,
+        'RESEARCH' => 1,
+        'INFLUENCE_INF' => 2,
+        'MOVE' => 3,
+        'INFLUENCE_COLONY' => 2
+      }
+    },
+    'race_human5' => {
+      'COUNT' => 1,
+      'RESOURCES' => {
+        'MINERALS' => 3,
+        'MONEY' => 2,
+        'SCIENCE' => 3
+      },
+      'TAG' => 'race_human5',
+      'SOURCE_TAG' => 'src_base',
+      'TECH' => {
+        'GRID' => {
+          'COST' => [
+            0,
+            -1,
+            -2,
+            -3,
+            -4,
+            -6,
+            -8,
+            0
+          ],
+          'VP' => [
+            0,
+            0,
+            0,
+            0,
+            1,
+            2,
+            3,
+            5
+          ],
+          'POSSESS' => []
+        },
+        'NANO' => {
+          'POSSESS' => [],
+          'VP' => [
+            0,
+            0,
+            0,
+            0,
+            1,
+            2,
+            3,
+            5
+          ],
+          'COST' => [
+            0,
+            -1,
+            -2,
+            -3,
+            -4,
+            -6,
+            -8,
+            0
+          ]
+        },
+        'MILITARY' => {
+          'POSSESS' => [
+            'tech_starbase'
+          ],
+          'VP' => [
+            0,
+            0,
+            0,
+            0,
+            1,
+            2,
+            3,
+            5
+          ],
+          'COST' => [
+            0,
+            -1,
+            -2,
+            -3,
+            -4,
+            -6,
+            -8,
+            0
+          ]
+        }
+      },
+      'COLONY_COUNT' => 3,
+      'LONG_NAME' => 'Terran Conglomerate',
+      'EXCHANGE' => 2,
+      'SHIP_TEMPLATES' => [
+        'shiptemplate_race_human5_1',
+        'shiptemplate_race_human5_2',
+        'shiptemplate_race_human5_3',
+        'shiptemplate_race_human5_4'
+      ],
+      'ACTION' => {
+        'RESEARCH' => 1,
+        'BUILD' => 2,
+        'MOVE' => 3,
+        'INFLUENCE_INF' => 2,
+        'INFLUENCE_COLONY' => 2,
+        'EXPLORE' => 1,
+        'UPGRADE' => 2
+      },
+      'ACTIONS' => {},
+      'TRACKS' => {
+        'SCIENCE' => {
+          'COUNT' => 11,
+          'PROGRESSION' => [
+            28,
+            24,
+            21,
+            18,
+            15,
+            12,
+            10,
+            8,
+            6,
+            4,
+            3,
+            2,
+            0
+          ]
+        },
+        'MONEY' => {
+          'COUNT' => 11,
+          'PROGRESSION' => [
+            28,
+            24,
+            21,
+            18,
+            15,
+            12,
+            10,
+            8,
+            6,
+            4,
+            3,
+            2,
+            0
+          ]
+        },
+        'INFLUENCE' => {
+          'PROGRESSION' => [
+            -30,
+            -25,
+            -21,
+            -17,
+            -13,
+            -10,
+            -7,
+            -5,
+            -3,
+            -2,
+            -1,
+            0,
+            0,
+            0
+          ],
+          'COUNT' => 12
+        },
+        'MINERALS' => {
+          'PROGRESSION' => [
+            28,
+            24,
+            21,
+            18,
+            15,
+            12,
+            10,
+            8,
+            6,
+            4,
+            3,
+            2,
+            0
+          ],
+          'COUNT' => 11
+        }
+      },
+      'STARTING_SHIPS' => [
+        'class_interceptor'
+      ],
+      'ALLOWED_ACTIONS' => [],
+      'COLONY_USED' => 0,
+      'ACTION_COUNT' => 0,
+      'COST_ORBITAL' => undef,
+      'EXCLUDE_RACE' => 'race_cyborgs',
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'COST_MONUMENT' => undef,
+      'VP_SLOTS' => {
+        'AMBASSADOR' => 1,
+        'BATTLE' => 0,
+        'ANY' => 4
+      },
+      'HOME' => 'tile_229',
+      'OWNER_ID' => 1,
+      'FLAG_PASSED' => 1
+    }
+  },
+  'SETTINGS' => {
+    'SHIP_INDEX' => 1,
+    'PLAYERS_DONE' => [
+      1
+    ],
+    'LONG_NAME' => undef,
+    'PLAYERS_NEXT_ROUND' => [],
+    'OPTION_TAGS' => [
+      'option_test'
+    ],
+    'TILE_STACK_LIMIT_3' => 10,
+    'PLAYERS_PENDING' => [
+      0,
+      2
+    ],
+    'PLAYER_IDS' => [
+      55,
+      200,
+      300
+    ],
+    'DEVELOPMENT_LIMIT' => 4,
+    'OWNER_ID' => 0,
+    'SOURCE_TAGS' => [
+      'src_base',
+      'src_test'
+    ],
+    'LOG_ID' => 'testid123'
+  },
+  'TECHNOLOGY' => {
+    'tech_computer2' => {
+      'COUNT' => 4,
+      'BASE_COST' => 8,
+      'TAG' => 'tech_computer2',
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'MIN_COST' => 5,
+      'LONG_NAME' => 'Positron Computer',
+      'SOURCE_TAG' => 'src_base',
+      'OWNER_ID' => '',
+      'CATEGORY' => 'grid'
+    },
+    'tech_bombs' => {
+      'CATEGORY' => 'military',
+      'OWNER_ID' => '',
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'TAG' => 'tech_bombs',
+      'BASE_COST' => 2,
+      'COUNT' => 5,
+      'SOURCE_TAG' => 'src_base',
+      'MIN_COST' => 2,
+      'LONG_NAME' => 'Neutron Bombs'
+    },
+    'tech_shield1' => {
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Gauss Shield',
+      'MIN_COST' => 2,
+      'COUNT' => 5,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'TAG' => 'tech_shield1',
+      'BASE_COST' => 2,
+      'CATEGORY' => 'grid',
+      'OWNER_ID' => ''
+    },
+    'tech_advanced_science' => {
+      'OWNER_ID' => '',
+      'CATEGORY' => 'nano',
+      'LONG_NAME' => 'Advanced Labs',
+      'MIN_COST' => 6,
+      'SOURCE_TAG' => 'src_base',
+      'TAG' => 'tech_advanced_science',
+      'BASE_COST' => 10,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'COUNT' => 4
+    },
+    'tech_artifact_reader' => {
+      'OWNER_ID' => '',
+      'CATEGORY' => 'nano',
+      'LONG_NAME' => 'Artifact Key',
+      'MIN_COST' => 7,
+      'SOURCE_TAG' => 'src_base',
+      'BASE_COST' => 14,
+      'TAG' => 'tech_artifact_reader',
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'COUNT' => 3
+    },
+    'tech_advanced_minerals' => {
+      'OWNER_ID' => '',
+      'CATEGORY' => 'military',
+      'LONG_NAME' => 'Advanced Mining',
+      'MIN_COST' => 6,
+      'SOURCE_TAG' => 'src_base',
+      'BASE_COST' => 10,
+      'TAG' => 'tech_advanced_minerals',
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'COUNT' => 4
+    },
+    'tech_hull2' => {
+      'OWNER_ID' => '',
+      'CATEGORY' => 'grid',
+      'COUNT' => 5,
+      'TAG' => 'tech_hull2',
+      'BASE_COST' => 4,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'LONG_NAME' => 'Improved Hull',
+      'MIN_COST' => 3,
+      'SOURCE_TAG' => 'src_base'
+    },
+    'tech_influence1' => {
+      'COUNT' => 5,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'TAG' => 'tech_influence1',
+      'BASE_COST' => 6,
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Advanced Robotics',
+      'MIN_COST' => 4,
+      'CATEGORY' => 'nano',
+      'OWNER_ID' => ''
+    },
+    'tech_energy6' => {
+      'OWNER_ID' => '',
+      'CATEGORY' => 'grid',
+      'BASE_COST' => 10,
+      'TAG' => 'tech_energy6',
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'COUNT' => 5,
+      'LONG_NAME' => 'Fusion Source',
+      'MIN_COST' => 6,
+      'SOURCE_TAG' => 'src_base'
+    },
+    'tech_stealth' => {
+      'CATEGORY' => 'special',
+      'OWNER_ID' => '',
+      'COUNT' => 1,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'BASE_COST' => 7,
+      'TAG' => 'tech_stealth',
+      'SOURCE_TAG' => 'src_base',
+      'MIN_COST' => 6,
+      'LONG_NAME' => 'Cloaking Device'
+    },
+    'tech_drive2' => {
+      'CATEGORY' => 'grid',
+      'OWNER_ID' => '',
+      'COUNT' => 5,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'TAG' => 'tech_drive2',
+      'BASE_COST' => 4,
+      'SOURCE_TAG' => 'src_base',
+      'MIN_COST' => 3,
+      'LONG_NAME' => 'Fusion Drive'
+    },
+    'tech_obilisk' => {
+      'CATEGORY' => 'nano',
+      'OWNER_ID' => '',
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Monolith',
+      'MIN_COST' => 6,
+      'COUNT' => 3,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'TAG' => 'tech_obilisk',
+      'BASE_COST' => 12
+    },
+    'tech_influence2' => {
+      'CATEGORY' => 'grid',
+      'OWNER_ID' => '',
+      'COUNT' => 3,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'TAG' => 'tech_influence2',
+      'BASE_COST' => 16,
+      'SOURCE_TAG' => 'src_base',
+      'MIN_COST' => 8,
+      'LONG_NAME' => 'Quantum Grid'
+    },
+    'tech_computer3' => {
+      'COUNT' => 3,
+      'BASE_COST' => 16,
+      'TAG' => 'tech_computer3',
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'LONG_NAME' => 'Gluon Computer',
+      'MIN_COST' => 8,
+      'SOURCE_TAG' => 'src_base',
+      'OWNER_ID' => '',
+      'CATEGORY' => 'military'
+    },
+    'tech_beam4' => {
+      'CATEGORY' => 'grid',
+      'OWNER_ID' => '',
+      'COUNT' => 3,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'TAG' => 'tech_beam4',
+      'BASE_COST' => 14,
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Antimatter Cannon',
+      'MIN_COST' => 7
+    },
+    'tech_drive3' => {
+      'COUNT' => 3,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'BASE_COST' => 12,
+      'TAG' => 'tech_drive3',
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Tachyon Drive',
+      'MIN_COST' => 6,
+      'CATEGORY' => 'grid',
+      'OWNER_ID' => ''
+    },
+    'tech_advanced_build' => {
+      'COUNT' => 5,
+      'BASE_COST' => 2,
+      'TAG' => 'tech_advanced_build',
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'MIN_COST' => 2,
+      'LONG_NAME' => 'Nanorobots',
+      'SOURCE_TAG' => 'src_base',
+      'OWNER_ID' => '',
+      'CATEGORY' => 'nano'
+    },
+    'tech_advanced_money' => {
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'BASE_COST' => 10,
+      'TAG' => 'tech_advanced_money',
+      'COUNT' => 4,
+      'SOURCE_TAG' => 'src_base',
+      'MIN_COST' => 6,
+      'LONG_NAME' => 'Advanced Economy',
+      'CATEGORY' => 'grid',
+      'OWNER_ID' => ''
+    },
+    'tech_energy9' => {
+      'CATEGORY' => 'military',
+      'OWNER_ID' => '',
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Tachyon Source',
+      'MIN_COST' => 6,
+      'COUNT' => 3,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'TAG' => 'tech_energy9',
+      'BASE_COST' => 12
+    },
+    'tech_missile2' => {
+      'SOURCE_TAG' => 'src_base',
+      'MIN_COST' => 7,
+      'LONG_NAME' => 'Plasma Missile',
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'BASE_COST' => 14,
+      'TAG' => 'tech_missile2',
+      'COUNT' => 3,
+      'CATEGORY' => 'military',
+      'OWNER_ID' => ''
+    },
+    'tech_beam2' => {
+      'COUNT' => 5,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'BASE_COST' => 6,
+      'TAG' => 'tech_beam2',
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Plasma Cannon',
+      'MIN_COST' => 4,
+      'CATEGORY' => 'military',
+      'OWNER_ID' => ''
+    },
+    'tech_starbase' => {
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'BASE_COST' => 4,
+      'TAG' => 'tech_starbase',
+      'COUNT' => 5,
+      'SOURCE_TAG' => 'src_base',
+      'MIN_COST' => 3,
+      'LONG_NAME' => 'Starbase',
+      'CATEGORY' => 'military',
+      'OWNER_ID' => ''
+    },
+    'tech_wormhole_generator' => {
+      'CATEGORY' => 'nano',
+      'OWNER_ID' => '',
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Wormhole Generator',
+      'MIN_COST' => 8,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'BASE_COST' => 16,
+      'TAG' => 'tech_wormhole_generator',
+      'COUNT' => 3
+    },
+    'tech_shield2' => {
+      'CATEGORY' => 'military',
+      'OWNER_ID' => '',
+      'SOURCE_TAG' => 'src_base',
+      'MIN_COST' => 5,
+      'LONG_NAME' => 'Phase Shield',
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'BASE_COST' => 8,
+      'TAG' => 'tech_shield2',
+      'COUNT' => 4
+    },
+    'tech_ring' => {
+      'CATEGORY' => 'nano',
+      'OWNER_ID' => '',
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Orbital',
+      'MIN_COST' => 5,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'BASE_COST' => 8,
+      'TAG' => 'tech_ring',
+      'COUNT' => 4
+    }
+  },
+  'TILES' => {
+    'tile_001' => {
+      'OWNER_ID' => '',
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'HIVE' => 0,
+      'WARPS' => 64,
+      'ANCIENT_LINK' => 1,
+      'STACK' => 0,
+      'ID' => '001',
+      'STARTING_SHIPS' => [
+        'class_defense'
+      ],
+      'MONOLITH' => 0,
+      'ORBITAL' => 0,
+      'VP' => 4,
+      'DISCOVERIES' => [
+        'disc_money'
+      ],
+      'SHIPS' => [
+        'ship_shiptemplate_defense1_npc_1'
+      ],
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Galactic Center',
+      'RESOURCES' => [
+        {
+          'TYPE' => 'science',
+          'ADVANCED' => 0,
+          'OWNER' => -1
+        },
+        {
+          'OWNER' => -1,
+          'TYPE' => 'science',
+          'ADVANCED' => 1
+        },
+        {
+          'ADVANCED' => 0,
+          'TYPE' => 'minerals',
+          'OWNER' => -1
+        },
+        {
+          'TYPE' => 'minerals',
+          'ADVANCED' => 1,
+          'OWNER' => -1
+        },
+        {
+          'OWNER' => -1,
+          'ADVANCED' => 0,
+          'TYPE' => 'wild'
+        },
+        {
+          'ADVANCED' => 0,
+          'TYPE' => 'wild',
+          'OWNER' => -1
+        }
+      ],
+      'TAG' => 'tile_001',
+      'DISCOVERY_COUNT' => 1,
+      'COUNT' => 1
+    },
+    'tile_305' => {
+      'ID' => '305',
+      'STARTING_SHIPS' => [
+        'class_ancient_cruiser'
+      ],
+      'ORBITAL' => 0,
+      'MONOLITH' => 0,
+      'VP' => 1,
+      'DISCOVERIES' => [
+        'disc_muon_source'
+      ],
+      'SHIPS' => [],
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Lambda Serpentis',
+      'RESOURCES' => [
+        {
+          'TYPE' => 'science',
+          'ADVANCED' => 0,
+          'OWNER' => -1
+        },
+        {
+          'TYPE' => 'minerals',
+          'ADVANCED' => 0,
+          'OWNER' => -1
+        }
+      ],
+      'TAG' => 'tile_305',
+      'DISCOVERY_COUNT' => 1,
+      'COUNT' => 1,
+      'OWNER_ID' => '',
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'HIVE' => 0,
+      'ANCIENT_LINK' => 0,
+      'WARPS' => 11,
+      'STACK' => 3
+    },
+    'tile_107' => {
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'HIVE' => 0,
+      'ANCIENT_LINK' => 0,
+      'STACK' => 1,
+      'WARPS' => 48,
+      'OWNER_ID' => '',
+      'DISCOVERIES' => [],
+      'VP' => 2,
+      'SHIPS' => [],
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Aldebaran',
+      'RESOURCES' => [
+        {
+          'OWNER' => -1,
+          'TYPE' => 'science',
+          'ADVANCED' => 1
+        },
+        {
+          'OWNER' => -1,
+          'TYPE' => 'minerals',
+          'ADVANCED' => 1
+        },
+        {
+          'TYPE' => 'money',
+          'ADVANCED' => 0,
+          'OWNER' => -1
+        }
+      ],
+      'TAG' => 'tile_107',
+      'DISCOVERY_COUNT' => 0,
+      'COUNT' => 1,
+      'ID' => '107',
+      'STARTING_SHIPS' => [],
+      'MONOLITH' => 0,
+      'ORBITAL' => 0
+    },
+    'tile_106' => {
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Capella',
+      'DISCOVERIES' => [],
+      'VP' => 2,
+      'SHIPS' => [],
+      'DISCOVERY_COUNT' => 0,
+      'COUNT' => 1,
+      'RESOURCES' => [
+        {
+          'ADVANCED' => 0,
+          'TYPE' => 'science',
+          'OWNER' => -1
+        },
+        {
+          'TYPE' => 'minerals',
+          'ADVANCED' => 0,
+          'OWNER' => -1
+        }
+      ],
+      'TAG' => 'tile_106',
+      'ID' => '106',
+      'MONOLITH' => 0,
+      'ORBITAL' => 0,
+      'STARTING_SHIPS' => [],
+      'ANCIENT_LINK' => 0,
+      'WARPS' => 16,
+      'STACK' => 1,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'HIVE' => 0,
+      'OWNER_ID' => ''
+    },
+    'tile_208' => {
+      'ANCIENT_LINK' => 0,
+      'STACK' => 2,
+      'WARPS' => 45,
+      'HIVE' => 0,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'OWNER_ID' => '',
+      'LONG_NAME' => 'Iota Persei',
+      'SOURCE_TAG' => 'src_base',
+      'SHIPS' => [],
+      'DISCOVERIES' => [
+        'disc_science'
+      ],
+      'VP' => 1,
+      'COUNT' => 1,
+      'DISCOVERY_COUNT' => 1,
+      'TAG' => 'tile_208',
+      'RESOURCES' => [],
+      'ID' => '208',
+      'ORBITAL' => 0,
+      'MONOLITH' => 0,
+      'STARTING_SHIPS' => []
+    },
+    'tile_209' => {
+      'OWNER_ID' => '',
+      'HIVE' => 0,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'ANCIENT_LINK' => 0,
+      'STACK' => 2,
+      'WARPS' => 43,
+      'ID' => '209',
+      'STARTING_SHIPS' => [],
+      'ORBITAL' => 0,
+      'MONOLITH' => 0,
+      'SHIPS' => [],
+      'VP' => 1,
+      'DISCOVERIES' => [],
+      'LONG_NAME' => 'Delta Eridani',
+      'SOURCE_TAG' => 'src_base',
+      'TAG' => 'tile_209',
+      'RESOURCES' => [
+        {
+          'OWNER' => -1,
+          'TYPE' => 'science',
+          'ADVANCED' => 0
+        },
+        {
+          'ADVANCED' => 1,
+          'TYPE' => 'money',
+          'OWNER' => -1
+        }
+      ],
+      'COUNT' => 1,
+      'DISCOVERY_COUNT' => 0
+    },
+    'tile_315' => {
+      'STACK' => 3,
+      'ANCIENT_LINK' => 0,
+      'WARPS' => 41,
+      'HIVE' => 0,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'OWNER_ID' => '',
+      'COUNT' => 1,
+      'DISCOVERY_COUNT' => 1,
+      'TAG' => 'tile_315',
+      'RESOURCES' => [],
+      'LONG_NAME' => 'Epsilon Aurigae',
+      'SOURCE_TAG' => 'src_base',
+      'SHIPS' => [],
+      'DISCOVERIES' => [
+        'disc_morph_shield'
+      ],
+      'VP' => 1,
+      'MONOLITH' => 0,
+      'ORBITAL' => 0,
+      'STARTING_SHIPS' => [],
+      'ID' => '315'
+    },
+    'tile_304' => {
+      'DISCOVERIES' => [],
+      'VP' => 1,
+      'SHIPS' => [],
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Theta Pegasi',
+      'RESOURCES' => [
+        {
+          'TYPE' => 'minerals',
+          'ADVANCED' => 0,
+          'OWNER' => -1
+        },
+        {
+          'OWNER' => -1,
+          'ADVANCED' => 1,
+          'TYPE' => 'money'
+        }
+      ],
+      'TAG' => 'tile_304',
+      'DISCOVERY_COUNT' => 0,
+      'COUNT' => 1,
+      'ID' => '304',
+      'STARTING_SHIPS' => [],
+      'ORBITAL' => 0,
+      'MONOLITH' => 0,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'HIVE' => 0,
+      'STACK' => 3,
+      'ANCIENT_LINK' => 0,
+      'WARPS' => 9,
+      'OWNER_ID' => ''
+    },
+    'tile_102' => {
+      'OWNER_ID' => '',
+      'STACK' => 1,
+      'ANCIENT_LINK' => 1,
+      'WARPS' => 46,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'HIVE' => 0,
+      'ID' => '102',
+      'ORBITAL' => 0,
+      'MONOLITH' => 0,
+      'STARTING_SHIPS' => [],
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Pollux',
+      'DISCOVERIES' => [],
+      'VP' => 3,
+      'SHIPS' => [],
+      'DISCOVERY_COUNT' => 0,
+      'COUNT' => 1,
+      'RESOURCES' => [
+        {
+          'OWNER' => -1,
+          'ADVANCED' => 0,
+          'TYPE' => 'science'
+        },
+        {
+          'ADVANCED' => 1,
+          'TYPE' => 'science',
+          'OWNER' => -1
+        }
+      ],
+      'TAG' => 'tile_102'
+    },
+    'tile_303' => {
+      'ANCIENT_LINK' => 1,
+      'STACK' => 3,
+      'WARPS' => 40,
+      'HIVE' => 0,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'OWNER_ID' => '',
+      'LONG_NAME' => 'Eta Cephei',
+      'SOURCE_TAG' => 'src_base',
+      'SHIPS' => [],
+      'DISCOVERIES' => [
+        'disc_cruiser'
+      ],
+      'VP' => 2,
+      'COUNT' => 1,
+      'DISCOVERY_COUNT' => 1,
+      'TAG' => 'tile_303',
+      'RESOURCES' => [
+        {
+          'OWNER' => -1,
+          'ADVANCED' => 0,
+          'TYPE' => 'wild'
+        }
+      ],
+      'ID' => '303',
+      'ORBITAL' => 0,
+      'MONOLITH' => 0,
+      'STARTING_SHIPS' => [
+        'class_ancient_cruiser'
+      ]
+    },
+    'tile_202' => {
+      'OWNER_ID' => '',
+      'ANCIENT_LINK' => 0,
+      'WARPS' => 40,
+      'STACK' => 2,
+      'HIVE' => 0,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'MONOLITH' => 0,
+      'ORBITAL' => 0,
+      'STARTING_SHIPS' => [],
+      'ID' => '202',
+      'COUNT' => 1,
+      'DISCOVERY_COUNT' => 0,
+      'TAG' => 'tile_202',
+      'RESOURCES' => [
+        {
+          'OWNER' => -1,
+          'TYPE' => 'science',
+          'ADVANCED' => 1
+        },
+        {
+          'TYPE' => 'minerals',
+          'ADVANCED' => 0,
+          'OWNER' => -1
+        }
+      ],
+      'LONG_NAME' => 'Fomalhaut',
+      'SOURCE_TAG' => 'src_base',
+      'SHIPS' => [],
+      'VP' => 1,
+      'DISCOVERIES' => []
+    },
+    'tile_204' => {
+      'OWNER_ID' => '',
+      'ANCIENT_LINK' => 1,
+      'WARPS' => 43,
+      'STACK' => 2,
+      'HIVE' => 0,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'ID' => '204',
+      'ORBITAL' => 0,
+      'MONOLITH' => 0,
+      'STARTING_SHIPS' => [
+        'class_ancient_cruiser'
+      ],
+      'LONG_NAME' => 'Vega',
+      'SOURCE_TAG' => 'src_base',
+      'SHIPS' => [],
+      'DISCOVERIES' => [
+        'disc_minerals'
+      ],
+      'VP' => 2,
+      'COUNT' => 1,
+      'DISCOVERY_COUNT' => 1,
+      'TAG' => 'tile_204',
+      'RESOURCES' => [
+        {
+          'ADVANCED' => 1,
+          'TYPE' => 'minerals',
+          'OWNER' => -1
+        },
+        {
+          'OWNER' => -1,
+          'TYPE' => 'money',
+          'ADVANCED' => 1
+        },
+        {
+          'ADVANCED' => 0,
+          'TYPE' => 'wild',
+          'OWNER' => -1
+        }
+      ]
+    },
+    'tile_211' => {
+      'ANCIENT_LINK' => 1,
+      'STACK' => 2,
+      'WARPS' => 16,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'HIVE' => 0,
+      'OWNER_ID' => '',
+      'DISCOVERY_COUNT' => 1,
+      'COUNT' => 1,
+      'RESOURCES' => [
+        {
+          'ADVANCED' => 1,
+          'TYPE' => 'minerals',
+          'OWNER' => -1
+        },
+        {
+          'TYPE' => 'money',
+          'ADVANCED' => 0,
+          'OWNER' => -1
+        },
+        {
+          'ADVANCED' => 0,
+          'TYPE' => 'wild',
+          'OWNER' => -1
+        }
+      ],
+      'TAG' => 'tile_211',
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Beta Aquilae',
+      'DISCOVERIES' => [
+        'disc_computer3'
+      ],
+      'VP' => 2,
+      'SHIPS' => [],
+      'ORBITAL' => 0,
+      'MONOLITH' => 0,
+      'STARTING_SHIPS' => [
+        'class_ancient_cruiser'
+      ],
+      'ID' => '211'
+    },
+    'tile_101' => {
+      'RESOURCES' => [
+        {
+          'ADVANCED' => 0,
+          'TYPE' => 'minerals',
+          'OWNER' => -1
+        },
+        {
+          'OWNER' => -1,
+          'TYPE' => 'minerals',
+          'ADVANCED' => 1
+        },
+        {
+          'OWNER' => -1,
+          'ADVANCED' => 0,
+          'TYPE' => 'money'
+        }
+      ],
+      'TAG' => 'tile_101',
+      'DISCOVERY_COUNT' => 1,
+      'COUNT' => 1,
+      'DISCOVERIES' => [
+        'disc_money'
+      ],
+      'VP' => 2,
+      'SHIPS' => [],
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Castor',
+      'STARTING_SHIPS' => [
+        'class_ancient_cruiser'
+      ],
+      'MONOLITH' => 0,
+      'ORBITAL' => 0,
+      'ID' => '101',
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'HIVE' => 0,
+      'ANCIENT_LINK' => 0,
+      'STACK' => 1,
+      'WARPS' => 63,
+      'OWNER_ID' => ''
+    },
+    'tile_205' => {
+      'STACK' => 2,
+      'ANCIENT_LINK' => 0,
+      'WARPS' => 28,
+      'HIVE' => 0,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'OWNER_ID' => '',
+      'LONG_NAME' => 'Mu Herculis',
+      'SOURCE_TAG' => 'src_base',
+      'SHIPS' => [],
+      'DISCOVERIES' => [],
+      'VP' => 1,
+      'COUNT' => 1,
+      'DISCOVERY_COUNT' => 0,
+      'TAG' => 'tile_205',
+      'RESOURCES' => [
+        {
+          'OWNER' => -1,
+          'ADVANCED' => 1,
+          'TYPE' => 'science'
+        },
+        {
+          'ADVANCED' => 0,
+          'TYPE' => 'money',
+          'OWNER' => -1
+        },
+        {
+          'OWNER' => -1,
+          'TYPE' => 'money',
+          'ADVANCED' => 1
+        }
+      ],
+      'ID' => '205',
+      'MONOLITH' => 0,
+      'ORBITAL' => 0,
+      'STARTING_SHIPS' => []
+    },
+    'tile_314' => {
+      'WARPS' => 28,
+      'ANCIENT_LINK' => 0,
+      'STACK' => 3,
+      'HIVE' => 0,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'OWNER_ID' => '',
+      'LONG_NAME' => 'Spica',
+      'SOURCE_TAG' => 'src_base',
+      'SHIPS' => [],
+      'DISCOVERIES' => [
+        'disc_energy11'
+      ],
+      'VP' => 1,
+      'COUNT' => 1,
+      'DISCOVERY_COUNT' => 1,
+      'TAG' => 'tile_314',
+      'RESOURCES' => [
+        {
+          'TYPE' => 'wild',
+          'ADVANCED' => 0,
+          'OWNER' => -1
+        }
+      ],
+      'ID' => '314',
+      'MONOLITH' => 0,
+      'ORBITAL' => 0,
+      'STARTING_SHIPS' => []
+    },
+    'tile_312' => {
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'HIVE' => 0,
+      'WARPS' => 11,
+      'ANCIENT_LINK' => 0,
+      'STACK' => 3,
+      'OWNER_ID' => '',
+      'RESOURCES' => [
+        {
+          'ADVANCED' => 0,
+          'TYPE' => 'minerals',
+          'OWNER' => -1
+        }
+      ],
+      'TAG' => 'tile_312',
+      'DISCOVERY_COUNT' => 1,
+      'COUNT' => 1,
+      'DISCOVERIES' => [
+        'disc_technology'
+      ],
+      'VP' => 1,
+      'SHIPS' => [],
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Antares',
+      'STARTING_SHIPS' => [],
+      'MONOLITH' => 0,
+      'ORBITAL' => 0,
+      'ID' => '312'
+    },
+    'tile_311' => {
+      'ID' => '311',
+      'STARTING_SHIPS' => [],
+      'ORBITAL' => 0,
+      'MONOLITH' => 0,
+      'SHIPS' => [],
+      'VP' => 1,
+      'DISCOVERIES' => [
+        'disc_hyper_drive'
+      ],
+      'LONG_NAME' => 'Canopus',
+      'SOURCE_TAG' => 'src_base',
+      'TAG' => 'tile_311',
+      'RESOURCES' => [
+        {
+          'ADVANCED' => 0,
+          'TYPE' => 'minerals',
+          'OWNER' => -1
+        }
+      ],
+      'COUNT' => 1,
+      'DISCOVERY_COUNT' => 1,
+      'OWNER_ID' => '',
+      'HIVE' => 0,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'ANCIENT_LINK' => 0,
+      'STACK' => 3,
+      'WARPS' => 13
+    },
+    'tile_229' => {
+      'OWNER_ID' => 1,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'HIVE' => 0,
+      'WARPS' => 27,
+      'ANCIENT_LINK' => 1,
+      'STACK' => 'homeworlds',
+      'ID' => '229',
+      'STARTING_SHIPS' => [],
+      'MONOLITH' => 0,
+      'ORBITAL' => 0,
+      'DISCOVERIES' => [],
+      'VP' => 3,
+      'SHIPS' => [
+        'ship_shiptemplate_race_human5_1_1_1'
+      ],
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Tau Ceti',
+      'RESOURCES' => [
+        {
+          'ADVANCED' => 0,
+          'TYPE' => 'science',
+          'OWNER' => 1
+        },
+        {
+          'OWNER' => -1,
+          'ADVANCED' => 1,
+          'TYPE' => 'science'
+        },
+        {
+          'TYPE' => 'minerals',
+          'ADVANCED' => 0,
+          'OWNER' => 1
+        },
+        {
+          'OWNER' => 1,
+          'ADVANCED' => 0,
+          'TYPE' => 'money'
+        },
+        {
+          'OWNER' => -1,
+          'ADVANCED' => 1,
+          'TYPE' => 'money'
+        }
+      ],
+      'TAG' => 'tile_229',
+      'DISCOVERY_COUNT' => 0,
+      'COUNT' => 1
+    },
+    'tile_104' => {
+      'OWNER_ID' => '',
+      'ANCIENT_LINK' => 0,
+      'WARPS' => 28,
+      'STACK' => 1,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'HIVE' => 0,
+      'ORBITAL' => 0,
+      'MONOLITH' => 0,
+      'STARTING_SHIPS' => [
+        'class_ancient_cruiser',
+        'class_ancient_cruiser'
+      ],
+      'ID' => '104',
+      'DISCOVERY_COUNT' => 1,
+      'COUNT' => 1,
+      'RESOURCES' => [
+        {
+          'OWNER' => -1,
+          'ADVANCED' => 0,
+          'TYPE' => 'science'
+        },
+        {
+          'OWNER' => -1,
+          'TYPE' => 'science',
+          'ADVANCED' => 1
+        },
+        {
+          'OWNER' => -1,
+          'ADVANCED' => 0,
+          'TYPE' => 'money'
+        },
+        {
+          'ADVANCED' => 1,
+          'TYPE' => 'money',
+          'OWNER' => -1
+        }
+      ],
+      'TAG' => 'tile_104',
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Arcturus',
+      'VP' => 2,
+      'DISCOVERIES' => [
+        'disc_science'
+      ],
+      'SHIPS' => []
+    },
+    'tile_318' => {
+      'DISCOVERIES' => [],
+      'VP' => 1,
+      'SHIPS' => [],
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Gamma Velorum',
+      'RESOURCES' => [
+        {
+          'ADVANCED' => 1,
+          'TYPE' => 'minerals',
+          'OWNER' => -1
+        },
+        {
+          'OWNER' => -1,
+          'ADVANCED' => 0,
+          'TYPE' => 'wild'
+        }
+      ],
+      'TAG' => 'tile_318',
+      'DISCOVERY_COUNT' => 0,
+      'COUNT' => 1,
+      'ID' => '318',
+      'STARTING_SHIPS' => [],
+      'MONOLITH' => 0,
+      'ORBITAL' => 0,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'HIVE' => 0,
+      'STACK' => 3,
+      'ANCIENT_LINK' => 0,
+      'WARPS' => 12,
+      'OWNER_ID' => ''
+    },
+    'tile_316' => {
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'HIVE' => 0,
+      'ANCIENT_LINK' => 0,
+      'WARPS' => 11,
+      'STACK' => 3,
+      'OWNER_ID' => '',
+      'RESOURCES' => [],
+      'TAG' => 'tile_316',
+      'DISCOVERY_COUNT' => 1,
+      'COUNT' => 1,
+      'DISCOVERIES' => [
+        'disc_minerals'
+      ],
+      'VP' => 1,
+      'SHIPS' => [],
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Iota Carinae',
+      'STARTING_SHIPS' => [],
+      'ORBITAL' => 0,
+      'MONOLITH' => 0,
+      'ID' => '316'
+    },
+    'tile_206' => {
+      'DISCOVERY_COUNT' => 1,
+      'COUNT' => 1,
+      'RESOURCES' => [
+        {
+          'TYPE' => 'minerals',
+          'ADVANCED' => 0,
+          'OWNER' => -1
+        }
+      ],
+      'TAG' => 'tile_206',
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Epsilon Indi',
+      'DISCOVERIES' => [
+        'disc_science'
+      ],
+      'VP' => 1,
+      'SHIPS' => [],
+      'MONOLITH' => 0,
+      'ORBITAL' => 0,
+      'STARTING_SHIPS' => [],
+      'ID' => '206',
+      'ANCIENT_LINK' => 0,
+      'WARPS' => 46,
+      'STACK' => 2,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'HIVE' => 0,
+      'OWNER_ID' => ''
+    },
+    'tile_313' => {
+      'DISCOVERY_COUNT' => 1,
+      'COUNT' => 1,
+      'RESOURCES' => [
+        {
+          'OWNER' => -1,
+          'ADVANCED' => 0,
+          'TYPE' => 'wild'
+        }
+      ],
+      'TAG' => 'tile_313',
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Alpha Ursae Minoris',
+      'DISCOVERIES' => [
+        'disc_turret1'
+      ],
+      'VP' => 1,
+      'SHIPS' => [],
+      'ORBITAL' => 0,
+      'MONOLITH' => 0,
+      'STARTING_SHIPS' => [],
+      'ID' => '313',
+      'ANCIENT_LINK' => 0,
+      'STACK' => 3,
+      'WARPS' => 9,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'HIVE' => 0,
+      'OWNER_ID' => ''
+    },
+    'tile_306' => {
+      'ID' => '306',
+      'STARTING_SHIPS' => [],
+      'ORBITAL' => 0,
+      'MONOLITH' => 0,
+      'SHIPS' => [],
+      'VP' => 1,
+      'DISCOVERIES' => [],
+      'LONG_NAME' => 'Beta Centauri',
+      'SOURCE_TAG' => 'src_base',
+      'TAG' => 'tile_306',
+      'RESOURCES' => [
+        {
+          'OWNER' => -1,
+          'ADVANCED' => 0,
+          'TYPE' => 'minerals'
+        },
+        {
+          'OWNER' => -1,
+          'ADVANCED' => 0,
+          'TYPE' => 'money'
+        }
+      ],
+      'COUNT' => 1,
+      'DISCOVERY_COUNT' => 0,
+      'OWNER_ID' => '',
+      'HIVE' => 0,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'ANCIENT_LINK' => 0,
+      'WARPS' => 10,
+      'STACK' => 3
+    },
+    'tile_302' => {
+      'OWNER_ID' => '',
+      'HIVE' => 0,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'STACK' => 3,
+      'ANCIENT_LINK' => 1,
+      'WARPS' => 25,
+      'ID' => '302',
+      'STARTING_SHIPS' => [
+        'class_ancient_cruiser'
+      ],
+      'ORBITAL' => 0,
+      'MONOLITH' => 0,
+      'SHIPS' => [],
+      'VP' => 2,
+      'DISCOVERIES' => [
+        'disc_drive4'
+      ],
+      'LONG_NAME' => 'Gamma Serpentis',
+      'SOURCE_TAG' => 'src_base',
+      'TAG' => 'tile_302',
+      'RESOURCES' => [
+        {
+          'OWNER' => -1,
+          'ADVANCED' => 0,
+          'TYPE' => 'minerals'
+        },
+        {
+          'TYPE' => 'money',
+          'ADVANCED' => 1,
+          'OWNER' => -1
+        }
+      ],
+      'COUNT' => 1,
+      'DISCOVERY_COUNT' => 1
+    },
+    'tile_308' => {
+      'OWNER_ID' => '',
+      'HIVE' => 0,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'WARPS' => 44,
+      'ANCIENT_LINK' => 0,
+      'STACK' => 3,
+      'STARTING_SHIPS' => [],
+      'ORBITAL' => 0,
+      'MONOLITH' => 0,
+      'ID' => '308',
+      'TAG' => 'tile_308',
+      'RESOURCES' => [
+        {
+          'ADVANCED' => 0,
+          'TYPE' => 'science',
+          'OWNER' => -1
+        },
+        {
+          'ADVANCED' => 1,
+          'TYPE' => 'minerals',
+          'OWNER' => -1
+        }
+      ],
+      'COUNT' => 1,
+      'DISCOVERY_COUNT' => 0,
+      'SHIPS' => [],
+      'VP' => 1,
+      'DISCOVERIES' => [],
+      'LONG_NAME' => 'Kappa Scorpii',
+      'SOURCE_TAG' => 'src_base'
+    },
+    'tile_307' => {
+      'OWNER_ID' => '',
+      'HIVE' => 0,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'STACK' => 3,
+      'ANCIENT_LINK' => 0,
+      'WARPS' => 13,
+      'ID' => '307',
+      'STARTING_SHIPS' => [],
+      'MONOLITH' => 0,
+      'ORBITAL' => 0,
+      'SHIPS' => [],
+      'VP' => 1,
+      'DISCOVERIES' => [],
+      'LONG_NAME' => 'Sigma Sagittarii',
+      'SOURCE_TAG' => 'src_base',
+      'TAG' => 'tile_307',
+      'RESOURCES' => [
+        {
+          'OWNER' => -1,
+          'ADVANCED' => 1,
+          'TYPE' => 'science'
+        },
+        {
+          'OWNER' => -1,
+          'ADVANCED' => 0,
+          'TYPE' => 'money'
+        }
+      ],
+      'COUNT' => 1,
+      'DISCOVERY_COUNT' => 0
+    },
+    'tile_221' => {
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'HIVE' => 0,
+      'ANCIENT_LINK' => 1,
+      'STACK' => 'homeworlds',
+      'WARPS' => 54,
+      'OWNER_ID' => 2,
+      'RESOURCES' => [
+        {
+          'OWNER' => 2,
+          'ADVANCED' => 0,
+          'TYPE' => 'science'
+        },
+        {
+          'ADVANCED' => 1,
+          'TYPE' => 'science',
+          'OWNER' => -1
+        },
+        {
+          'ADVANCED' => 0,
+          'TYPE' => 'minerals',
+          'OWNER' => 2
+        },
+        {
+          'OWNER' => 2,
+          'TYPE' => 'money',
+          'ADVANCED' => 0
+        },
+        {
+          'ADVANCED' => 1,
+          'TYPE' => 'money',
+          'OWNER' => -1
+        }
+      ],
+      'TAG' => 'tile_221',
+      'DISCOVERY_COUNT' => 0,
+      'COUNT' => 1,
+      'DISCOVERIES' => [],
+      'VP' => 3,
+      'SHIPS' => [
+        'ship_shiptemplate_race_human1_1_2_1'
+      ],
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Procyon',
+      'STARTING_SHIPS' => [],
+      'MONOLITH' => 0,
+      'ORBITAL' => 0,
+      'ID' => '221'
+    },
+    'tile_309' => {
+      'RESOURCES' => [
+        {
+          'ADVANCED' => 1,
+          'TYPE' => 'science',
+          'OWNER' => -1
+        },
+        {
+          'ADVANCED' => 0,
+          'TYPE' => 'money',
+          'OWNER' => -1
+        }
+      ],
+      'TAG' => 'tile_309',
+      'DISCOVERY_COUNT' => 0,
+      'COUNT' => 1,
+      'VP' => 1,
+      'DISCOVERIES' => [],
+      'SHIPS' => [],
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Phi Piscium',
+      'STARTING_SHIPS' => [],
+      'ORBITAL' => 0,
+      'MONOLITH' => 0,
+      'ID' => '309',
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'HIVE' => 0,
+      'WARPS' => 41,
+      'ANCIENT_LINK' => 0,
+      'STACK' => 3,
+      'OWNER_ID' => ''
+    },
+    'tile_105' => {
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'HIVE' => 0,
+      'STACK' => 1,
+      'ANCIENT_LINK' => 1,
+      'WARPS' => 60,
+      'OWNER_ID' => '',
+      'RESOURCES' => [
+        {
+          'OWNER' => -1,
+          'ADVANCED' => 0,
+          'TYPE' => 'science'
+        },
+        {
+          'OWNER' => -1,
+          'ADVANCED' => 1,
+          'TYPE' => 'minerals'
+        },
+        {
+          'OWNER' => -1,
+          'ADVANCED' => 0,
+          'TYPE' => 'money'
+        }
+      ],
+      'TAG' => 'tile_105',
+      'DISCOVERY_COUNT' => 1,
+      'COUNT' => 1,
+      'VP' => 3,
+      'DISCOVERIES' => [
+        'disc_hull3b'
+      ],
+      'SHIPS' => [],
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Zeta Herculis',
+      'STARTING_SHIPS' => [
+        'class_ancient_cruiser'
+      ],
+      'MONOLITH' => 0,
+      'ORBITAL' => 0,
+      'ID' => '105'
+    },
+    'tile_108' => {
+      'OWNER_ID' => '',
+      'HIVE' => 0,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'ANCIENT_LINK' => 0,
+      'STACK' => 1,
+      'WARPS' => 28,
+      'ID' => '108',
+      'STARTING_SHIPS' => [
+        'class_ancient_cruiser'
+      ],
+      'ORBITAL' => 0,
+      'MONOLITH' => 0,
+      'SHIPS' => [],
+      'VP' => 2,
+      'DISCOVERIES' => [
+        'disc_cruiser'
+      ],
+      'LONG_NAME' => 'Mu Cassiopeiae',
+      'SOURCE_TAG' => 'src_base',
+      'TAG' => 'tile_108',
+      'RESOURCES' => [
+        {
+          'OWNER' => -1,
+          'TYPE' => 'science',
+          'ADVANCED' => 0
+        },
+        {
+          'ADVANCED' => 1,
+          'TYPE' => 'money',
+          'OWNER' => -1
+        },
+        {
+          'ADVANCED' => 0,
+          'TYPE' => 'wild',
+          'OWNER' => -1
+        }
+      ],
+      'COUNT' => 1,
+      'DISCOVERY_COUNT' => 1
+    },
+    'tile_317' => {
+      'OWNER_ID' => '',
+      'WARPS' => 24,
+      'ANCIENT_LINK' => 0,
+      'STACK' => 3,
+      'HIVE' => 0,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'ID' => '317',
+      'ORBITAL' => 0,
+      'MONOLITH' => 0,
+      'STARTING_SHIPS' => [],
+      'LONG_NAME' => 'Beta Crucis',
+      'SOURCE_TAG' => 'src_base',
+      'SHIPS' => [],
+      'VP' => 1,
+      'DISCOVERIES' => [],
+      'COUNT' => 1,
+      'DISCOVERY_COUNT' => 0,
+      'TAG' => 'tile_317',
+      'RESOURCES' => [
+        {
+          'TYPE' => 'money',
+          'ADVANCED' => 0,
+          'OWNER' => -1
+        },
+        {
+          'ADVANCED' => 1,
+          'TYPE' => 'money',
+          'OWNER' => -1
+        }
+      ]
+    },
+    'tile_223' => {
+      'ID' => '223',
+      'STARTING_SHIPS' => [],
+      'MONOLITH' => 0,
+      'ORBITAL' => 0,
+      'SHIPS' => [
+        'ship_shiptemplate_race_human2_1_0_1'
+      ],
+      'VP' => 3,
+      'DISCOVERIES' => [],
+      'LONG_NAME' => 'Altair',
+      'SOURCE_TAG' => 'src_base',
+      'TAG' => 'tile_223',
+      'RESOURCES' => [
+        {
+          'TYPE' => 'science',
+          'ADVANCED' => 0,
+          'OWNER' => 0
+        },
+        {
+          'ADVANCED' => 1,
+          'TYPE' => 'science',
+          'OWNER' => -1
+        },
+        {
+          'ADVANCED' => 0,
+          'TYPE' => 'minerals',
+          'OWNER' => 0
+        },
+        {
+          'OWNER' => 0,
+          'ADVANCED' => 0,
+          'TYPE' => 'money'
+        },
+        {
+          'TYPE' => 'money',
+          'ADVANCED' => 1,
+          'OWNER' => -1
+        }
+      ],
+      'COUNT' => 1,
+      'DISCOVERY_COUNT' => 0,
+      'OWNER_ID' => 0,
+      'HIVE' => 0,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'ANCIENT_LINK' => 1,
+      'WARPS' => 45,
+      'STACK' => 'homeworlds'
+    },
+    'tile_103' => {
+      'DISCOVERIES' => [],
+      'VP' => 2,
+      'SHIPS' => [],
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Beta Leonis',
+      'RESOURCES' => [
+        {
+          'OWNER' => -1,
+          'TYPE' => 'money',
+          'ADVANCED' => 1
+        },
+        {
+          'OWNER' => -1,
+          'ADVANCED' => 0,
+          'TYPE' => 'wild'
+        }
+      ],
+      'TAG' => 'tile_103',
+      'DISCOVERY_COUNT' => 0,
+      'COUNT' => 1,
+      'ID' => '103',
+      'STARTING_SHIPS' => [],
+      'MONOLITH' => 0,
+      'ORBITAL' => 0,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'HIVE' => 0,
+      'ANCIENT_LINK' => 0,
+      'WARPS' => 56,
+      'STACK' => 1,
+      'OWNER_ID' => ''
+    },
+    'tile_210' => {
+      'ID' => '210',
+      'ORBITAL' => 0,
+      'MONOLITH' => 0,
+      'STARTING_SHIPS' => [],
+      'LONG_NAME' => 'Psi Capricorni',
+      'SOURCE_TAG' => 'src_base',
+      'SHIPS' => [],
+      'DISCOVERIES' => [],
+      'VP' => 1,
+      'COUNT' => 1,
+      'DISCOVERY_COUNT' => 0,
+      'TAG' => 'tile_210',
+      'RESOURCES' => [
+        {
+          'TYPE' => 'minerals',
+          'ADVANCED' => 0,
+          'OWNER' => -1
+        },
+        {
+          'TYPE' => 'money',
+          'ADVANCED' => 0,
+          'OWNER' => -1
+        }
+      ],
+      'OWNER_ID' => '',
+      'WARPS' => 41,
+      'ANCIENT_LINK' => 0,
+      'STACK' => 2,
+      'HIVE' => 0,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => ''
+    },
+    'tile_201' => {
+      'ORBITAL' => 0,
+      'MONOLITH' => 0,
+      'STARTING_SHIPS' => [],
+      'ID' => '201',
+      'DISCOVERY_COUNT' => 0,
+      'COUNT' => 1,
+      'RESOURCES' => [
+        {
+          'OWNER' => -1,
+          'TYPE' => 'minerals',
+          'ADVANCED' => 0
+        },
+        {
+          'TYPE' => 'money',
+          'ADVANCED' => 0,
+          'OWNER' => -1
+        }
+      ],
+      'TAG' => 'tile_201',
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Alpha Centauri',
+      'VP' => 1,
+      'DISCOVERIES' => [],
+      'SHIPS' => [],
+      'OWNER_ID' => '',
+      'ANCIENT_LINK' => 0,
+      'STACK' => 2,
+      'WARPS' => 40,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'HIVE' => 0
+    },
+    'tile_207' => {
+      'ANCIENT_LINK' => 0,
+      'STACK' => 2,
+      'WARPS' => 11,
+      'HIVE' => 0,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'OWNER_ID' => '',
+      'LONG_NAME' => 'Zeta Reticuli',
+      'SOURCE_TAG' => 'src_base',
+      'SHIPS' => [],
+      'VP' => 1,
+      'DISCOVERIES' => [
+        'disc_disrupter'
+      ],
+      'COUNT' => 1,
+      'DISCOVERY_COUNT' => 1,
+      'TAG' => 'tile_207',
+      'RESOURCES' => [],
+      'ID' => '207',
+      'ORBITAL' => 0,
+      'MONOLITH' => 0,
+      'STARTING_SHIPS' => []
+    },
+    'tile_301' => {
+      'ID' => '301',
+      'STARTING_SHIPS' => [
+        'class_ancient_cruiser',
+        'class_ancient_cruiser'
+      ],
+      'ORBITAL' => 0,
+      'MONOLITH' => 0,
+      'SHIPS' => [],
+      'VP' => 2,
+      'DISCOVERIES' => [
+        'disc_shield3'
+      ],
+      'LONG_NAME' => 'Zeta Draconis',
+      'SOURCE_TAG' => 'src_base',
+      'TAG' => 'tile_301',
+      'RESOURCES' => [
+        {
+          'ADVANCED' => 0,
+          'TYPE' => 'science',
+          'OWNER' => -1
+        },
+        {
+          'OWNER' => -1,
+          'TYPE' => 'minerals',
+          'ADVANCED' => 1
+        },
+        {
+          'TYPE' => 'money',
+          'ADVANCED' => 0,
+          'OWNER' => -1
+        }
+      ],
+      'COUNT' => 1,
+      'DISCOVERY_COUNT' => 1,
+      'OWNER_ID' => '',
+      'HIVE' => 0,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'ANCIENT_LINK' => 1,
+      'STACK' => 3,
+      'WARPS' => 13
+    },
+    'tile_203' => {
+      'RESOURCES' => [
+        {
+          'OWNER' => -1,
+          'TYPE' => 'science',
+          'ADVANCED' => 0
+        },
+        {
+          'OWNER' => -1,
+          'ADVANCED' => 0,
+          'TYPE' => 'minerals'
+        },
+        {
+          'TYPE' => 'money',
+          'ADVANCED' => 0,
+          'OWNER' => -1
+        }
+      ],
+      'TAG' => 'tile_203',
+      'DISCOVERY_COUNT' => 1,
+      'COUNT' => 1,
+      'VP' => 1,
+      'DISCOVERIES' => [
+        'disc_cruiser'
+      ],
+      'SHIPS' => [],
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Chi Draconis',
+      'STARTING_SHIPS' => [
+        'class_ancient_cruiser',
+        'class_ancient_cruiser'
+      ],
+      'ORBITAL' => 0,
+      'MONOLITH' => 0,
+      'ID' => '203',
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'HIVE' => 0,
+      'STACK' => 2,
+      'ANCIENT_LINK' => 0,
+      'WARPS' => 43,
+      'OWNER_ID' => ''
+    },
+    'tile_310' => {
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'HIVE' => 0,
+      'ANCIENT_LINK' => 0,
+      'STACK' => 3,
+      'WARPS' => 9,
+      'OWNER_ID' => '',
+      'RESOURCES' => [
+        {
+          'OWNER' => -1,
+          'ADVANCED' => 0,
+          'TYPE' => 'science'
+        },
+        {
+          'TYPE' => 'minerals',
+          'ADVANCED' => 0,
+          'OWNER' => -1
+        }
+      ],
+      'TAG' => 'tile_310',
+      'DISCOVERY_COUNT' => 0,
+      'COUNT' => 1,
+      'VP' => 1,
+      'DISCOVERIES' => [],
+      'SHIPS' => [],
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Nu Phoenicis',
+      'STARTING_SHIPS' => [],
+      'ORBITAL' => 0,
+      'MONOLITH' => 0,
+      'ID' => '310'
+    }
+  },
+  'DEVELOPMENT_STACK' => [
+    []
+  ],
+  'BOARD' => {
     'TILE_STACKS' => {
+      'homeworlds' => {
+        'DRAW' => [],
+        'DISCARD' => []
+      },
+      '1' => {
+        'DRAW' => [
+          'tile_103',
+          'tile_105',
+          'tile_108',
+          'tile_104',
+          'tile_107',
+          'tile_106',
+          'tile_101',
+          'tile_102'
+        ],
+        'DISCARD' => []
+      },
       'ancient_homeworlds' => {
+        'DISCARD' => [],
+        'DRAW' => []
+      },
+      '0' => {
         'DRAW' => [],
         'DISCARD' => []
       },
       '3' => {
         'DISCARD' => [],
         'DRAW' => [
+          'tile_305',
           'tile_315',
-          'tile_309',
-          'tile_307',
+          'tile_302',
           'tile_310',
-          'tile_318',
-          'tile_316',
+          'tile_307',
+          'tile_311',
           'tile_301',
+          'tile_314',
           'tile_306',
-          'tile_313',
-          'tile_317'
+          'tile_316'
         ]
       },
       '2' => {
+        'DISCARD' => [],
         'DRAW' => [
           'tile_203',
-          'tile_205',
-          'tile_206',
-          'tile_202',
-          'tile_209',
-          'tile_210',
-          'tile_208',
           'tile_201',
-          'tile_207',
+          'tile_209',
+          'tile_211',
+          'tile_208',
+          'tile_210',
+          'tile_202',
+          'tile_206',
+          'tile_205',
           'tile_204',
-          'tile_211'
-        ],
-        'DISCARD' => []
-      },
+          'tile_207'
+        ]
+      }
+    },
+    'SPACES' => {
       '0' => {
-        'DISCARD' => [],
-        'DRAW' => []
+        '0' => 'tile_001',
+        '-2' => 'tile_229'
       },
-      '1' => {
-        'DRAW' => [
-          'tile_105',
-          'tile_102',
-          'tile_101',
-          'tile_108',
-          'tile_107',
-          'tile_104',
-          'tile_106',
-          'tile_103'
-        ],
-        'DISCARD' => []
+      '2' => {
+        '0' => 'tile_223'
       },
-      'homeworlds' => {
-        'DISCARD' => [],
-        'DRAW' => []
+      '-2' => {
+        '2' => 'tile_221'
       }
     }
   },
-  'TILES' => {
-    'tile_305' => {
-      'DISCOVERY_COUNT' => 1,
-      'SOURCE_TAG' => 'src_base',
-      'RESOURCES' => [
-        {
-          'TYPE' => 'science',
-          'OWNER' => -1,
-          'ADVANCED' => 0
-        },
-        {
-          'TYPE' => 'minerals',
-          'OWNER' => -1,
-          'ADVANCED' => 0
-        }
-      ],
-      'REQUIRED_OPTION' => '',
-      'ORBITAL' => 0,
-      'LONG_NAME' => 'Lambda Serpentis',
-      'MONOLITH' => 0,
-      'VP' => 1,
-      'ID' => '305',
-      'ANCIENT_LINK' => 0,
-      'HIVE' => 0,
-      'WARPS' => 11,
-      'STARTING_SHIPS' => [
-        'class_ancient_cruiser'
-      ],
-      'TAG' => 'tile_305',
+  'TECH_DRAW_COUNT' => 6,
+  'STATE' => {
+    'PLAYER' => 0,
+    'SUBPHASE' => 0,
+    'STATE' => 2,
+    'ROUND' => 1,
+    'PHASE' => 1
+  },
+  'COMPONENTS' => {
+    'comp_computer1' => {
+      'TAG' => 'comp_computer1',
       'COUNT' => 1,
-      'STACK' => 3,
-      'DISCOVERIES' => [
-        'disc_money'
-      ],
-      'SHIPS' => [],
+      'INITIATIVE' => 0,
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Electron Computer',
+      'ENERGY' => 0,
+      'ATTACK_COUNT' => 0,
+      'HULL_POINTS' => 0,
+      'COMPUTER' => 1,
+      'SHIELD' => 0,
+      'MOVEMENT' => 0,
+      'REQUIRES' => '',
+      'REQUIRED_OPTION' => '',
       'PROVIDES' => [],
+      'ATTACK_DAMAGE' => 0,
+      'IS_MISSILE' => 0,
       'OWNER_ID' => ''
     },
-    'tile_223' => {
-      'DISCOVERY_COUNT' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'RESOURCES' => [
-        {
-          'OWNER' => 0,
-          'ADVANCED' => 0,
-          'TYPE' => 'science'
-        },
-        {
-          'ADVANCED' => 1,
-          'OWNER' => -1,
-          'TYPE' => 'science'
-        },
-        {
-          'ADVANCED' => 0,
-          'OWNER' => 0,
-          'TYPE' => 'minerals'
-        },
-        {
-          'ADVANCED' => 0,
-          'OWNER' => 0,
-          'TYPE' => 'money'
-        },
-        {
-          'ADVANCED' => 1,
-          'OWNER' => -1,
-          'TYPE' => 'money'
-        }
-      ],
-      'LONG_NAME' => 'Altair',
-      'MONOLITH' => 0,
-      'ID' => '223',
-      'VP' => 3,
-      'REQUIRED_OPTION' => '',
-      'ORBITAL' => 0,
-      'WARPS' => 45,
-      'COUNT' => 1,
-      'STARTING_SHIPS' => [],
-      'TAG' => 'tile_223',
-      'ANCIENT_LINK' => 1,
-      'HIVE' => 0,
-      'OWNER_ID' => 0,
-      'DISCOVERIES' => [],
-      'STACK' => 'homeworlds',
-      'SHIPS' => [
-        'ship_shiptemplate_race_human2_1_0_1'
-      ],
-      'PROVIDES' => []
-    },
-    'tile_301' => {
-      'ORBITAL' => 0,
-      'REQUIRED_OPTION' => '',
-      'LONG_NAME' => 'Zeta Draconis',
-      'MONOLITH' => 0,
-      'VP' => 2,
-      'ID' => '301',
-      'RESOURCES' => [
-        {
-          'OWNER' => -1,
-          'ADVANCED' => 0,
-          'TYPE' => 'science'
-        },
-        {
-          'OWNER' => -1,
-          'ADVANCED' => 1,
-          'TYPE' => 'minerals'
-        },
-        {
-          'OWNER' => -1,
-          'ADVANCED' => 0,
-          'TYPE' => 'money'
-        }
-      ],
-      'DISCOVERY_COUNT' => 1,
-      'SOURCE_TAG' => 'src_base',
-      'PROVIDES' => [],
-      'STACK' => 3,
-      'DISCOVERIES' => [
-        'disc_cruiser'
-      ],
-      'SHIPS' => [],
+    'comp_hull3b' => {
       'OWNER_ID' => '',
-      'HIVE' => 0,
-      'ANCIENT_LINK' => 1,
-      'WARPS' => 13,
-      'COUNT' => 1,
-      'STARTING_SHIPS' => [
-        'class_ancient_cruiser',
-        'class_ancient_cruiser'
-      ],
-      'TAG' => 'tile_301'
-    },
-    'tile_207' => {
-      'SHIPS' => [],
-      'STACK' => 2,
-      'DISCOVERIES' => [
-        'disc_morph_shield'
-      ],
-      'PROVIDES' => [],
-      'OWNER_ID' => '',
-      'ANCIENT_LINK' => 0,
-      'HIVE' => 0,
-      'COUNT' => 1,
-      'STARTING_SHIPS' => [],
-      'TAG' => 'tile_207',
-      'WARPS' => 11,
+      'IS_MISSILE' => 0,
+      'ATTACK_DAMAGE' => 0,
       'REQUIRED_OPTION' => '',
-      'ORBITAL' => 0,
-      'ID' => '207',
-      'VP' => 1,
-      'MONOLITH' => 0,
-      'LONG_NAME' => 'Zeta Reticuli',
-      'SOURCE_TAG' => 'src_base',
-      'DISCOVERY_COUNT' => 1,
-      'RESOURCES' => []
-    },
-    'tile_308' => {
-      'OWNER_ID' => '',
-      'SHIPS' => [],
-      'STACK' => 3,
-      'DISCOVERIES' => [],
       'PROVIDES' => [],
-      'STARTING_SHIPS' => [],
-      'COUNT' => 1,
-      'TAG' => 'tile_308',
-      'WARPS' => 44,
-      'ANCIENT_LINK' => 0,
-      'HIVE' => 0,
-      'ID' => '308',
-      'VP' => 1,
-      'LONG_NAME' => 'Kappa Scorpii',
-      'MONOLITH' => 0,
-      'REQUIRED_OPTION' => '',
-      'ORBITAL' => 0,
+      'MOVEMENT' => 0,
+      'SHIELD' => 0,
+      'COMPUTER' => 0,
+      'REQUIRES' => 'discovery',
+      'ENERGY' => 0,
+      'ATTACK_COUNT' => 0,
+      'HULL_POINTS' => 3,
+      'LONG_NAME' => 'Shard Hull',
       'SOURCE_TAG' => 'src_base',
-      'DISCOVERY_COUNT' => 0,
-      'RESOURCES' => [
-        {
-          'OWNER' => -1,
-          'ADVANCED' => 0,
-          'TYPE' => 'science'
-        },
-        {
-          'TYPE' => 'minerals',
-          'OWNER' => -1,
-          'ADVANCED' => 1
-        }
-      ]
-    },
-    'tile_314' => {
-      'RESOURCES' => [
-        {
-          'TYPE' => 'wild',
-          'OWNER' => -1,
-          'ADVANCED' => 0
-        }
-      ],
-      'DISCOVERY_COUNT' => 1,
-      'SOURCE_TAG' => 'src_base',
-      'ORBITAL' => 0,
-      'REQUIRED_OPTION' => '',
-      'MONOLITH' => 0,
-      'LONG_NAME' => 'Spica',
-      'VP' => 1,
-      'ID' => '314',
-      'HIVE' => 0,
-      'ANCIENT_LINK' => 0,
-      'WARPS' => 28,
-      'TAG' => 'tile_314',
-      'STARTING_SHIPS' => [],
-      'COUNT' => 1,
-      'PROVIDES' => [],
-      'STACK' => 3,
-      'DISCOVERIES' => [
-        'disc_minerals'
-      ],
-      'SHIPS' => [],
-      'OWNER_ID' => ''
-    },
-    'tile_313' => {
-      'RESOURCES' => [
-        {
-          'TYPE' => 'wild',
-          'ADVANCED' => 0,
-          'OWNER' => -1
-        }
-      ],
-      'DISCOVERY_COUNT' => 1,
-      'SOURCE_TAG' => 'src_base',
-      'MONOLITH' => 0,
-      'LONG_NAME' => 'Alpha Ursae Minoris',
-      'ID' => '313',
-      'VP' => 1,
-      'ORBITAL' => 0,
-      'REQUIRED_OPTION' => '',
-      'WARPS' => 9,
-      'TAG' => 'tile_313',
-      'STARTING_SHIPS' => [],
-      'COUNT' => 1,
-      'HIVE' => 0,
-      'ANCIENT_LINK' => 0,
-      'OWNER_ID' => '',
-      'PROVIDES' => [],
-      'DISCOVERIES' => [
-        'disc_minerals'
-      ],
-      'STACK' => 3,
-      'SHIPS' => []
-    },
-    'tile_306' => {
-      'ORBITAL' => 0,
-      'REQUIRED_OPTION' => '',
-      'LONG_NAME' => 'Beta Centauri',
-      'MONOLITH' => 0,
-      'VP' => 1,
-      'ID' => '306',
-      'RESOURCES' => [
-        {
-          'TYPE' => 'minerals',
-          'OWNER' => -1,
-          'ADVANCED' => 0
-        },
-        {
-          'TYPE' => 'money',
-          'OWNER' => -1,
-          'ADVANCED' => 0
-        }
-      ],
-      'DISCOVERY_COUNT' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'PROVIDES' => [],
-      'STACK' => 3,
-      'DISCOVERIES' => [],
-      'SHIPS' => [],
-      'OWNER_ID' => '',
-      'HIVE' => 0,
-      'ANCIENT_LINK' => 0,
-      'WARPS' => 10,
-      'TAG' => 'tile_306',
-      'STARTING_SHIPS' => [],
+      'INITIATIVE' => 0,
+      'TAG' => 'comp_hull3b',
       'COUNT' => 1
     },
-    'tile_303' => {
-      'ID' => '303',
-      'VP' => 2,
-      'MONOLITH' => 0,
-      'LONG_NAME' => 'Eta Cephei',
-      'REQUIRED_OPTION' => '',
-      'ORBITAL' => 0,
+    'comp_turret1' => {
       'SOURCE_TAG' => 'src_base',
-      'DISCOVERY_COUNT' => 1,
-      'RESOURCES' => [
-        {
-          'TYPE' => 'wild',
-          'OWNER' => -1,
-          'ADVANCED' => 0
-        }
-      ],
+      'INITIATIVE' => 0,
+      'LONG_NAME' => 'Ion Turret',
+      'TAG' => 'comp_turret1',
+      'COUNT' => 1,
+      'COMPUTER' => 0,
+      'SHIELD' => 0,
+      'MOVEMENT' => 0,
+      'REQUIRES' => 'discovery',
+      'ATTACK_COUNT' => 2,
+      'ENERGY' => 0,
+      'HULL_POINTS' => 0,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'IS_MISSILE' => 0,
       'OWNER_ID' => '',
-      'SHIPS' => [],
-      'DISCOVERIES' => [
-        'disc_drive4'
-      ],
-      'STACK' => 3,
-      'PROVIDES' => [],
-      'STARTING_SHIPS' => [
-        'class_ancient_cruiser'
-      ],
-      'TAG' => 'tile_303',
-      'COUNT' => 1,
-      'WARPS' => 40,
-      'ANCIENT_LINK' => 1,
-      'HIVE' => 0
+      'ATTACK_DAMAGE' => 1
     },
-    'tile_201' => {
+    'comp_missile2' => {
+      'COMPUTER' => 0,
+      'SHIELD' => 0,
+      'MOVEMENT' => 0,
+      'REQUIRES' => 'tech_missile2',
+      'ENERGY' => 0,
+      'ATTACK_COUNT' => 2,
+      'HULL_POINTS' => 0,
       'SOURCE_TAG' => 'src_base',
-      'DISCOVERY_COUNT' => 0,
-      'RESOURCES' => [
-        {
-          'TYPE' => 'minerals',
-          'OWNER' => -1,
-          'ADVANCED' => 0
-        },
-        {
-          'TYPE' => 'money',
-          'OWNER' => -1,
-          'ADVANCED' => 0
-        }
-      ],
-      'REQUIRED_OPTION' => '',
-      'ORBITAL' => 0,
-      'VP' => 1,
-      'ID' => '201',
-      'MONOLITH' => 0,
-      'LONG_NAME' => 'Alpha Centauri',
-      'ANCIENT_LINK' => 0,
-      'HIVE' => 0,
-      'STARTING_SHIPS' => [],
-      'TAG' => 'tile_201',
+      'INITIATIVE' => 0,
+      'LONG_NAME' => 'Plasma Missiles',
+      'TAG' => 'comp_missile2',
       'COUNT' => 1,
-      'WARPS' => 40,
-      'SHIPS' => [],
-      'STACK' => 2,
-      'DISCOVERIES' => [],
-      'PROVIDES' => [],
-      'OWNER_ID' => ''
-    },
-    'tile_107' => {
-      'PROVIDES' => [],
-      'STACK' => 1,
-      'DISCOVERIES' => [],
-      'SHIPS' => [],
+      'IS_MISSILE' => 1,
       'OWNER_ID' => '',
-      'HIVE' => 0,
-      'ANCIENT_LINK' => 0,
-      'WARPS' => 48,
-      'STARTING_SHIPS' => [],
-      'COUNT' => 1,
-      'TAG' => 'tile_107',
-      'ORBITAL' => 0,
+      'ATTACK_DAMAGE' => 2,
       'REQUIRED_OPTION' => '',
-      'LONG_NAME' => 'Aldebaran',
-      'MONOLITH' => 0,
-      'ID' => '107',
-      'VP' => 2,
-      'RESOURCES' => [
-        {
-          'TYPE' => 'science',
-          'ADVANCED' => 1,
-          'OWNER' => -1
-        },
-        {
-          'OWNER' => -1,
-          'ADVANCED' => 1,
-          'TYPE' => 'minerals'
-        },
-        {
-          'TYPE' => 'money',
-          'ADVANCED' => 0,
-          'OWNER' => -1
-        }
-      ],
-      'DISCOVERY_COUNT' => 0,
-      'SOURCE_TAG' => 'src_base'
-    },
-    'tile_229' => {
-      'LONG_NAME' => 'Tau Ceti',
-      'MONOLITH' => 0,
-      'VP' => 3,
-      'ID' => '229',
-      'ORBITAL' => 0,
-      'REQUIRED_OPTION' => '',
-      'RESOURCES' => [
-        {
-          'TYPE' => 'science',
-          'OWNER' => 1,
-          'ADVANCED' => 0
-        },
-        {
-          'ADVANCED' => 1,
-          'OWNER' => -1,
-          'TYPE' => 'science'
-        },
-        {
-          'ADVANCED' => 0,
-          'OWNER' => 1,
-          'TYPE' => 'minerals'
-        },
-        {
-          'ADVANCED' => 0,
-          'OWNER' => 1,
-          'TYPE' => 'money'
-        },
-        {
-          'TYPE' => 'money',
-          'ADVANCED' => 1,
-          'OWNER' => -1
-        }
-      ],
-      'DISCOVERY_COUNT' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'OWNER_ID' => 1,
-      'PROVIDES' => [],
-      'DISCOVERIES' => [],
-      'STACK' => 'homeworlds',
-      'SHIPS' => [
-        'ship_shiptemplate_race_human5_1_1_1'
-      ],
-      'WARPS' => 27,
-      'STARTING_SHIPS' => [],
-      'COUNT' => 1,
-      'TAG' => 'tile_229',
-      'HIVE' => 0,
-      'ANCIENT_LINK' => 1
-    },
-    'tile_304' => {
-      'ANCIENT_LINK' => 0,
-      'HIVE' => 0,
-      'TAG' => 'tile_304',
-      'STARTING_SHIPS' => [],
-      'COUNT' => 1,
-      'WARPS' => 9,
-      'SHIPS' => [],
-      'STACK' => 3,
-      'DISCOVERIES' => [],
-      'PROVIDES' => [],
-      'OWNER_ID' => '',
-      'SOURCE_TAG' => 'src_base',
-      'DISCOVERY_COUNT' => 0,
-      'RESOURCES' => [
-        {
-          'OWNER' => -1,
-          'ADVANCED' => 0,
-          'TYPE' => 'minerals'
-        },
-        {
-          'TYPE' => 'money',
-          'OWNER' => -1,
-          'ADVANCED' => 1
-        }
-      ],
-      'REQUIRED_OPTION' => '',
-      'ORBITAL' => 0,
-      'VP' => 1,
-      'ID' => '304',
-      'MONOLITH' => 0,
-      'LONG_NAME' => 'Theta Pegasi'
-    },
-    'tile_203' => {
-      'OWNER_ID' => '',
-      'STACK' => 2,
-      'DISCOVERIES' => [
-        'disc_money'
-      ],
-      'SHIPS' => [],
-      'PROVIDES' => [],
-      'WARPS' => 43,
-      'STARTING_SHIPS' => [
-        'class_ancient_cruiser',
-        'class_ancient_cruiser'
-      ],
-      'TAG' => 'tile_203',
-      'COUNT' => 1,
-      'ANCIENT_LINK' => 0,
-      'HIVE' => 0,
-      'LONG_NAME' => 'Chi Draconis',
-      'MONOLITH' => 0,
-      'VP' => 1,
-      'ID' => '203',
-      'REQUIRED_OPTION' => '',
-      'ORBITAL' => 0,
-      'DISCOVERY_COUNT' => 1,
-      'SOURCE_TAG' => 'src_base',
-      'RESOURCES' => [
-        {
-          'TYPE' => 'science',
-          'OWNER' => -1,
-          'ADVANCED' => 0
-        },
-        {
-          'TYPE' => 'minerals',
-          'ADVANCED' => 0,
-          'OWNER' => -1
-        },
-        {
-          'TYPE' => 'money',
-          'ADVANCED' => 0,
-          'OWNER' => -1
-        }
-      ]
-    },
-    'tile_205' => {
-      'RESOURCES' => [
-        {
-          'TYPE' => 'science',
-          'OWNER' => -1,
-          'ADVANCED' => 1
-        },
-        {
-          'ADVANCED' => 0,
-          'OWNER' => -1,
-          'TYPE' => 'money'
-        },
-        {
-          'OWNER' => -1,
-          'ADVANCED' => 1,
-          'TYPE' => 'money'
-        }
-      ],
-      'DISCOVERY_COUNT' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'ORBITAL' => 0,
-      'REQUIRED_OPTION' => '',
-      'MONOLITH' => 0,
-      'LONG_NAME' => 'Mu Herculis',
-      'VP' => 1,
-      'ID' => '205',
-      'HIVE' => 0,
-      'ANCIENT_LINK' => 0,
-      'WARPS' => 28,
-      'COUNT' => 1,
-      'STARTING_SHIPS' => [],
-      'TAG' => 'tile_205',
-      'PROVIDES' => [],
-      'DISCOVERIES' => [],
-      'STACK' => 2,
-      'SHIPS' => [],
-      'OWNER_ID' => ''
-    },
-    'tile_101' => {
-      'OWNER_ID' => '',
-      'PROVIDES' => [],
-      'SHIPS' => [],
-      'STACK' => 1,
-      'DISCOVERIES' => [
-        'disc_energy11'
-      ],
-      'COUNT' => 1,
-      'STARTING_SHIPS' => [
-        'class_ancient_cruiser'
-      ],
-      'TAG' => 'tile_101',
-      'WARPS' => 63,
-      'HIVE' => 0,
-      'ANCIENT_LINK' => 0,
-      'ID' => '101',
-      'VP' => 2,
-      'MONOLITH' => 0,
-      'LONG_NAME' => 'Castor',
-      'ORBITAL' => 0,
-      'REQUIRED_OPTION' => '',
-      'RESOURCES' => [
-        {
-          'TYPE' => 'minerals',
-          'ADVANCED' => 0,
-          'OWNER' => -1
-        },
-        {
-          'OWNER' => -1,
-          'ADVANCED' => 1,
-          'TYPE' => 'minerals'
-        },
-        {
-          'TYPE' => 'money',
-          'OWNER' => -1,
-          'ADVANCED' => 0
-        }
-      ],
-      'SOURCE_TAG' => 'src_base',
-      'DISCOVERY_COUNT' => 1
-    },
-    'tile_108' => {
-      'PROVIDES' => [],
-      'DISCOVERIES' => [
-        'disc_hyper_drive'
-      ],
-      'STACK' => 1,
-      'SHIPS' => [],
-      'OWNER_ID' => '',
-      'HIVE' => 0,
-      'ANCIENT_LINK' => 0,
-      'WARPS' => 28,
-      'TAG' => 'tile_108',
-      'STARTING_SHIPS' => [
-        'class_ancient_cruiser'
-      ],
-      'COUNT' => 1,
-      'ORBITAL' => 0,
-      'REQUIRED_OPTION' => '',
-      'MONOLITH' => 0,
-      'LONG_NAME' => 'Mu Cassiopeiae',
-      'ID' => '108',
-      'VP' => 2,
-      'RESOURCES' => [
-        {
-          'ADVANCED' => 0,
-          'OWNER' => -1,
-          'TYPE' => 'science'
-        },
-        {
-          'ADVANCED' => 1,
-          'OWNER' => -1,
-          'TYPE' => 'money'
-        },
-        {
-          'OWNER' => -1,
-          'ADVANCED' => 0,
-          'TYPE' => 'wild'
-        }
-      ],
-      'DISCOVERY_COUNT' => 1,
-      'SOURCE_TAG' => 'src_base'
-    },
-    'tile_315' => {
-      'DISCOVERY_COUNT' => 1,
-      'SOURCE_TAG' => 'src_base',
-      'RESOURCES' => [],
-      'LONG_NAME' => 'Epsilon Aurigae',
-      'MONOLITH' => 0,
-      'ID' => '315',
-      'VP' => 1,
-      'REQUIRED_OPTION' => '',
-      'ORBITAL' => 0,
-      'WARPS' => 41,
-      'STARTING_SHIPS' => [],
-      'TAG' => 'tile_315',
-      'COUNT' => 1,
-      'ANCIENT_LINK' => 0,
-      'HIVE' => 0,
-      'OWNER_ID' => '',
-      'DISCOVERIES' => [
-        'disc_shield3'
-      ],
-      'STACK' => 3,
-      'SHIPS' => [],
       'PROVIDES' => []
     },
-    'tile_317' => {
-      'WARPS' => 24,
-      'STARTING_SHIPS' => [],
+    'comp_computer2' => {
       'COUNT' => 1,
-      'TAG' => 'tile_317',
-      'HIVE' => 0,
-      'ANCIENT_LINK' => 0,
+      'TAG' => 'comp_computer2',
+      'LONG_NAME' => 'Positron Computer',
+      'SOURCE_TAG' => 'src_base',
+      'INITIATIVE' => 1,
+      'HULL_POINTS' => 0,
+      'ENERGY' => 0,
+      'ATTACK_COUNT' => 0,
+      'REQUIRES' => 'tech_computer2',
+      'MOVEMENT' => 0,
+      'SHIELD' => 0,
+      'COMPUTER' => 2,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'ATTACK_DAMAGE' => 0,
       'OWNER_ID' => '',
-      'PROVIDES' => [],
-      'DISCOVERIES' => [],
-      'STACK' => 3,
-      'SHIPS' => [],
-      'RESOURCES' => [
-        {
-          'TYPE' => 'money',
-          'ADVANCED' => 0,
-          'OWNER' => -1
-        },
-        {
-          'ADVANCED' => 1,
-          'OWNER' => -1,
-          'TYPE' => 'money'
-        }
-      ],
-      'DISCOVERY_COUNT' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'MONOLITH' => 0,
-      'LONG_NAME' => 'Beta Crucis',
-      'ID' => '317',
-      'VP' => 1,
-      'ORBITAL' => 0,
-      'REQUIRED_OPTION' => ''
+      'IS_MISSILE' => 0
     },
-    'tile_302' => {
-      'RESOURCES' => [
-        {
-          'ADVANCED' => 0,
-          'OWNER' => -1,
-          'TYPE' => 'minerals'
-        },
-        {
-          'OWNER' => -1,
-          'ADVANCED' => 1,
-          'TYPE' => 'money'
-        }
-      ],
-      'DISCOVERY_COUNT' => 1,
-      'SOURCE_TAG' => 'src_base',
-      'ORBITAL' => 0,
+    'comp_computer3' => {
       'REQUIRED_OPTION' => '',
-      'LONG_NAME' => 'Gamma Serpentis',
-      'MONOLITH' => 0,
-      'ID' => '302',
-      'VP' => 2,
-      'HIVE' => 0,
-      'ANCIENT_LINK' => 1,
-      'WARPS' => 25,
-      'TAG' => 'tile_302',
-      'STARTING_SHIPS' => [
-        'class_ancient_cruiser'
-      ],
-      'COUNT' => 1,
       'PROVIDES' => [],
-      'STACK' => 3,
-      'DISCOVERIES' => [
-        'disc_science'
-      ],
-      'SHIPS' => [],
-      'OWNER_ID' => ''
-    },
-    'tile_202' => {
-      'SOURCE_TAG' => 'src_base',
-      'DISCOVERY_COUNT' => 0,
-      'RESOURCES' => [
-        {
-          'TYPE' => 'science',
-          'OWNER' => -1,
-          'ADVANCED' => 1
-        },
-        {
-          'TYPE' => 'minerals',
-          'OWNER' => -1,
-          'ADVANCED' => 0
-        }
-      ],
-      'REQUIRED_OPTION' => '',
-      'ORBITAL' => 0,
-      'ID' => '202',
-      'VP' => 1,
-      'LONG_NAME' => 'Fomalhaut',
-      'MONOLITH' => 0,
-      'ANCIENT_LINK' => 0,
-      'HIVE' => 0,
-      'COUNT' => 1,
-      'STARTING_SHIPS' => [],
-      'TAG' => 'tile_202',
-      'WARPS' => 40,
-      'SHIPS' => [],
-      'DISCOVERIES' => [],
-      'STACK' => 2,
-      'PROVIDES' => [],
-      'OWNER_ID' => ''
-    },
-    'tile_311' => {
-      'PROVIDES' => [],
-      'DISCOVERIES' => [
-        'disc_muon_source'
-      ],
-      'STACK' => 3,
-      'SHIPS' => [],
+      'IS_MISSILE' => 0,
       'OWNER_ID' => '',
-      'HIVE' => 0,
-      'ANCIENT_LINK' => 0,
-      'WARPS' => 13,
-      'STARTING_SHIPS' => [],
-      'TAG' => 'tile_311',
+      'ATTACK_DAMAGE' => 0,
+      'SOURCE_TAG' => 'src_base',
+      'INITIATIVE' => 2,
+      'LONG_NAME' => 'Gluon Computer',
       'COUNT' => 1,
-      'ORBITAL' => 0,
-      'REQUIRED_OPTION' => '',
-      'LONG_NAME' => 'Canopus',
-      'MONOLITH' => 0,
-      'ID' => '311',
-      'VP' => 1,
-      'RESOURCES' => [
-        {
-          'TYPE' => 'minerals',
-          'ADVANCED' => 0,
-          'OWNER' => -1
-        }
-      ],
-      'DISCOVERY_COUNT' => 1,
-      'SOURCE_TAG' => 'src_base'
+      'TAG' => 'comp_computer3',
+      'REQUIRES' => 'tech_computer3',
+      'COMPUTER' => 3,
+      'SHIELD' => 0,
+      'MOVEMENT' => 0,
+      'HULL_POINTS' => 0,
+      'ENERGY' => 0,
+      'ATTACK_COUNT' => 0
     },
-    'tile_316' => {
-      'ANCIENT_LINK' => 0,
-      'HIVE' => 0,
-      'WARPS' => 11,
-      'COUNT' => 1,
-      'STARTING_SHIPS' => [],
-      'TAG' => 'tile_316',
-      'STACK' => 3,
-      'DISCOVERIES' => [
-        'disc_cruiser'
-      ],
-      'SHIPS' => [],
-      'PROVIDES' => [],
+    'comp_drive2' => {
+      'IS_MISSILE' => 0,
       'OWNER_ID' => '',
-      'DISCOVERY_COUNT' => 1,
-      'SOURCE_TAG' => 'src_base',
-      'RESOURCES' => [],
+      'ATTACK_DAMAGE' => 0,
       'REQUIRED_OPTION' => '',
-      'ORBITAL' => 0,
-      'MONOLITH' => 0,
-      'LONG_NAME' => 'Iota Carinae',
-      'ID' => '316',
-      'VP' => 1
-    },
-    'tile_221' => {
-      'ID' => '221',
-      'VP' => 3,
-      'LONG_NAME' => 'Procyon',
-      'MONOLITH' => 0,
-      'REQUIRED_OPTION' => '',
-      'ORBITAL' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'DISCOVERY_COUNT' => 0,
-      'RESOURCES' => [
-        {
-          'OWNER' => 2,
-          'ADVANCED' => 0,
-          'TYPE' => 'science'
-        },
-        {
-          'TYPE' => 'science',
-          'OWNER' => -1,
-          'ADVANCED' => 1
-        },
-        {
-          'ADVANCED' => 0,
-          'OWNER' => 2,
-          'TYPE' => 'minerals'
-        },
-        {
-          'ADVANCED' => 0,
-          'OWNER' => 2,
-          'TYPE' => 'money'
-        },
-        {
-          'TYPE' => 'money',
-          'ADVANCED' => 1,
-          'OWNER' => -1
-        }
-      ],
-      'OWNER_ID' => 2,
-      'SHIPS' => [
-        'ship_shiptemplate_race_human1_1_2_1'
-      ],
-      'STACK' => 'homeworlds',
-      'DISCOVERIES' => [],
       'PROVIDES' => [],
-      'STARTING_SHIPS' => [],
-      'TAG' => 'tile_221',
-      'COUNT' => 1,
-      'WARPS' => 54,
-      'ANCIENT_LINK' => 1,
-      'HIVE' => 0
-    },
-    'tile_204' => {
-      'MONOLITH' => 0,
-      'LONG_NAME' => 'Vega',
-      'ID' => '204',
-      'VP' => 2,
-      'ORBITAL' => 0,
-      'REQUIRED_OPTION' => '',
-      'RESOURCES' => [
-        {
-          'OWNER' => -1,
-          'ADVANCED' => 1,
-          'TYPE' => 'minerals'
-        },
-        {
-          'OWNER' => -1,
-          'ADVANCED' => 1,
-          'TYPE' => 'money'
-        },
-        {
-          'OWNER' => -1,
-          'ADVANCED' => 0,
-          'TYPE' => 'wild'
-        }
-      ],
-      'DISCOVERY_COUNT' => 1,
+      'REQUIRES' => 'tech_drive2',
+      'COMPUTER' => 0,
+      'SHIELD' => 0,
+      'MOVEMENT' => 2,
+      'HULL_POINTS' => 0,
+      'ATTACK_COUNT' => 0,
+      'ENERGY' => 0,
+      'INITIATIVE' => 2,
       'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Fusion Drive',
+      'COUNT' => 1,
+      'TAG' => 'comp_drive2'
+    },
+    'comp_energy2' => {
       'OWNER_ID' => '',
-      'PROVIDES' => [],
-      'STACK' => 2,
-      'DISCOVERIES' => [
-        'disc_turret1'
-      ],
-      'SHIPS' => [],
-      'WARPS' => 43,
-      'STARTING_SHIPS' => [
-        'class_ancient_cruiser'
-      ],
-      'COUNT' => 1,
-      'TAG' => 'tile_204',
-      'HIVE' => 0,
-      'ANCIENT_LINK' => 1
-    },
-    'tile_104' => {
-      'PROVIDES' => [],
-      'DISCOVERIES' => [
-        'disc_science'
-      ],
-      'STACK' => 1,
-      'SHIPS' => [],
-      'OWNER_ID' => '',
-      'HIVE' => 0,
-      'ANCIENT_LINK' => 0,
-      'WARPS' => 28,
-      'STARTING_SHIPS' => [
-        'class_ancient_cruiser',
-        'class_ancient_cruiser'
-      ],
-      'TAG' => 'tile_104',
-      'COUNT' => 1,
-      'ORBITAL' => 0,
+      'IS_MISSILE' => 0,
+      'ATTACK_DAMAGE' => 0,
       'REQUIRED_OPTION' => '',
-      'LONG_NAME' => 'Arcturus',
-      'MONOLITH' => 0,
-      'ID' => '104',
-      'VP' => 2,
-      'RESOURCES' => [
-        {
-          'TYPE' => 'science',
-          'OWNER' => -1,
-          'ADVANCED' => 0
-        },
-        {
-          'TYPE' => 'science',
-          'ADVANCED' => 1,
-          'OWNER' => -1
-        },
-        {
-          'TYPE' => 'money',
-          'ADVANCED' => 0,
-          'OWNER' => -1
-        },
-        {
-          'TYPE' => 'money',
-          'OWNER' => -1,
-          'ADVANCED' => 1
-        }
-      ],
-      'DISCOVERY_COUNT' => 1,
-      'SOURCE_TAG' => 'src_base'
-    },
-    'tile_106' => {
-      'SHIPS' => [],
-      'DISCOVERIES' => [],
-      'STACK' => 1,
       'PROVIDES' => [],
-      'OWNER_ID' => '',
-      'ANCIENT_LINK' => 0,
-      'HIVE' => 0,
-      'STARTING_SHIPS' => [],
-      'COUNT' => 1,
-      'TAG' => 'tile_106',
-      'WARPS' => 16,
-      'REQUIRED_OPTION' => '',
-      'ORBITAL' => 0,
-      'ID' => '106',
-      'VP' => 2,
-      'MONOLITH' => 0,
-      'LONG_NAME' => 'Capella',
+      'SHIELD' => 0,
+      'MOVEMENT' => 0,
+      'COMPUTER' => 0,
+      'REQUIRES' => 'discovery',
+      'ENERGY' => 2,
+      'ATTACK_COUNT' => 0,
+      'HULL_POINTS' => 0,
+      'LONG_NAME' => 'Muon Source',
       'SOURCE_TAG' => 'src_base',
-      'DISCOVERY_COUNT' => 0,
-      'RESOURCES' => [
-        {
-          'ADVANCED' => 0,
-          'OWNER' => -1,
-          'TYPE' => 'science'
-        },
-        {
-          'ADVANCED' => 0,
-          'OWNER' => -1,
-          'TYPE' => 'minerals'
-        }
-      ]
-    },
-    'tile_318' => {
-      'WARPS' => 12,
-      'COUNT' => 1,
-      'STARTING_SHIPS' => [],
-      'TAG' => 'tile_318',
-      'ANCIENT_LINK' => 0,
-      'HIVE' => 0,
-      'OWNER_ID' => '',
-      'STACK' => 3,
-      'DISCOVERIES' => [],
-      'SHIPS' => [],
-      'PROVIDES' => [],
-      'DISCOVERY_COUNT' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'RESOURCES' => [
-        {
-          'TYPE' => 'minerals',
-          'ADVANCED' => 1,
-          'OWNER' => -1
-        },
-        {
-          'ADVANCED' => 0,
-          'OWNER' => -1,
-          'TYPE' => 'wild'
-        }
-      ],
-      'MONOLITH' => 0,
-      'LONG_NAME' => 'Gamma Velorum',
-      'VP' => 1,
-      'ID' => '318',
-      'REQUIRED_OPTION' => '',
-      'ORBITAL' => 0
-    },
-    'tile_310' => {
-      'PROVIDES' => [],
-      'SHIPS' => [],
-      'STACK' => 3,
-      'DISCOVERIES' => [],
-      'OWNER_ID' => '',
-      'HIVE' => 0,
-      'ANCIENT_LINK' => 0,
-      'TAG' => 'tile_310',
-      'STARTING_SHIPS' => [],
-      'COUNT' => 1,
-      'WARPS' => 9,
-      'ORBITAL' => 0,
-      'REQUIRED_OPTION' => '',
-      'ID' => '310',
-      'VP' => 1,
-      'MONOLITH' => 0,
-      'LONG_NAME' => 'Nu Phoenicis',
-      'RESOURCES' => [
-        {
-          'ADVANCED' => 0,
-          'OWNER' => -1,
-          'TYPE' => 'science'
-        },
-        {
-          'TYPE' => 'minerals',
-          'OWNER' => -1,
-          'ADVANCED' => 0
-        }
-      ],
-      'SOURCE_TAG' => 'src_base',
-      'DISCOVERY_COUNT' => 0
-    },
-    'tile_309' => {
-      'RESOURCES' => [
-        {
-          'OWNER' => -1,
-          'ADVANCED' => 1,
-          'TYPE' => 'science'
-        },
-        {
-          'ADVANCED' => 0,
-          'OWNER' => -1,
-          'TYPE' => 'money'
-        }
-      ],
-      'SOURCE_TAG' => 'src_base',
-      'DISCOVERY_COUNT' => 0,
-      'ORBITAL' => 0,
-      'REQUIRED_OPTION' => '',
-      'ID' => '309',
-      'VP' => 1,
-      'LONG_NAME' => 'Phi Piscium',
-      'MONOLITH' => 0,
-      'HIVE' => 0,
-      'ANCIENT_LINK' => 0,
-      'STARTING_SHIPS' => [],
-      'COUNT' => 1,
-      'TAG' => 'tile_309',
-      'WARPS' => 41,
-      'PROVIDES' => [],
-      'SHIPS' => [],
-      'STACK' => 3,
-      'DISCOVERIES' => [],
-      'OWNER_ID' => ''
-    },
-    'tile_105' => {
-      'WARPS' => 60,
-      'STARTING_SHIPS' => [
-        'class_ancient_cruiser'
-      ],
-      'COUNT' => 1,
-      'TAG' => 'tile_105',
-      'ANCIENT_LINK' => 1,
-      'HIVE' => 0,
-      'OWNER_ID' => '',
-      'STACK' => 1,
-      'DISCOVERIES' => [
-        'disc_cruiser'
-      ],
-      'SHIPS' => [],
-      'PROVIDES' => [],
-      'DISCOVERY_COUNT' => 1,
-      'SOURCE_TAG' => 'src_base',
-      'RESOURCES' => [
-        {
-          'TYPE' => 'science',
-          'ADVANCED' => 0,
-          'OWNER' => -1
-        },
-        {
-          'OWNER' => -1,
-          'ADVANCED' => 1,
-          'TYPE' => 'minerals'
-        },
-        {
-          'TYPE' => 'money',
-          'OWNER' => -1,
-          'ADVANCED' => 0
-        }
-      ],
-      'LONG_NAME' => 'Zeta Herculis',
-      'MONOLITH' => 0,
-      'VP' => 3,
-      'ID' => '105',
-      'REQUIRED_OPTION' => '',
-      'ORBITAL' => 0
-    },
-    'tile_001' => {
-      'DISCOVERY_COUNT' => 1,
-      'SOURCE_TAG' => 'src_base',
-      'RESOURCES' => [
-        {
-          'ADVANCED' => 0,
-          'OWNER' => -1,
-          'TYPE' => 'science'
-        },
-        {
-          'TYPE' => 'science',
-          'OWNER' => -1,
-          'ADVANCED' => 1
-        },
-        {
-          'TYPE' => 'minerals',
-          'OWNER' => -1,
-          'ADVANCED' => 0
-        },
-        {
-          'ADVANCED' => 1,
-          'OWNER' => -1,
-          'TYPE' => 'minerals'
-        },
-        {
-          'TYPE' => 'wild',
-          'ADVANCED' => 0,
-          'OWNER' => -1
-        },
-        {
-          'ADVANCED' => 0,
-          'OWNER' => -1,
-          'TYPE' => 'wild'
-        }
-      ],
-      'REQUIRED_OPTION' => '',
-      'ORBITAL' => 0,
-      'MONOLITH' => 0,
-      'LONG_NAME' => 'Galactic Center',
-      'VP' => 4,
-      'ID' => '001',
-      'ANCIENT_LINK' => 1,
-      'HIVE' => 0,
-      'WARPS' => 64,
-      'COUNT' => 1,
-      'STARTING_SHIPS' => [
-        'class_defense'
-      ],
-      'TAG' => 'tile_001',
-      'STACK' => 0,
-      'DISCOVERIES' => [
-        'disc_technology'
-      ],
-      'SHIPS' => [
-        'ship_shiptemplate_defense1_npc_1'
-      ],
-      'PROVIDES' => [],
-      'OWNER_ID' => ''
-    },
-    'tile_103' => {
-      'DISCOVERY_COUNT' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'RESOURCES' => [
-        {
-          'OWNER' => -1,
-          'ADVANCED' => 1,
-          'TYPE' => 'money'
-        },
-        {
-          'TYPE' => 'wild',
-          'OWNER' => -1,
-          'ADVANCED' => 0
-        }
-      ],
-      'MONOLITH' => 0,
-      'LONG_NAME' => 'Beta Leonis',
-      'VP' => 2,
-      'ID' => '103',
-      'REQUIRED_OPTION' => '',
-      'ORBITAL' => 0,
-      'WARPS' => 56,
-      'TAG' => 'tile_103',
-      'STARTING_SHIPS' => [],
-      'COUNT' => 1,
-      'ANCIENT_LINK' => 0,
-      'HIVE' => 0,
-      'OWNER_ID' => '',
-      'DISCOVERIES' => [],
-      'STACK' => 1,
-      'SHIPS' => [],
-      'PROVIDES' => []
-    },
-    'tile_206' => {
-      'ANCIENT_LINK' => 0,
-      'HIVE' => 0,
-      'STARTING_SHIPS' => [],
-      'TAG' => 'tile_206',
-      'COUNT' => 1,
-      'WARPS' => 46,
-      'SHIPS' => [],
-      'DISCOVERIES' => [
-        'disc_science'
-      ],
-      'STACK' => 2,
-      'PROVIDES' => [],
-      'OWNER_ID' => '',
-      'SOURCE_TAG' => 'src_base',
-      'DISCOVERY_COUNT' => 1,
-      'RESOURCES' => [
-        {
-          'TYPE' => 'minerals',
-          'ADVANCED' => 0,
-          'OWNER' => -1
-        }
-      ],
-      'REQUIRED_OPTION' => '',
-      'ORBITAL' => 0,
-      'VP' => 1,
-      'ID' => '206',
-      'LONG_NAME' => 'Epsilon Indi',
-      'MONOLITH' => 0
-    },
-    'tile_312' => {
-      'ORBITAL' => 0,
-      'REQUIRED_OPTION' => '',
-      'MONOLITH' => 0,
-      'LONG_NAME' => 'Antares',
-      'ID' => '312',
-      'VP' => 1,
-      'RESOURCES' => [
-        {
-          'OWNER' => -1,
-          'ADVANCED' => 0,
-          'TYPE' => 'minerals'
-        }
-      ],
-      'DISCOVERY_COUNT' => 1,
-      'SOURCE_TAG' => 'src_base',
-      'PROVIDES' => [],
-      'STACK' => 3,
-      'DISCOVERIES' => [
-        'disc_disrupter'
-      ],
-      'SHIPS' => [],
-      'OWNER_ID' => '',
-      'HIVE' => 0,
-      'ANCIENT_LINK' => 0,
-      'WARPS' => 11,
-      'COUNT' => 1,
-      'STARTING_SHIPS' => [],
-      'TAG' => 'tile_312'
-    },
-    'tile_307' => {
-      'DISCOVERIES' => [],
-      'STACK' => 3,
-      'SHIPS' => [],
-      'PROVIDES' => [],
-      'OWNER_ID' => '',
-      'ANCIENT_LINK' => 0,
-      'HIVE' => 0,
-      'WARPS' => 13,
-      'STARTING_SHIPS' => [],
-      'TAG' => 'tile_307',
-      'COUNT' => 1,
-      'REQUIRED_OPTION' => '',
-      'ORBITAL' => 0,
-      'MONOLITH' => 0,
-      'LONG_NAME' => 'Sigma Sagittarii',
-      'ID' => '307',
-      'VP' => 1,
-      'DISCOVERY_COUNT' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'RESOURCES' => [
-        {
-          'OWNER' => -1,
-          'ADVANCED' => 1,
-          'TYPE' => 'science'
-        },
-        {
-          'OWNER' => -1,
-          'ADVANCED' => 0,
-          'TYPE' => 'money'
-        }
-      ]
-    },
-    'tile_211' => {
-      'STARTING_SHIPS' => [
-        'class_ancient_cruiser'
-      ],
-      'COUNT' => 1,
-      'TAG' => 'tile_211',
-      'WARPS' => 16,
-      'HIVE' => 0,
-      'ANCIENT_LINK' => 1,
-      'OWNER_ID' => '',
-      'PROVIDES' => [],
-      'SHIPS' => [],
-      'DISCOVERIES' => [
-        'disc_hull3b'
-      ],
-      'STACK' => 2,
-      'RESOURCES' => [
-        {
-          'TYPE' => 'minerals',
-          'OWNER' => -1,
-          'ADVANCED' => 1
-        },
-        {
-          'TYPE' => 'money',
-          'OWNER' => -1,
-          'ADVANCED' => 0
-        },
-        {
-          'TYPE' => 'wild',
-          'OWNER' => -1,
-          'ADVANCED' => 0
-        }
-      ],
-      'SOURCE_TAG' => 'src_base',
-      'DISCOVERY_COUNT' => 1,
-      'VP' => 2,
-      'ID' => '211',
-      'LONG_NAME' => 'Beta Aquilae',
-      'MONOLITH' => 0,
-      'ORBITAL' => 0,
-      'REQUIRED_OPTION' => ''
-    },
-    'tile_102' => {
-      'OWNER_ID' => '',
-      'DISCOVERIES' => [],
-      'STACK' => 1,
-      'SHIPS' => [],
-      'PROVIDES' => [],
-      'WARPS' => 46,
-      'STARTING_SHIPS' => [],
-      'TAG' => 'tile_102',
-      'COUNT' => 1,
-      'ANCIENT_LINK' => 1,
-      'HIVE' => 0,
-      'LONG_NAME' => 'Pollux',
-      'MONOLITH' => 0,
-      'ID' => '102',
-      'VP' => 3,
-      'REQUIRED_OPTION' => '',
-      'ORBITAL' => 0,
-      'DISCOVERY_COUNT' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'RESOURCES' => [
-        {
-          'TYPE' => 'science',
-          'OWNER' => -1,
-          'ADVANCED' => 0
-        },
-        {
-          'ADVANCED' => 1,
-          'OWNER' => -1,
-          'TYPE' => 'science'
-        }
-      ]
-    },
-    'tile_208' => {
-      'RESOURCES' => [],
-      'SOURCE_TAG' => 'src_base',
-      'DISCOVERY_COUNT' => 1,
-      'ORBITAL' => 0,
-      'REQUIRED_OPTION' => '',
-      'ID' => '208',
-      'VP' => 1,
-      'MONOLITH' => 0,
-      'LONG_NAME' => 'Iota Persei',
-      'HIVE' => 0,
-      'ANCIENT_LINK' => 0,
-      'TAG' => 'tile_208',
-      'STARTING_SHIPS' => [],
-      'COUNT' => 1,
-      'WARPS' => 45,
-      'PROVIDES' => [],
-      'SHIPS' => [],
-      'STACK' => 2,
-      'DISCOVERIES' => [
-        'disc_minerals'
-      ],
-      'OWNER_ID' => ''
-    },
-    'tile_209' => {
-      'REQUIRED_OPTION' => '',
-      'ORBITAL' => 0,
-      'LONG_NAME' => 'Delta Eridani',
-      'MONOLITH' => 0,
-      'VP' => 1,
-      'ID' => '209',
-      'DISCOVERY_COUNT' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'RESOURCES' => [
-        {
-          'ADVANCED' => 0,
-          'OWNER' => -1,
-          'TYPE' => 'science'
-        },
-        {
-          'ADVANCED' => 1,
-          'OWNER' => -1,
-          'TYPE' => 'money'
-        }
-      ],
-      'DISCOVERIES' => [],
-      'STACK' => 2,
-      'SHIPS' => [],
-      'PROVIDES' => [],
-      'OWNER_ID' => '',
-      'ANCIENT_LINK' => 0,
-      'HIVE' => 0,
-      'WARPS' => 43,
-      'STARTING_SHIPS' => [],
-      'TAG' => 'tile_209',
+      'INITIATIVE' => 1,
+      'TAG' => 'comp_energy2',
       'COUNT' => 1
     },
-    'tile_210' => {
-      'DISCOVERY_COUNT' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'RESOURCES' => [
-        {
-          'ADVANCED' => 0,
-          'OWNER' => -1,
-          'TYPE' => 'minerals'
-        },
-        {
-          'OWNER' => -1,
-          'ADVANCED' => 0,
-          'TYPE' => 'money'
-        }
-      ],
-      'MONOLITH' => 0,
-      'LONG_NAME' => 'Psi Capricorni',
-      'ID' => '210',
-      'VP' => 1,
-      'REQUIRED_OPTION' => '',
-      'ORBITAL' => 0,
-      'WARPS' => 41,
-      'TAG' => 'tile_210',
-      'STARTING_SHIPS' => [],
-      'COUNT' => 1,
-      'ANCIENT_LINK' => 0,
-      'HIVE' => 0,
+    'comp_shield1' => {
+      'IS_MISSILE' => 0,
       'OWNER_ID' => '',
-      'STACK' => 2,
-      'DISCOVERIES' => [],
-      'SHIPS' => [],
+      'ATTACK_DAMAGE' => 0,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'COMPUTER' => 0,
+      'SHIELD' => 1,
+      'MOVEMENT' => 0,
+      'REQUIRES' => 'tech_shield1',
+      'ENERGY' => 0,
+      'ATTACK_COUNT' => 0,
+      'HULL_POINTS' => 0,
+      'SOURCE_TAG' => 'src_base',
+      'INITIATIVE' => 0,
+      'LONG_NAME' => 'Gauss Shield',
+      'TAG' => 'comp_shield1',
+      'COUNT' => 1
+    },
+    'comp_shield2' => {
+      'HULL_POINTS' => 0,
+      'ATTACK_COUNT' => 0,
+      'ENERGY' => 0,
+      'REQUIRES' => 'tech_shield2',
+      'SHIELD' => 2,
+      'MOVEMENT' => 0,
+      'COMPUTER' => 0,
+      'COUNT' => 1,
+      'TAG' => 'comp_shield2',
+      'LONG_NAME' => 'Phase Shield',
+      'SOURCE_TAG' => 'src_base',
+      'INITIATIVE' => 0,
+      'ATTACK_DAMAGE' => 0,
+      'OWNER_ID' => '',
+      'IS_MISSILE' => 0,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => ''
+    },
+    'comp_drive4' => {
+      'ATTACK_DAMAGE' => 0,
+      'OWNER_ID' => '',
+      'IS_MISSILE' => 0,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'ATTACK_COUNT' => 0,
+      'ENERGY' => 0,
+      'HULL_POINTS' => 0,
+      'SHIELD' => 0,
+      'MOVEMENT' => 4,
+      'COMPUTER' => 0,
+      'REQUIRES' => 'discovery',
+      'TAG' => 'comp_drive4',
+      'COUNT' => 1,
+      'LONG_NAME' => 'Coniformal Drive',
+      'SOURCE_TAG' => 'src_base',
+      'INITIATIVE' => 2
+    },
+    'comp_hull1' => {
+      'COUNT' => 1,
+      'TAG' => 'comp_hull1',
+      'LONG_NAME' => 'Hull',
+      'INITIATIVE' => 0,
+      'SOURCE_TAG' => 'src_base',
+      'HULL_POINTS' => 1,
+      'ENERGY' => 0,
+      'ATTACK_COUNT' => 0,
+      'REQUIRES' => '',
+      'MOVEMENT' => 0,
+      'SHIELD' => 0,
+      'COMPUTER' => 0,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'ATTACK_DAMAGE' => 0,
+      'OWNER_ID' => '',
+      'IS_MISSILE' => 0
+    },
+    'comp_energy11' => {
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'ATTACK_DAMAGE' => 0,
+      'OWNER_ID' => '',
+      'IS_MISSILE' => 0,
+      'COUNT' => 1,
+      'TAG' => 'comp_energy11',
+      'LONG_NAME' => 'Hypergrid Source',
+      'SOURCE_TAG' => 'src_base',
+      'INITIATIVE' => 0,
+      'HULL_POINTS' => 0,
+      'ENERGY' => 11,
+      'ATTACK_COUNT' => 0,
+      'REQUIRES' => 'discovery',
+      'MOVEMENT' => 0,
+      'SHIELD' => 0,
+      'COMPUTER' => 0
+    },
+    'comp_shield_1b' => {
+      'ENERGY' => 0,
+      'ATTACK_COUNT' => 0,
+      'HULL_POINTS' => 0,
+      'COMPUTER' => 0,
+      'SHIELD' => 1,
+      'MOVEMENT' => 0,
+      'REQUIRES' => 'discovery',
+      'TAG' => 'comp_shield_1b',
+      'COUNT' => 1,
+      'INITIATIVE' => 2,
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Morph Shield',
+      'ATTACK_DAMAGE' => 0,
+      'IS_MISSILE' => 0,
+      'OWNER_ID' => '',
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => []
+    },
+    'comp_drive1' => {
+      'SOURCE_TAG' => 'src_base',
+      'INITIATIVE' => 1,
+      'LONG_NAME' => 'Nuclear Drive',
+      'TAG' => 'comp_drive1',
+      'COUNT' => 1,
+      'COMPUTER' => 0,
+      'MOVEMENT' => 1,
+      'SHIELD' => 0,
+      'REQUIRES' => '',
+      'ATTACK_COUNT' => 0,
+      'ENERGY' => 0,
+      'HULL_POINTS' => 0,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'IS_MISSILE' => 0,
+      'OWNER_ID' => '',
+      'ATTACK_DAMAGE' => 0
+    },
+    'comp_drive3' => {
+      'SOURCE_TAG' => 'src_base',
+      'INITIATIVE' => 3,
+      'LONG_NAME' => 'Tachyon Drive',
+      'COUNT' => 1,
+      'TAG' => 'comp_drive3',
+      'REQUIRES' => 'tech_drive3',
+      'COMPUTER' => 0,
+      'SHIELD' => 0,
+      'MOVEMENT' => 3,
+      'HULL_POINTS' => 0,
+      'ATTACK_COUNT' => 0,
+      'ENERGY' => 0,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'IS_MISSILE' => 0,
+      'OWNER_ID' => '',
+      'ATTACK_DAMAGE' => 0
+    },
+    'comp_energy6' => {
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'ATTACK_DAMAGE' => 0,
+      'IS_MISSILE' => 0,
+      'OWNER_ID' => '',
+      'TAG' => 'comp_energy6',
+      'COUNT' => 1,
+      'SOURCE_TAG' => 'src_base',
+      'INITIATIVE' => 0,
+      'LONG_NAME' => 'Fusion Source',
+      'ATTACK_COUNT' => 0,
+      'ENERGY' => 6,
+      'HULL_POINTS' => 0,
+      'COMPUTER' => 0,
+      'MOVEMENT' => 0,
+      'SHIELD' => 0,
+      'REQUIRES' => 'tech_energy6'
+    },
+    'comp_disrupter' => {
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'IS_MISSILE' => 0,
+      'OWNER_ID' => '',
+      'ATTACK_DAMAGE' => 1,
+      'SOURCE_TAG' => 'src_base',
+      'INITIATIVE' => 3,
+      'LONG_NAME' => 'Ion Disruptor',
+      'COUNT' => 1,
+      'TAG' => 'comp_disrupter',
+      'REQUIRES' => 'discovery',
+      'COMPUTER' => 0,
+      'MOVEMENT' => 0,
+      'SHIELD' => 0,
+      'HULL_POINTS' => 0,
+      'ENERGY' => 0,
+      'ATTACK_COUNT' => 1
+    },
+    'comp_energy9' => {
+      'ATTACK_COUNT' => 0,
+      'ENERGY' => 9,
+      'HULL_POINTS' => 0,
+      'COMPUTER' => 0,
+      'SHIELD' => 0,
+      'MOVEMENT' => 0,
+      'REQUIRES' => 'tech_energy9',
+      'TAG' => 'comp_energy9',
+      'COUNT' => 1,
+      'SOURCE_TAG' => 'src_base',
+      'INITIATIVE' => 0,
+      'LONG_NAME' => 'Tachyon Source',
+      'ATTACK_DAMAGE' => 0,
+      'IS_MISSILE' => 0,
+      'OWNER_ID' => '',
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => ''
+    },
+    'comp_shield3' => {
+      'ENERGY' => 0,
+      'ATTACK_COUNT' => 0,
+      'HULL_POINTS' => 0,
+      'SHIELD' => 3,
+      'MOVEMENT' => 0,
+      'COMPUTER' => 0,
+      'REQUIRES' => 'discovery',
+      'TAG' => 'comp_shield3',
+      'COUNT' => 1,
+      'LONG_NAME' => 'Flux Shield',
+      'INITIATIVE' => 0,
+      'SOURCE_TAG' => 'src_base',
+      'ATTACK_DAMAGE' => 0,
+      'OWNER_ID' => '',
+      'IS_MISSILE' => 0,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => ''
+    },
+    'comp_beam2' => {
+      'SHIELD' => 0,
+      'MOVEMENT' => 0,
+      'COMPUTER' => 0,
+      'REQUIRES' => 'tech_beam2',
+      'ATTACK_COUNT' => 1,
+      'ENERGY' => 0,
+      'HULL_POINTS' => 0,
+      'LONG_NAME' => 'Plasma Cannon',
+      'SOURCE_TAG' => 'src_base',
+      'INITIATIVE' => 0,
+      'TAG' => 'comp_beam2',
+      'COUNT' => 1,
+      'OWNER_ID' => '',
+      'IS_MISSILE' => 0,
+      'ATTACK_DAMAGE' => 2,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => ''
+    },
+    'comp_hyper_drive' => {
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [
+        'jump_drive',
+        'ship_drive'
+      ],
+      'ATTACK_DAMAGE' => 0,
+      'OWNER_ID' => '',
+      'IS_MISSILE' => 0,
+      'TAG' => 'comp_hyper_drive',
+      'COUNT' => 1,
+      'LONG_NAME' => 'Jump Drive',
+      'SOURCE_TAG' => 'src_base',
+      'INITIATIVE' => 0,
+      'ENERGY' => 0,
+      'ATTACK_COUNT' => 0,
+      'HULL_POINTS' => 0,
+      'MOVEMENT' => 0,
+      'SHIELD' => 0,
+      'COMPUTER' => 0,
+      'REQUIRES' => 'discovery'
+    },
+    'comp_energy3' => {
+      'ATTACK_COUNT' => 0,
+      'ENERGY' => 3,
+      'HULL_POINTS' => 0,
+      'COMPUTER' => 0,
+      'SHIELD' => 0,
+      'MOVEMENT' => 0,
+      'REQUIRES' => '',
+      'TAG' => 'comp_energy3',
+      'COUNT' => 1,
+      'INITIATIVE' => 0,
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Nuclear Source',
+      'ATTACK_DAMAGE' => 0,
+      'IS_MISSILE' => 0,
+      'OWNER_ID' => '',
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => ''
+    },
+    'comp_hull2' => {
+      'LONG_NAME' => 'Improved Hull',
+      'SOURCE_TAG' => 'src_base',
+      'INITIATIVE' => 0,
+      'COUNT' => 1,
+      'TAG' => 'comp_hull2',
+      'REQUIRES' => 'tech_hull2',
+      'MOVEMENT' => 0,
+      'SHIELD' => 0,
+      'COMPUTER' => 0,
+      'HULL_POINTS' => 2,
+      'ATTACK_COUNT' => 0,
+      'ENERGY' => 0,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'OWNER_ID' => '',
+      'IS_MISSILE' => 0,
+      'ATTACK_DAMAGE' => 0
+    },
+    'comp_beam1' => {
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'ATTACK_DAMAGE' => 1,
+      'IS_MISSILE' => 0,
+      'OWNER_ID' => '',
+      'TAG' => 'comp_beam1',
+      'COUNT' => 1,
+      'INITIATIVE' => 0,
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Ion Cannon',
+      'ENERGY' => 0,
+      'ATTACK_COUNT' => 1,
+      'HULL_POINTS' => 0,
+      'COMPUTER' => 0,
+      'MOVEMENT' => 0,
+      'SHIELD' => 0,
+      'REQUIRES' => ''
+    },
+    'comp_beam4' => {
+      'REQUIRES' => 'tech_beam4',
+      'COMPUTER' => 0,
+      'MOVEMENT' => 0,
+      'SHIELD' => 0,
+      'HULL_POINTS' => 0,
+      'ATTACK_COUNT' => 1,
+      'ENERGY' => 0,
+      'INITIATIVE' => 0,
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Antimatter Cannon',
+      'COUNT' => 1,
+      'TAG' => 'comp_beam4',
+      'IS_MISSILE' => 0,
+      'OWNER_ID' => '',
+      'ATTACK_DAMAGE' => 4,
+      'REQUIRED_OPTION' => '',
       'PROVIDES' => []
     }
   },
-  'SHIPS' => {
-    'ship_shiptemplate_race_human2_1_0_1' => {
-      'REQUIRED_OPTION' => '',
-      'PROVIDES' => [],
-      'OWNER_ID' => 0,
-      'LONG_NAME' => '',
-      'TEMPLATE_TAG' => 'shiptemplate_race_human2_1',
-      'SOURCE_TAG' => undef,
-      'DAMAGE' => 0,
-      'TAG' => 'ship_shiptemplate_race_human2_1_0_1',
-      'COUNT' => 1
-    },
-    'ship_shiptemplate_defense1_npc_1' => {
-      'SOURCE_TAG' => undef,
-      'DAMAGE' => 0,
-      'TAG' => 'ship_shiptemplate_defense1_npc_1',
-      'COUNT' => 1,
-      'TEMPLATE_TAG' => 'shiptemplate_defense1',
-      'OWNER_ID' => -1,
-      'LONG_NAME' => '',
-      'REQUIRED_OPTION' => '',
-      'PROVIDES' => []
-    },
-    'ship_shiptemplate_race_human1_1_2_1' => {
-      'LONG_NAME' => '',
-      'OWNER_ID' => 2,
-      'PROVIDES' => [],
-      'REQUIRED_OPTION' => '',
-      'COUNT' => 1,
-      'TAG' => 'ship_shiptemplate_race_human1_1_2_1',
-      'DAMAGE' => 0,
-      'SOURCE_TAG' => undef,
-      'TEMPLATE_TAG' => 'shiptemplate_race_human1_1'
-    },
-    'ship_shiptemplate_race_human5_1_1_1' => {
-      'LONG_NAME' => '',
-      'OWNER_ID' => 1,
-      'PROVIDES' => [],
-      'REQUIRED_OPTION' => '',
-      'TAG' => 'ship_shiptemplate_race_human5_1_1_1',
-      'COUNT' => 1,
-      'SOURCE_TAG' => undef,
-      'DAMAGE' => 0,
-      'TEMPLATE_TAG' => 'shiptemplate_race_human5_1'
-    }
-  },
+  'AVAILABLE_TECH' => [
+    'tech_advanced_build',
+    'tech_missile2',
+    'tech_bombs',
+    'tech_bombs',
+    'tech_ring',
+    'tech_advanced_minerals',
+    'tech_artifact_reader',
+    'tech_starbase',
+    'tech_beam2',
+    'tech_shield1',
+    'tech_obilisk',
+    'tech_influence2',
+    'tech_influence1',
+    'tech_bombs'
+  ],
   'VP_BAG' => [
     1,
     1,
@@ -1629,215 +3058,441 @@ $VAR1 = {
     4,
     4
   ],
-  'SHIP_TEMPLATES' => {
-    'shiptemplate_race_human5_1' => {
-      'HULL_POINTS' => 0,
-      'VP_DRAW' => 1,
-      'SHIELDS' => 0,
-      'PROVIDES' => [],
-      'CLASS' => 'class_interceptor',
-      'OWNER_ID' => '',
-      'COMPUTER' => 0,
-      'TAG' => 'shiptemplate_race_human5_1',
-      'COUNT' => 1,
-      'ENERGY' => 0,
-      'REQUIRED_OPTION' => '',
-      'COST' => 3,
-      'SLOTS' => 4,
-      'LONG_NAME' => 'Cobra',
-      'INITIATIVE' => 0,
-      'COMPONENTS' => [
-        'comp_beam1',
-        'comp_energy3',
-        'comp_drive1'
-      ],
-      'SOURCE_TAG' => undef
+  'STARTING_LOCATIONS' => [
+    {
+      'WARPS' => 27,
+      'SPACE' => '0,-2'
     },
-    'shiptemplate_race_human1_3' => {
-      'COMPUTER' => 0,
-      'OWNER_ID' => '',
-      'CLASS' => 'class_dreadnought',
-      'PROVIDES' => [],
-      'SHIELDS' => 0,
-      'HULL_POINTS' => 0,
-      'VP_DRAW' => 3,
-      'COUNT' => 1,
-      'TAG' => 'shiptemplate_race_human1_3',
-      'LONG_NAME' => 'Vanquisher',
-      'SLOTS' => 8,
-      'COST' => 8,
-      'REQUIRED_OPTION' => '',
-      'ENERGY' => 0,
-      'SOURCE_TAG' => undef,
-      'COMPONENTS' => [
-        'comp_beam1',
-        'comp_beam1',
-        'comp_energy3',
-        'comp_drive1',
-        'comp_computer1',
-        'comp_hull1',
-        'comp_hull1'
-      ],
-      'INITIATIVE' => 0
+    {
+      'WARPS' => 45,
+      'SPACE' => '2,0'
     },
-    'shiptemplate_race_human5_4' => {
+    {
+      'SPACE' => '-2,2',
+      'WARPS' => 54
+    }
+  ],
+  'DISCOVERY_BAG' => [
+    'disc_drive4',
+    'disc_science',
+    'disc_science',
+    'disc_science',
+    'disc_shield3',
+    'disc_energy11',
+    'disc_hull3b',
+    'disc_cruiser',
+    'disc_cruiser',
+    'disc_cruiser',
+    'disc_minerals',
+    'disc_minerals',
+    'disc_minerals',
+    'disc_morph_shield',
+    'disc_technology',
+    'disc_money',
+    'disc_money',
+    'disc_money',
+    'disc_disrupter',
+    'disc_muon_source',
+    'disc_computer3',
+    'disc_turret1',
+    'disc_hyper_drive'
+  ],
+  'TECH_BAG' => [
+    'tech_advanced_science',
+    'tech_advanced_science',
+    'tech_advanced_science',
+    'tech_advanced_science',
+    'tech_shield1',
+    'tech_shield1',
+    'tech_shield1',
+    'tech_shield1',
+    'tech_computer2',
+    'tech_computer2',
+    'tech_computer2',
+    'tech_computer2',
+    'tech_influence1',
+    'tech_influence1',
+    'tech_influence1',
+    'tech_influence1',
+    'tech_advanced_minerals',
+    'tech_advanced_minerals',
+    'tech_advanced_minerals',
+    'tech_advanced_build',
+    'tech_advanced_build',
+    'tech_advanced_build',
+    'tech_advanced_build',
+    'tech_advanced_money',
+    'tech_advanced_money',
+    'tech_advanced_money',
+    'tech_advanced_money',
+    'tech_influence2',
+    'tech_influence2',
+    'tech_obilisk',
+    'tech_obilisk',
+    'tech_wormhole_generator',
+    'tech_wormhole_generator',
+    'tech_wormhole_generator',
+    'tech_ring',
+    'tech_ring',
+    'tech_ring',
+    'tech_energy9',
+    'tech_energy9',
+    'tech_energy9',
+    'tech_bombs',
+    'tech_bombs',
+    'tech_hull2',
+    'tech_hull2',
+    'tech_hull2',
+    'tech_hull2',
+    'tech_hull2',
+    'tech_energy6',
+    'tech_energy6',
+    'tech_energy6',
+    'tech_energy6',
+    'tech_energy6',
+    'tech_artifact_reader',
+    'tech_artifact_reader',
+    'tech_drive3',
+    'tech_drive3',
+    'tech_drive3',
+    'tech_beam4',
+    'tech_beam4',
+    'tech_beam4',
+    'tech_stealth',
+    'tech_computer3',
+    'tech_computer3',
+    'tech_computer3',
+    'tech_drive2',
+    'tech_drive2',
+    'tech_drive2',
+    'tech_drive2',
+    'tech_drive2',
+    'tech_shield2',
+    'tech_shield2',
+    'tech_shield2',
+    'tech_shield2',
+    'tech_missile2',
+    'tech_missile2',
+    'tech_starbase',
+    'tech_starbase',
+    'tech_starbase',
+    'tech_starbase',
+    'tech_beam2',
+    'tech_beam2',
+    'tech_beam2',
+    'tech_beam2'
+  ],
+  'SHIPS' => {
+    'ship_shiptemplate_defense1_npc_1' => {
+      'LONG_NAME' => '',
       'SOURCE_TAG' => undef,
-      'INITIATIVE' => 0,
-      'COMPONENTS' => [
-        'comp_beam1',
-        'comp_computer1',
-        'comp_hull1',
-        'comp_hull1'
-      ],
-      'LONG_NAME' => 'Rhino',
-      'SLOTS' => 5,
-      'REQUIRED_OPTION' => '',
-      'ENERGY' => 3,
-      'COST' => 3,
-      'TAG' => 'shiptemplate_race_human5_4',
       'COUNT' => 1,
-      'OWNER_ID' => '',
-      'COMPUTER' => 0,
-      'HULL_POINTS' => 0,
-      'SHIELDS' => 0,
-      'VP_DRAW' => 1,
+      'TEMPLATE_TAG' => 'shiptemplate_defense1',
+      'TAG' => 'ship_shiptemplate_defense1_npc_1',
       'PROVIDES' => [],
-      'CLASS' => 'class_starbase'
-    },
-    'shiptemplate_race_human2_2' => {
-      'COUNT' => 1,
-      'TAG' => 'shiptemplate_race_human2_2',
-      'PROVIDES' => [],
-      'CLASS' => 'class_cruiser',
-      'VP_DRAW' => 2,
-      'HULL_POINTS' => 0,
-      'SHIELDS' => 0,
-      'COMPUTER' => 0,
-      'OWNER_ID' => '',
-      'COMPONENTS' => [
-        'comp_beam1',
-        'comp_energy3',
-        'comp_drive1',
-        'comp_computer1',
-        'comp_hull1'
-      ],
-      'INITIATIVE' => 0,
-      'SOURCE_TAG' => undef,
-      'COST' => 5,
       'REQUIRED_OPTION' => '',
-      'ENERGY' => 0,
-      'LONG_NAME' => 'Gagarin',
-      'SLOTS' => 6
+      'OWNER_ID' => -1,
+      'DAMAGE' => 0
     },
-    'shiptemplate_race_human1_4' => {
-      'TAG' => 'shiptemplate_race_human1_4',
-      'COUNT' => 1,
-      'SHIELDS' => 0,
-      'VP_DRAW' => 1,
-      'HULL_POINTS' => 0,
-      'CLASS' => 'class_starbase',
-      'PROVIDES' => [],
-      'OWNER_ID' => '',
-      'COMPUTER' => 0,
-      'INITIATIVE' => 0,
-      'COMPONENTS' => [
-        'comp_beam1',
-        'comp_computer1',
-        'comp_hull1',
-        'comp_hull1'
-      ],
+    'ship_shiptemplate_race_human1_1_2_1' => {
+      'DAMAGE' => 0,
+      'OWNER_ID' => 2,
       'SOURCE_TAG' => undef,
-      'ENERGY' => 3,
-      'REQUIRED_OPTION' => '',
-      'COST' => 3,
-      'SLOTS' => 5,
-      'LONG_NAME' => 'Defender'
-    },
-    'shiptemplate_race_human2_1' => {
-      'SLOTS' => 4,
-      'LONG_NAME' => 'Laika',
-      'ENERGY' => 0,
-      'REQUIRED_OPTION' => '',
-      'COST' => 3,
-      'SOURCE_TAG' => undef,
-      'INITIATIVE' => 0,
-      'COMPONENTS' => [
-        'comp_beam1',
-        'comp_energy3',
-        'comp_drive1'
-      ],
-      'OWNER_ID' => '',
-      'COMPUTER' => 0,
-      'VP_DRAW' => 1,
-      'SHIELDS' => 0,
-      'HULL_POINTS' => 0,
+      'LONG_NAME' => '',
       'PROVIDES' => [],
-      'CLASS' => 'class_interceptor',
-      'COUNT' => 1,
-      'TAG' => 'shiptemplate_race_human2_1'
-    },
-    'shiptemplate_race_human1_1' => {
-      'COMPUTER' => 0,
-      'OWNER_ID' => '',
-      'PROVIDES' => [],
-      'CLASS' => 'class_interceptor',
-      'VP_DRAW' => 1,
-      'HULL_POINTS' => 0,
-      'SHIELDS' => 0,
-      'TAG' => 'shiptemplate_race_human1_1',
-      'COUNT' => 1,
-      'LONG_NAME' => 'Explorer',
-      'SLOTS' => 4,
-      'COST' => 3,
       'REQUIRED_OPTION' => '',
-      'ENERGY' => 0,
-      'SOURCE_TAG' => undef,
-      'COMPONENTS' => [
-        'comp_beam1',
-        'comp_energy3',
-        'comp_drive1'
-      ],
-      'INITIATIVE' => 0
-    },
-    'shiptemplate_race_human2_3' => {
-      'COST' => 8,
-      'REQUIRED_OPTION' => '',
-      'ENERGY' => 0,
-      'LONG_NAME' => 'Armstrong',
-      'SLOTS' => 8,
-      'COMPONENTS' => [
-        'comp_beam1',
-        'comp_beam1',
-        'comp_energy3',
-        'comp_drive1',
-        'comp_computer1',
-        'comp_hull1',
-        'comp_hull1'
-      ],
-      'INITIATIVE' => 0,
-      'SOURCE_TAG' => undef,
-      'CLASS' => 'class_dreadnought',
-      'PROVIDES' => [],
-      'VP_DRAW' => 3,
-      'HULL_POINTS' => 0,
-      'SHIELDS' => 0,
-      'COMPUTER' => 0,
-      'OWNER_ID' => '',
-      'TAG' => 'shiptemplate_race_human2_3',
+      'TAG' => 'ship_shiptemplate_race_human1_1_2_1',
+      'TEMPLATE_TAG' => 'shiptemplate_race_human1_1',
       'COUNT' => 1
     },
-    'shiptemplate_race_human1_2' => {
-      'TAG' => 'shiptemplate_race_human1_2',
+    'ship_shiptemplate_race_human5_1_1_1' => {
+      'OWNER_ID' => 1,
+      'DAMAGE' => 0,
+      'TEMPLATE_TAG' => 'shiptemplate_race_human5_1',
       'COUNT' => 1,
-      'OWNER_ID' => '',
-      'COMPUTER' => 0,
-      'SHIELDS' => 0,
-      'VP_DRAW' => 2,
-      'HULL_POINTS' => 0,
-      'CLASS' => 'class_cruiser',
+      'REQUIRED_OPTION' => '',
       'PROVIDES' => [],
+      'TAG' => 'ship_shiptemplate_race_human5_1_1_1',
+      'SOURCE_TAG' => undef,
+      'LONG_NAME' => ''
+    },
+    'ship_shiptemplate_race_human2_1_0_1' => {
+      'DAMAGE' => 0,
+      'OWNER_ID' => 0,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'TAG' => 'ship_shiptemplate_race_human2_1_0_1',
+      'TEMPLATE_TAG' => 'shiptemplate_race_human2_1',
+      'COUNT' => 1,
+      'SOURCE_TAG' => undef,
+      'LONG_NAME' => ''
+    }
+  },
+  'DISCOVERIES' => {
+    'disc_money' => {
+      'OWNER_ID' => '',
+      'COUNT' => 3,
+      'TAG' => 'disc_money',
+      'RESOURCES' => {
+        'MINERALS' => 0,
+        'MONEY' => 8,
+        'SCIENCE' => 0
+      },
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'COMPONENT' => '',
+      'LONG_NAME' => '8 Credits',
+      'SOURCE_TAG' => 'src_base'
+    },
+    'disc_minerals' => {
+      'SOURCE_TAG' => 'src_base',
+      'COMPONENT' => '',
+      'LONG_NAME' => '6 Minerals',
+      'COUNT' => 3,
+      'RESOURCES' => {
+        'SCIENCE' => 0,
+        'MONEY' => 0,
+        'MINERALS' => 6
+      },
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'TAG' => 'disc_minerals',
+      'OWNER_ID' => ''
+    },
+    'disc_morph_shield' => {
+      'OWNER_ID' => '',
+      'REQUIRED_OPTION' => '',
+      'RESOURCES' => {
+        'MINERALS' => 0,
+        'MONEY' => 0,
+        'SCIENCE' => 0
+      },
+      'PROVIDES' => [],
+      'TAG' => 'disc_morph_shield',
+      'COUNT' => 1,
+      'SOURCE_TAG' => 'src_base',
+      'COMPONENT' => 'comp_shield_1b',
+      'LONG_NAME' => 'Component - Morph Shield'
+    },
+    'disc_technology' => {
+      'COUNT' => 1,
+      'RESOURCES' => {
+        'SCIENCE' => 0,
+        'MONEY' => 0,
+        'MINERALS' => 0
+      },
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'TAG' => 'disc_technology',
+      'SOURCE_TAG' => 'src_base',
+      'COMPONENT' => '',
+      'LONG_NAME' => 'Free Technology',
+      'OWNER_ID' => ''
+    },
+    'disc_turret1' => {
+      'OWNER_ID' => '',
+      'TAG' => 'disc_turret1',
+      'RESOURCES' => {
+        'MINERALS' => 0,
+        'MONEY' => 0,
+        'SCIENCE' => 0
+      },
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'COUNT' => 1,
+      'COMPONENT' => 'comp_turret1',
+      'LONG_NAME' => 'Component - Ion Turret',
+      'SOURCE_TAG' => 'src_base'
+    },
+    'disc_hyper_drive' => {
+      'RESOURCES' => {
+        'SCIENCE' => 0,
+        'MINERALS' => 0,
+        'MONEY' => 0
+      },
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'TAG' => 'disc_hyper_drive',
+      'COUNT' => 1,
+      'SOURCE_TAG' => 'src_base',
+      'COMPONENT' => 'comp_hyper_drive',
+      'LONG_NAME' => 'Component - Jump Drive',
+      'OWNER_ID' => ''
+    },
+    'disc_hull3b' => {
+      'OWNER_ID' => '',
+      'COUNT' => 1,
+      'REQUIRED_OPTION' => '',
+      'RESOURCES' => {
+        'MONEY' => 0,
+        'MINERALS' => 0,
+        'SCIENCE' => 0
+      },
+      'PROVIDES' => [],
+      'TAG' => 'disc_hull3b',
+      'SOURCE_TAG' => 'src_base',
+      'COMPONENT' => 'comp_hull3b',
+      'LONG_NAME' => 'Component - Shard Hull'
+    },
+    'disc_cruiser' => {
+      'OWNER_ID' => '',
+      'TAG' => 'disc_cruiser',
+      'PROVIDES' => [],
+      'RESOURCES' => {
+        'SCIENCE' => 0,
+        'MONEY' => 0,
+        'MINERALS' => 0
+      },
+      'REQUIRED_OPTION' => '',
+      'COUNT' => 3,
+      'COMPONENT' => '',
+      'LONG_NAME' => 'Free Cruiser',
+      'SOURCE_TAG' => 'src_base'
+    },
+    'disc_shield3' => {
+      'OWNER_ID' => '',
+      'SOURCE_TAG' => 'src_base',
+      'COMPONENT' => 'comp_shield3',
+      'LONG_NAME' => 'Component - Flux Shield',
+      'RESOURCES' => {
+        'MINERALS' => 0,
+        'MONEY' => 0,
+        'SCIENCE' => 0
+      },
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'TAG' => 'disc_shield3',
+      'COUNT' => 1
+    },
+    'disc_energy11' => {
+      'RESOURCES' => {
+        'SCIENCE' => 0,
+        'MINERALS' => 0,
+        'MONEY' => 0
+      },
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'TAG' => 'disc_energy11',
+      'COUNT' => 1,
+      'SOURCE_TAG' => 'src_base',
+      'LONG_NAME' => 'Component - Hypergrid',
+      'COMPONENT' => 'comp_energy11',
+      'OWNER_ID' => ''
+    },
+    'disc_science' => {
+      'COMPONENT' => '',
+      'LONG_NAME' => '5 Science',
+      'SOURCE_TAG' => 'src_base',
+      'TAG' => 'disc_science',
+      'RESOURCES' => {
+        'MINERALS' => 0,
+        'MONEY' => 0,
+        'SCIENCE' => 5
+      },
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'COUNT' => 3,
+      'OWNER_ID' => ''
+    },
+    'disc_computer3' => {
+      'OWNER_ID' => '',
+      'COUNT' => 1,
+      'TAG' => 'disc_computer3',
+      'RESOURCES' => {
+        'MINERALS' => 0,
+        'MONEY' => 0,
+        'SCIENCE' => 0
+      },
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'LONG_NAME' => 'Component - Axion Computer',
+      'COMPONENT' => 'comp_computer3',
+      'SOURCE_TAG' => 'src_base'
+    },
+    'disc_muon_source' => {
+      'SOURCE_TAG' => 'src_base',
+      'COMPONENT' => 'comp_energy2',
+      'LONG_NAME' => 'Component - Muon Source',
+      'COUNT' => 1,
+      'PROVIDES' => [],
+      'RESOURCES' => {
+        'MINERALS' => 0,
+        'MONEY' => 0,
+        'SCIENCE' => 0
+      },
+      'REQUIRED_OPTION' => '',
+      'TAG' => 'disc_muon_source',
+      'OWNER_ID' => ''
+    },
+    'disc_drive4' => {
+      'OWNER_ID' => '',
+      'COMPONENT' => 'comp_drive4',
+      'LONG_NAME' => 'Component - Conformal Drive',
+      'SOURCE_TAG' => 'src_base',
+      'TAG' => 'disc_drive4',
+      'REQUIRED_OPTION' => '',
+      'RESOURCES' => {
+        'MONEY' => 0,
+        'MINERALS' => 0,
+        'SCIENCE' => 0
+      },
+      'PROVIDES' => [],
+      'COUNT' => 1
+    },
+    'disc_disrupter' => {
+      'OWNER_ID' => '',
+      'COUNT' => 1,
+      'TAG' => 'disc_disrupter',
+      'RESOURCES' => {
+        'SCIENCE' => 0,
+        'MINERALS' => 0,
+        'MONEY' => 0
+      },
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'COMPONENT' => 'comp_disrupter',
+      'LONG_NAME' => 'Component - Ion Disrupter',
+      'SOURCE_TAG' => 'src_base'
+    }
+  },
+  'SHIP_TEMPLATES' => {
+    'shiptemplate_race_human2_1' => {
+      'HULL_POINTS' => 0,
+      'ENERGY' => 0,
+      'COMPUTER' => 0,
+      'COMPONENTS' => [
+        'comp_beam1',
+        'comp_energy3',
+        'comp_drive1'
+      ],
+      'COUNT' => 1,
+      'CLASS' => 'class_interceptor',
+      'SLOTS' => 4,
+      'TAG' => 'shiptemplate_race_human2_1',
       'SOURCE_TAG' => undef,
       'INITIATIVE' => 0,
+      'LONG_NAME' => 'Laika',
+      'COST' => 3,
+      'SHIELDS' => 0,
+      'OWNER_ID' => '',
+      'VP_DRAW' => 1,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => []
+    },
+    'shiptemplate_race_human2_2' => {
+      'VP_DRAW' => 2,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'OWNER_ID' => '',
+      'SHIELDS' => 0,
+      'LONG_NAME' => 'Gagarin',
+      'INITIATIVE' => 0,
+      'SOURCE_TAG' => undef,
+      'COST' => 5,
+      'CLASS' => 'class_cruiser',
+      'COUNT' => 1,
+      'TAG' => 'shiptemplate_race_human2_2',
+      'SLOTS' => 6,
       'COMPONENTS' => [
         'comp_beam1',
         'comp_energy3',
@@ -1845,19 +3500,66 @@ $VAR1 = {
         'comp_computer1',
         'comp_hull1'
       ],
-      'LONG_NAME' => 'Conqueror',
-      'SLOTS' => 6,
-      'REQUIRED_OPTION' => '',
+      'COMPUTER' => 0,
+      'HULL_POINTS' => 0,
+      'ENERGY' => 0
+    },
+    'shiptemplate_race_human1_1' => {
+      'COST' => 3,
+      'INITIATIVE' => 0,
+      'SOURCE_TAG' => undef,
+      'LONG_NAME' => 'Explorer',
+      'SLOTS' => 4,
+      'TAG' => 'shiptemplate_race_human1_1',
+      'CLASS' => 'class_interceptor',
+      'COUNT' => 1,
+      'COMPUTER' => 0,
+      'COMPONENTS' => [
+        'comp_beam1',
+        'comp_energy3',
+        'comp_drive1'
+      ],
       'ENERGY' => 0,
-      'COST' => 5
+      'HULL_POINTS' => 0,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'VP_DRAW' => 1,
+      'OWNER_ID' => '',
+      'SHIELDS' => 0
+    },
+    'shiptemplate_race_human5_3' => {
+      'SHIELDS' => 0,
+      'OWNER_ID' => '',
+      'VP_DRAW' => 3,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => [],
+      'HULL_POINTS' => 0,
+      'ENERGY' => 0,
+      'COMPONENTS' => [
+        'comp_beam1',
+        'comp_beam1',
+        'comp_energy3',
+        'comp_drive1',
+        'comp_computer1',
+        'comp_hull1',
+        'comp_hull1'
+      ],
+      'COMPUTER' => 0,
+      'COUNT' => 1,
+      'CLASS' => 'class_dreadnought',
+      'TAG' => 'shiptemplate_race_human5_3',
+      'SLOTS' => 8,
+      'LONG_NAME' => 'Elephant',
+      'INITIATIVE' => 0,
+      'SOURCE_TAG' => undef,
+      'COST' => 8
     },
     'shiptemplate_race_human5_2' => {
-      'SLOTS' => 6,
-      'LONG_NAME' => 'Lion',
-      'COST' => 5,
-      'ENERGY' => 0,
+      'OWNER_ID' => '',
+      'SHIELDS' => 0,
       'REQUIRED_OPTION' => '',
-      'SOURCE_TAG' => undef,
+      'PROVIDES' => [],
+      'VP_DRAW' => 2,
       'COMPONENTS' => [
         'comp_beam1',
         'comp_energy3',
@@ -1865,28 +3567,25 @@ $VAR1 = {
         'comp_computer1',
         'comp_hull1'
       ],
-      'INITIATIVE' => 0,
       'COMPUTER' => 0,
-      'OWNER_ID' => '',
-      'CLASS' => 'class_cruiser',
-      'PROVIDES' => [],
-      'VP_DRAW' => 2,
-      'SHIELDS' => 0,
+      'ENERGY' => 0,
       'HULL_POINTS' => 0,
+      'COST' => 5,
+      'LONG_NAME' => 'Lion',
+      'SOURCE_TAG' => undef,
+      'INITIATIVE' => 0,
       'TAG' => 'shiptemplate_race_human5_2',
+      'SLOTS' => 6,
+      'CLASS' => 'class_cruiser',
       'COUNT' => 1
     },
     'shiptemplate_defense1' => {
-      'COUNT' => 0,
-      'TAG' => 'shiptemplate_defense1',
-      'VP_DRAW' => 3,
-      'SHIELDS' => 0,
-      'HULL_POINTS' => 0,
-      'PROVIDES' => [],
-      'CLASS' => 'class_defense',
       'OWNER_ID' => -1,
+      'SHIELDS' => 0,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'VP_DRAW' => 3,
       'COMPUTER' => 0,
-      'INITIATIVE' => 0,
       'COMPONENTS' => [
         'comp_beam1',
         'comp_beam1',
@@ -1898,30 +3597,75 @@ $VAR1 = {
         'comp_hull2',
         'comp_hull2'
       ],
-      'SOURCE_TAG' => 'src_base',
-      'REQUIRED_OPTION' => '',
       'ENERGY' => 0,
-      'COST' => 0,
-      'LONG_NAME' => '',
-      'SLOTS' => 0
-    },
-    'shiptemplate_race_human5_3' => {
-      'OWNER_ID' => '',
-      'COMPUTER' => 0,
       'HULL_POINTS' => 0,
-      'SHIELDS' => 0,
-      'VP_DRAW' => 3,
-      'CLASS' => 'class_dreadnought',
+      'COST' => 0,
+      'SOURCE_TAG' => 'src_base',
+      'INITIATIVE' => 0,
+      'LONG_NAME' => '',
+      'SLOTS' => 0,
+      'TAG' => 'shiptemplate_defense1',
+      'COUNT' => 0,
+      'CLASS' => 'class_defense'
+    },
+    'shiptemplate_race_human1_2' => {
       'PROVIDES' => [],
-      'TAG' => 'shiptemplate_race_human5_3',
-      'COUNT' => 1,
-      'SLOTS' => 8,
-      'LONG_NAME' => 'Elephant',
-      'ENERGY' => 0,
       'REQUIRED_OPTION' => '',
-      'COST' => 8,
+      'VP_DRAW' => 2,
+      'SHIELDS' => 0,
+      'OWNER_ID' => '',
+      'TAG' => 'shiptemplate_race_human1_2',
+      'SLOTS' => 6,
+      'CLASS' => 'class_cruiser',
+      'COUNT' => 1,
+      'COST' => 5,
+      'LONG_NAME' => 'Conqueror',
+      'INITIATIVE' => 0,
+      'SOURCE_TAG' => undef,
+      'ENERGY' => 0,
+      'HULL_POINTS' => 0,
+      'COMPONENTS' => [
+        'comp_beam1',
+        'comp_energy3',
+        'comp_drive1',
+        'comp_computer1',
+        'comp_hull1'
+      ],
+      'COMPUTER' => 0
+    },
+    'shiptemplate_race_human1_4' => {
+      'HULL_POINTS' => 0,
+      'ENERGY' => 3,
+      'COMPONENTS' => [
+        'comp_beam1',
+        'comp_computer1',
+        'comp_hull1',
+        'comp_hull1'
+      ],
+      'COMPUTER' => 0,
+      'COUNT' => 1,
+      'CLASS' => 'class_starbase',
+      'TAG' => 'shiptemplate_race_human1_4',
+      'SLOTS' => 5,
+      'LONG_NAME' => 'Defender',
       'SOURCE_TAG' => undef,
       'INITIATIVE' => 0,
+      'COST' => 3,
+      'SHIELDS' => 0,
+      'OWNER_ID' => '',
+      'VP_DRAW' => 1,
+      'REQUIRED_OPTION' => '',
+      'PROVIDES' => []
+    },
+    'shiptemplate_race_human1_3' => {
+      'SHIELDS' => 0,
+      'OWNER_ID' => '',
+      'VP_DRAW' => 3,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'HULL_POINTS' => 0,
+      'ENERGY' => 0,
+      'COMPUTER' => 0,
       'COMPONENTS' => [
         'comp_beam1',
         'comp_beam1',
@@ -1930,1881 +3674,137 @@ $VAR1 = {
         'comp_computer1',
         'comp_hull1',
         'comp_hull1'
-      ]
+      ],
+      'CLASS' => 'class_dreadnought',
+      'COUNT' => 1,
+      'SLOTS' => 8,
+      'TAG' => 'shiptemplate_race_human1_3',
+      'INITIATIVE' => 0,
+      'SOURCE_TAG' => undef,
+      'LONG_NAME' => 'Vanquisher',
+      'COST' => 8
     },
-    'shiptemplate_race_human2_4' => {
+    'shiptemplate_race_human5_1' => {
+      'COMPUTER' => 0,
+      'COMPONENTS' => [
+        'comp_beam1',
+        'comp_energy3',
+        'comp_drive1'
+      ],
+      'ENERGY' => 0,
+      'HULL_POINTS' => 0,
+      'COST' => 3,
       'SOURCE_TAG' => undef,
       'INITIATIVE' => 0,
+      'LONG_NAME' => 'Cobra',
+      'SLOTS' => 4,
+      'TAG' => 'shiptemplate_race_human5_1',
+      'COUNT' => 1,
+      'CLASS' => 'class_interceptor',
+      'OWNER_ID' => '',
+      'SHIELDS' => 0,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'VP_DRAW' => 1
+    },
+    'shiptemplate_race_human5_4' => {
+      'HULL_POINTS' => 0,
+      'ENERGY' => 3,
+      'COMPUTER' => 0,
       'COMPONENTS' => [
         'comp_beam1',
         'comp_computer1',
         'comp_hull1',
         'comp_hull1'
       ],
-      'LONG_NAME' => 'Yang',
-      'SLOTS' => 5,
-      'REQUIRED_OPTION' => '',
-      'ENERGY' => 3,
-      'COST' => 3,
-      'COUNT' => 1,
-      'TAG' => 'shiptemplate_race_human2_4',
-      'OWNER_ID' => '',
-      'COMPUTER' => 0,
-      'VP_DRAW' => 1,
-      'HULL_POINTS' => 0,
-      'SHIELDS' => 0,
       'CLASS' => 'class_starbase',
-      'PROVIDES' => []
+      'COUNT' => 1,
+      'SLOTS' => 5,
+      'TAG' => 'shiptemplate_race_human5_4',
+      'INITIATIVE' => 0,
+      'SOURCE_TAG' => undef,
+      'LONG_NAME' => 'Rhino',
+      'COST' => 3,
+      'SHIELDS' => 0,
+      'OWNER_ID' => '',
+      'VP_DRAW' => 1,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => ''
+    },
+    'shiptemplate_race_human2_3' => {
+      'HULL_POINTS' => 0,
+      'ENERGY' => 0,
+      'COMPUTER' => 0,
+      'COMPONENTS' => [
+        'comp_beam1',
+        'comp_beam1',
+        'comp_energy3',
+        'comp_drive1',
+        'comp_computer1',
+        'comp_hull1',
+        'comp_hull1'
+      ],
+      'CLASS' => 'class_dreadnought',
+      'COUNT' => 1,
+      'SLOTS' => 8,
+      'TAG' => 'shiptemplate_race_human2_3',
+      'INITIATIVE' => 0,
+      'SOURCE_TAG' => undef,
+      'LONG_NAME' => 'Armstrong',
+      'COST' => 8,
+      'SHIELDS' => 0,
+      'OWNER_ID' => '',
+      'VP_DRAW' => 3,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => ''
     },
     'shiptemplate_ancient1' => {
-      'COMPUTER' => 0,
-      'OWNER_ID' => -1,
-      'PROVIDES' => [],
-      'CLASS' => 'class_ancient_cruiser',
       'VP_DRAW' => 1,
+      'PROVIDES' => [],
+      'REQUIRED_OPTION' => '',
+      'OWNER_ID' => -1,
       'SHIELDS' => 0,
-      'HULL_POINTS' => 0,
+      'LONG_NAME' => '',
+      'INITIATIVE' => 0,
+      'SOURCE_TAG' => 'src_base',
+      'COST' => 0,
+      'CLASS' => 'class_ancient_cruiser',
       'COUNT' => -1,
       'TAG' => 'shiptemplate_ancient1',
-      'LONG_NAME' => '',
       'SLOTS' => 0,
-      'COST' => 0,
-      'REQUIRED_OPTION' => '',
-      'ENERGY' => 0,
-      'SOURCE_TAG' => 'src_base',
       'COMPONENTS' => [
         'comp_beam1',
         'comp_beam1',
         'comp_hull1',
         'comp_computer1'
       ],
-      'INITIATIVE' => 0
-    }
-  },
-  'DISCOVERIES' => {
-    'disc_minerals' => {
-      'SOURCE_TAG' => 'src_base',
-      'COUNT' => 3,
-      'TAG' => 'disc_minerals',
-      'RESOURCES' => {
-        'MONEY' => 0,
-        'MINERALS' => 6,
-        'SCIENCE' => 0
-      },
-      'COMPONENT' => '',
-      'OWNER_ID' => '',
-      'LONG_NAME' => '6 Minerals',
-      'REQUIRED_OPTION' => '',
-      'PROVIDES' => []
-    },
-    'disc_turret1' => {
-      'SOURCE_TAG' => 'src_base',
-      'COUNT' => 1,
-      'TAG' => 'disc_turret1',
-      'RESOURCES' => {
-        'MINERALS' => 0,
-        'MONEY' => 0,
-        'SCIENCE' => 0
-      },
-      'COMPONENT' => 'comp_turret1',
-      'OWNER_ID' => '',
-      'LONG_NAME' => 'Component - Ion Turret',
-      'REQUIRED_OPTION' => '',
-      'PROVIDES' => []
-    },
-    'disc_technology' => {
-      'RESOURCES' => {
-        'MONEY' => 0,
-        'MINERALS' => 0,
-        'SCIENCE' => 0
-      },
-      'COMPONENT' => '',
-      'TAG' => 'disc_technology',
-      'COUNT' => 1,
-      'SOURCE_TAG' => 'src_base',
-      'PROVIDES' => [],
-      'REQUIRED_OPTION' => '',
-      'LONG_NAME' => 'Free Technology',
-      'OWNER_ID' => ''
-    },
-    'disc_money' => {
-      'SOURCE_TAG' => 'src_base',
-      'TAG' => 'disc_money',
-      'COUNT' => 3,
-      'COMPONENT' => '',
-      'RESOURCES' => {
-        'SCIENCE' => 0,
-        'MINERALS' => 0,
-        'MONEY' => 8
-      },
-      'OWNER_ID' => '',
-      'LONG_NAME' => '8 Credits',
-      'REQUIRED_OPTION' => '',
-      'PROVIDES' => []
-    },
-    'disc_hyper_drive' => {
-      'TAG' => 'disc_hyper_drive',
-      'COUNT' => 1,
-      'RESOURCES' => {
-        'SCIENCE' => 0,
-        'MINERALS' => 0,
-        'MONEY' => 0
-      },
-      'COMPONENT' => 'comp_hyper_drive',
-      'SOURCE_TAG' => 'src_base',
-      'LONG_NAME' => 'Component - Jump Drive',
-      'OWNER_ID' => '',
-      'PROVIDES' => [],
-      'REQUIRED_OPTION' => ''
-    },
-    'disc_disrupter' => {
-      'LONG_NAME' => 'Component - Ion Disrupter',
-      'OWNER_ID' => '',
-      'PROVIDES' => [],
-      'REQUIRED_OPTION' => '',
-      'COUNT' => 1,
-      'TAG' => 'disc_disrupter',
-      'COMPONENT' => 'comp_disrupter',
-      'RESOURCES' => {
-        'MONEY' => 0,
-        'MINERALS' => 0,
-        'SCIENCE' => 0
-      },
-      'SOURCE_TAG' => 'src_base'
-    },
-    'disc_morph_shield' => {
-      'TAG' => 'disc_morph_shield',
-      'COUNT' => 1,
-      'RESOURCES' => {
-        'SCIENCE' => 0,
-        'MINERALS' => 0,
-        'MONEY' => 0
-      },
-      'COMPONENT' => 'comp_shield_1b',
-      'SOURCE_TAG' => 'src_base',
-      'LONG_NAME' => 'Component - Morph Shield',
-      'OWNER_ID' => '',
-      'PROVIDES' => [],
-      'REQUIRED_OPTION' => ''
-    },
-    'disc_computer3' => {
-      'REQUIRED_OPTION' => '',
-      'PROVIDES' => [],
-      'OWNER_ID' => '',
-      'LONG_NAME' => 'Component - Axion Computer',
-      'SOURCE_TAG' => 'src_base',
-      'TAG' => 'disc_computer3',
-      'COUNT' => 1,
-      'COMPONENT' => 'comp_computer3',
-      'RESOURCES' => {
-        'SCIENCE' => 0,
-        'MONEY' => 0,
-        'MINERALS' => 0
-      }
-    },
-    'disc_cruiser' => {
-      'COUNT' => 3,
-      'TAG' => 'disc_cruiser',
-      'RESOURCES' => {
-        'SCIENCE' => 0,
-        'MINERALS' => 0,
-        'MONEY' => 0
-      },
-      'COMPONENT' => '',
-      'SOURCE_TAG' => 'src_base',
-      'PROVIDES' => [],
-      'REQUIRED_OPTION' => '',
-      'LONG_NAME' => 'Free Cruiser',
-      'OWNER_ID' => ''
-    },
-    'disc_drive4' => {
-      'SOURCE_TAG' => 'src_base',
-      'RESOURCES' => {
-        'MONEY' => 0,
-        'MINERALS' => 0,
-        'SCIENCE' => 0
-      },
-      'COMPONENT' => 'comp_drive4',
-      'TAG' => 'disc_drive4',
-      'COUNT' => 1,
-      'REQUIRED_OPTION' => '',
-      'PROVIDES' => [],
-      'OWNER_ID' => '',
-      'LONG_NAME' => 'Component - Conformal Drive'
-    },
-    'disc_hull3b' => {
-      'REQUIRED_OPTION' => '',
-      'PROVIDES' => [],
-      'OWNER_ID' => '',
-      'LONG_NAME' => 'Component - Shard Hull',
-      'SOURCE_TAG' => 'src_base',
-      'TAG' => 'disc_hull3b',
-      'COUNT' => 1,
-      'COMPONENT' => 'comp_hull3b',
-      'RESOURCES' => {
-        'MONEY' => 0,
-        'MINERALS' => 0,
-        'SCIENCE' => 0
-      }
-    },
-    'disc_muon_source' => {
-      'SOURCE_TAG' => 'src_base',
-      'RESOURCES' => {
-        'MINERALS' => 0,
-        'MONEY' => 0,
-        'SCIENCE' => 0
-      },
-      'COMPONENT' => 'comp_energy2',
-      'TAG' => 'disc_muon_source',
-      'COUNT' => 1,
-      'OWNER_ID' => '',
-      'LONG_NAME' => 'Component - Muon Source',
-      'REQUIRED_OPTION' => '',
-      'PROVIDES' => []
-    },
-    'disc_energy11' => {
-      'SOURCE_TAG' => 'src_base',
-      'COUNT' => 1,
-      'TAG' => 'disc_energy11',
-      'COMPONENT' => 'comp_energy11',
-      'RESOURCES' => {
-        'MONEY' => 0,
-        'MINERALS' => 0,
-        'SCIENCE' => 0
-      },
-      'REQUIRED_OPTION' => '',
-      'PROVIDES' => [],
-      'OWNER_ID' => '',
-      'LONG_NAME' => 'Component - Hypergrid'
-    },
-    'disc_shield3' => {
-      'REQUIRED_OPTION' => '',
-      'PROVIDES' => [],
-      'OWNER_ID' => '',
-      'LONG_NAME' => 'Component - Flux Shield',
-      'SOURCE_TAG' => 'src_base',
-      'COMPONENT' => 'comp_shield3',
-      'RESOURCES' => {
-        'MINERALS' => 0,
-        'MONEY' => 0,
-        'SCIENCE' => 0
-      },
-      'COUNT' => 1,
-      'TAG' => 'disc_shield3'
-    },
-    'disc_science' => {
-      'SOURCE_TAG' => 'src_base',
-      'TAG' => 'disc_science',
-      'COUNT' => 3,
-      'RESOURCES' => {
-        'MONEY' => 0,
-        'MINERALS' => 0,
-        'SCIENCE' => 5
-      },
-      'COMPONENT' => '',
-      'OWNER_ID' => '',
-      'LONG_NAME' => '5 Science',
-      'REQUIRED_OPTION' => '',
-      'PROVIDES' => []
-    }
-  },
-  'TECH_DRAW_COUNT' => 6,
-  'STARTING_LOCATIONS' => [
-    {
-      'SPACE' => '0,-2',
-      'WARPS' => 27
-    },
-    {
-      'SPACE' => '2,0',
-      'WARPS' => 45
-    },
-    {
-      'WARPS' => 54,
-      'SPACE' => '-2,2'
-    }
-  ],
-  'DISCOVERY_BAG' => [
-    'disc_science',
-    'disc_science',
-    'disc_science',
-    'disc_turret1',
-    'disc_money',
-    'disc_money',
-    'disc_money',
-    'disc_hyper_drive',
-    'disc_computer3',
-    'disc_drive4',
-    'disc_energy11',
-    'disc_shield3',
-    'disc_technology',
-    'disc_minerals',
-    'disc_minerals',
-    'disc_minerals',
-    'disc_disrupter',
-    'disc_morph_shield',
-    'disc_cruiser',
-    'disc_cruiser',
-    'disc_cruiser',
-    'disc_hull3b',
-    'disc_muon_source'
-  ],
-  'RACES' => {
-    'race_human5' => {
-      'ACTION_COUNT' => 0,
-      'STARTING_SHIPS' => [
-        'class_interceptor'
-      ],
-      'TAG' => 'race_human5',
-      'COUNT' => 1,
-      'FLAG_PASSED' => 1,
-      'COLONY_COUNT' => 3,
-      'OWNER_ID' => 1,
-      'SHIP_TEMPLATES' => [
-        'shiptemplate_race_human5_1',
-        'shiptemplate_race_human5_2',
-        'shiptemplate_race_human5_3',
-        'shiptemplate_race_human5_4'
-      ],
-      'EXCLUDE_RACE' => 'race_cyborgs',
-      'TECH' => {
-        'NANO' => {
-          'COST' => [
-            0,
-            -1,
-            -2,
-            -3,
-            -4,
-            -6,
-            -8,
-            0
-          ],
-          'POSSESS' => [],
-          'VP' => [
-            0,
-            0,
-            0,
-            0,
-            1,
-            2,
-            3,
-            5
-          ]
-        },
-        'GRID' => {
-          'VP' => [
-            0,
-            0,
-            0,
-            0,
-            1,
-            2,
-            3,
-            5
-          ],
-          'POSSESS' => [],
-          'COST' => [
-            0,
-            -1,
-            -2,
-            -3,
-            -4,
-            -6,
-            -8,
-            0
-          ]
-        },
-        'MILITARY' => {
-          'COST' => [
-            0,
-            -1,
-            -2,
-            -3,
-            -4,
-            -6,
-            -8,
-            0
-          ],
-          'POSSESS' => [
-            'tech_starbase'
-          ],
-          'VP' => [
-            0,
-            0,
-            0,
-            0,
-            1,
-            2,
-            3,
-            5
-          ]
-        }
-      },
-      'COLONY_USED' => 0,
-      'PROVIDES' => [],
-      'TRACKS' => {
-        'MONEY' => {
-          'PROGRESSION' => [
-            28,
-            24,
-            21,
-            18,
-            15,
-            12,
-            10,
-            8,
-            6,
-            4,
-            3,
-            2,
-            0
-          ],
-          'COUNT' => 11
-        },
-        'MINERALS' => {
-          'COUNT' => 11,
-          'PROGRESSION' => [
-            28,
-            24,
-            21,
-            18,
-            15,
-            12,
-            10,
-            8,
-            6,
-            4,
-            3,
-            2,
-            0
-          ]
-        },
-        'SCIENCE' => {
-          'COUNT' => 11,
-          'PROGRESSION' => [
-            28,
-            24,
-            21,
-            18,
-            15,
-            12,
-            10,
-            8,
-            6,
-            4,
-            3,
-            2,
-            0
-          ]
-        },
-        'INFLUENCE' => {
-          'COUNT' => 12,
-          'PROGRESSION' => [
-            -30,
-            -25,
-            -21,
-            -17,
-            -13,
-            -10,
-            -7,
-            -5,
-            -3,
-            -2,
-            -1,
-            0,
-            0,
-            0
-          ]
-        }
-      },
-      'SOURCE_TAG' => 'src_base',
-      'RESOURCES' => {
-        'MONEY' => 2,
-        'MINERALS' => 3,
-        'SCIENCE' => 3
-      },
-      'ACTION' => {
-        'INFLUENCE_INF' => 2,
-        'INFLUENCE_COLONY' => 2,
-        'BUILD' => 2,
-        'UPGRADE' => 2,
-        'MOVE' => 3,
-        'EXPLORE' => 1,
-        'RESEARCH' => 1
-      },
-      'ALLOWED_ACTIONS' => [],
-      'COST_MONUMENT' => undef,
-      'VP_SLOTS' => {
-        'BATTLE' => 0,
-        'AMBASSADOR' => 1,
-        'ANY' => 4
-      },
-      'HOME' => 'tile_229',
-      'EXCHANGE' => 2,
-      'LONG_NAME' => 'Terran Conglomerate',
-      'REQUIRED_OPTION' => '',
-      'ACTIONS' => {},
-      'COST_ORBITAL' => undef
-    },
-    'race_human2' => {
-      'ALLOWED_ACTIONS' => [
-        'action_pass',
-        'action_react_upgrade',
-        'action_react_build',
-        'action_react_move'
-      ],
-      'ACTION' => {
-        'EXPLORE' => 1,
-        'MOVE' => 3,
-        'UPGRADE' => 2,
-        'RESEARCH' => 1,
-        'INFLUENCE_COLONY' => 2,
-        'BUILD' => 2,
-        'INFLUENCE_INF' => 2
-      },
-      'RESOURCES' => {
-        'SCIENCE' => 3,
-        'MONEY' => 2,
-        'MINERALS' => 3
-      },
-      'SOURCE_TAG' => 'src_base',
-      'TRACKS' => {
-        'MINERALS' => {
-          'COUNT' => 11,
-          'PROGRESSION' => [
-            28,
-            24,
-            21,
-            18,
-            15,
-            12,
-            10,
-            8,
-            6,
-            4,
-            3,
-            2,
-            0
-          ]
-        },
-        'MONEY' => {
-          'PROGRESSION' => [
-            28,
-            24,
-            21,
-            18,
-            15,
-            12,
-            10,
-            8,
-            6,
-            4,
-            3,
-            2,
-            0
-          ],
-          'COUNT' => 11
-        },
-        'INFLUENCE' => {
-          'PROGRESSION' => [
-            -30,
-            -25,
-            -21,
-            -17,
-            -13,
-            -10,
-            -7,
-            -5,
-            -3,
-            -2,
-            -1,
-            0,
-            0,
-            0
-          ],
-          'COUNT' => 12
-        },
-        'SCIENCE' => {
-          'PROGRESSION' => [
-            28,
-            24,
-            21,
-            18,
-            15,
-            12,
-            10,
-            8,
-            6,
-            4,
-            3,
-            2,
-            0
-          ],
-          'COUNT' => 11
-        }
-      },
-      'COST_ORBITAL' => undef,
-      'ACTIONS' => {},
-      'REQUIRED_OPTION' => '',
-      'LONG_NAME' => 'Terran Federation',
-      'VP_SLOTS' => {
-        'BATTLE' => 0,
-        'AMBASSADOR' => 1,
-        'ANY' => 4
-      },
-      'COST_MONUMENT' => undef,
-      'EXCHANGE' => 2,
-      'HOME' => 'tile_223',
-      'COLONY_COUNT' => 3,
-      'FLAG_PASSED' => 1,
-      'STARTING_SHIPS' => [
-        'class_interceptor'
-      ],
-      'TAG' => 'race_human2',
-      'COUNT' => 1,
-      'ACTION_COUNT' => 0,
-      'PROVIDES' => [],
-      'COLONY_USED' => 0,
-      'SHIP_TEMPLATES' => [
-        'shiptemplate_race_human2_1',
-        'shiptemplate_race_human2_2',
-        'shiptemplate_race_human2_3',
-        'shiptemplate_race_human2_4'
-      ],
-      'EXCLUDE_RACE' => 'race_water',
-      'TECH' => {
-        'GRID' => {
-          'POSSESS' => [],
-          'VP' => [
-            0,
-            0,
-            0,
-            0,
-            1,
-            2,
-            3,
-            5
-          ],
-          'COST' => [
-            0,
-            -1,
-            -2,
-            -3,
-            -4,
-            -6,
-            -8,
-            0
-          ]
-        },
-        'NANO' => {
-          'POSSESS' => [],
-          'VP' => [
-            0,
-            0,
-            0,
-            0,
-            1,
-            2,
-            3,
-            5
-          ],
-          'COST' => [
-            0,
-            -1,
-            -2,
-            -3,
-            -4,
-            -6,
-            -8,
-            0
-          ]
-        },
-        'MILITARY' => {
-          'VP' => [
-            0,
-            0,
-            0,
-            0,
-            1,
-            2,
-            3,
-            5
-          ],
-          'POSSESS' => [
-            'tech_starbase'
-          ],
-          'COST' => [
-            0,
-            -1,
-            -2,
-            -3,
-            -4,
-            -6,
-            -8,
-            0
-          ]
-        }
-      },
-      'OWNER_ID' => 0
-    },
-    'race_human1' => {
-      'EXCLUDE_RACE' => 'race_oldrace',
-      'SHIP_TEMPLATES' => [
-        'shiptemplate_race_human1_1',
-        'shiptemplate_race_human1_2',
-        'shiptemplate_race_human1_3',
-        'shiptemplate_race_human1_4'
-      ],
-      'TECH' => {
-        'NANO' => {
-          'COST' => [
-            0,
-            -1,
-            -2,
-            -3,
-            -4,
-            -6,
-            -8,
-            0
-          ],
-          'POSSESS' => [],
-          'VP' => [
-            0,
-            0,
-            0,
-            0,
-            1,
-            2,
-            3,
-            5
-          ]
-        },
-        'GRID' => {
-          'COST' => [
-            0,
-            -1,
-            -2,
-            -3,
-            -4,
-            -6,
-            -8,
-            0
-          ],
-          'VP' => [
-            0,
-            0,
-            0,
-            0,
-            1,
-            2,
-            3,
-            5
-          ],
-          'POSSESS' => []
-        },
-        'MILITARY' => {
-          'POSSESS' => [
-            'tech_starbase'
-          ],
-          'VP' => [
-            0,
-            0,
-            0,
-            0,
-            1,
-            2,
-            3,
-            5
-          ],
-          'COST' => [
-            0,
-            -1,
-            -2,
-            -3,
-            -4,
-            -6,
-            -8,
-            0
-          ]
-        }
-      },
-      'PROVIDES' => [],
-      'COLONY_USED' => 0,
-      'OWNER_ID' => 2,
-      'COLONY_COUNT' => 3,
-      'ACTION_COUNT' => 0,
-      'STARTING_SHIPS' => [
-        'class_interceptor'
-      ],
-      'FLAG_PASSED' => 1,
-      'TAG' => 'race_human1',
-      'COUNT' => 1,
-      'ACTIONS' => {},
-      'REQUIRED_OPTION' => '',
-      'COST_ORBITAL' => undef,
-      'VP_SLOTS' => {
-        'AMBASSADOR' => 1,
-        'BATTLE' => 0,
-        'ANY' => 4
-      },
-      'EXCHANGE' => 2,
-      'COST_MONUMENT' => undef,
-      'HOME' => 'tile_221',
-      'LONG_NAME' => 'Terran Directorate',
-      'ALLOWED_ACTIONS' => [],
-      'ACTION' => {
-        'EXPLORE' => 1,
-        'MOVE' => 3,
-        'UPGRADE' => 2,
-        'RESEARCH' => 1,
-        'BUILD' => 2,
-        'INFLUENCE_COLONY' => 2,
-        'INFLUENCE_INF' => 2
-      },
-      'SOURCE_TAG' => 'src_base',
-      'TRACKS' => {
-        'SCIENCE' => {
-          'PROGRESSION' => [
-            28,
-            24,
-            21,
-            18,
-            15,
-            12,
-            10,
-            8,
-            6,
-            4,
-            3,
-            2,
-            0
-          ],
-          'COUNT' => 11
-        },
-        'INFLUENCE' => {
-          'COUNT' => 12,
-          'PROGRESSION' => [
-            -30,
-            -25,
-            -21,
-            -17,
-            -13,
-            -10,
-            -7,
-            -5,
-            -3,
-            -2,
-            -1,
-            0,
-            0,
-            0
-          ]
-        },
-        'MONEY' => {
-          'PROGRESSION' => [
-            28,
-            24,
-            21,
-            18,
-            15,
-            12,
-            10,
-            8,
-            6,
-            4,
-            3,
-            2,
-            0
-          ],
-          'COUNT' => 11
-        },
-        'MINERALS' => {
-          'COUNT' => 11,
-          'PROGRESSION' => [
-            28,
-            24,
-            21,
-            18,
-            15,
-            12,
-            10,
-            8,
-            6,
-            4,
-            3,
-            2,
-            0
-          ]
-        }
-      },
-      'RESOURCES' => {
-        'MONEY' => 2,
-        'MINERALS' => 3,
-        'SCIENCE' => 3
-      }
-    }
-  },
-  'TECH_BAG' => [
-    'tech_hull2',
-    'tech_hull2',
-    'tech_hull2',
-    'tech_hull2',
-    'tech_hull2',
-    'tech_shield1',
-    'tech_shield1',
-    'tech_shield1',
-    'tech_shield1',
-    'tech_artifact_reader',
-    'tech_artifact_reader',
-    'tech_artifact_reader',
-    'tech_starbase',
-    'tech_starbase',
-    'tech_starbase',
-    'tech_stealth',
-    'tech_wormhole_generator',
-    'tech_wormhole_generator',
-    'tech_wormhole_generator',
-    'tech_beam2',
-    'tech_beam2',
-    'tech_beam2',
-    'tech_beam2',
-    'tech_influence2',
-    'tech_influence2',
-    'tech_influence2',
-    'tech_drive2',
-    'tech_drive2',
-    'tech_drive2',
-    'tech_computer3',
-    'tech_computer3',
-    'tech_computer3',
-    'tech_energy6',
-    'tech_energy6',
-    'tech_energy6',
-    'tech_energy6',
-    'tech_energy9',
-    'tech_energy9',
-    'tech_energy9',
-    'tech_beam4',
-    'tech_beam4',
-    'tech_beam4',
-    'tech_shield2',
-    'tech_shield2',
-    'tech_shield2',
-    'tech_shield2',
-    'tech_advanced_money',
-    'tech_advanced_money',
-    'tech_advanced_money',
-    'tech_advanced_money',
-    'tech_drive3',
-    'tech_drive3',
-    'tech_drive3',
-    'tech_bombs',
-    'tech_bombs',
-    'tech_bombs',
-    'tech_bombs',
-    'tech_advanced_minerals',
-    'tech_advanced_minerals',
-    'tech_advanced_minerals',
-    'tech_advanced_science',
-    'tech_advanced_science',
-    'tech_advanced_science',
-    'tech_advanced_science',
-    'tech_computer2',
-    'tech_computer2',
-    'tech_computer2',
-    'tech_advanced_build',
-    'tech_advanced_build',
-    'tech_advanced_build',
-    'tech_influence1',
-    'tech_influence1',
-    'tech_influence1',
-    'tech_influence1',
-    'tech_missile2',
-    'tech_missile2',
-    'tech_missile2',
-    'tech_obilisk',
-    'tech_obilisk',
-    'tech_obilisk',
-    'tech_ring',
-    'tech_ring',
-    'tech_ring'
-  ],
-  'DEVELOPMENT_STACK' => [
-    []
-  ],
-  'COMPONENTS' => {
-    'comp_hyper_drive' => {
-      'ENERGY' => 0,
-      'REQUIRED_OPTION' => '',
-      'ATTACK_DAMAGE' => 0,
-      'REQUIRES' => 'discovery',
-      'LONG_NAME' => 'Jump Drive',
-      'SHIELD' => 0,
-      'INITIATIVE' => 0,
-      'MOVEMENT' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'PROVIDES' => [
-        'jump_drive',
-        'ship_drive'
-      ],
-      'IS_MISSILE' => 0,
-      'HULL_POINTS' => 0,
-      'COMPUTER' => 0,
-      'OWNER_ID' => '',
-      'COUNT' => 1,
-      'TAG' => 'comp_hyper_drive',
-      'ATTACK_COUNT' => 0
-    },
-    'comp_energy9' => {
-      'INITIATIVE' => 0,
-      'SHIELD' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'MOVEMENT' => 0,
-      'ENERGY' => 9,
-      'REQUIRED_OPTION' => '',
-      'ATTACK_DAMAGE' => 0,
-      'REQUIRES' => 'tech_energy9',
-      'LONG_NAME' => 'Tachyon Source',
-      'ATTACK_COUNT' => 0,
-      'COUNT' => 1,
-      'TAG' => 'comp_energy9',
-      'HULL_POINTS' => 0,
-      'PROVIDES' => [],
-      'IS_MISSILE' => 0,
-      'OWNER_ID' => '',
-      'COMPUTER' => 0
-    },
-    'comp_missile2' => {
-      'COUNT' => 1,
-      'TAG' => 'comp_missile2',
-      'ATTACK_COUNT' => 2,
-      'PROVIDES' => [],
-      'IS_MISSILE' => 1,
-      'HULL_POINTS' => 0,
-      'COMPUTER' => 0,
-      'OWNER_ID' => '',
-      'SHIELD' => 0,
-      'INITIATIVE' => 0,
-      'MOVEMENT' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'ENERGY' => 0,
-      'REQUIRED_OPTION' => '',
-      'ATTACK_DAMAGE' => 2,
-      'LONG_NAME' => 'Plasma Missiles',
-      'REQUIRES' => 'tech_missile2'
-    },
-    'comp_shield3' => {
-      'REQUIRED_OPTION' => '',
-      'ENERGY' => 0,
-      'REQUIRES' => 'discovery',
-      'LONG_NAME' => 'Flux Shield',
-      'ATTACK_DAMAGE' => 0,
-      'INITIATIVE' => 0,
-      'SHIELD' => 3,
-      'SOURCE_TAG' => 'src_base',
-      'MOVEMENT' => 0,
-      'HULL_POINTS' => 0,
-      'IS_MISSILE' => 0,
-      'PROVIDES' => [],
-      'OWNER_ID' => '',
-      'COMPUTER' => 0,
-      'ATTACK_COUNT' => 0,
-      'COUNT' => 1,
-      'TAG' => 'comp_shield3'
-    },
-    'comp_hull2' => {
-      'REQUIRED_OPTION' => '',
-      'ENERGY' => 0,
-      'LONG_NAME' => 'Improved Hull',
-      'REQUIRES' => 'tech_hull2',
-      'ATTACK_DAMAGE' => 0,
-      'SHIELD' => 0,
-      'INITIATIVE' => 0,
-      'MOVEMENT' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'IS_MISSILE' => 0,
-      'PROVIDES' => [],
-      'HULL_POINTS' => 2,
-      'COMPUTER' => 0,
-      'OWNER_ID' => '',
-      'TAG' => 'comp_hull2',
-      'COUNT' => 1,
-      'ATTACK_COUNT' => 0
-    },
-    'comp_shield_1b' => {
-      'PROVIDES' => [],
-      'IS_MISSILE' => 0,
-      'HULL_POINTS' => 0,
-      'COMPUTER' => 0,
-      'OWNER_ID' => '',
-      'COUNT' => 1,
-      'TAG' => 'comp_shield_1b',
-      'ATTACK_COUNT' => 0,
-      'ENERGY' => 0,
-      'REQUIRED_OPTION' => '',
-      'ATTACK_DAMAGE' => 0,
-      'REQUIRES' => 'discovery',
-      'LONG_NAME' => 'Morph Shield',
-      'SHIELD' => 1,
-      'INITIATIVE' => 2,
-      'MOVEMENT' => 0,
-      'SOURCE_TAG' => 'src_base'
-    },
-    'comp_energy2' => {
-      'SOURCE_TAG' => 'src_base',
-      'MOVEMENT' => 0,
-      'INITIATIVE' => 1,
-      'SHIELD' => 0,
-      'REQUIRES' => 'discovery',
-      'LONG_NAME' => 'Muon Source',
-      'ATTACK_DAMAGE' => 0,
-      'REQUIRED_OPTION' => '',
-      'ENERGY' => 2,
-      'ATTACK_COUNT' => 0,
-      'COUNT' => 1,
-      'TAG' => 'comp_energy2',
-      'OWNER_ID' => '',
       'COMPUTER' => 0,
       'HULL_POINTS' => 0,
-      'IS_MISSILE' => 0,
-      'PROVIDES' => []
-    },
-    'comp_hull3b' => {
-      'REQUIRES' => 'discovery',
-      'LONG_NAME' => 'Shard Hull',
-      'ATTACK_DAMAGE' => 0,
-      'REQUIRED_OPTION' => '',
-      'ENERGY' => 0,
-      'MOVEMENT' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'SHIELD' => 0,
-      'INITIATIVE' => 0,
-      'COMPUTER' => 0,
-      'OWNER_ID' => '',
-      'IS_MISSILE' => 0,
-      'PROVIDES' => [],
-      'HULL_POINTS' => 3,
-      'COUNT' => 1,
-      'TAG' => 'comp_hull3b',
-      'ATTACK_COUNT' => 0
-    },
-    'comp_beam1' => {
-      'HULL_POINTS' => 0,
-      'IS_MISSILE' => 0,
-      'PROVIDES' => [],
-      'OWNER_ID' => '',
-      'COMPUTER' => 0,
-      'ATTACK_COUNT' => 1,
-      'TAG' => 'comp_beam1',
-      'COUNT' => 1,
-      'REQUIRED_OPTION' => '',
-      'ENERGY' => 0,
-      'LONG_NAME' => 'Ion Cannon',
-      'REQUIRES' => '',
-      'ATTACK_DAMAGE' => 1,
-      'INITIATIVE' => 0,
-      'SHIELD' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'MOVEMENT' => 0
-    },
-    'comp_disrupter' => {
-      'SHIELD' => 0,
-      'INITIATIVE' => 3,
-      'MOVEMENT' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'REQUIRED_OPTION' => '',
-      'ENERGY' => 0,
-      'REQUIRES' => 'discovery',
-      'LONG_NAME' => 'Ion Disruptor',
-      'ATTACK_DAMAGE' => 1,
-      'COUNT' => 1,
-      'TAG' => 'comp_disrupter',
-      'ATTACK_COUNT' => 1,
-      'IS_MISSILE' => 0,
-      'PROVIDES' => [],
-      'HULL_POINTS' => 0,
-      'COMPUTER' => 0,
-      'OWNER_ID' => ''
-    },
-    'comp_hull1' => {
-      'COMPUTER' => 0,
-      'OWNER_ID' => '',
-      'PROVIDES' => [],
-      'IS_MISSILE' => 0,
-      'HULL_POINTS' => 1,
-      'COUNT' => 1,
-      'TAG' => 'comp_hull1',
-      'ATTACK_COUNT' => 0,
-      'ATTACK_DAMAGE' => 0,
-      'LONG_NAME' => 'Hull',
-      'REQUIRES' => '',
-      'ENERGY' => 0,
-      'REQUIRED_OPTION' => '',
-      'MOVEMENT' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'SHIELD' => 0,
-      'INITIATIVE' => 0
-    },
-    'comp_computer3' => {
-      'REQUIRED_OPTION' => '',
-      'ENERGY' => 0,
-      'LONG_NAME' => 'Gluon Computer',
-      'REQUIRES' => 'tech_computer3',
-      'ATTACK_DAMAGE' => 0,
-      'INITIATIVE' => 2,
-      'SHIELD' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'MOVEMENT' => 0,
-      'HULL_POINTS' => 0,
-      'IS_MISSILE' => 0,
-      'PROVIDES' => [],
-      'OWNER_ID' => '',
-      'COMPUTER' => 3,
-      'ATTACK_COUNT' => 0,
-      'COUNT' => 1,
-      'TAG' => 'comp_computer3'
-    },
-    'comp_drive3' => {
-      'COUNT' => 1,
-      'TAG' => 'comp_drive3',
-      'ATTACK_COUNT' => 0,
-      'COMPUTER' => 0,
-      'OWNER_ID' => '',
-      'PROVIDES' => [],
-      'IS_MISSILE' => 0,
-      'HULL_POINTS' => 0,
-      'MOVEMENT' => 3,
-      'SOURCE_TAG' => 'src_base',
-      'SHIELD' => 0,
-      'INITIATIVE' => 3,
-      'ATTACK_DAMAGE' => 0,
-      'LONG_NAME' => 'Tachyon Drive',
-      'REQUIRES' => 'tech_drive3',
-      'ENERGY' => 0,
-      'REQUIRED_OPTION' => ''
-    },
-    'comp_turret1' => {
-      'TAG' => 'comp_turret1',
-      'COUNT' => 1,
-      'ATTACK_COUNT' => 2,
-      'COMPUTER' => 0,
-      'OWNER_ID' => '',
-      'IS_MISSILE' => 0,
-      'PROVIDES' => [],
-      'HULL_POINTS' => 0,
-      'MOVEMENT' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'SHIELD' => 0,
-      'INITIATIVE' => 0,
-      'REQUIRES' => 'discovery',
-      'LONG_NAME' => 'Ion Turret',
-      'ATTACK_DAMAGE' => 1,
-      'REQUIRED_OPTION' => '',
       'ENERGY' => 0
     },
-    'comp_computer2' => {
-      'REQUIRED_OPTION' => '',
-      'ENERGY' => 0,
-      'REQUIRES' => 'tech_computer2',
-      'LONG_NAME' => 'Positron Computer',
-      'ATTACK_DAMAGE' => 0,
-      'SHIELD' => 0,
-      'INITIATIVE' => 1,
-      'MOVEMENT' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'IS_MISSILE' => 0,
-      'PROVIDES' => [],
-      'HULL_POINTS' => 0,
-      'COMPUTER' => 2,
-      'OWNER_ID' => '',
-      'TAG' => 'comp_computer2',
-      'COUNT' => 1,
-      'ATTACK_COUNT' => 0
-    },
-    'comp_energy11' => {
-      'TAG' => 'comp_energy11',
-      'COUNT' => 1,
-      'ATTACK_COUNT' => 0,
-      'IS_MISSILE' => 0,
-      'PROVIDES' => [],
-      'HULL_POINTS' => 0,
+    'shiptemplate_race_human2_4' => {
+      'COMPONENTS' => [
+        'comp_beam1',
+        'comp_computer1',
+        'comp_hull1',
+        'comp_hull1'
+      ],
       'COMPUTER' => 0,
-      'OWNER_ID' => '',
-      'SHIELD' => 0,
-      'INITIATIVE' => 0,
-      'MOVEMENT' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'REQUIRED_OPTION' => '',
-      'ENERGY' => 11,
-      'REQUIRES' => 'discovery',
-      'LONG_NAME' => 'Hypergrid Source',
-      'ATTACK_DAMAGE' => 0
-    },
-    'comp_drive4' => {
-      'IS_MISSILE' => 0,
-      'PROVIDES' => [],
-      'HULL_POINTS' => 0,
-      'COMPUTER' => 0,
-      'OWNER_ID' => '',
-      'TAG' => 'comp_drive4',
-      'COUNT' => 1,
-      'ATTACK_COUNT' => 0,
-      'REQUIRED_OPTION' => '',
-      'ENERGY' => 0,
-      'LONG_NAME' => 'Coniformal Drive',
-      'REQUIRES' => 'discovery',
-      'ATTACK_DAMAGE' => 0,
-      'SHIELD' => 0,
-      'INITIATIVE' => 2,
-      'MOVEMENT' => 4,
-      'SOURCE_TAG' => 'src_base'
-    },
-    'comp_computer1' => {
-      'ATTACK_COUNT' => 0,
-      'COUNT' => 1,
-      'TAG' => 'comp_computer1',
-      'HULL_POINTS' => 0,
-      'PROVIDES' => [],
-      'IS_MISSILE' => 0,
-      'OWNER_ID' => '',
-      'COMPUTER' => 1,
-      'INITIATIVE' => 0,
-      'SHIELD' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'MOVEMENT' => 0,
-      'ENERGY' => 0,
-      'REQUIRED_OPTION' => '',
-      'ATTACK_DAMAGE' => 0,
-      'LONG_NAME' => 'Electron Computer',
-      'REQUIRES' => ''
-    },
-    'comp_drive2' => {
-      'REQUIRED_OPTION' => '',
-      'ENERGY' => 0,
-      'REQUIRES' => 'tech_drive2',
-      'LONG_NAME' => 'Fusion Drive',
-      'ATTACK_DAMAGE' => 0,
-      'SHIELD' => 0,
-      'INITIATIVE' => 2,
-      'MOVEMENT' => 2,
-      'SOURCE_TAG' => 'src_base',
-      'IS_MISSILE' => 0,
-      'PROVIDES' => [],
-      'HULL_POINTS' => 0,
-      'COMPUTER' => 0,
-      'OWNER_ID' => '',
-      'COUNT' => 1,
-      'TAG' => 'comp_drive2',
-      'ATTACK_COUNT' => 0
-    },
-    'comp_beam2' => {
-      'TAG' => 'comp_beam2',
-      'COUNT' => 1,
-      'ATTACK_COUNT' => 1,
-      'PROVIDES' => [],
-      'IS_MISSILE' => 0,
-      'HULL_POINTS' => 0,
-      'COMPUTER' => 0,
-      'OWNER_ID' => '',
-      'SHIELD' => 0,
-      'INITIATIVE' => 0,
-      'MOVEMENT' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'ENERGY' => 0,
-      'REQUIRED_OPTION' => '',
-      'ATTACK_DAMAGE' => 2,
-      'LONG_NAME' => 'Plasma Cannon',
-      'REQUIRES' => 'tech_beam2'
-    },
-    'comp_shield1' => {
-      'OWNER_ID' => '',
-      'COMPUTER' => 0,
-      'HULL_POINTS' => 0,
-      'PROVIDES' => [],
-      'IS_MISSILE' => 0,
-      'ATTACK_COUNT' => 0,
-      'COUNT' => 1,
-      'TAG' => 'comp_shield1',
-      'ATTACK_DAMAGE' => 0,
-      'LONG_NAME' => 'Gauss Shield',
-      'REQUIRES' => 'tech_shield1',
-      'ENERGY' => 0,
-      'REQUIRED_OPTION' => '',
-      'SOURCE_TAG' => 'src_base',
-      'MOVEMENT' => 0,
-      'INITIATIVE' => 0,
-      'SHIELD' => 1
-    },
-    'comp_energy6' => {
-      'COMPUTER' => 0,
-      'OWNER_ID' => '',
-      'IS_MISSILE' => 0,
-      'PROVIDES' => [],
-      'HULL_POINTS' => 0,
-      'TAG' => 'comp_energy6',
-      'COUNT' => 1,
-      'ATTACK_COUNT' => 0,
-      'REQUIRES' => 'tech_energy6',
-      'LONG_NAME' => 'Fusion Source',
-      'ATTACK_DAMAGE' => 0,
-      'REQUIRED_OPTION' => '',
-      'ENERGY' => 6,
-      'MOVEMENT' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'SHIELD' => 0,
-      'INITIATIVE' => 0
-    },
-    'comp_drive1' => {
-      'INITIATIVE' => 1,
-      'SHIELD' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'MOVEMENT' => 1,
-      'REQUIRED_OPTION' => '',
-      'ENERGY' => 0,
-      'REQUIRES' => '',
-      'LONG_NAME' => 'Nuclear Drive',
-      'ATTACK_DAMAGE' => 0,
-      'ATTACK_COUNT' => 0,
-      'COUNT' => 1,
-      'TAG' => 'comp_drive1',
-      'HULL_POINTS' => 0,
-      'IS_MISSILE' => 0,
-      'PROVIDES' => [],
-      'OWNER_ID' => '',
-      'COMPUTER' => 0
-    },
-    'comp_beam4' => {
-      'REQUIRED_OPTION' => '',
-      'ENERGY' => 0,
-      'LONG_NAME' => 'Antimatter Cannon',
-      'REQUIRES' => 'tech_beam4',
-      'ATTACK_DAMAGE' => 4,
-      'SHIELD' => 0,
-      'INITIATIVE' => 0,
-      'MOVEMENT' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'IS_MISSILE' => 0,
-      'PROVIDES' => [],
-      'HULL_POINTS' => 0,
-      'COMPUTER' => 0,
-      'OWNER_ID' => '',
-      'COUNT' => 1,
-      'TAG' => 'comp_beam4',
-      'ATTACK_COUNT' => 1
-    },
-    'comp_energy3' => {
-      'ATTACK_DAMAGE' => 0,
-      'LONG_NAME' => 'Nuclear Source',
-      'REQUIRES' => '',
       'ENERGY' => 3,
-      'REQUIRED_OPTION' => '',
-      'MOVEMENT' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'SHIELD' => 0,
-      'INITIATIVE' => 0,
-      'COMPUTER' => 0,
-      'OWNER_ID' => '',
-      'PROVIDES' => [],
-      'IS_MISSILE' => 0,
       'HULL_POINTS' => 0,
-      'TAG' => 'comp_energy3',
-      'COUNT' => 1,
-      'ATTACK_COUNT' => 0
-    },
-    'comp_shield2' => {
-      'SHIELD' => 2,
+      'COST' => 3,
+      'LONG_NAME' => 'Yang',
       'INITIATIVE' => 0,
-      'MOVEMENT' => 0,
-      'SOURCE_TAG' => 'src_base',
-      'REQUIRED_OPTION' => '',
-      'ENERGY' => 0,
-      'LONG_NAME' => 'Phase Shield',
-      'REQUIRES' => 'tech_shield2',
-      'ATTACK_DAMAGE' => 0,
-      'TAG' => 'comp_shield2',
-      'COUNT' => 1,
-      'ATTACK_COUNT' => 0,
-      'IS_MISSILE' => 0,
-      'PROVIDES' => [],
-      'HULL_POINTS' => 0,
-      'COMPUTER' => 0,
-      'OWNER_ID' => ''
-    }
-  },
-  'AVAILABLE_TECH' => [
-    'tech_beam2',
-    'tech_advanced_build',
-    'tech_advanced_minerals',
-    'tech_ring',
-    'tech_influence1',
-    'tech_bombs',
-    'tech_energy6',
-    'tech_drive2',
-    'tech_computer2',
-    'tech_shield1',
-    'tech_drive2',
-    'tech_advanced_build',
-    'tech_starbase',
-    'tech_starbase'
-  ],
-  'SHIP_POOL' => {
-    'ship_shiptemplate_ancient1' => {
-      'TEMPLATE_TAG' => 'shiptemplate_ancient1',
-      'TAG' => 'ship_shiptemplate_ancient1',
-      'COUNT' => 1,
-      'DAMAGE' => 0,
       'SOURCE_TAG' => undef,
-      'PROVIDES' => [],
-      'REQUIRED_OPTION' => '',
-      'LONG_NAME' => '',
-      'OWNER_ID' => -1
-    },
-    'ship_shiptemplate_defense1' => {
-      'TEMPLATE_TAG' => 'shiptemplate_defense1',
-      'DAMAGE' => 0,
-      'SOURCE_TAG' => undef,
-      'TAG' => 'ship_shiptemplate_defense1',
+      'TAG' => 'shiptemplate_race_human2_4',
+      'SLOTS' => 5,
       'COUNT' => 1,
+      'CLASS' => 'class_starbase',
+      'OWNER_ID' => '',
+      'SHIELDS' => 0,
       'REQUIRED_OPTION' => '',
       'PROVIDES' => [],
-      'OWNER_ID' => -1,
-      'LONG_NAME' => ''
+      'VP_DRAW' => 1
     }
-  },
-  'TECHNOLOGY' => {
-    'tech_beam4' => {
-      'CATEGORY' => 'grid',
-      'SOURCE_TAG' => 'src_base',
-      'MIN_COST' => 7,
-      'COUNT' => 3,
-      'BASE_COST' => 14,
-      'TAG' => 'tech_beam4',
-      'REQUIRED_OPTION' => '',
-      'PROVIDES' => [],
-      'OWNER_ID' => '',
-      'LONG_NAME' => 'Antimatter Cannon'
-    },
-    'tech_energy9' => {
-      'BASE_COST' => 12,
-      'MIN_COST' => 6,
-      'TAG' => 'tech_energy9',
-      'COUNT' => 3,
-      'SOURCE_TAG' => 'src_base',
-      'CATEGORY' => 'military',
-      'LONG_NAME' => 'Tachyon Source',
-      'OWNER_ID' => '',
-      'PROVIDES' => [],
-      'REQUIRED_OPTION' => ''
-    },
-    'tech_advanced_build' => {
-      'SOURCE_TAG' => 'src_base',
-      'BASE_COST' => 2,
-      'MIN_COST' => 2,
-      'TAG' => 'tech_advanced_build',
-      'COUNT' => 5,
-      'CATEGORY' => 'nano',
-      'OWNER_ID' => '',
-      'LONG_NAME' => 'Nanorobots',
-      'REQUIRED_OPTION' => '',
-      'PROVIDES' => []
-    },
-    'tech_energy6' => {
-      'LONG_NAME' => 'Fusion Source',
-      'OWNER_ID' => '',
-      'PROVIDES' => [],
-      'REQUIRED_OPTION' => '',
-      'MIN_COST' => 6,
-      'TAG' => 'tech_energy6',
-      'BASE_COST' => 10,
-      'COUNT' => 5,
-      'SOURCE_TAG' => 'src_base',
-      'CATEGORY' => 'grid'
-    },
-    'tech_computer3' => {
-      'CATEGORY' => 'military',
-      'SOURCE_TAG' => 'src_base',
-      'MIN_COST' => 8,
-      'COUNT' => 3,
-      'BASE_COST' => 16,
-      'TAG' => 'tech_computer3',
-      'REQUIRED_OPTION' => '',
-      'PROVIDES' => [],
-      'OWNER_ID' => '',
-      'LONG_NAME' => 'Gluon Computer'
-    },
-    'tech_computer2' => {
-      'CATEGORY' => 'grid',
-      'SOURCE_TAG' => 'src_base',
-      'MIN_COST' => 5,
-      'BASE_COST' => 8,
-      'COUNT' => 4,
-      'TAG' => 'tech_computer2',
-      'REQUIRED_OPTION' => '',
-      'PROVIDES' => [],
-      'OWNER_ID' => '',
-      'LONG_NAME' => 'Positron Computer'
-    },
-    'tech_drive2' => {
-      'OWNER_ID' => '',
-      'LONG_NAME' => 'Fusion Drive',
-      'REQUIRED_OPTION' => '',
-      'PROVIDES' => [],
-      'SOURCE_TAG' => 'src_base',
-      'MIN_COST' => 3,
-      'BASE_COST' => 4,
-      'COUNT' => 5,
-      'TAG' => 'tech_drive2',
-      'CATEGORY' => 'grid'
-    },
-    'tech_beam2' => {
-      'OWNER_ID' => '',
-      'LONG_NAME' => 'Plasma Cannon',
-      'REQUIRED_OPTION' => '',
-      'PROVIDES' => [],
-      'SOURCE_TAG' => 'src_base',
-      'TAG' => 'tech_beam2',
-      'MIN_COST' => 4,
-      'BASE_COST' => 6,
-      'COUNT' => 5,
-      'CATEGORY' => 'military'
-    },
-    'tech_influence2' => {
-      'OWNER_ID' => '',
-      'LONG_NAME' => 'Quantum Grid',
-      'REQUIRED_OPTION' => '',
-      'PROVIDES' => [],
-      'SOURCE_TAG' => 'src_base',
-      'MIN_COST' => 8,
-      'BASE_COST' => 16,
-      'TAG' => 'tech_influence2',
-      'COUNT' => 3,
-      'CATEGORY' => 'grid'
-    },
-    'tech_advanced_science' => {
-      'MIN_COST' => 6,
-      'TAG' => 'tech_advanced_science',
-      'BASE_COST' => 10,
-      'COUNT' => 4,
-      'SOURCE_TAG' => 'src_base',
-      'CATEGORY' => 'nano',
-      'LONG_NAME' => 'Advanced Labs',
-      'OWNER_ID' => '',
-      'PROVIDES' => [],
-      'REQUIRED_OPTION' => ''
-    },
-    'tech_ring' => {
-      'LONG_NAME' => 'Orbital',
-      'OWNER_ID' => '',
-      'PROVIDES' => [],
-      'REQUIRED_OPTION' => '',
-      'COUNT' => 4,
-      'MIN_COST' => 5,
-      'BASE_COST' => 8,
-      'TAG' => 'tech_ring',
-      'SOURCE_TAG' => 'src_base',
-      'CATEGORY' => 'nano'
-    },
-    'tech_obilisk' => {
-      'REQUIRED_OPTION' => '',
-      'PROVIDES' => [],
-      'OWNER_ID' => '',
-      'LONG_NAME' => 'Monolith',
-      'CATEGORY' => 'nano',
-      'SOURCE_TAG' => 'src_base',
-      'BASE_COST' => 12,
-      'MIN_COST' => 6,
-      'TAG' => 'tech_obilisk',
-      'COUNT' => 3
-    },
-    'tech_missile2' => {
-      'LONG_NAME' => 'Plasma Missile',
-      'OWNER_ID' => '',
-      'PROVIDES' => [],
-      'REQUIRED_OPTION' => '',
-      'MIN_COST' => 7,
-      'TAG' => 'tech_missile2',
-      'BASE_COST' => 14,
-      'COUNT' => 3,
-      'SOURCE_TAG' => 'src_base',
-      'CATEGORY' => 'military'
-    },
-    'tech_shield2' => {
-      'BASE_COST' => 8,
-      'MIN_COST' => 5,
-      'COUNT' => 4,
-      'TAG' => 'tech_shield2',
-      'SOURCE_TAG' => 'src_base',
-      'CATEGORY' => 'military',
-      'LONG_NAME' => 'Phase Shield',
-      'OWNER_ID' => '',
-      'PROVIDES' => [],
-      'REQUIRED_OPTION' => ''
-    },
-    'tech_influence1' => {
-      'CATEGORY' => 'nano',
-      'SOURCE_TAG' => 'src_base',
-      'TAG' => 'tech_influence1',
-      'MIN_COST' => 4,
-      'BASE_COST' => 6,
-      'COUNT' => 5,
-      'REQUIRED_OPTION' => '',
-      'PROVIDES' => [],
-      'OWNER_ID' => '',
-      'LONG_NAME' => 'Advanced Robotics'
-    },
-    'tech_stealth' => {
-      'MIN_COST' => 6,
-      'BASE_COST' => 7,
-      'COUNT' => 1,
-      'TAG' => 'tech_stealth',
-      'SOURCE_TAG' => 'src_base',
-      'CATEGORY' => 'special',
-      'LONG_NAME' => 'Cloaking Device',
-      'OWNER_ID' => '',
-      'PROVIDES' => [],
-      'REQUIRED_OPTION' => ''
-    },
-    'tech_starbase' => {
-      'CATEGORY' => 'military',
-      'SOURCE_TAG' => 'src_base',
-      'COUNT' => 5,
-      'MIN_COST' => 3,
-      'BASE_COST' => 4,
-      'TAG' => 'tech_starbase',
-      'REQUIRED_OPTION' => '',
-      'PROVIDES' => [],
-      'OWNER_ID' => '',
-      'LONG_NAME' => 'Starbase'
-    },
-    'tech_artifact_reader' => {
-      'CATEGORY' => 'nano',
-      'MIN_COST' => 7,
-      'BASE_COST' => 14,
-      'TAG' => 'tech_artifact_reader',
-      'COUNT' => 3,
-      'SOURCE_TAG' => 'src_base',
-      'PROVIDES' => [],
-      'REQUIRED_OPTION' => '',
-      'LONG_NAME' => 'Artifact Key',
-      'OWNER_ID' => ''
-    },
-    'tech_advanced_money' => {
-      'REQUIRED_OPTION' => '',
-      'PROVIDES' => [],
-      'OWNER_ID' => '',
-      'LONG_NAME' => 'Advanced Economy',
-      'CATEGORY' => 'grid',
-      'SOURCE_TAG' => 'src_base',
-      'BASE_COST' => 10,
-      'MIN_COST' => 6,
-      'COUNT' => 4,
-      'TAG' => 'tech_advanced_money'
-    },
-    'tech_shield1' => {
-      'CATEGORY' => 'grid',
-      'MIN_COST' => 2,
-      'COUNT' => 5,
-      'BASE_COST' => 2,
-      'TAG' => 'tech_shield1',
-      'SOURCE_TAG' => 'src_base',
-      'PROVIDES' => [],
-      'REQUIRED_OPTION' => '',
-      'LONG_NAME' => 'Gauss Shield',
-      'OWNER_ID' => ''
-    },
-    'tech_hull2' => {
-      'CATEGORY' => 'grid',
-      'SOURCE_TAG' => 'src_base',
-      'MIN_COST' => 3,
-      'COUNT' => 5,
-      'BASE_COST' => 4,
-      'TAG' => 'tech_hull2',
-      'REQUIRED_OPTION' => '',
-      'PROVIDES' => [],
-      'OWNER_ID' => '',
-      'LONG_NAME' => 'Improved Hull'
-    },
-    'tech_wormhole_generator' => {
-      'CATEGORY' => 'nano',
-      'SOURCE_TAG' => 'src_base',
-      'BASE_COST' => 16,
-      'MIN_COST' => 8,
-      'TAG' => 'tech_wormhole_generator',
-      'COUNT' => 3,
-      'REQUIRED_OPTION' => '',
-      'PROVIDES' => [],
-      'OWNER_ID' => '',
-      'LONG_NAME' => 'Wormhole Generator'
-    },
-    'tech_advanced_minerals' => {
-      'OWNER_ID' => '',
-      'LONG_NAME' => 'Advanced Mining',
-      'REQUIRED_OPTION' => '',
-      'PROVIDES' => [],
-      'SOURCE_TAG' => 'src_base',
-      'COUNT' => 4,
-      'MIN_COST' => 6,
-      'BASE_COST' => 10,
-      'TAG' => 'tech_advanced_minerals',
-      'CATEGORY' => 'military'
-    },
-    'tech_bombs' => {
-      'OWNER_ID' => '',
-      'LONG_NAME' => 'Neutron Bombs',
-      'REQUIRED_OPTION' => '',
-      'PROVIDES' => [],
-      'SOURCE_TAG' => 'src_base',
-      'TAG' => 'tech_bombs',
-      'MIN_COST' => 2,
-      'BASE_COST' => 2,
-      'COUNT' => 5,
-      'CATEGORY' => 'military'
-    },
-    'tech_drive3' => {
-      'OWNER_ID' => '',
-      'LONG_NAME' => 'Tachyon Drive',
-      'REQUIRED_OPTION' => '',
-      'PROVIDES' => [],
-      'SOURCE_TAG' => 'src_base',
-      'BASE_COST' => 12,
-      'MIN_COST' => 6,
-      'COUNT' => 3,
-      'TAG' => 'tech_drive3',
-      'CATEGORY' => 'grid'
-    }
-  },
-  'SETTINGS' => {
-    'PLAYERS_NEXT_ROUND' => [],
-    'PLAYERS_DONE' => [
-      1
-    ],
-    'DEVELOPMENT_LIMIT' => 4,
-    'PLAYER_IDS' => [
-      55,
-      200,
-      300
-    ],
-    'LONG_NAME' => undef,
-    'OWNER_ID' => 0,
-    'OPTION_TAGS' => [
-      'option_test'
-    ],
-    'TILE_STACK_LIMIT_3' => 10,
-    'LOG_ID' => 'testid123',
-    'PLAYERS_PENDING' => [
-      0,
-      2
-    ],
-    'SOURCE_TAGS' => [
-      'src_base',
-      'src_test'
-    ],
-    'SHIP_INDEX' => 1
-  },
-  'STATE' => {
-    'SUBPHASE' => 0,
-    'PHASE' => 1,
-    'PLAYER' => 0,
-    'ROUND' => 1,
-    'STATE' => 2
   }
 };

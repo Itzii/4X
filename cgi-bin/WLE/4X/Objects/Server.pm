@@ -13,6 +13,7 @@ use WLE::Methods::Simple;
 use WLE::4X::Enums::Status;
 
 use WLE::4X::Objects::MetaActions;
+use WLE::4X::Objects::InfoActions;
 use WLE::4X::Objects::PlayerActions;
 use WLE::4X::Objects::RawActions;
 use WLE::4X::Objects::ServerState;
@@ -148,12 +149,12 @@ sub do {
         $user_id++;
     }
 
-    my $action = lc( $args{'action'} );
+    my $action_tag = lc( $args{'action'} );
     delete( $args{'action'} );
 
     my %actions = (
 
-        'status'            => { 'method' => \&action_status },
+        'status'            => { 'method' => \&action_status, 'flag_anytime' => 1 },
 
         'create_game'       => { 'flag_req_status' => $ST_PREGAME, 'method' => \&action_create_game },
         'add_source'        => { 'flag_req_status' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_add_source },
@@ -164,35 +165,64 @@ sub do {
         'remove_player'     => { 'flag_req_status' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_remove_player },
         'begin'             => { 'flag_req_status' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_begin },
 
-        'select_race'       => { 'flag_req_status' => $ST_RACESELECTION, 'flag_player_phase' => 1, 'method' => \&action_select_race_and_location },
+        'select_race'       => { 'flag_req_status' => $ST_RACESELECTION, 'flag_active_player' => 1, 'method' => \&action_select_race_and_location },
 
-        'action_pass'       => { 'flag_req_status' => $ST_NORMAL, 'flag_player_phase' => 1, 'method' => \&action_action_pass },
+        'action_pass'       => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_pass_action },
+        'action_explore'    => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_explore },
+        'action_influence'  => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_influence },
+        'action_research'   => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_research },
+        'action_upgrade'    => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_upgrade },
+        'action_build'      => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_build },
+        'action_move'       => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_move },
 
+        'action_react_upgrade'    => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_react_upgrade },
+        'action_react_build'      => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_react_build },
+        'action_react_move'       => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_react_move },
 
 
     );
 
-    unless ( defined( $actions{ $action } ) ) {
+    unless ( defined( $actions{ $action_tag } ) ) {
         return ( 'success' => 0, 'message' => "Invalid 'action' element." );
     }
 
-    if ( defined( $actions{ $action }->{'flag_req_status'} ) ) {
-        if ( $self->state() != $actions{ $action }->{'flag_req_status'} ) {
-            return ( 'success' => 0, 'message' => 'Invalid status for action.' );
+    my $action = $actions{ $action_tag };
+
+    unless ( defined( $action->{'flag_anytime'} ) ) {
+
+        if ( defined( $action->{'flag_req_status'} ) ) {
+            if ( $self->state() != $action->{'flag_req_status'} ) {
+                return ( 'success' => 0, 'message' => 'Invalid status for action.' );
+            }
         }
-    }
 
-
-    if ( defined( $actions{ $action }->{'flag_owner_only'} ) && $self->user_is_owner() == 0 )  {
-        return ( 'success' => 0, 'message' => 'Action is allowed by game owner only.' );
-    }
-
-    if ( defined( $actions{ $action }->{'flag_player_phase'} ) ) {
-        my $waiting_on = $self->waiting_on_player_id();
-
-        if ( $waiting_on == -1 || ( $waiting_on > -1 && $waiting_on != $self->current_user() ) ) {
-            return ( 'success' => 0, 'message' => 'Action is not allowed by this player at this time.' );
+        if ( defined( $action->{'flag_owner_only'} ) && $self->user_is_owner() == 0 )  {
+            return ( 'success' => 0, 'message' => 'Action is allowed by game owner only.' );
         }
+
+        if ( defined( $action->{'flag_active_player'} ) ) {
+            my $waiting_on = $self->waiting_on_player_id();
+
+            if ( $waiting_on == -1 || ( $waiting_on > -1 && $waiting_on != $self->current_user() ) ) {
+                return ( 'success' => 0, 'message' => 'Action is not allowed by this player at this time.' );
+            }
+        }
+
+        if ( defined( $action->{'flag_req_phase'} ) ) {
+            if ( $self->phase() != $action->{'flag_req_phase'} ) {
+                return ( 'success' => 0, 'message' => 'Wrong phase for action.' );
+            }
+        }
+
+        if ( $self->state() == $ST_NORMAL ) {
+
+            my $race = $self->race_of_current_user();
+
+            unless ( matches_any( $action_tag, $race->allowed_actions() ) ) {
+                return ( 'success' => 0, 'message' => 'Action is not allowed by player at this time.' );
+            }
+        }
+
     }
 
     my %response = (
@@ -202,7 +232,7 @@ sub do {
 
     my $data = undef;
     $args{'__data'} = \$data;
-    $response{'success'} = $actions{ $action }->{'method'}->( $self, %args );
+    $response{'success'} = $action->{'method'}->( $self, %args );
     $response{'message'} = $self->last_error();
     $response{'data'} = $data;
 
@@ -298,17 +328,36 @@ sub user_is_owner {
 sub race_tag_of_current_user {
     my $self        = shift;
 
-    if ( $self->current_user() == -1 ) {
-        return '';
-    }
+    my $race = $self->race_of_player_id( $self->current_user() );
 
-    foreach my $race_tag ( keys( %{ $self->races() } ) ) {
-        if ( $self->races()->{ $race_tag }->owner_id() == $self->current_user() ) {
-            return $race_tag;
-        }
+    if ( defined( $race ) ) {
+        return $race->tag();
     }
 
     return '';
+}
+
+#############################################################################
+
+sub race_of_player_id {
+    my $self        = shift;
+    my $player_id   = shift;
+
+    foreach my $race ( values( %{ $self->races() } ) ) {
+        if ( $race->owner_id() eq $player_id ) {
+            return $race;
+        }
+    }
+
+    return undef;
+}
+
+#############################################################################
+
+sub race_of_current_user {
+    my $self        = shift;
+
+    return $self->race_of_player_id( $self->current_user() );
 }
 
 #############################################################################

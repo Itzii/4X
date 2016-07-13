@@ -56,6 +56,8 @@ sub _init {
         'MOVE' => 3,
     };
 
+    $self->{'ALLOWED_ACTIONS'} = [];
+
     $self->{'RESOURCES'} = {
         'MONEY' => 2,
         'SCIENCE' => 3,
@@ -156,6 +158,63 @@ sub set_flag_passed {
     my $value       = shift;
 
     $self->{'FLAG_PASSED'} = $value;
+
+    return;
+}
+
+#############################################################################
+
+sub allowed_actions {
+    my $self        = shift;
+
+    return @{ $self->{'ALLOWED_ACTIONS'} };
+}
+
+#############################################################################
+
+sub set_allowed_actions {
+    my $self        = shift;
+    my @actions     = @_;
+
+    @{ $self->{'ALLOWED_ACTIONS'} } = @actions;
+
+    return;
+}
+
+#############################################################################
+
+sub start_turn {
+    my $self        = shift;
+
+    if ( $self->has_passed() ) {
+        $self->set_allowed_actions(
+            'action_pass_action',
+            'action_react_upgrade',
+            'action_react_build',
+            'action_react_move',
+        );
+    }
+    else {
+        $self->set_allowed_actions(
+            'action_pass_action',
+            'action_explore',
+            'action_influence',
+            'action_research',
+            'action_upgrade',
+            'action_build',
+            'action_move',
+        );
+    }
+
+    return;
+}
+
+#############################################################################
+
+sub end_turn {
+    my $self        = shift;
+
+    $self->set_allowed_actions();
 
     return;
 }
@@ -392,6 +451,10 @@ sub from_hash {
         }
     }
 
+    if ( defined( $r_hash->{'ALLOWED_ACTIONS'} ) ) {
+        @{ $self->{'ALLOWED_ACTIONS'} } = @{ $r_hash->{'ALLOWED_ACTIONS'} };
+    }
+
     my @templates = ();
 
     if ( defined( $r_hash->{'SHIP_TEMPLATES'} ) ) {
@@ -485,19 +548,7 @@ sub to_hash {
         $r_hash->{'VP_SLOTS'}->{ $section_tag } = $self->{'VP_SLOTS'}->{ $section_tag };
     }
 
-#    my @templates = ();
-#    foreach my $template_tag ( @{ $self->{'SHIP_TEMPLATES'} } ) {
-#        my $template = $self->server()->templates()->{ $template_tag };
-#
-#        if ( defined( $template ) ) {
-#            my $template_hash = {};
-#            if ( $template->to_hash( $template_hash ) ) {
-#                push( @templates, $template_hash );
-#            }
-#        }
-#    }
-#
-#    $r_hash->{'SHIP_TEMPLATES'} = \@templates;
+    $r_hash->{'ALLOWED_ACTIONS'} = $self->{'ALLOWED_ACTIONS'};
 
     $r_hash->{'SHIP_TEMPLATES'} = $self->{'SHIP_TEMPLATES'};
 

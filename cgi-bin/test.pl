@@ -362,7 +362,26 @@ sub test_Object_Server {
 		'log_id'		=> $log_id,
 	);
 
+	@status = split( /:/, $response{'data'} );
+	$waiting_for = $status[ 3 ];
 	show( $server->status() );
+
+	%response = $server->do(
+		'action'		=> 'action_pass',
+		'user'			=> '3',
+		'log_id'		=> $log_id,
+	);
+
+	ok( $response{'success'} == 0, 'action_pass failed' );
+
+	%response = $server->do(
+		'action'		=> 'action_pass',
+		'user'			=> $waiting_for,
+		'log_id'		=> $log_id,
+	);
+
+	ok( $response{'success'} == 1, 'action_pass succeeded' );
+	show( $response{'message'} );
 
 
 	return;

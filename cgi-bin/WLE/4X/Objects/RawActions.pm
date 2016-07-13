@@ -37,7 +37,12 @@ my %actions = (
     \&_raw_add_to_available_tech        => 'add_to_available_tech',
     \&_raw_next_player                  => 'next_player',
     \&_raw_start_next_round             => 'start_next_round',
+    \&_raw_set_allowed_race_actions     => 'set_allowed_actions',
 
+    \&_raw_player_pass_action           => 'player_pass',
+
+
+    \&_raw_start_combat_phase           => 'start_combat_phase',
 
 );
 
@@ -618,6 +623,42 @@ sub _raw_add_players_to_next_round {
 
 #############################################################################
 
+sub _raw_start_combat_phase {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'beginning combat phase';
+    }
+
+    # TODO start the combat phase
+
+    # get a list of tiles that combat is going to take place in.
+    # if there are any then we begin the combat phase in the outermost tile
+    # otherwise we skip to the upkeep phase
+
+
+
+    $self->{'STATE'} = {
+        'STATE' => $ST_NORMAL,
+        'ROUND' => $self->round(),
+        'PHASE' => $PH_COMBAT,
+        'PLAYER' => -1,
+        'SUBPHASE' => 0,
+    };
+
+    $self->_raw_set_status( $EV_SUB_ACTION, $self->status() );
+
+    return;
+}
+
+#############################################################################
+
 sub _raw_create_tile_stack {
     my $self        = shift;
     my $source      = shift;
@@ -894,6 +935,27 @@ sub _raw_influence_tile {
 
 #############################################################################
 
+sub _raw_set_allowed_race_actions {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $race_tag    = shift( @args );
+    my @allowed     = @args;
+
+    my $race = $self->races()->{ $race_tag };
+
+    $race->set_allowed_actions( @allowed );
+
+    return;
+}
+
+#############################################################################
+
 sub _raw_remove_non_playing_races {
     my $self        = shift;
     my $source      = shift;
@@ -1107,6 +1169,27 @@ sub _raw_add_to_available_tech {
     return;
 }
 
+#############################################################################
+
+sub _raw_player_pass_action {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $race = $self->race_of_current_user();
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return $race->tag() . ' passed';
+    }
+
+    $race->set_flag_passed( 1 );
+
+    return;
+}
 
 #############################################################################
 
@@ -1123,12 +1206,25 @@ sub _raw_next_player {
         return 'next player';
     }
 
+    my $race = $self->race_of_current_user();
+    if ( defined( $race ) ) {
+        $race->end_turn();
+    }
+
     my $done_player = shift( @{ $self->{'SETTINGS'}->{'PLAYERS_PENDING'} } );
 
     push( @{ $self->{'SETTINGS'}->{'PLAYERS_DONE'} }, $done_player );
 
     if ( scalar( @{ $self->{'SETTINGS'}->{'PLAYERS_PENDING'} } ) > 0 ) {
-        $self->{'STATE'}->{'PLAYER'} = $self->{'SETTINGS'}->{'PLAYERS_PENDING'}->[ 0 ];
+
+        my $current_player = $self->{'SETTINGS'}->{'PLAYERS_PENDING'}->[ 0 ];
+
+        $race = $self->race_of_player_id( $current_player );
+        if ( defined( $race ) ) {
+            $race->start_turn();
+        }
+
+        $self->{'STATE'}->{'PLAYER'} = $current_player;
         return;
     }
 
@@ -1165,12 +1261,16 @@ sub _raw_start_next_round {
     $self->{'SETTINGS'}->{'PLAYERS_PENDING'} = \@ready;
 
     my $new_round = $self->{'STATE'}->{'ROUND'} + 1;
+    my $current_player = $self->{'SETTINGS'}->{'PLAYERS_PENDING'}->[ 0 ];
+
+    my $race = $self->race_of_player_id( $current_player );
+    $race->start_turn();
 
     $self->{'STATE'} = {
         'STATE' => $ST_NORMAL,
         'ROUND' => $new_round,
         'PHASE' => $PH_ACTION,
-        'PLAYER' => $self->{'SETTINGS'}->{'PLAYERS_PENDING'}->[ 0 ],
+        'PLAYER' => $current_player,
         'SUBPHASE' => 0,
     };
 

@@ -245,24 +245,44 @@ sub start_turn {
     $self->{'ACTION_COUNT'} = 0;
     $self->allowed_actions()->clear();
 
+    my $has_movable_ships = 0;
+
+    foreach my $tile_tag ( $self->server()->board()->tiles_on_board() ) {
+        if ( $self->server()->tiles()->{ $tile_tag }->unpinned_ship_count( $self->owner_id() ) ) {
+            $has_movable_ships = 1;
+            last;
+        }
+    }
+
     if ( $self->has_passed() ) {
         $self->allowed_actions()->add_items(
             'action_pass',
             'action_react_upgrade',
             'action_react_build',
-            'action_react_move',
         );
+
+        if ( $has_movable_ships ) {
+            $self->allowed_actions()->add_items( 'action_react_move' );
+        }
     }
     else {
-        $self->set_allowed_actions()->add_items(
+        $self->allowed_actions()->add_items(
             'action_pass',
-            'action_explore',
             'action_influence',
             'action_research',
             'action_upgrade',
             'action_build',
-            'action_move',
         );
+
+        my @explorable_locations = $self->server()->board()->explorable_spaces_for_race( $self->tag() );
+        if ( scalar( @explorable_locations ) ) {
+            $self->allowed_actions()->add_items( 'action_explore' );
+        }
+
+        if ( $has_movable_ships ) {
+            $self->allowed_actions()->add_items( 'action_move' );
+        }
+
     }
 
     return;

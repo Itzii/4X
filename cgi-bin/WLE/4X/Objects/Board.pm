@@ -123,6 +123,39 @@ sub tile_discard_stack {
 
 #############################################################################
 
+sub tiles_on_board {
+    my $self        = shift;
+
+    my @tags = ();
+
+    foreach my $column ( keys( %{ $self->{'SPACES'} } ) ) {
+        foreach my $row ( keys( %{ $self->{'SPACES'}->{ $column } } ) ) {
+            push( @tags, $self->{'SPACES'}->{ $column }->{ $row } );
+        }
+    }
+
+    return;
+}
+
+#############################################################################
+
+sub location_of_tile {
+    my $self        = shift;
+    my $tile_tag    = shift;
+
+    foreach my $column ( keys( %{ $self->{'SPACES'} } ) ) {
+        foreach my $row ( keys( %{ $self->{'SPACES'}->{ $column } } ) ) {
+            if ( $self->{'SPACES'}->{ $column }->{ $row } eq $tile_tag ) {
+                return $column . ':' . $row;
+            }
+        }
+    }
+
+    return '';
+}
+
+#############################################################################
+
 sub server {
     my $self        = shift;
 
@@ -164,13 +197,14 @@ sub place_tile {
 
 sub explorable_spaces_for_race {
     my $self        = shift;
+    my $race_tag    = shift;
 
     my %explorable = ();
 
     foreach my $column ( keys( %{ $self->{'SPACES'} } ) ) {
         foreach my $row ( keys( %{ $self->{'SPACES'}->{ $column } } ) ) {
 
-            foreach my $adjacent_location ( $self->_explorable_from_location( $column, $row ) ) {
+            foreach my $adjacent_location ( $self->_explorable_from_location( $race_tag, $column, $row ) ) {
                 $explorable{ $adjacent_location } = 1;
             }
         }
@@ -183,6 +217,7 @@ sub explorable_spaces_for_race {
 
 sub _explorable_from_location {
     my $self        = shift;
+    my $race_tag    = shift;
     my $x_pos       = shift;
     my $y_pos       = shift;
 
@@ -190,7 +225,7 @@ sub _explorable_from_location {
 
     my $flag_explorer_available = 0;
 
-    if ( $tile->owner_id() == $self->server()->current_user() ) {
+    if ( $tile->owner_id() == $self->races()->{ $race_tag }->owner_id() ) {
         $flag_explorer_available = 1;
     }
     elsif ( $tile->unpinned_ship_count() > 0 ) {

@@ -244,7 +244,7 @@ sub unpinned_ship_count {
         }
     }
 
-    if ( $enemy_count == 0 ) {
+    if ( $friendly_count == 0 || $enemy_count == 0 ) {
         return $friendly_count;
     }
 

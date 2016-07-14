@@ -10,6 +10,9 @@ our @EXPORT_OK = qw(
 
 our @EXPORT = qw(
 
+    text_from_resource_enum
+    enum_from_resource_text
+
     $RES_MONEY
     $RES_MINERALS
     $RES_SCIENCE
@@ -57,12 +60,12 @@ sub enum_from_resource_text {
     my $text        = shift;
 
     foreach my $enum ( 0 .. $RES_COUNT - 1 ) {
-        if ( text_from_resource_enum( $enum ) eq $text ) {
+        if ( text_from_resource_enum( $enum ) eq uc( $text ) ) {
             return $enum;
         }
     }
 
-    if ( text_from_resouce_enum( $RES_WILD ) eq $text ) {
+    if ( text_from_resouce_enum( $RES_WILD ) eq uc( $text ) ) {
         return $RES_WILD;
     }
 

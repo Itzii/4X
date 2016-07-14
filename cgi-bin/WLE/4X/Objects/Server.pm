@@ -164,6 +164,7 @@ sub do {
     my %actions = (
 
         'status'            => { 'method' => \&action_status, 'flag_anytime' => 1 },
+        'exchange'          => { 'method' => \&action_exchange, 'flag_anytime' => 1 },
 
         'create_game'       => { 'flag_req_status' => $ST_PREGAME, 'method' => \&action_create_game },
         'add_source'        => { 'flag_req_status' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_add_source },
@@ -392,6 +393,39 @@ sub action_status {
         $player_id,
         $self->{'STATE'}->{'SUBPHASE'},
     );
+
+    return 1;
+}
+
+#############################################################################
+
+sub action_exchange {
+    my $self        = shift;
+    my %args        = @_;
+
+    unless ( $self->_open_for_writing( $self->log_id() ) ) {
+        return 0;
+    }
+
+    unless ( defined( $args{'res_from'} ) ) {
+        $self->set_error( 'Missing Resource - From' );
+        return 0;
+    }
+
+    unless ( defined( $args{'res_to'} ) ) {
+        $self->set_error( 'Missing Resource - To' );
+        return 0;
+    }
+
+    $self->_raw_exchange(
+        $EV_FROM_INTERFACE,
+        enum_from_resource_text( $args{'res_from'} ),
+        enum_from_resource_text( $args{'res_to'} ),
+    );
+
+    $self->_save_state();
+
+    $self->_close_all();
 
     return 1;
 }

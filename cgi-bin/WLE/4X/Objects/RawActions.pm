@@ -11,6 +11,7 @@ use WLE::4X::Enums::Basic;
 my %actions = (
     \&_raw_create_game                  => 'create',
     \&_raw_set_status                   => 'status',
+    \&_raw_exchange                     => 'exchange',
     \&_raw_add_source                   => 'add_source',
     \&_raw_remove_source                => 'remove_source',
     \&_raw_add_option                   => 'add_option',
@@ -22,6 +23,7 @@ my %actions = (
     \&_raw_add_players_to_next_round    => 'queue_next_round',
     \&_raw_create_tile_stack            => 'create_tile_stack',
     \&_raw_remove_tile_from_stack       => 'remove_tile_from_stack',
+    \&_raw_empty_tile_discard_stack     => 'empty_tile_discard',
     \&_raw_place_tile_on_board          => 'place_tile_on_board',
     \&_raw_discard_tile                 => 'discard_tile',
     \&_raw_create_development_stack     => 'create_development_stack',
@@ -40,6 +42,9 @@ my %actions = (
     \&_raw_set_allowed_race_actions     => 'set_allowed_actions',
 
     \&_raw_increment_race_action        => 'inc_race_action',
+    \&_raw_spend_influence              => 'spend_influence',
+    \&_raw_add_item_to_hand             => 'add_hand_item',
+    \&_raw_remove_item_from_hand        => 'remove_hand_item',
     \&_raw_player_pass_action           => 'player_pass',
 
 
@@ -95,6 +100,33 @@ sub _raw_set_status {
     $self->{'STATE'}->{'PHASE'} = $values[ 2 ];
     $self->{'STATE'}->{'PLAYER'} = $values[ 3 ];
     $self->{'STATE'}->{'SUBPHASE'} = $values[ 4 ];
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_exchange {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $res_from    = shift( @args );
+    my $res_to      = shift( @args );
+    my $quantity    = shift( @args );
+
+    my $race = $self->race_of_current_user();
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        my ( $cost, $return ) = $race->exchange_rate( $res_from, $res_to );
+        return 'exchanged ' . $cost . ' ' . text_from_resource_enum( $res_from ) . ' for ' . $return . ' ' . text_from_resource_enum( $res_to );
+    }
+
+    $race->exchange_resources( $res_from, $res_to );
 
     return;
 }
@@ -696,6 +728,28 @@ sub _raw_remove_tile_from_stack {
 
 #############################################################################
 
+sub _raw_empty_tile_discard_stack {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $stack_id = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'discard pile for tile stack ' . $stack_id . ' emptied';
+    }
+
+    $self->board()->tile_discard_stack( $stack_id )->clear();
+
+    return;
+}
+
+#############################################################################
+
 sub _raw_place_tile_on_board {
     my $self        = shift;
     my $source      = shift;
@@ -831,7 +885,7 @@ sub _raw_select_race_and_location {
             $open_slots = $start_hex->available_resource_spots( $type->[ 0 ], 1 );
 
             foreach ( 1 .. $open_slots ) {
-                $race->remove_cube( $type->[ 0 ] );
+                $race->track_of( $type->[ 0 ] )->spend();
                 $start_hex->add_cube( $race->owner_id(), $type->[ 0 ], 1 )
             }
         }
@@ -905,7 +959,7 @@ sub _raw_influence_tile {
 
     my $race = $self->races()->{ $race_tag };
 
-    $race->remove_cube( $RES_INFLUENCE );
+    $race->track_of( $RES_INFLUENCE )->spend();
 
     $self->tiles()->{ $tile_tag }->set_owner_id( $race->owner_id() );
 
@@ -1150,6 +1204,75 @@ sub _raw_increment_race_action {
     my $race = $self->race_of_current_user();
 
     $race->set_action_count( $self->action_count() + 1 );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_spend_influence {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $race = $self->race_of_current_user();
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return $race_tag . ' spent 1 influence';
+    }
+
+
+
+
+
+}
+
+#############################################################################
+
+sub _raw_add_item_to_hand {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $race = $self->race_of_current_user();
+    my $item = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'added to hand: ' . $item;
+    }
+
+    $race->in_hand()->add_items( $item );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_remove_item_from_hand {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $race = $self->race_of_current_user();
+    my $item = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'removed from hand: ' . $item;
+    }
+
+    $race->in_hand()->remove_item( $item );
 
     return;
 }

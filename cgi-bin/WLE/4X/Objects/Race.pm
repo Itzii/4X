@@ -5,6 +5,8 @@ use warnings;
 
 use WLE::4X::Enums::Basic;
 
+use WLE::4X::Objects::ResourceTrack;
+
 use parent 'WLE::4X::Objects::Element';
 #############################################################################
 # constructor args
@@ -64,29 +66,36 @@ sub _init {
     $self->{'IN_HAND'} = WLE::Objects::Stack->new();
 
     $self->{'RESOURCES'} = {
-        'MONEY' => 2,
-        'SCIENCE' => 3,
-        'MINERALS' => 3,
+        $RES_MONEY => 2,
+        $RES_SCIENCE => 3,
+        $RES_MINERALS => 3,
     };
 
-    $self->{'TRACKS'} = {
-        'INFLUENCE' => {
-            'PROGRESSION' => [ -30, -25, -21, -17, -13, -10, -7, -5, -3, -2, -1, 0, 0, 0 ],
-            'COUNT' => 13,
-        },
-        'MONEY' => {
-            'PROGRESSION' => [ 28, 24, 21, 18, 15, 12, 10, 8, 6, 4, 3, 2, 0 ],
-            'COUNT' => 11,
-        },
-        'SCIENCE' => {
-            'PROGRESSION' => [ 28, 24, 21, 18, 15, 12, 10, 8, 6, 4, 3, 2, 0 ],
-            'COUNT' => 11,
-        },
-        'MINERALS' => {
-            'PROGRESSION' => [ 28, 24, 21, 18, 15, 12, 10, 8, 6, 4, 3, 2, 0 ],
-            'COUNT' => 11,
-        },
-    };
+    $self->{'TRACKS'} = {};
+
+    my $track = WLE::4X::Objects::ResourceTrack->new( 'store_spent' => 1 );
+    $track->set_values( -30, -25, -21, -17, -13, -10, -7, -5, -3, -2, -1, 0, 0, 0 );
+    $track->add_to_track( 13 );
+
+    $self->{'TRACKS'}->{ $RES_INFLUENCE } = $track;
+
+    $track = WLE::4X::Objects::ResourceTrack->new();
+    $track->set_values( 28, 24, 21, 18, 15, 12, 10, 8, 6, 4, 3, 2, 0 );
+    $track->add_to_track( 11 );
+
+    $self->{'TRACKS'}->{ $RES_SCIENCE } = $track;
+
+    $track = WLE::4X::Objects::ResourceTrack->new();
+    $track->set_values( 28, 24, 21, 18, 15, 12, 10, 8, 6, 4, 3, 2, 0 );
+    $track->add_to_track( 11 );
+
+    $self->{'TRACKS'}->{ $RES_MONEY } = $track;
+
+    $track = WLE::4X::Objects::ResourceTrack->new();
+    $track->set_values( 28, 24, 21, 18, 15, 12, 10, 8, 6, 4, 3, 2, 0 );
+    $track->add_to_track( 11 );
+
+    $self->{'TRACKS'}->{ $RES_MINERALS } = $track;
 
     $self->{'TECH'} = {
         'MILITARY' => {
@@ -239,6 +248,42 @@ sub in_hand {
 
 #############################################################################
 
+sub exchange_rate {
+    my $self        = shift;
+    my $res_from    = shift;
+    my $res_to      = shift;
+
+    if ( $self->provides( 'spec_pirates' ) ) {
+        if ( $res_from == $RES_MONEY ) {
+            return ( 3, 2 );
+        }
+    }
+
+    return ( $self->{'EXCHANGE'}, 1 );
+}
+
+#############################################################################
+
+sub exchange_resources {
+    my $self        = shift;
+    my $res_from    = shift;
+    my $res_to      = shift;
+
+    my ( $cost, $return ) = $self->exchange_rate( $res_from, $res_to );
+
+    if ( $self->{'RESOURCES'}->{ $res_from } < $cost ) {
+        return 0;
+    }
+
+    $self->{'RESOURCES'}->{ $res_from } -= $cost;
+    $self->{'RESOURCES'}->{ $res_to } += $return;
+
+    return 1;
+}
+
+
+#############################################################################
+
 sub start_turn {
     my $self        = shift;
 
@@ -336,88 +381,11 @@ sub template_of_class {
 
 #############################################################################
 
-sub cube_count {
+sub track_of {
     my $self        = shift;
     my $type_enum   = shift;
 
-    my $type_text = WLE::4X::Enums::Basic::text_from_resource_enum( $type_enum );
-
-    unless ( defined( $self->{'TRACKS'}->{ $type_text } ) ) {
-        return 0;
-    }
-
-    return $self->{'TRACKS'}->{ $type_text }->{'COUNT'};
-}
-
-#############################################################################
-
-sub cube_count_is_max {
-    my $self        = shift;
-    my $type_enum   = shift;
-
-    my $type_text = WLE::4X::Enums::Basic::text_from_resource_enum( $type_enum );
-
-    unless ( defined( $self->{'TRACKS'}->{ $type_text } ) ) {
-        return 1;
-    }
-
-    my $max = scalar( @{ $self->{'TRACKS'}->{ $type_text }->{'PROGRESSION'} } ) - 1;
-    my $current = $self->{'TRACKS'}->{ $type_text }->{'COUNT'};
-
-    return ( $current >= $max );
-}
-
-#############################################################################
-
-sub remove_cube {
-    my $self        = shift;
-    my $type_enum   = shift;
-
-    unless ( $self->cube_count( $type_enum ) > 0 ) {
-        return 0;
-    }
-
-    my $type_text = WLE::4X::Enums::Basic::text_from_resource_enum( $type_enum );
-
-    $self->{'TRACKS'}->{ $type_text }->{'COUNT'} --;
-
-    return 1;
-}
-
-#############################################################################
-
-sub add_cube {
-    my $self        = shift;
-    my $type_enum   = shift;
-
-    if ( $self->cube_count_is_max( $type_enum ) ) {
-        return 0;
-    }
-
-    my $type_text = WLE::4X::Enums::Basic::text_from_resource_enum( $type_enum );
-
-    $self->{'TRACKS'}->{ $type_text }->{'COUNT'} ++;
-
-    return 1;
-}
-
-#############################################################################
-
-sub cube_income {
-    my $self        = shift;
-    my $type_enum   = shift;
-
-    my $type_text = WLE::4X::Enums::Basic::text_from_resource_enum( $type_enum );
-
-    if ( $type_text == $RES_UNKNOWN ) {
-        return 0;
-    }
-
-    unless ( defined( $self->{'TRACKS'}->{ $type_text } ) ) {
-        return 0;
-    }
-
-    return $self->{'TRACKS'}->{ $type_text }->{'PROGRESSION'}->[ $self->{'TRACKS'}->{ $type_text }->{'COUNT'} ];
+    return $self->{'TRACKS'}->{ $type_enum };
 }
 
 #############################################################################
@@ -496,18 +464,30 @@ sub from_hash {
     }
 
     if ( defined( $r_hash->{'RESOURCES'} ) ) {
-        foreach my $resource_tag ( 'MONEY', 'SCIENCE', 'MINERALS' ) {
-            if ( WLE::Methods::Simple::looks_like_number( $r_hash->{'ACTIONS'}->{ $resource_tag } ) ) {
-                $self->{'RESOURCES'}->{ $resource_tag } = $r_hash->{'RESOURCES'}->{ $resource_tag };
+        foreach my $resource_type ( $RES_MONEY, $RES_SCIENCE, $RES_MINERALS ) {
+            my $resource_text = text_from_resource_enum( $resource_type );
+            if ( WLE::Methods::Simple::looks_like_number( $r_hash->{'ACTIONS'}->{ $resource_text } ) ) {
+                $self->{'RESOURCES'}->{ $resource_type } = $r_hash->{'RESOURCES'}->{ $resource_text };
             }
         }
     }
 
     if ( defined( $r_hash->{'TRACKS'} ) ) {
         foreach my $track_tag ( 'INFLUENCE', 'MONEY', 'SCIENCE', 'MINERALS' ) {
-            if ( ref( $r_hash->{'TRACKS'}->{ $track_tag } ) eq 'ARRAY' ) {
-                my @track = @{ $r_hash->{'TRACKS'}->{ $track_tag } };
-                $self->{'TRACKS'}->{ $track_tag } = \@track;
+            if ( defined( $r_hash->{'TRACKS'}->{ $track_tag } ) ) {
+                my $hash = $r_hash->{'TRACKS'}->{ $track_tag };
+                my $track = $self->track_of( enum_from_resource_text( $track_tag ) );
+                if ( defined( $track ) ) {
+                    if ( defined( $hash->{'PROGRESSION'} ) ) {
+                        $track->set_values( @{ $hash->{'PROGRESSION'} } );
+                    }
+                    if ( defined( $hash->{'COUNT'} ) ) {
+                        $track->set_track_count( $hash->{'COUNT'} );
+                    }
+                    if ( defined( $hash->{'SPENT'} ) ) {
+                        $track->set_spent_count( $hash->{'SPENT'} );
+                    }
+                }
             }
         }
     }
@@ -614,14 +594,21 @@ sub to_hash {
     }
 
     $r_hash->{'RESOURCES'} = {};
-    foreach my $resource_tag ( 'MONEY', 'SCIENCE', 'MINERALS' ) {
-        $r_hash->{'RESOURCES'}->{ $resource_tag } = $self->{'RESOURCES'}->{ $resource_tag };
+    foreach my $resource_type ( $RES_MONEY, $RES_SCIENCE, $RES_MINERALS ) {
+        $r_hash->{'RESOURCES'}->{ text_from_resource_enum( $resource_type ) } = $self->{'RESOURCES'}->{ $resource_type };
     }
 
     $r_hash->{'TRACKS'} = {};
     foreach my $track_tag ( 'INFLUENCE', 'MONEY', 'SCIENCE', 'MINERALS' ) {
-        my %values = %{ $self->{'TRACKS'}->{ $track_tag } };
-        $r_hash->{'TRACKS'}->{ $track_tag } = \%values;
+        my $type = enum_from_resource_text( $track_tag ) {
+            my $track = $self->track_of( $type );
+
+            $r_hash->{'TRACKS'}->{ $track_tag } = {
+                'PROGRESSION' => [ $track->values() ],
+                'COUNT'         => $track->available_to_spend(),
+                'SPENT'         => $track->spent_count(),
+            };
+        }
     }
 
     $r_hash->{'TECH'} = {};

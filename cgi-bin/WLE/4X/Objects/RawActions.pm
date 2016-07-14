@@ -378,12 +378,10 @@ sub _raw_begin {
     # vp tokens
     # print STDERR "\n  vp tokens ... ";
 
-    $self->{'VP_BAG'} = [];
-
     foreach my $value ( 1 .. 4 ) {
         if ( defined( $settings->{'VP_' . $value } ) ) {
             foreach ( 0 .. $settings->{'VP_' . $value } - 1 ) {
-                push( @{ $self->{'VP_BAG'} }, $value );
+                $self->vp_bag()->add_items( $value );
             }
         }
     }
@@ -392,8 +390,6 @@ sub _raw_begin {
 #    print STDERR "\n  discoveries ... ";
 
     $self->{'DISCOVERIES'} = {};
-
-    my @discovery_bag = ();
 
     foreach my $disc_key ( keys( %{ $VAR1->{'DISCOVERIES'} } ) ) {
 
@@ -405,16 +401,14 @@ sub _raw_begin {
 
         if ( defined( $discovery ) ) {
             if ( $self->item_is_allowed_in_game( $discovery ) ) {
-                $self->{'DISCOVERIES'}->{ $discovery->tag() } = $discovery;
+                $self->discoveries()->{ $discovery->tag() } = $discovery;
 
                 foreach ( 1 .. $discovery->count() ) {
-                    push( @discovery_bag, $discovery->tag() );
+                    $self->discovery_bag()->add_items( $discovery->tag() );
                 }
             }
         }
     }
-
-    $self->{'DISCOVERY_BAG'} = \@discovery_bag;
 
     # tiles
 #    print STDERR "\n  tiles ... ";
@@ -934,7 +928,8 @@ sub _raw_set_allowed_race_actions {
 
     my $race = $self->races()->{ $race_tag };
 
-    $race->set_allowed_actions( @allowed );
+    $race->allowed_actions()->clear();
+    $race->allowed_actions()->add_items( @allowed );
 
     return;
 }

@@ -145,7 +145,7 @@ sub _read_state {
     # vp tokens
     # print STDERR "\n  vp tokens ... ";
 
-    $self->{'VP_BAG'} = $VAR1->{'VP_BAG'};
+    $self->vp_bag()->add_items( @{ $VAR1->{'VP_BAG'} } );
 
     # discoveries
 #    print STDERR "\n  discoveries ... ";
@@ -165,7 +165,7 @@ sub _read_state {
         }
     }
 
-    $self->{'DISCOVERY_BAG'} = $VAR1->{'DISCOVERY_BAG'};
+    $self->discovery_bag()->add_items( @{ $VAR1->{'DISCOVERY_BAG'} } );
 
     # tiles
 #    print STDERR "\n  tiles ... ";
@@ -260,8 +260,6 @@ sub _read_state {
 
     # ship pool
 
-    $self->{'SHIP_POOL'} = {};
-
     foreach my $ship_key ( keys( %{ $VAR1->{'SHIP_POOL'} } ) ) {
 
         my $ship = WLE::4X::Objects::Ship->new(
@@ -271,14 +269,12 @@ sub _read_state {
         );
 
         if ( defined( $ship ) ) {
-            $self->{'SHIP_POOL'}->{ $ship->tag() } = $ship;
+            $self->ship_pool()->{ $ship->tag() } = $ship;
         }
     }
 
 
     # races
-
-    $self->{'RACES'} = {};
 
     foreach my $race_tag ( keys( %{ $VAR1->{'RACES'} } ) ) {
 
@@ -328,18 +324,18 @@ sub _save_state {
         # ship components
         $data{'COMPONENTS'} = {};
 
-        foreach my $key ( keys( %{ $self->{'COMPONENTS'} } ) ) {
-            $data{'COMPONENTS'}->{ $key } = {};
-            $self->{'COMPONENTS'}->{ $key }->to_hash( $data{'COMPONENTS'}->{ $key } );
+        foreach my $component ( values( %{ $self->ship_components() } ) ) {
+            $data{'COMPONENTS'}->{ $component->tag() } = {};
+            $component->to_hash( $data{'COMPONENTS'}->{ $component->tag() } );
         }
 
         # technology
 
         $data{'TECHNOLOGY'} = {};
 
-        foreach my $key ( keys( %{ $self->{'TECHNOLOGY'} } ) ) {
-            $data{'TECHNOLOGY'}->{ $key } = {};
-            $self->{'TECHNOLOGY'}->{ $key }->to_hash( $data{'TECHNOLOGY'}->{ $key } );
+        foreach my $technology ( values( %{ $self->technology() } ) ) {
+            $data{'TECHNOLOGY'}->{ $technology->tag() } = {};
+            $technology->to_hash( $data{'TECHNOLOGY'}->{ $technology->tag() } );
         }
 
         $data{'TECH_BAG'} = [ $self->tech_bag()->items() ];
@@ -347,16 +343,16 @@ sub _save_state {
 
         # vp tokens
 
-        $data{'VP_BAG'} = $self->{'VP_BAG'};
+        $data{'VP_BAG'} = [ $self->vp_bag()->items() ];
 
         # discoveries
 
-        foreach my $key ( keys( %{ $self->{'DISCOVERIES'} } ) ) {
-            $data{'DISCOVERIES'}->{ $key } = {};
-            $self->{'DISCOVERIES'}->{ $key }->to_hash( $data{'DISCOVERIES'}->{ $key } );
+        foreach my $discovery ( values( %{ $self->discoveries() } ) ) {
+            $data{'DISCOVERIES'}->{ $discovery->tag() } = {};
+            $discovery->to_hash( $data{'DISCOVERIES'}->{ $discovery->tag() } );
         }
 
-        $data{'DISCOVERY_BAG'} = $self->{'DISCOVERY_BAG'};
+        $data{'DISCOVERY_BAG'} = [ $self->discovery_bag()->items() ];
 
         # board
 
@@ -368,18 +364,18 @@ sub _save_state {
 
         # tiles
 
-        foreach my $key ( keys( %{ $self->{'TILES'} } ) ) {
-            $data{'TILES'}->{ $key } = {};
-            $self->{'TILES'}->{ $key }->to_hash( $data{'TILES'}->{ $key } );
+        foreach my $tile ( values( %{ $self->tiles() } ) ) {
+            $data{'TILES'}->{ $tile->tag() } = {};
+            $tile->to_hash( $data{'TILES'}->{ $tile->tag() } );
         }
 
         # developments
 
         my @developments = ();
-        foreach my $key ( keys( %{ $self->{'DEVELOPMENTS'} } ) ) {
+        foreach my $development ( values( %{ $self->developments() } ) ) {
             my %dev_hash = ();
-            $self->{'DEVELOPMENTS'}->{ $key }->to_hash( \%dev_hash );
-            $data{'DEVELOPMENTS'}->{ $key } = \%dev_hash;
+            $development->to_hash( \%dev_hash );
+            $data{'DEVELOPMENTS'}->{ $development->tag() } = \%dev_hash;
         }
 
         $data{'DEVELOPMENT_STACK'} = [ $self->{'DEVELOPMENT_STACK'} ];
@@ -388,53 +384,39 @@ sub _save_state {
 #        print STDERR "\n saving ship_templates ... ";
 
         $data{'SHIP_TEMPLATES'} = {};
-        foreach my $template_tag ( keys( %{ $self->{'SHIP_TEMPLATES'} } ) ) {
+        foreach my $template ( values( %{ $self->templates() } ) ) {
 
-            if ( defined( $self->{'SHIP_TEMPLATES'}->{ $template_tag } ) ) {
-                my %template_hash = ();
-                $self->{'SHIP_TEMPLATES'}->{ $template_tag }->to_hash( \%template_hash );
+            my %template_hash = ();
+            $template->to_hash( \%template_hash );
 
-                $data{'SHIP_TEMPLATES'}->{ $template_tag } = \%template_hash;
-            }
+            $data{'SHIP_TEMPLATES'}->{ $template->tag() } = \%template_hash;
         }
 
         # ships
 
         $data{'SHIPS'} = {};
-        foreach my $ship_tag ( keys( %{ $self->{'SHIPS'} } ) ) {
-
-            if ( defined( $self->{'SHIPS'}->{ $ship_tag } ) ) {
-                my %ship_hash = ();
-                $self->{'SHIPS'}->{ $ship_tag }->to_hash( \%ship_hash );
-
-                $data{'SHIPS'}->{ $ship_tag } = \%ship_hash;
-            }
+        foreach my $ship ( values( %{ $self->ships() } ) ) {
+            my %ship_hash = ();
+            $ship->to_hash( \%ship_hash );
+            $data{'SHIPS'}->{ $ship->tag() } = \%ship_hash;
         }
 
         # ship pool
 
         $data{'SHIP_POOL'} = {};
-        foreach my $ship_tag ( keys( %{ $self->{'SHIP_POOL'} } ) ) {
-
-            if ( defined( $self->{'SHIP_POOL'}->{ $ship_tag } ) ) {
-                my %ship_hash = ();
-                $self->{'SHIP_POOL'}->{ $ship_tag }->to_hash( \%ship_hash );
-
-                $data{'SHIP_POOL'}->{ $ship_tag } = \%ship_hash;
-            }
+        foreach my $ship ( values( %{ $self->ship_pool() } ) ) {
+            my %ship_hash = ();
+            $ship->to_hash( \%ship_hash );
+            $data{'SHIP_POOL'}->{ $ship->tag() } = \%ship_hash;
         }
 
         # races
 
         $data{'RACES'} = {};
-        foreach my $race_tag ( %{ $self->{'RACES'} } ) {
-
-            if ( defined( $self->{'RACES'}->{ $race_tag } ) ) {
-                my %race_hash = ();
-                $self->{'RACES'}->{ $race_tag }->to_hash( \%race_hash );
-
-                $data{'RACES'}->{ $race_tag } = \%race_hash;
-            }
+        foreach my $race ( values( %{ $self->races() } ) ) {
+            my %race_hash = ();
+            $race->to_hash( \%race_hash );
+            $data{'RACES'}->{ $race->tag() } = \%race_hash;
         }
 
     }

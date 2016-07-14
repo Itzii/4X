@@ -108,11 +108,16 @@ sub _init {
     $self->{'SHIP_TEMPLATES'} = {};
     $self->{'SHIPS'} = {};
     $self->{'SHIP_POOL'} = {};
+    $self->{'COMPONENTS'} = {};
     $self->{'TILES'} = {};
     $self->{'TECHNOLOGY'} = {};
+    $self->{'DISCOVERIES'} = {};
+    $self->{'DEVELOPMENTS'} = {};
 
     $self->{'BOARD'} = WLE::4X::Objects::Board->new( 'server' => $self );
     $self->{'TECH_BAG'} = WLE::Objects::Stack->new();
+    $self->{'DISCOVERY_BAG'} = WLE::Objects::Stack->new();
+    $self->{'VP_BAG'} = WLE::Objects::Stack->new();
 
 
     $self->{'STATE'} = {
@@ -222,8 +227,8 @@ sub do {
 
             my $race = $self->race_of_current_user();
 
-            unless ( matches_any( $action_tag, $race->allowed_actions() ) ) {
-                print STDERR "\nAllowed Actions: " . join( ',', $race->allowed_actions() );
+            unless ( $race->allowed_actions()->contains( $action_tag ) ) {
+                print STDERR "\nAllowed Actions: " . join( ',', $race->allowed_actions()->items() );
                 return ( 'success' => 0, 'message' => 'Action is not allowed by player at this time.' );
             }
         }
@@ -603,6 +608,30 @@ sub discoveries {
     my $self        = shift;
 
     return $self->{'DISCOVERIES'};
+}
+
+#############################################################################
+
+sub discovery_bag {
+    my $self        = shift;
+
+    return $self->{'DISCOVERY_BAG'};
+}
+
+#############################################################################
+
+sub developments {
+    my $self        = shift;
+
+    return $self->{'DEVELOPMENTS'};
+}
+
+#############################################################################
+
+sub vp_bag {
+    my $self        = shift;
+
+    return $self->{'VP_BAG'};
 }
 
 #############################################################################

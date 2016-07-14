@@ -150,6 +150,15 @@ sub select_random_item {
 
 #############################################################################
 
+sub contains {
+    my $self        = shift;
+    my $value       = shift;
+
+    return ( matches_any( $value, $self->items() ) );
+}
+
+#############################################################################
+
 sub shuffle {
     my $self        = shift;
 

@@ -351,12 +351,11 @@ sub action_begin {
 
     # add discoveries to tiles
 
-    my @discovery_tags = @{ $self->{'DISCOVERY_BAG'} };
-    WLE::Methods::Simple::shuffle_in_place( \@discovery_tags );
-
     foreach my $tile ( values( %{ $self->tiles() } ) ) {
         foreach ( 1 .. $tile->discovery_count() ) {
-            $self->_raw_add_discovery_to_tile( $EV_FROM_INTERFACE, $tile->tag(), shift( @discovery_tags ) );
+            my $discovery_tag = $self->discovery_bag()->select_random_item();
+            $self->discovery_bag()->remove_item( $discovery_tag );
+            $self->_raw_add_discovery_to_tile( $EV_FROM_INTERFACE, $tile->tag(), $discovery_tag );
         }
     }
 

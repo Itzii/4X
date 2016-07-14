@@ -59,7 +59,9 @@ sub _init {
 
     $self->{'ACTION_COUNT'} = 0;
 
-    $self->{'ALLOWED_ACTIONS'} = [];
+    $self->{'ALLOWED_ACTIONS'} = WLE::Objects::Stack->new();
+
+    $self->{'IN_HAND'} = WLE::Objects::Stack->new();
 
     $self->{'RESOURCES'} = {
         'MONEY' => 2,
@@ -170,18 +172,7 @@ sub set_flag_passed {
 sub allowed_actions {
     my $self        = shift;
 
-    return @{ $self->{'ALLOWED_ACTIONS'} };
-}
-
-#############################################################################
-
-sub set_allowed_actions {
-    my $self        = shift;
-    my @actions     = @_;
-
-    @{ $self->{'ALLOWED_ACTIONS'} } = @actions;
-
-    return;
+    return $self->{'ALLOWED_ACTIONS'};
 }
 
 #############################################################################
@@ -240,13 +231,22 @@ sub colony_ships_available {
 
 #############################################################################
 
+sub in_hand {
+    my $self        = shift;
+
+    return $self->{'IN_HAND'};
+}
+
+#############################################################################
+
 sub start_turn {
     my $self        = shift;
 
     $self->{'ACTION_COUNT'} = 0;
+    $self->allowed_actions()->clear();
 
     if ( $self->has_passed() ) {
-        $self->set_allowed_actions(
+        $self->allowed_actions()->add_items(
             'action_pass',
             'action_react_upgrade',
             'action_react_build',
@@ -254,7 +254,7 @@ sub start_turn {
         );
     }
     else {
-        $self->set_allowed_actions(
+        $self->set_allowed_actions()->add_items(
             'action_pass',
             'action_explore',
             'action_influence',
@@ -273,7 +273,7 @@ sub start_turn {
 sub end_turn {
     my $self        = shift;
 
-    $self->set_allowed_actions();
+    $self->allowed_actions()->clear();
 
     return;
 }
@@ -463,6 +463,10 @@ sub from_hash {
         $self->{'ACTION_COUNT'} = $r_hash->{'ACTION_COUNT'};
     }
 
+    if ( defined( $r_hash->{'IN_HAND'} ) ) {
+        $self->in_hand()->add_items( @{ $r_hash->{'IN_HAND'} } );
+    }
+
     if ( defined( $r_hash->{'ACTIONS'} ) ) {
         foreach my $action_tag ( 'EXPLORE', 'INFLUENCE_INF', 'INFLUENCE_COLONY', 'RESEARCH', 'UPGRADE', 'BUILD', 'MOVE' ) {
             if ( WLE::Methods::Simple::looks_like_number( $r_hash->{'ACTIONS'}->{ $action_tag } ) ) {
@@ -519,7 +523,7 @@ sub from_hash {
     }
 
     if ( defined( $r_hash->{'ALLOWED_ACTIONS'} ) ) {
-        @{ $self->{'ALLOWED_ACTIONS'} } = @{ $r_hash->{'ALLOWED_ACTIONS'} };
+        $self->allowed_actions()->add_items( @{ $r_hash->{'ALLOWED_ACTIONS'} } );
     }
 
     my @templates = ();
@@ -582,6 +586,8 @@ sub to_hash {
         $r_hash->{ $tag } = $self->{ $tag };
     }
 
+    $r_hash->{'IN_HAND'} = [ $self->in_hand()->items() ];
+
     $r_hash->{'ACTIONS'} = {};
     foreach my $action_tag ( 'EXPLORE', 'INFLUENCE_INF', 'INFLUENCE_COLONY', 'RESEARCH', 'UPGRADE', 'BUILD', 'MOVE' ) {
         $r_hash->{'ACTION'}->{ $action_tag } = $self->{'ACTIONS'}->{ $action_tag };
@@ -615,7 +621,7 @@ sub to_hash {
         $r_hash->{'VP_SLOTS'}->{ $section_tag } = $self->{'VP_SLOTS'}->{ $section_tag };
     }
 
-    $r_hash->{'ALLOWED_ACTIONS'} = $self->{'ALLOWED_ACTIONS'};
+    $r_hash->{'ALLOWED_ACTIONS'} = [ $self->allowed_actions()->items() ];
 
     $r_hash->{'SHIP_TEMPLATES'} = $self->{'SHIP_TEMPLATES'};
 

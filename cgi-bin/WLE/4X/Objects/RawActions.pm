@@ -43,6 +43,7 @@ my %actions = (
 
     \&_raw_increment_race_action        => 'inc_race_action',
     \&_raw_spend_influence              => 'spend_influence',
+    \&_raw_use_colony_ship              => 'use_colony_ship',
     \&_raw_add_item_to_hand             => 'add_hand_item',
     \&_raw_remove_item_from_hand        => 'remove_hand_item',
     \&_raw_player_pass_action           => 'player_pass',
@@ -762,11 +763,13 @@ sub _raw_place_tile_on_board {
     my $tile_tag        = shift( @args );
     my $location_x      = shift( @args );
     my $location_y      = shift( @args );
+    my $warps           = shift( @args );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
         return 'tile ' . $tile_tag . ' placed on board at location ' . $location_x . ',' . $location_y;
     }
 
+    $self->tiles()->{ $tile_tag }->set_warps( $warps );
     $self->board()->place_tile( $location_x, $location_y, $tile_tag );
 
     return;
@@ -858,10 +861,8 @@ sub _raw_select_race_and_location {
 
     my $start_hex = $self->tiles()->{ $start_hex_tag };
 
-    $start_hex->set_warps( $warp_gates );
-
     $self->_raw_remove_tile_from_stack( $EV_SUB_ACTION, $start_hex_tag );
-    $self->_raw_place_tile_on_board( $EV_SUB_ACTION, $start_hex_tag, $location_x, $location_y );
+    $self->_raw_place_tile_on_board( $EV_SUB_ACTION, $start_hex_tag, $location_x, $location_y, $warp_gates );
     $self->_raw_influence_tile( $EV_SUB_ACTION, $race_tag, $start_hex_tag );
 
 
@@ -1053,6 +1054,10 @@ sub _raw_create_ship_on_tile {
 
     my $template = $self->templates()->{ $template_tag };
 
+    if ( $template->count() > 0 ) {
+        $template->set_count( $template->count() - 1 );
+    }
+
     my $ship = WLE::4X::Objects::Ship->new(
         'server'        => $self,
         'template'      => $template,
@@ -1222,13 +1227,43 @@ sub _raw_spend_influence {
     my $race = $self->race_of_current_user();
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return $race_tag . ' spent 1 influence';
+        return $race->tag() . ' spent 1 influence';
     }
 
+    $race->track_of( $RES_INFLUENCE )->spend_but_keep();
 
+    return;
+}
 
+#############################################################################
 
+sub _raw_use_colony_ship {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
 
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $tile_tag    = shift( @args );
+    my $type        = shift( @args );
+    my $advanced    = shift( @args );
+
+    my $race = $self->race_of_current_user();
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        my $advanced_text = ( $advanced == 1 ) ? ' (adv) ' : '';
+        return $race->tag() . ' used colony ship to place an ' . $advanced_text . text_from_resource_enum( $type ) . ' cube on ' . $tile_tag;
+    }
+
+    $race->set_colony_ships_used( $race->colony_ships_used() + 1 );
+
+    $race->track_tag( $type )->spend();
+
+    $self->_raw_place_cube_on_tile( $race->tag(), $tile_tag, $type, $advanced );
+
+    return;    
 }
 
 #############################################################################

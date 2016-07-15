@@ -189,6 +189,12 @@ sub do {
         'action_react_build'      => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_react_build },
         'action_react_move'       => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_react_move },
 
+        'place_tile'        => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_explore_place_tile },
+        'discard_tile'      => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_explore_discard_tile },
+
+
+        'use_colony_ship'   => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'flag_ignore_allowed' => 1, 'method' => \&action_use_colony_ship },
+#        'finish_turn'       => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_finish_turn },
 
     );
 
@@ -228,10 +234,13 @@ sub do {
 
             my $race = $self->race_of_current_user();
 
-            unless ( $race->allowed_actions()->contains( $action_tag ) ) {
-                print STDERR "\nAllowed Actions: " . join( ',', $race->allowed_actions()->items() );
-                return ( 'success' => 0, 'message' => 'Action is not allowed by player at this time.' );
+            unless ( defined( $action->{'flag_ignore_allowed'} ) ) {
+                unless ( $race->allowed_actions()->contains( $action_tag ) ) {
+                    print STDERR "\nAllowed Actions: " . join( ',', $race->allowed_actions()->items() );
+                    return ( 'success' => 0, 'message' => 'Action is not allowed by player at this time.' );
+                }
             }
+
         }
 
     }

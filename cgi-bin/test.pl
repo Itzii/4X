@@ -79,6 +79,43 @@ sub test_Methods_Simple {
 
 	show( join( ',', @test ) );
 
+	my $value = 0b01110000;
+	my $shifted_value = 0b11100000;
+	$value = WLE::Methods::Simple::rotate_bits_left( $value );
+
+	ok( $value == $shifted_value, 'left shift is correct' );
+
+	$value = 0b11100000;
+	$shifted_value = 0b11000001;
+	$value = WLE::Methods::Simple::rotate_bits_left( $value );
+
+	ok( $value == $shifted_value, 'left shift with moved bit is correct' );
+#	show( sprintf( '%0b', $value ) );
+
+	$value = 0b00001110;
+	$shifted_value = 0b00000111;
+	$value = WLE::Methods::Simple::rotate_bits_right( $value );
+
+	ok( $value == $shifted_value, 'right shift is correct' );
+
+	$value = 0b00000111;
+	$shifted_value = 0b10000011;
+	$value = WLE::Methods::Simple::rotate_bits_right( $value );
+
+	ok( $value == $shifted_value, 'right shift with moved bit is correct' );
+
+	$value = 0b00111000;
+	$shifted_value = 0b00110001;
+	$value = WLE::Methods::Simple::rotate_bits_left( $value, 6 );
+
+	ok( $value == $shifted_value, 'left shift of short byte is correct' );
+
+	$value = 0b00000111;
+	$shifted_value = 0b00100011;
+	$value = WLE::Methods::Simple::rotate_bits_right( $value, 6 );
+
+	ok( $value == $shifted_value, 'right shift of short byte is correct' );
+
 	return;
 }
 

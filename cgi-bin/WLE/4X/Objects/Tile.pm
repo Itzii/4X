@@ -222,6 +222,25 @@ sub ships {
 
 #############################################################################
 
+sub has_explorer {
+    my $self                = shift;
+    my $race_tag            = shift;
+    my $flag_unpinned_only  = shift; $flag_unpinned_only = 1            unless defined( $flag_unpinned_only );
+
+    my $flag_explorer_available = 0;
+
+    if ( $self->owner_id() == $self->races()->{ $race_tag }->owner_id() ) {
+        return 1;
+    }
+    elsif ( $self->unpinned_ship_count() > 0 ) {
+        return 1;
+    }
+
+    return 0;
+}
+
+#############################################################################
+
 sub unpinned_ship_count {
     my $self        = shift;
     my $user_id     = shift;
@@ -257,6 +276,23 @@ sub unpinned_ship_count {
     }
 
     return $friendly_count - $enemy_count;
+}
+
+#############################################################################
+
+sub user_ship_count {
+    my $self        = shift;
+    my $user_id     = shift;
+
+    my $count = 0;
+
+    foreach my $ship_tag ( $self->ships() ) {
+        if ( $self->server()->ships()->{ $ship_tag }->owner_id() == $user_id ) {
+            $count++;
+        }
+    }
+
+    return $count;
 }
 
 #############################################################################
@@ -317,11 +353,6 @@ sub add_starting_ships {
             -1,
         );
 
-        my $template = $self->server()->templates()->{ $template_tag };
-
-        if ( $template->count() > 0 ) {
-            $template->set_count( $template->count() - 1 );
-        }
     }
 
     return;
@@ -384,6 +415,8 @@ sub add_cube {
         return 1;
     }
 
+    return $self->add_cube( $owner_id, $RES_WILD, 0 );
+
     return 0;
 }
 
@@ -439,6 +472,22 @@ sub has_warp_on_side {
     return ( ( $self->{'WARPS'} & $bitmask ) > 0 ) ? 1 : 0;
 }
 
+#############################################################################
+
+sub are_new_warp_gates_valid {
+    my $self        = shift;
+    my $value       = shift;
+
+    for ( 1 .. 6 ) {
+        if ( $value == $self->{'WARPS'} ) {
+            return 1;
+        }
+
+        $value = rotate_bits_left( $value );
+    }
+
+    return 0;
+}
 
 #############################################################################
 

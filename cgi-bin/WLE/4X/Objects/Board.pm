@@ -3,6 +3,8 @@ package WLE::4X::Objects::Board;
 use strict;
 use warnings;
 
+use WLE::Methods::Simple;
+
 use WLE::Objects::Stack;
 
 use WLE::4X::Objects::Tile;
@@ -174,7 +176,7 @@ sub place_tile {
         return 0;
     }
 
-    unless ( WLE::Methods::Simple::looks_like_number( $x_pos ) && WLE::Methods::Simple::looks_like_number( $y_pos ) ) {
+    unless ( looks_like_number( $x_pos ) && looks_like_number( $y_pos ) ) {
         return 0;
     }
 
@@ -215,6 +217,62 @@ sub explorable_spaces_for_race {
 
 #############################################################################
 
+sub tile_pair_is_traversable {
+    my $self        = shift;
+    my $race_tag    = shift;
+    my $loc_x1      = shift;
+    my $loc_y1      = shift;
+    my $loc_x2      = shift;
+    my $loc_y2      = shift;
+
+    unless ( $self->locations_adjacent( $loc_x1, $loc_y1, $loc_x2, $loc_y2 ) ) {
+        return 0;
+    }
+
+    my $has_wormhole = $self->server()->races()->{ $race_tag }->has_technology( 'tech_wormhole_generator' );
+
+    my $tile1 = $self->tile_at_location( $loc_x1, $loc_y1 );
+    my $tile2 = $self->tile_at_location( $loc_x2, $loc_y2 );
+
+    foreach my $direction ( 0 .. 5 ) {
+        my $remote_tile = $self->tile_in_direction( $loc_x1, $loc_y1, $direction );
+        if ( $remote_tile == $tile2 ) {
+            my $warp_here = $tile1->has_warp_on_side( $direction );
+            my $warp_there = $tile2->has_warp_on_side( ( $direction + 3) % 6 );
+
+            if ( $warp_here && $warp_there ) {
+                return 1;
+            }
+            elsif ( $has_wormhole && ( $warp_here || $warp_there ) ) {
+                return 1;
+            }
+        }
+    }
+
+    return 0;    
+}
+
+#############################################################################
+
+sub locations_adjacent {
+    my $self        = shift;
+    my $loc_x1      = shift;
+    my $loc_y1      = shift;
+    my $loc_x2      = shift;
+    my $loc_y2      = shift;
+
+    foreach my $direction ( 0 .. 5 ) {
+        my ( $loc_x3, $loc_y3 ) = $self->location_in_direction( $loc_x1, $loc_y1, $direction );
+        if ( $loc_x2 == $loc_x3 && $loc_y2 == $loc_y3 ) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+#############################################################################
+
 sub _explorable_from_location {
     my $self        = shift;
     my $race_tag    = shift;
@@ -223,22 +281,13 @@ sub _explorable_from_location {
 
     my $tile = $self->tile_at_location( $x_pos, $y_pos );
 
-    my $flag_explorer_available = 0;
-
-    if ( $tile->owner_id() == $self->races()->{ $race_tag }->owner_id() ) {
-        $flag_explorer_available = 1;
-    }
-    elsif ( $tile->unpinned_ship_count() > 0 ) {
-        $flag_explorer_available = 1;
-    }
-
-    unless ( $flag_explorer_available ) {
+    unless ( $tile->has_explorer( $race_tag ) ) {
         return ();
     }
 
-    my @adjacents = ();
-
     my $has_wormhole = $self->server()->race_of_current_user()->has_technology( 'tech_wormhole_generator' );
+
+    my @adjacents = ();
 
     foreach my $direction ( 0 .. 5 ) {
         if ( $has_wormhole || $tile->has_warp_on_side( $direction ) ) {

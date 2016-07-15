@@ -82,5 +82,45 @@ sub shuffle_in_place {
 }
 
 #############################################################################
+
+sub rotate_bits_left {
+    my $value       = shift;
+    my $bitcount    = shift; $bitcount = 8          unless defined( $bitcount );
+    my $places      = shift; $places = 1            unless defined( $places );
+
+    my $limit = ( 2 ** $bitcount ) - 1;
+
+    for ( 1 .. $places ) {
+
+        $value = $value << 1;
+
+        if ( $value > $limit ) {
+            $value -= $limit;
+            $value |= 1;
+        }
+    }
+
+    return $value;
+}
+
+#############################################################################
+
+sub rotate_bits_right {
+    my $value       = shift;
+    my $bitcount    = shift; $bitcount = 8          unless defined( $bitcount );
+    my $places      = shift; $places = 1            unless defined( $places );
+
+    for ( 1 .. $places ) {
+        my $right_bit = $value & 1;
+        $right_bit = $right_bit << ( $bitcount - 1 );
+
+        $value = ( $value >> 1 ) | $right_bit;
+        $value = $value | $right_bit;
+    }
+
+    return $value;
+}
+
+#############################################################################
 #############################################################################
 1

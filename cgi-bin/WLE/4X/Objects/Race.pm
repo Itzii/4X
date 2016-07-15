@@ -205,6 +205,15 @@ sub set_action_count {
 
 #############################################################################
 
+sub maximum_action_count {
+    my $self        = shift;
+    my $action_type = shift;
+
+    return $self->{'ACTIONS'}->{ $action_type };
+
+}
+#############################################################################
+
 sub total_colony_ships {
     my $self        = shift;
 
@@ -317,10 +326,10 @@ sub start_turn {
             'action_research',
             'action_upgrade',
             'action_build',
+            'use_colony_ship',
         );
 
-        my @explorable_locations = $self->server()->board()->explorable_spaces_for_race( $self->tag() );
-        if ( scalar( @explorable_locations ) ) {
+        if ( $self->can_explore() ) {
             $self->allowed_actions()->add_items( 'action_explore' );
         }
 
@@ -331,6 +340,15 @@ sub start_turn {
     }
 
     return;
+}
+
+#############################################################################
+
+sub can_explore {
+    my $self        = shift;
+
+    my @explorable_locations = $self->server()->board()->explorable_spaces_for_race( $self->tag() );
+    return ( scalar( @explorable_locations ) > 0 );
 }
 
 #############################################################################
@@ -600,15 +618,14 @@ sub to_hash {
 
     $r_hash->{'TRACKS'} = {};
     foreach my $track_tag ( 'INFLUENCE', 'MONEY', 'SCIENCE', 'MINERALS' ) {
-        my $type = enum_from_resource_text( $track_tag ) {
-            my $track = $self->track_of( $type );
+        my $type = enum_from_resource_text( $track_tag );
+        my $track = $self->track_of( $type );
 
-            $r_hash->{'TRACKS'}->{ $track_tag } = {
-                'PROGRESSION' => [ $track->values() ],
-                'COUNT'         => $track->available_to_spend(),
-                'SPENT'         => $track->spent_count(),
-            };
-        }
+        $r_hash->{'TRACKS'}->{ $track_tag } = {
+            'PROGRESSION' => [ $track->values() ],
+            'COUNT'         => $track->available_to_spend(),
+            'SPENT'         => $track->spent_count(),
+        };
     }
 
     $r_hash->{'TECH'} = {};

@@ -510,7 +510,7 @@ sub _prepare_for_first_round {
                 my $tile = $self->tiles()->{ $tile_tag };
 
                 $self->_raw_remove_tile_from_stack( 1, $tile_tag );
-                $self->_raw_place_tile_on_board( 1, $tile_tag, $x, $y );
+                $self->_raw_place_tile_on_board( 1, $tile_tag, $x, $y, $location_warps );
 
                 $tile->add_starting_ships();
             }

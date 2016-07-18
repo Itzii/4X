@@ -21,6 +21,12 @@ our @EXPORT = qw(
     $RES_WILD
     $RES_UNKNOWN
 
+    $TECH_MILITARY
+    $TECH_GRID
+    $TECH_NANO
+    $TECH_WILD
+    $TECH_UNKNOWN
+
 
 );
 
@@ -70,6 +76,39 @@ sub enum_from_resource_text {
     }
 
     return $RES_UNKNOWN;
+}
+
+#############################################################################
+
+sub text_from_tech_enum {
+    my $tech_type       = shift;
+
+    my %values = (
+        $TECH_MILITARY  => 'MILITARY',
+        $TECH_GRID      => 'GRID',
+        $TECH_NANO      => 'NANO',
+        $TECH_WILD      => 'WILD',
+    );
+
+    if ( defined( $values{ $enum } ) ) {
+        return $values{ $enum },
+    }
+
+    return 'UNKNOWN';
+}
+
+#############################################################################
+
+sub enum_from_tech_text {
+    my $text        = shift;
+
+    foreach my $enum ( 0 .. $RES_COUNT - 1 ) {
+        if ( text_from_tech_enum( $enum ) eq uc( $text ) ) {
+            return $enum;
+        }
+    }
+
+    return $TECH_UNKNOWN;
 }
 
 #############################################################################

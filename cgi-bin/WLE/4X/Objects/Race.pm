@@ -60,6 +60,7 @@ sub _init {
     };
 
     $self->{'ACTION_COUNT'} = 0;
+    $self->{'ACTION_FLIP_COLONY_COUNT'} = 0;
 
     $self->{'ALLOWED_ACTIONS'} = WLE::Objects::Stack->new();
 
@@ -97,23 +98,17 @@ sub _init {
 
     $self->{'TRACKS'}->{ $RES_MINERALS } = $track;
 
-    $self->{'TECH'} = {
-        'MILITARY' => {
-            'COST' => [ 0, -1, -2, -3, -4, -6, -8, 0 ],
-            'VP' => [ 0, 0, 0, 0, 1, 2, 3, 5 ],
-            'POSSESS' => [],
-        },
-        'GRID' => {
-            'COST' => [ 0, -1, -2, -3, -4, -6, -8, 0 ],
-            'VP' => [ 0, 0, 0, 0, 1, 2, 3, 5 ],
-            'POSSESS' => [],
-        },
-        'NANO' => {
-            'COST' => [ 0, -1, -2, -3, -4, -6, -8, 0 ],
-            'VP' => [ 0, 0, 0, 0, 1, 2, 3, 5 ],
-            'POSSESS' => [],
-        },
-    };
+    $self->{'TECH'} = {};
+
+    $track = WLE::4X::Objects::TechTrack->new();
+    $self->{'TECH'}->{ $TECH_MILITARY } = $track;
+
+    $track = WLE::4X::Objects::TechTrack->new();
+    $self->{'TECH'}->{ $TECH_GRID } = $track;
+
+    $track = WLE::4X::Objects::TechTrack->new();
+    $self->{'TECH'}->{ $TECH_NANO } = $track;
+
 
     $self->{'STARTING_SHIPS'} = [ 'class_interceptor' ],
 
@@ -212,6 +207,34 @@ sub maximum_action_count {
     return $self->{'ACTIONS'}->{ $action_type };
 
 }
+
+#############################################################################
+
+sub colony_flip_count {
+    my $self        = shift;
+
+    return $self->{'ACTION_FLIP_COLONY_COUNT'};
+}
+
+#############################################################################
+
+sub set_colony_flip_count {
+    my $self        = shift;
+    my $value       = shift;
+
+    $self->{'ACTION_FLIP_COLONY_COUNT'} = $value;
+
+    return;
+}
+
+#############################################################################
+
+sub maximum_colony_flip_count {
+    my $self        = shift;
+
+    return $self->{'ACTIONS'}->{'INFLUENCE_COLONY'};
+}
+
 #############################################################################
 
 sub total_colony_ships {
@@ -273,6 +296,15 @@ sub exchange_rate {
 
 #############################################################################
 
+sub resource_count {
+    my $self        = shift;
+    my $type        = shift;
+
+    return $self->{'RESOURCES'}->{ $type };
+}
+
+#############################################################################
+
 sub exchange_resources {
     my $self        = shift;
     my $res_from    = shift;
@@ -297,6 +329,7 @@ sub start_turn {
     my $self        = shift;
 
     $self->{'ACTION_COUNT'} = 0;
+    $self->{'ACTION_FLIP_COLONY_COUNT'} = 0;
     $self->allowed_actions()->clear();
 
     my $has_movable_ships = 0;
@@ -399,7 +432,7 @@ sub template_of_class {
 
 #############################################################################
 
-sub track_of {
+sub resource_track_of {
     my $self        = shift;
     my $type_enum   = shift;
 
@@ -408,19 +441,25 @@ sub track_of {
 
 #############################################################################
 
+sub tech_track_of {
+    my $self        = shift;
+    my $tech_enum   = shift;
+
+    return $self->{'TECH'}->{ $tech_enum };
+}
+#############################################################################
+
 sub has_technology {
     my $self        = shift;
     my $tech_tag    = shift;
 
-    foreach my $section_tag ( 'MILITARY', 'GRID', 'NANO' ) {
-        if ( defined( $self->{'TECH'}->{ $section_tag }->{'POSSESS'} ) ) {
-            foreach my $race_tech_tag ( @{ $self->{'TECH'}->{ $section_tag }->{'POSSESS'} } ) {
-                my $tech = $self->server()->technology()->{ $race_tech_tag };
+    foreach ( $TECH_MILITARY, $TECH_GRID, $TECH_NANO ) {
+        foreach my $possessed_tech_tag ( $self->tech_track_of( $_ )->techs() ) {
+            my $tech = $self->server()->technology()->{ $possessed_tech_tag };
 
-                if ( defined( $tech ) ) {
-                    if ( $tech->provides( $tech_tag ) ) {
-                        return 1;
-                    }
+            if ( defined( $tech ) ) {
+                if ( $tech->provides( $tech_tag ) ) {
+                    return 1;
                 }
             }
         }
@@ -445,32 +484,10 @@ sub from_hash {
 
     $self->{'HOME'} = $r_hash->{'HOME'};
 
-    if ( defined( $r_hash->{'FLAG_PASSED'} ) ) {
-        $self->{'FLAG_PASSED'} = $r_hash->{'FLAG_PASSED'};
-    }
-
-    if ( defined( $r_hash->{'EXCLUDE_RACE'} ) ) {
-        $self->{'EXCLUDE_RACE'} = $r_hash->{'EXCLUDE_RACE'};
-    }
-
-    if ( defined( $r_hash->{'COLONY_COUNT'} ) ) {
-        $self->{'COLONY_COUNT'} = $r_hash->{'COLONY_COUNT'};
-    }
-
-    if ( defined( $r_hash->{'COLONY_USED'} ) ) {
-        $self->{'COLONY_USED'} = $r_hash->{'COLONY_USED'};
-    }
-
-    if ( defined( $r_hash->{'EXCHANGE'} ) ) {
-        $self->{'EXCHANGE'} = $r_hash->{'EXCHANGE'};
-    }
-
-    if ( defined( $r_hash->{'ACTION_COUNT'} ) ) {
-        $self->{'ACTION_COUNT'} = $r_hash->{'ACTION_COUNT'};
-    }
-
-    if ( defined( $r_hash->{'IN_HAND'} ) ) {
-        $self->in_hand()->add_items( @{ $r_hash->{'IN_HAND'} } );
+    foreach my $value ( 'FLAG_PASSED', 'EXCLUDE_RACE', 'COLONY_COUNT', 'COLONY_USED', 'EXCHANGE', 'ACTION_COUNT', 'ACTION_FLIP_COLONY_COUNT', 'IN_HAND' ) {
+        if ( defined( $r_hash->{ $value } ) ) {
+            $self->{ $value } = $r_hash->{ $value };
+        }
     }
 
     if ( defined( $r_hash->{'ACTIONS'} ) ) {
@@ -494,7 +511,7 @@ sub from_hash {
         foreach my $track_tag ( 'INFLUENCE', 'MONEY', 'SCIENCE', 'MINERALS' ) {
             if ( defined( $r_hash->{'TRACKS'}->{ $track_tag } ) ) {
                 my $hash = $r_hash->{'TRACKS'}->{ $track_tag };
-                my $track = $self->track_of( enum_from_resource_text( $track_tag ) );
+                my $track = $self->resource_track_of( enum_from_resource_text( $track_tag ) );
                 if ( defined( $track ) ) {
                     if ( defined( $hash->{'PROGRESSION'} ) ) {
                         $track->set_values( @{ $hash->{'PROGRESSION'} } );
@@ -511,12 +528,10 @@ sub from_hash {
     }
 
     if ( defined( $r_hash->{'TECH'} ) ) {
-        foreach my $tech_tag ( 'MILITARY', 'GRID', 'NANO' ) {
-            foreach my $section_tag ( 'COST', 'VP', 'POSSESS' ) {
-                if ( ref( $r_hash->{'TECH'}->{ $tech_tag }->{ $section_tag } ) eq 'ARRAY' ) {
-                    my @values = @{ $r_hash->{'TECH'}->{ $tech_tag }->{ $section_tag } };
-                    $self->{'TECH'}->{ $tech_tag }->{ $section_tag } = \@values;
-                }
+        foreach my $tech_type ( $TECH_MILITARY, $TECH_GRID, $TECH_NANO ) {
+            my $tech_text = text_from_tech_enum( $tech_tag );
+            if ( defined( $r_hash->{'TECH'}->{ $tech_text} ) ) {
+                $self->resource_track_of( $tech_type )->add_techs( @{ $r_hash->{'TECH'}->{ $tech_text } } );
             }
         }
     }
@@ -600,7 +615,7 @@ sub to_hash {
         return 0;
     }
 
-    foreach my $tag ( 'HOME', 'EXCLUDE_RACE', 'COLONY_COUNT', 'COLONY_USED', 'EXCHANGE', 'COST_ORBITAL', 'COST_MONUMENT', 'FLAG_PASSED', 'ACTION_COUNT' ) {
+    foreach my $tag ( 'HOME', 'EXCLUDE_RACE', 'COLONY_COUNT', 'COLONY_USED', 'EXCHANGE', 'COST_ORBITAL', 'COST_MONUMENT', 'FLAG_PASSED', 'ACTION_COUNT', 'ACTION_FLIP_COLONY_COUNT' ) {
         $r_hash->{ $tag } = $self->{ $tag };
     }
 
@@ -619,7 +634,7 @@ sub to_hash {
     $r_hash->{'TRACKS'} = {};
     foreach my $track_tag ( 'INFLUENCE', 'MONEY', 'SCIENCE', 'MINERALS' ) {
         my $type = enum_from_resource_text( $track_tag );
-        my $track = $self->track_of( $type );
+        my $track = $self->resource_track_of( $type );
 
         $r_hash->{'TRACKS'}->{ $track_tag } = {
             'PROGRESSION' => [ $track->values() ],
@@ -629,12 +644,9 @@ sub to_hash {
     }
 
     $r_hash->{'TECH'} = {};
-    foreach my $tech_tag ( 'MILITARY', 'GRID', 'NANO' ) {
-        $r_hash->{'TECH'}->{ $tech_tag } = {};
-        foreach my $section_tag ( 'COST', 'VP', 'POSSESS' ) {
-            my @values = @{ $self->{'TECH'}->{ $tech_tag }->{ $section_tag } };
-            $r_hash->{'TECH'}->{ $tech_tag }->{ $section_tag } = \@values;
-        }
+    foreach my $tech_type ( $TECH_MILITARY, $TECH_GRID, $TECH_NANO ) {
+        my $tech_text = text_from_tech_enum( $tech_type );
+        $r_hash->{'TECH'}->{ $tech_text } = [ $self->tech_track_of( $tech_type )->techs() ];
     }
 
     my @ships = @{ $self->{'STARTING_SHIPS'} };

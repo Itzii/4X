@@ -81,7 +81,7 @@ sub from_hash {
     }
 
     if ( defined( $r_hash->{'CATEGORY'} ) ) {
-        $self->{'CATEGORY'} = $r_hash->{'CATEGORY'};
+        $self->{'CATEGORY'} = enum_from_tech_text( $r_hash->{'CATEGORY'} );
     }
 
     if ( WLE::Methods::Simple::looks_like_number( $r_hash->{'BASE_COST'} ) ) {
@@ -105,7 +105,7 @@ sub to_hash {
         return 0;
     }
 
-    $r_hash->{'CATEGORY'} = $self->category();
+    $r_hash->{'CATEGORY'} = text_from_tech_enum( $self->category() );
 
     $r_hash->{'BASE_COST'} = $self->base_cost();
     $r_hash->{'MIN_COST'} = $self->min_cost();

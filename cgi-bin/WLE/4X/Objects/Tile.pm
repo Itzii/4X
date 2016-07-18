@@ -451,6 +451,24 @@ sub remove_cube {
 
 #############################################################################
 
+sub remove_all_cubes_of_owner {
+    my $self            = shift;
+    my $owner_id        = shift;
+
+    my @cubes = ();
+
+    foreach my $slot ( @{ $self->{'RESOURCE_SLOTS'} } ) {
+        if ( $slot->{'OWNER'} == $owner_id ) {
+            $slot->{'OWNER'} = -1;
+            push( @cubes, $slot->{'TYPE'} );
+        }
+    }
+
+    return @cubes;
+}
+
+#############################################################################
+
 sub has_warp_on_side {
     my $self        = shift;
     my $direction   = shift;

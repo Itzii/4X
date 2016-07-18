@@ -249,7 +249,7 @@ sub tile_pair_is_traversable {
         }
     }
 
-    return 0;    
+    return 0;
 }
 
 #############################################################################
@@ -309,6 +309,32 @@ sub _explorable_from_location {
     }
 
     return @adjacents;
+}
+
+#############################################################################
+
+sub tile_is_influencible {
+    my $self        = shift;
+    my $tile_tag    = shift;
+
+    my $race = $self->server()->race_of_current_user();
+    my ( $loc_x, $loc_y ) = split( /:/, $self->location_of_tile( $tile_tag ) );
+
+    foreach my $direction ( 0 .. 5 ) {
+        my ( $loc_x2, $loc_y2 ) = $self->location_in_direction( $loc_x, $loc_y, $direction );
+
+        my $tile = $self->tile_at_location( $loc_x2, $loc_y2 );
+
+        if ( defined( $tile ) ) {
+            if ( $self->tile_pair_is_traversable( $race->tag(), $loc_x, $loc_y, $loc_x2, $loc_y2 ) ) {
+                if ( $tile->user_ship_count( $self->current_user() ) > 0 ) {
+                    return 1;
+                }
+            }
+        }
+    }
+
+    return 0;
 }
 
 #############################################################################

@@ -29,7 +29,9 @@ my %actions = (
     \&_raw_create_development_stack     => 'create_development_stack',
     \&_raw_select_race_and_location     => 'select_race_and_location',
     \&_raw_place_cube_on_tile           => 'place_cube_on_tile',
+    \&_raw_place_cube_on_track          => 'place_cube_on_track',
     \&_raw_influence_tile               => 'influence_tile',
+    \&_raw_remove_influence_from_tile   => 'uninfluence_tile'
     \&_raw_remove_non_playing_races     => 'remove_non_playing_races',
     \&_raw_create_ship_on_tile          => 'create_ship_on_tile',
     \&_raw_add_ship_to_tile             => 'add_ship_to_tile',
@@ -886,7 +888,7 @@ sub _raw_select_race_and_location {
             $open_slots = $start_hex->available_resource_spots( $type->[ 0 ], 1 );
 
             foreach ( 1 .. $open_slots ) {
-                $race->track_of( $type->[ 0 ] )->spend();
+                $race->resource_track_of( $type->[ 0 ] )->spend();
                 $start_hex->add_cube( $race->owner_id(), $type->[ 0 ], 1 )
             }
         }
@@ -942,6 +944,29 @@ sub _raw_place_cube_on_tile {
 
 #############################################################################
 
+sub _raw_place_cube_on_track {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $race_tag    = shift( @args );
+    my $cube_type   = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return $race_tag . ' returned cube to track ' . text_from_resource_enum( $cube_type );
+    }
+
+    $self->race_of_current_user()->resource_track_of( $cube_type )->add_to_track();
+
+    return;
+}
+
+#############################################################################
+
 sub _raw_influence_tile {
     my $self        = shift;
     my $source      = shift;
@@ -960,9 +985,74 @@ sub _raw_influence_tile {
 
     my $race = $self->races()->{ $race_tag };
 
-    $race->track_of( $RES_INFLUENCE )->spend();
+    $race->resource_track_of( $RES_INFLUENCE )->spend();
 
     $self->tiles()->{ $tile_tag }->set_owner_id( $race->owner_id() );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_remove_influence_from_tile {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $tile_tag    = shift( @args );
+    my $race        = $self->race_of_current_user();
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return $race->tag() . ' removed influence from tile ' . $tile_tag;
+    }
+
+    my $tile = $self->tiles()->{ $tile_tag };
+    $tile->set_owner_id( -1 );
+
+    $race->resource_track_of( $RES_INFLUENCE )->add_to_track();
+
+    $self->_raw_remove_all_cubes_of_owner( $EV_SUB_ACTION, $tile_tag );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_remove_all_cubes_of_owner {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $tile_tag = shift( @args );
+    my $race = $self->race_of_current_user();
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return $race->tag() . ' removed cubes from tile ' . $tile_tag;
+    }
+
+    my @cubes = $self->tiles()->{ $tile_tag }->remove_all_cubes_of_owner( $race->owner_id() );
+
+    foreach my $cube_type ( @cubes ) {
+        if ( $cube_type == $RES_WILD ) {
+            $self->_raw_add_item_to_hand( $EV_SUB_ACTION, $cube_type );
+        }
+        else {
+            if ( $race->resource_track_of( $cube_type )->available_spaces() > 0 ) {
+                $race->resource_track_of( $cube_type )->add_to_track();
+            }
+            else {
+                $self->_raw_add_item_to_hand( $EV_SUB_ACTION, $RES_WILD );
+            }
+        }
+    }
 
     return;
 }
@@ -1230,7 +1320,7 @@ sub _raw_spend_influence {
         return $race->tag() . ' spent 1 influence';
     }
 
-    $race->track_of( $RES_INFLUENCE )->spend_but_keep();
+    $race->resource_track_of( $RES_INFLUENCE )->spend_but_keep();
 
     return;
 }
@@ -1263,7 +1353,29 @@ sub _raw_use_colony_ship {
 
     $self->_raw_place_cube_on_tile( $race->tag(), $tile_tag, $type, $advanced );
 
-    return;    
+    return;
+}
+
+#############################################################################
+
+sub _raw_unuse_colony_ship {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $race = $self->race_of_current_user();
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return $race->tag() . ' flipped a colony ship';
+    }
+
+    $race->set_colony_ships_used( $race->colony_ships_used() - 1 );
+
+    return;
 }
 
 #############################################################################

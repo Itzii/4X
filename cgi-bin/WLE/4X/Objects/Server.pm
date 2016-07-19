@@ -116,6 +116,7 @@ sub _init {
 
     $self->{'BOARD'} = WLE::4X::Objects::Board->new( 'server' => $self );
     $self->{'TECH_BAG'} = WLE::Objects::Stack->new();
+    $self->{'AVAILABLE_TECH'} = WLE::Objects::Stack->new();
     $self->{'DISCOVERY_BAG'} = WLE::Objects::Stack->new();
     $self->{'VP_BAG'} = WLE::Objects::Stack->new();
 
@@ -192,7 +193,12 @@ sub do {
         'place_tile'        => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_explore_place_tile },
         'discard_tile'      => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_explore_discard_tile },
         'unflip_colony_ship'=> { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_influence_unflip_colony_ship },
-        'replace_cube'      => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_influence_replace_cube },
+
+#        'place_influence_token' => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_interrupt_place_influence_token },
+        'replace_cube'      => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_interrupt_replace_cube },
+        'choose_discovery'  => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_interrupt_choose_discovery },
+#        'place_component'   => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_interrupt_place_component },
+#        'select_free_technology' => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_interrupt_select_technology },
 
 
         'use_colony_ship'   => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'flag_ignore_allowed' => 1, 'method' => \&action_use_colony_ship },
@@ -205,6 +211,8 @@ sub do {
     }
 
     my $action = $actions{ $action_tag };
+    my $race = undef;
+
 
     unless ( defined( $action->{'flag_anytime'} ) ) {
 
@@ -234,10 +242,10 @@ sub do {
 
         if ( $self->state() == $ST_NORMAL ) {
 
-            my $race = $self->race_of_current_user();
+            $race = $self->race_of_current_user();
 
             unless ( defined( $action->{'flag_ignore_allowed'} ) ) {
-                unless ( $race->allowed_actions()->contains( $action_tag ) ) {
+                unless ( $race->adjusted_allowed_actions()->contains( $action_tag ) ) {
                     print STDERR "\nAllowed Actions: " . join( ',', $race->allowed_actions()->items() );
                     return ( 'success' => 0, 'message' => 'Action is not allowed by player at this time.' );
                 }
@@ -257,6 +265,12 @@ sub do {
     $response{'success'} = $action->{'method'}->( $self, %args );
     $response{'message'} = $self->last_error();
     $response{'data'} = $data;
+    $response{'allowed'} = [];
+
+    if ( defined( $race ) ) {
+        $response{'allowed'} = [ $race->adjusted_allowed_actions() ];
+    }
+
 
     return %response;
 }
@@ -568,6 +582,14 @@ sub tech_bag {
     my $self        = shift;
 
     return $self->{'TECH_BAG'};
+}
+
+#############################################################################
+
+sub available_tech {
+    my $self        = shift;
+
+    return $self->{'AVAILABLE_TECH'};
 }
 
 #############################################################################

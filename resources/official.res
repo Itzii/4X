@@ -434,9 +434,7 @@ $VAR1 = {
             'FLAVOR' => 'The Directorate governs the Procyon sector with a strong hand. A seat in the Inner Circle is only given to the very best, carefully chosen (and rumouredly even genetically programmed) to continue the line of the Directors. While there may be power struggles behind the scenes, the Directorate is determined to lead the rather well-off civilization toward a great future.',
             'HOME' => 'tile_221',
             'TECH' => {
-                'MILITARY' => {
-                    'POSSESS' => [ 'tech_starbase' ],
-                },
+                'MILITARY' => [ 'tech_starbase' ],
             },
             'SHIP_TEMPLATES' => [
                 {
@@ -469,9 +467,7 @@ $VAR1 = {
             'FLAVOR' => 'Terran Federation consists of numerous state systems with relatively similar ideals and histories. The Altair system is considered to be the most important of them, and it houses the Federal Parliament. The state systems enjoy quite a lot of freedom in their government, but in time of need they work efficiently together to protect the Federation.',
             'HOME' => 'tile_223',
             'TECH' => {
-                'MILITARY' => {
-                    'POSSESS' => [ 'tech_starbase' ],
-                },
+                'MILITARY' => [ 'tech_starbase' ],
             },
             'SHIP_TEMPLATES' => [
                 {
@@ -503,9 +499,7 @@ $VAR1 = {
             'FLAVOR' => 'After the long diaspora, the Terran Union settled in the Eta Cassiopeiae system. Despite occasional internal struggles, the Union has stood tall during hard times, often through strong diplomatic efforts and by staying carefully neutral. This may soon change, however, as the home system will not be able to provide for the whole civilization.',
             'HOME' => 'tile_225',
             'TECH' => {
-                'MILITARY' => {
-                    'POSSESS' => [ 'tech_starbase' ],
-                },
+                'MILITARY' => [ 'tech_starbase' ],
             },
             'SHIP_TEMPLATES' => [
                 {
@@ -537,9 +531,7 @@ $VAR1 = {
             'FLAVOR' => 'After having set their home in the Sirius system and doing their part in the Hegemony war, the people of the Terran Republic have built a democratically ruled society, enjoying a relatively stable and prosperous life.',
             'HOME' => 'tile_227',
             'TECH' => {
-                'MILITARY' => {
-                    'POSSESS' => [ 'tech_starbase' ],
-                },
+                'MILITARY' => [ 'tech_starbase' ],
             },
             'SHIP_TEMPLATES' => [
                 {
@@ -571,9 +563,7 @@ $VAR1 = {
             'FLAVOR' => 'Unlike the other Terran factions, the Conglomerate was originally fully backed by corporations eager to invest in the deep space colonies. This is still reflected in the society all the way from the Board, the highest governmental body of the Conglomerate, to the most mundane details of life in the Tau Ceti system. The Conglomerate is a financial powerhouse and one of the key players in the Galactic Center business.',
             'HOME' => 'tile_229',
             'TECH' => {
-                'MILITARY' => {
-                    'POSSESS' => [ 'tech_starbase' ],
-                },
+                'MILITARY' => [ 'tech_starbase' ],
             },
             'SHIP_TEMPLATES' => [
                 {
@@ -605,9 +595,7 @@ $VAR1 = {
             'FLAVOR' => 'The Alliance was a major force in the Terran-Hegemony War, after the already dissolving faction united against the common enemy. After the decisive victory in the Battle of Delta Pavonis (33.142) and driving the Hegemony fleet out of the sector, the Alliance made Delta Pavonis their home system. They have come a long way since then, but the old treaties are still in effect and the Alliance holds strong.',
             'HOME' => 'tile_231',
             'TECH' => {
-                'MILITARY' => {
-                    'POSSESS' => [ 'tech_starbase' ],
-                },
+                'MILITARY' => [ 'tech_starbase' ],
             },
             'SHIP_TEMPLATES' => [
                 {
@@ -640,9 +628,7 @@ $VAR1 = {
                 'FLAVOR' => 'The Separatists started originally as a small rebel movement against the ruthless Directorate. Despite the Directorate\'s swift acts to take down any insurgence, a strong faction emerged to stand against the Inner Circle. After a long Civil War, the Terran Separatists finally managed to leave the Procyon oppression and were joined by like-minded forces from other Terran factions (and rumoredly even some alien ones). They have now settled in the Mu Arae system to start anew.',
                 'HOME' => 'tile_240',
                 'TECH' => {
-                    'MILITARY' => {
-                        'POSSESS' => [ 'tech_starbase' ],
-                    },
+                    'MILITARY' => [ 'tech_starbase' ],
                 },
                 'SHIP_TEMPLATES' => [
                     {
@@ -691,17 +677,9 @@ $VAR1 = {
                 },
             },
             'TECH' => {
-                'MILITARY' => {
-                    'POSSESS' => [ 'tech_beam2' ],
-                },
-                'GRID' => {
-                    'POSSESS' => [ 'tech_shield1' ],
-                },
-                'NANO' => {
-                    'COST' => [ 0, -1, -2, -3, -4, -6, -8, 0 ],
-                    'VP' => [ 0, 0, 0, 0, 1, 2, 3, 5 ],
-                    'POSSESS' => [ 'tech_drive2' ],
-                },
+                'MILITARY' => [ 'tech_beam2' ],
+                'GRID' => [ 'tech_shield1' ],
+                'NANO' => [ 'tech_drive2' ],
             },
             'STARTING_SHIPS' => [
                 'class_interceptor',
@@ -753,9 +731,7 @@ $VAR1 = {
                 'MINERALS' => 2,
             },
             'TECH' => {
-                'NANO' => {
-                    'POSSESS' => [ 'tech_advanced_science' ],
-                },
+                'NANO' => [ 'tech_advanced_science' ],
             },
             'VP_SLOTS' => {
                 'AMBASSADOR' => 1,
@@ -804,9 +780,7 @@ $VAR1 = {
                 'MINERALS' => 4,
             },
             'TECH' => {
-                'MILITARY' => {
-                    'POSSESS' => [ 'tech_starbase' ],
-                },
+                'MILITARY' => [ 'tech_starbase' ],
             },
             'STARTING_SHIPS' => [
                 'class_interceptor',
@@ -904,9 +878,7 @@ $VAR1 = {
                 'MINERALS' => 3,
             },
             'TECH' => {
-                'GRID' => {
-                    'POSSESS' => [ 'tech_computer2' ],
-                },
+                'GRID' => [ 'tech_computer2' ],
             },
             'VP_SLOTS' => {
                 'AMBASSADOR' => 0,
@@ -955,12 +927,8 @@ $VAR1 = {
                 'MINERALS' => 5,
             },
             'TECH' => {
-                'MILITARY' => {
-                    'POSSESS' => [ 'tech_bombs' ],
-                },
-                'GRID' => {
-                    'POSSESS' => [ 'tech_shield1' ],
-                },
+                'MILITARY' => [ 'tech_bombs' ],
+                'GRID' => [ 'tech_shield1' ],
             },
             'STARTING_SHIPS' => [
                 'class_cruiser',
@@ -1012,9 +980,7 @@ $VAR1 = {
                 'MINERALS' => 3,
             },
             'TECH' => {
-                'GRID' => {
-                    'POSSESS' => [ 'tech_energy6' ],
-                },
+                'GRID' => [ 'tech_energy6' ],
             },
             'VP_SLOTS' => {
                 'AMBASSADOR' => 0,
@@ -1062,9 +1028,7 @@ $VAR1 = {
                 'MINERALS' => 3,
             },
             'TECH' => {
-                'GRID' => {
-                    'POSSESS' => [ 'tech_energy6' ],
-                },
+                'GRID' => [ 'tech_energy6' ],
             },
             'VP_SLOTS' => {
                 'AMBASSADOR' => 0,
@@ -1113,12 +1077,8 @@ $VAR1 = {
                 'MINERALS' => 3,
             },
             'TECH' => {
-                'MILITARY' => {
-                    'POSSESS' => [ 'tech_starbase' ],
-                },
-                'GRID' => {
-                    'POSSESS' => [ 'tech_shield1' ],
-                },
+                'MILITARY' => [ 'tech_starbase' ],
+                'GRID' => [ 'tech_shield1' ],
             },
             'STARTING_SHIPS' => [
                 'class_interceptor',
@@ -1165,9 +1125,7 @@ $VAR1 = {
                 'MINERALS' => 3,
             },
             'TECH' => {
-                'GRID' => {
-                    'POSSESS' => [ 'tech_energy6' ],
-                },
+                'GRID' => [ 'tech_energy6' ],
             },
             'VP_SLOTS' => {
                 'AMBASSADOR' => 0,
@@ -1221,9 +1179,7 @@ $VAR1 = {
                 'MINERALS' => 4,
             },
             'TECH' => {
-                'NANO' => {
-                    'POSSESS' => [ 'tech_ring' ],
-                },
+                'NANO' => [ 'tech_ring' ],
             },
             'VP_SLOTS' => {
                 'AMBASSADOR' => 0,
@@ -1272,9 +1228,7 @@ $VAR1 = {
                 'MINERALS' => 3,
             },
             'TECH' => {
-                'GRID' => {
-                    'POSSESS' => [ 'tech_energy6' ],
-                },
+                'GRID' => [ 'tech_energy6' ],
             },
             'VP_SLOTS' => {
                 'AMBASSADOR' => 0,
@@ -1322,9 +1276,7 @@ $VAR1 = {
                 'MINERALS' => 3,
             },
             'TECH' => {
-                'GRID' => {
-                    'POSSESS' => [ 'tech_energy6' ],
-                },
+                'GRID' => [ 'tech_energy6' ],
             },
             'VP_SLOTS' => {
                 'AMBASSADOR' => 0,

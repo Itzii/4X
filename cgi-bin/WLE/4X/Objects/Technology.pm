@@ -3,6 +3,7 @@ package WLE::4X::Objects::Technology;
 use strict;
 use warnings;
 
+use WLE::4X::Enums::Basic;
 
 use parent 'WLE::4X::Objects::Element';
 

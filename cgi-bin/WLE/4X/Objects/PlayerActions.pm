@@ -224,6 +224,7 @@ sub action_explore_place_tile {
     if ( scalar( $tile->ships() ) < 1 || $race->provides( 'spec_descendants') ) {
         if ( $args{'influence'} eq '1' ) {
             $self->_raw_influence_tile( $race->tag(), $tile_tag );
+
         }
     }
 
@@ -308,6 +309,12 @@ sub action_influence {
         return 0;
     }
 
+    # TODO
+    # need to split the getting and placing of the influence
+    # token into two seperate parts - so the influencablility
+    # of the destination tile is determined correctly
+
+
     unless ( defined( $args{'from'} ) ) {
         $self->set_error( 'Missing From Element' );
         return 0;
@@ -322,8 +329,6 @@ sub action_influence {
 
     my $influence_from = $args{'from'};
     my $influence_to = $args{'to'};
-
-    my @allowed = ( 'unflip_colony_ship', 'finish_turn' );
 
     if ( $influence_from eq 'track' ) {
         my $tile = $self->tiles()->{ $influence_to };
@@ -354,7 +359,15 @@ sub action_influence {
             return 0;
         }
 
-        $self->_raw_influence_tile( $EV_FROM_INTERFACE, $race->tag(, $influence_to );
+        $self->_raw_influence_tile( $EV_FROM_INTERFACE, $race->tag(), $influence_to );
+
+        unless ( $race->provides( 'spec_descendants' ) ) {
+            foreach my $discovery_tag ( $tile->discoveries() ) {
+                $self->_raw_remove_discovery_from_tile( $EV_FROM_INTERFACE, $influence_to, $discovery_tag );
+                $self->_raw_add_item_to_hand( $EV_FROM_INTERFACE, $discovery_tag );
+            }
+        }
+
     }
     elsif ( $influence_from ne 'nowhere' ) {
 
@@ -370,7 +383,7 @@ sub action_influence {
             return 0;
         }
 
-        unless ( $influce_to eq 'track' ) {
+        unless ( $influence_to eq 'track' ) {
             my $loc_tag = $self->board()->location_of_tile( $influence_to );
             if ( $loc_tag eq '' ) {
                 $self->set_error( 'Invalid destination Tile' );
@@ -393,22 +406,27 @@ sub action_influence {
         $self->_raw_remove_influence_from_tile( $EV_FROM_INTERFACE, $influence_from );
 
         if ( $influence_to ne 'track') {
-            $self->_raw_influence_tile( $EV_FROM_INTERFACE, $race->tag(, $influence_to );
+            $self->_raw_influence_tile( $EV_FROM_INTERFACE, $race->tag(), $influence_to );
+
+            unless ( $race->provides( 'spec_descendants' ) ) {
+                foreach my $discovery_tag ( $tile->discoveries() ) {
+                    $self->_raw_remove_discovery_from_tile( $EV_FROM_INTERFACE, $influence_to, $discovery_tag );
+                    $self->_raw_add_item_to_hand( $EV_FROM_INTERFACE, $discovery_tag );
+                }
+            }
+
         }
     }
 
     $self->_raw_increment_race_action( $EV_FROM_INTERFACE );
 
-    if ( $race->action_count() < $race->maximum_action_count( 'INFLUENCE' ) ) {
+    my @allowed = ( 'unflip_colony_ship', 'finish_turn' );
+
+    if ( $race->action_count() < $race->maximum_action_count( 'INFLUENCE_INF' ) ) {
         push( @allowed, 'action_influence' );
     }
 
-    if ( $race->in_hand()->count() > 0 ) {
-        @allowed = ( 'replace_cube' );
-    }
-
     $self->_raw_set_allowed_race_actions( @allowed );
-
 
     $self->_save_state();
     $self->_close_all();
@@ -418,9 +436,9 @@ sub action_influence {
 
 #############################################################################
 
-sub action_influence_replace_cube {
+sub action_interrupt_replace_cube {
     my $self            = shift;
-    my @args            = @_;
+    my %args            = @_;
 
     unless ( $self->_open_for_writing( $self->log_id() ) ) {
         return 0;
@@ -429,7 +447,7 @@ sub action_influence_replace_cube {
     my $race = $self->race_of_current_user();
 
     unless ( $race->in_hand()->count() > 0 ) {
-        $self->set_error( 'No Cubes in hand' );
+        $self->set_error( 'Nothing in hand' );
         return 0;
     }
 
@@ -452,7 +470,7 @@ sub action_influence_replace_cube {
 
     my $cube_type = $args{'cube_type'};
 
-    unless ( $race->in_hand()->contains( $cube_type ) ) {
+    unless ( $race->in_hand()->contains( 'cube:' . $cube_type ) ) {
         $self->set_error( 'Not holding cube of that type' );
         return 0;
     }
@@ -471,15 +489,50 @@ sub action_influence_replace_cube {
 
     $self->_raw_place_cube_on_track( $EV_FROM_INTERFACE, $race->tag(), $dest_type );
 
-    if ( $race->in_hand()->count() > 0 ) {
-        $self->_raw_set_allowed_race_actions( 'replace_cube' );
+    my @allowed = ( 'unflip_colony_ship', 'finish_turn' );
+
+    if ( $race->action_count() < $race->maximum_action_count( 'INFLUENCE_INF' ) ) {
+        push( @allowed, 'action_influence' );
     }
-    elsif ( $race->action_count() < $race->maximum_action_count( 'INFLUENCE' ) ) {
-        $self->_raw_set_allowed_race_actions( 'action_influence', 'unflip_colony_ship', 'finish_turn' );
+
+    $self->_raw_set_allowed_race_actions( @allowed );
+
+    $self->_save_state();
+    $self->_close_all();
+
+    return 1;
+}
+
+############################################################################
+
+sub action_interrupt_choose_discovery {
+    my $self            = shift;
+    my %args            = @_;
+
+    unless ( $self->_open_for_writing( $self->log_id() ) ) {
+        return 0;
     }
-    else {
-        $self->_raw_set_allowed_race_actions( 'unflip_colony_ship', 'finish_turn' );
+
+    unless ( defined( $args{'discovery_tag'} ) ) {
+        $self->set_error( 'Missing Discovery tag' );
+        return 0;
     }
+
+    my $discovery_tag = $args{'discovery_tag'};
+    my $flag_as_vp = 0;
+
+    if ( defined( $args{'as_vp'} ) ) {
+        $flag_as_vp = $args{'as_vp'};
+    }
+
+    my $race = $self->race_of_current_user();
+
+    unless ( $race->in_hand()->contains( $discovery_tag ) ) {
+        $self->set_error( 'Not holding Discovery' );
+        return 0;
+    }
+
+    $self->_raw_use_discovery( $EV_FROM_INTERFACE, $discovery_tag, $flag_as_vp );
 
     $self->_save_state();
     $self->_close_all();
@@ -491,7 +544,7 @@ sub action_influence_replace_cube {
 
 sub action_influence_unflip_colony_ship {
     my $self            = shift;
-    my @args            = @_;
+    my %args            = @_;
 
     unless ( $self->_open_for_writing( $self->log_id() ) ) {
         return 0;
@@ -520,7 +573,7 @@ sub action_influence_unflip_colony_ship {
 
 sub action_research {
     my $self            = shift;
-    my @args            = @_;
+    my %args            = @_;
 
     unless ( $self->_open_for_writing( $self->log_id() ) ) {
         return 0;
@@ -577,7 +630,7 @@ sub action_research {
         return 0;
     }
 
-    
+
 
 
 

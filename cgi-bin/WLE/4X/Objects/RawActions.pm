@@ -31,12 +31,17 @@ my %actions = (
     \&_raw_place_cube_on_tile           => 'place_cube_on_tile',
     \&_raw_place_cube_on_track          => 'place_cube_on_track',
     \&_raw_influence_tile               => 'influence_tile',
-    \&_raw_remove_influence_from_tile   => 'uninfluence_tile'
+    \&_raw_remove_influence_from_tile   => 'uninfluence_tile',
     \&_raw_remove_non_playing_races     => 'remove_non_playing_races',
     \&_raw_create_ship_on_tile          => 'create_ship_on_tile',
     \&_raw_add_ship_to_tile             => 'add_ship_to_tile',
     \&_raw_add_discovery_to_tile        => 'add_discovery_to_tile',
     \&_raw_remove_discovery_from_tile   => 'remove_discovery_from_tile',
+    \&_raw_add_slot_to_tile             => 'add_slot_to_tile',
+    \&_raw_add_ancient_link_to_tile     => 'add_ancient_link_to_tile',
+    \&_raw_add_wormhole_to_tile         => 'add_wormhole_to_tile',
+    \&_raw_add_vp_to_tile               => 'add_vp_to_tile',
+    \&_raw_use_discovery                => 'use_discovery',
     \&_raw_remove_from_tech_bag         => 'remove_from_tech_bag',
     \&_raw_add_to_available_tech        => 'add_to_available_tech',
     \&_raw_next_player                  => 'next_player',
@@ -1042,14 +1047,14 @@ sub _raw_remove_all_cubes_of_owner {
 
     foreach my $cube_type ( @cubes ) {
         if ( $cube_type == $RES_WILD ) {
-            $self->_raw_add_item_to_hand( $EV_SUB_ACTION, $cube_type );
+            $self->_raw_add_item_to_hand( $EV_SUB_ACTION, 'cube:' . $cube_type );
         }
         else {
             if ( $race->resource_track_of( $cube_type )->available_spaces() > 0 ) {
                 $race->resource_track_of( $cube_type )->add_to_track();
             }
             else {
-                $self->_raw_add_item_to_hand( $EV_SUB_ACTION, $RES_WILD );
+                $self->_raw_add_item_to_hand( $EV_SUB_ACTION, 'cube:' . $RES_WILD );
             }
         }
     }
@@ -1234,6 +1239,141 @@ sub _raw_remove_discovery_from_tile {
     }
 
     $self->tiles()->{ $tile_tag }->remove_discovery( $discovery_tag );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_add_slot_to_tile {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $tile_tag        = shift( @args );
+    my $type            = shift( @args );
+    my $flag_advanced   = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        my $adv_text = ( $flag_advanced == 1 ) ? '(adv) ' : '';
+        return 'resource slot created on tile : ' . text_from_resource_enum( $type );
+    }
+
+    my $slot = WLE::4X::Objects::ResourceSpace->new();
+    $slot->set_resource_type( $type );
+    $slot->set_is_advanced( $flag_advanced );
+
+    $self->tiles()->{ $tile_tag }->add_slot( $slot );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_add_ancient_link_to_tile {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $tile_tag        = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'ancient link added to tile : ' . $tile_tag;
+    }
+
+    my $tile = $self->tiles()->{ $tile_tag };
+
+    $tile->set_ancient_link( $tile->ancient_links() + 1 );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_add_wormhole_to_tile {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $tile_tag        = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'wormhole added to tile : ' . $tile_tag;
+    }
+
+    $self->tiles()->{ $tile_tag }->set_wormhole( 1 );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_add_vp_to_tile {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $tile_tag        = shift( @args );
+    my $value           = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'vp added to tile : ' . $tile_tag;
+    }
+
+    my $tile = $self->tiles()->{ $tile_tag };
+
+    $tile->set_vp( $tile->base_vp() + $value );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_use_discovery {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $discovery_tag   = shift( @args );
+    my $flag_as_vp      = shift( @args );
+
+    my $race = $self->race_of_current_user();
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        my $as_text = ( $flag_as_vp == 1 ) ? 'as 2 vp' : 'for effect';
+        return $race->tag() . ' used discovery ' . $as_text;
+    }
+
+    if ( $flag_as_vp ) {
+        # TODO
+        # $race->add_vp_to_category( $VP_DISCOVERIES, 2 );
+    }
+    else {
+        # TODO need some way to preserve the tile where the discovery originated
+        # $self->use_discovery( $tile_tag, $discovery_tag );
+    }
+
+    $race->in_hand()->remove_item( $discovery_tile );
 
     return;
 }

@@ -320,6 +320,12 @@ sub tile_is_influencible {
     my $race = $self->server()->race_of_current_user();
     my ( $loc_x, $loc_y ) = split( /:/, $self->location_of_tile( $tile_tag ) );
 
+    my $this_tile = $self->server()->tiles()->{ $tile_tag };
+
+    if ( $this_tile->enemy_ship_count( $self->current_user() ) > 0 ) {
+        return 0;
+    }
+
     foreach my $direction ( 0 .. 5 ) {
         my ( $loc_x2, $loc_y2 ) = $self->location_in_direction( $loc_x, $loc_y, $direction );
 

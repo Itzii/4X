@@ -139,8 +139,7 @@ sub _read_state {
     }
 
     $self->tech_bag()->add_items( @{ $VAR1->{'TECH_BAG'} } );
-
-    $self->{'AVAILABLE_TECH'} = $VAR1->{'AVAILABLE_TECH'};
+    $self->available_tech()->add_items( @{ $VAR1->{'AVAILABLE_TECH'} } );
 
     # vp tokens
     # print STDERR "\n  vp tokens ... ";
@@ -339,7 +338,7 @@ sub _save_state {
         }
 
         $data{'TECH_BAG'} = [ $self->tech_bag()->items() ];
-        $data{'AVAILABLE_TECH'} = $self->{'AVAILABLE_TECH'};
+        $data{'AVAILABLE_TECH'} = [ $self->available_tech()->items() ];
 
         # vp tokens
 

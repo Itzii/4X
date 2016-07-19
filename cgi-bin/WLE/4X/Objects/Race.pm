@@ -6,6 +6,7 @@ use warnings;
 use WLE::4X::Enums::Basic;
 
 use WLE::4X::Objects::ResourceTrack;
+use WLE::4X::Objects::TechTrack;
 
 use parent 'WLE::4X::Objects::Element';
 #############################################################################
@@ -181,6 +182,46 @@ sub allowed_actions {
 
 #############################################################################
 
+sub adjusted_allowed_actions {
+    my $self        = shift;
+
+    my $list = WLE::Objects::Stack->new();
+
+    # has discoveries in hand from influencing tile
+    if ( $self->has_discovery_in_hand() ) {
+        $list->add_items( 'choose_discovery' );
+    }
+
+    # has influence token in hand from influence action
+    elsif ( $self->in_hand()->contains( 'influence_token' ) ) {
+        $list->add_items( 'place_influence_token' );
+    }
+
+    # has multiple technologies in hand from discovery tile
+    elsif ( $self->has_technology_in_hand() ) {
+        $list->add_items( 'select_free_technology' );
+    }
+
+    # component is in hand from either upgrade action or discovery tile
+    elsif ( $self->has_component_in_hand() ) {
+        $list->add_items( 'place_component' );
+    }
+
+    # cube in hand from de-influencing tile
+    elsif ( $self->has_cube_in_hand() ) {
+        $list->add_items( 'replace_cube' );
+    }
+
+    else {
+        return $self->allowed_actions();
+    }
+
+    return $list;
+}
+
+
+#############################################################################
+
 sub action_count {
     my $self        = shift;
 
@@ -280,6 +321,61 @@ sub in_hand {
 
 #############################################################################
 
+sub has_discovery_in_hand {
+    my $self        = shift;
+
+    foreach my $item ( $self->in_hand()->items() ) {
+        if ( defined( $self->server()->discoveries()->{ $item } ) ) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+#############################################################################
+
+sub has_component_in_hand {
+    my $self        = shift;
+
+    foreach my $item ( $self->in_hand()->items() ) {
+        if ( defined( $self->server()->components()->{ $item } ) ) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+#############################################################################
+
+sub has_technology_in_hand {
+    my $self        = shift;
+
+    foreach my $item ( $self->in_hand()->items() ) {
+        if ( defined( $self->server()->technology()->{ $item } ) ) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+#############################################################################
+
+sub has_cube_in_hand {
+    my $self        = shift;
+
+    foreach my $item ( $self->in_hand()->items() ) {
+        if ( $item =~ m{ ^ cube: }xs ) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+#############################################################################
+
 sub exchange_rate {
     my $self        = shift;
     my $res_from    = shift;
@@ -301,6 +397,18 @@ sub resource_count {
     my $type        = shift;
 
     return $self->{'RESOURCES'}->{ $type };
+}
+
+#############################################################################
+
+sub add_resource {
+    my $self        = shift;
+    my $type        = shift;
+    my $amount      = shift;
+
+    $self->{'RESOURCES'}->{ $type } += $amount;
+
+    return;
 }
 
 #############################################################################
@@ -529,9 +637,9 @@ sub from_hash {
 
     if ( defined( $r_hash->{'TECH'} ) ) {
         foreach my $tech_type ( $TECH_MILITARY, $TECH_GRID, $TECH_NANO ) {
-            my $tech_text = text_from_tech_enum( $tech_tag );
+            my $tech_text = text_from_tech_enum( $tech_type );
             if ( defined( $r_hash->{'TECH'}->{ $tech_text} ) ) {
-                $self->resource_track_of( $tech_type )->add_techs( @{ $r_hash->{'TECH'}->{ $tech_text } } );
+                $self->tech_track_of( $tech_type )->add_techs( @{ $r_hash->{'TECH'}->{ $tech_text } } );
             }
         }
     }

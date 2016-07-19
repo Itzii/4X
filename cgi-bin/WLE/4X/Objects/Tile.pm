@@ -99,7 +99,7 @@ sub total_vp {
 
 #############################################################################
 
-sub has_ancient_link {
+sub ancient_links {
     my $self        = shift;
 
     return $self->{'ANCIENT_LINK'};
@@ -297,6 +297,35 @@ sub user_ship_count {
 
 #############################################################################
 
+sub enemy_ship_count {
+    my $self        = shift;
+    my $user_id     = shift;
+
+    my $count = 0;
+
+    foreach my $ship_tag ( $self->ships() ) {
+        my $ship = $self->server()->ships()->{ $ship_tag };
+
+        if ( $ship->owner_id() != $user_id ) {
+
+            if ( $self->server()->races()->{ $user_id }->provides( 'spec_descendants' ) ) {
+                if ( $ship->class() ne 'class_ancient_cruiser' ) {
+                    $count++;
+                }
+            }
+            else {
+                $count++;
+            }
+
+            # TODO if ships are allied - they shouldn't count
+        }
+    }
+
+    return $count;
+}
+
+#############################################################################
+
 sub add_ship {
     my $self        = shift;
     my $ship_tag    = shift;
@@ -365,20 +394,18 @@ sub available_resource_spots {
     my $res_type        = shift;
     my $flag_advanced   = shift; $flag_advanced = 0             unless defined( $flag_advanced );
 
-    my $type_text = WLE::4X::Enums::Basic::text_from_resource_enum( $res_type );
-
     my $count = 0;
 
     foreach my $slot ( @{ $self->{'RESOURCE_SLOTS'} } ) {
-        unless ( lc( $slot->{'TYPE'} ) eq lc( $type_text ) ) {
+        unless ( $slot->resource_type() == $res_type ) {
             next;
         }
 
-        unless ( $slot->{'ADVANCED'} == $flag_advanced ) {
+        unless ( $slot->is_advanced() == $flag_advanced ) {
             next;
         }
 
-        unless ( $slot->{'OWNER'} eq '-1' ) {
+        unless ( $slot->owner_id() eq '-1' ) {
             next;
         }
 
@@ -399,19 +426,19 @@ sub add_cube {
     my $type_text = WLE::4X::Enums::Basic::text_from_resource_enum( $type_enum );
 
     foreach my $slot ( @{ $self->{'RESOURCE_SLOTS'} } ) {
-        unless ( lc( $slot->{'TYPE'} ) eq lc( $type_text ) ) {
+        unless ( $slot->resource_type() == $type_enum ) {
             next;
         }
 
-        unless ( $slot->{'ADVANCED'} == $flag_advanced ) {
+        unless ( $slot->is_advanced() == $flag_advanced ) {
             next;
         }
 
-        unless ( $slot->{'OWNER'} eq '-1' ) {
+        unless ( $slot->owner_id() eq '-1' ) {
             next;
         }
 
-        $slot->{'OWNER'} = $owner_id;
+        $slot->set_owner_id() = $owner_id;
         return 1;
     }
 
@@ -430,19 +457,19 @@ sub remove_cube {
     my $type_text = WLE::4X::Enums::Basic::text_from_resource_enum( $type_enum );
 
     foreach my $slot ( @{ $self->{'RESOURCE_SLOTS'} } ) {
-        unless ( $slot->{'TYPE'} eq $type_text ) {
+        unless ( $slot->resource_type() == $type_enum ) {
             next;
         }
 
-        unless ( $slot->{'ADVANCED'} == $flag_advanced ) {
+        unless ( $slot->is_advanced() == $flag_advanced ) {
             next;
         }
 
-        if ( $slot->{'OWNER'} eq '-1' ) {
+        if ( $slot->owner_id() eq '-1' ) {
             next;
         }
 
-        $slot->{'OWNER'} = -1;
+        $slot->set_owner_id( -1 );
         return 1;
     }
 
@@ -458,13 +485,57 @@ sub remove_all_cubes_of_owner {
     my @cubes = ();
 
     foreach my $slot ( @{ $self->{'RESOURCE_SLOTS'} } ) {
-        if ( $slot->{'OWNER'} == $owner_id ) {
-            $slot->{'OWNER'} = -1;
-            push( @cubes, $slot->{'TYPE'} );
+        if ( $slot->owner_id() == $owner_id ) {
+            $slot->set_owner_id( -1 );
+            push( @cubes, $slot->resource_type() );
         }
     }
 
     return @cubes;
+}
+
+#############################################################################
+
+sub add_slot {
+    my $self        = shift;
+    my $slot        = shift;
+
+    push( @{ $self->{'RESOURCE_SLOTS'} } );
+
+    return;
+}
+
+#############################################################################
+
+sub set_ancient_link {
+    my $self        = shift;
+    my $value       = shift;
+
+    $self->{'ANCIENT_LINK'} = $value;
+
+    return;
+}
+
+#############################################################################
+
+sub set_wormhole {
+    my $self        = shift;
+    my $value       = shift;
+
+    $self->{'WORMHOLE'} = $value;
+
+    return;
+}
+
+#############################################################################
+
+sub set_vp {
+    my $self        = shift;
+    my $value       = shift;
+
+    $self->{'VP'} = $value;
+
+    return;
 }
 
 #############################################################################
@@ -556,33 +627,12 @@ sub from_hash {
 
     if ( defined( $r_hash->{'RESOURCES'} ) ) {
         if ( ref( $r_hash->{'RESOURCES'} ) eq 'ARRAY' ) {
-            my @resources = ();
+            foreach my $slot_hash ( @{ $r_hash->{'RESOURCES'} } ) {
+                my $slot = WLE::4X::Objects::ResourceSpace->new();
+                $slot->from_hash( $slot_hash );
 
-            foreach my $slot ( @{ $r_hash->{'RESOURCES'} } ) {
-                if ( ref( $slot ) eq 'HASH' ) {
-                    my %local_slot = ( 'TYPE' => 'wild', 'OWNER' => -1, 'ADVANCED' => 0 );
-
-                    if ( defined( $slot->{'TYPE'} ) ) {
-                        $local_slot{'TYPE'} = $slot->{'TYPE'};
-                    }
-
-                    if ( defined( $slot->{'OWNER'} ) ) {
-                        if ( WLE::Methods::Simple::looks_like_number( $slot->{'OWNER'} ) ) {
-                            $local_slot{'OWNER'} = $slot->{'OWNER'};
-                        }
-                    }
-
-                    if ( defined( $slot->{'ADVANCED'} ) ) {
-                        if ( WLE::Methods::Simple::looks_like_number( $slot->{'ADVANCED'} ) ) {
-                            $local_slot{'ADVANCED'} = $slot->{'ADVANCED'};
-                        }
-                    }
-
-                    push( @resources, \%local_slot );
-                }
+                $self->add_slot( $slot );
             }
-
-            $self->{'RESOURCE_SLOTS'} = \@resources;
         }
     }
 
@@ -621,7 +671,15 @@ sub to_hash {
 
     $r_hash->{'DISCOVERIES'} = $self->{'DISCOVERIES'};
 
-    $r_hash->{'RESOURCES'} = $self->{'RESOURCE_SLOTS'};
+    my @resource_slots = ();
+
+    foreach my $slot ( @{ $self->{'RESOURCE_SLOTS'} } ) {
+        my %slot_hash = ();
+        $slot->to_hash( \%slot_hash );
+        push( @resource_slots, \%slot_hash );
+    }
+
+    $r_hash->{'RESOURCES'} = \@resource_slots;
 
     return 1;
 }

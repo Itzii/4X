@@ -13,12 +13,16 @@ our @EXPORT = qw(
     text_from_resource_enum
     enum_from_resource_text
 
+    text_from_tech_enum
+    enum_from_tech_text
+
     $RES_MONEY
     $RES_MINERALS
     $RES_SCIENCE
     $RES_INFLUENCE
     $RES_COUNT
     $RES_WILD
+    $RES_SCIENCE_MONEY
     $RES_UNKNOWN
 
     $TECH_MILITARY
@@ -38,7 +42,16 @@ our $RES_SCIENCE        = $i++;
 our $RES_INFLUENCE      = $i++;
 our $RES_COUNT          = $i++;
 our $RES_WILD           = $i++;
+our $RES_SCIENCE_MONEY  = $i++;
 our $RES_UNKNOWN        = $i++;
+
+$i = 0;
+
+our $TECH_MILITARY      = $i++;
+our $TECH_GRID          = $i++;
+our $TECH_NANO          = $i++;
+our $TECH_WILD          = $i++;
+our $TECH_UNKNOWN       = $i++;
 
 #############################################################################
 
@@ -90,8 +103,8 @@ sub text_from_tech_enum {
         $TECH_WILD      => 'WILD',
     );
 
-    if ( defined( $values{ $enum } ) ) {
-        return $values{ $enum },
+    if ( defined( $values{ $tech_type } ) ) {
+        return $values{ $tech_type },
     }
 
     return 'UNKNOWN';

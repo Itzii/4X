@@ -19,20 +19,31 @@ my %actions = (
     \&_raw_add_player                   => 'add_player',
     \&_raw_remove_player                => 'remove_player',
     \&_raw_begin                        => 'begin',
+
     \&_raw_set_player_order             => 'set_player_order',
     \&_raw_add_players_to_next_round    => 'queue_next_round',
+
     \&_raw_create_tile_stack            => 'create_tile_stack',
     \&_raw_remove_tile_from_stack       => 'remove_tile_from_stack',
     \&_raw_empty_tile_discard_stack     => 'empty_tile_discard',
     \&_raw_place_tile_on_board          => 'place_tile_on_board',
     \&_raw_discard_tile                 => 'discard_tile',
+
     \&_raw_create_development_stack     => 'create_development_stack',
+
     \&_raw_select_race_and_location     => 'select_race_and_location',
-    \&_raw_place_cube_on_tile           => 'place_cube_on_tile',
-    \&_raw_place_cube_on_track          => 'place_cube_on_track',
+    \&_raw_remove_non_playing_races     => 'remove_non_playing_races',
+
+    \&_raw_remove_from_tech_bag         => 'remove_from_tech_bag',
+    \&_raw_add_to_available_tech        => 'add_to_available_tech',
+    \&_raw_remove_from_available_tech   => 'remove_from_available_tech',
+    \&_raw_next_player                  => 'next_player',
+    \&_raw_start_next_round             => 'start_next_round',
+
+
     \&_raw_influence_tile               => 'influence_tile',
     \&_raw_remove_influence_from_tile   => 'uninfluence_tile',
-    \&_raw_remove_non_playing_races     => 'remove_non_playing_races',
+    \&_raw_place_cube_on_tile           => 'place_cube_on_tile',
     \&_raw_create_ship_on_tile          => 'create_ship_on_tile',
     \&_raw_add_ship_to_tile             => 'add_ship_to_tile',
     \&_raw_add_discovery_to_tile        => 'add_discovery_to_tile',
@@ -41,19 +52,24 @@ my %actions = (
     \&_raw_add_ancient_link_to_tile     => 'add_ancient_link_to_tile',
     \&_raw_add_wormhole_to_tile         => 'add_wormhole_to_tile',
     \&_raw_add_vp_to_tile               => 'add_vp_to_tile',
-    \&_raw_use_discovery                => 'use_discovery',
-    \&_raw_remove_from_tech_bag         => 'remove_from_tech_bag',
-    \&_raw_add_to_available_tech        => 'add_to_available_tech',
-    \&_raw_next_player                  => 'next_player',
-    \&_raw_start_next_round             => 'start_next_round',
-    \&_raw_set_allowed_race_actions     => 'set_allowed_actions',
 
+    \&_raw_place_cube_on_track          => 'place_cube_on_track',
+    \&_raw_pick_up_influence            => 'pick_up_influence',
+    \&_raw_return_influence_to_track    => 'return_influence_to_track',
+    \&_raw_use_discovery                => 'use_discovery',
+
+    \&_raw_set_allowed_race_actions     => 'set_allowed_actions',
     \&_raw_increment_race_action        => 'inc_race_action',
+
     \&_raw_spend_influence              => 'spend_influence',
     \&_raw_use_colony_ship              => 'use_colony_ship',
     \&_raw_add_item_to_hand             => 'add_hand_item',
     \&_raw_remove_item_from_hand        => 'remove_hand_item',
     \&_raw_player_pass_action           => 'player_pass',
+    \&_raw_add_to_tech_track            => 'add_to_tech_track',
+    \&_raw_buy_technology               => 'buy_technology',
+    \&_raw_spend_resource               => 'spend_resource',
+    \&_raw_upgrade_ship_component       => 'upgrade_ship',
 
 
     \&_raw_start_combat_phase           => 'start_combat_phase',
@@ -999,6 +1015,62 @@ sub _raw_influence_tile {
 
 #############################################################################
 
+sub _raw_pick_up_influence {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $tile_tag    = shift( @args );
+    my $race        = $self->race_of_current_user();
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return $race->tag() . ' picked up influence from ' . $tile_tag;
+    }
+
+    if ( $tile_tag eq 'track' ) {
+        $race->resource_track_of( $RES_INFLUENCE )->spend();
+    }
+    else {
+        my $tile = $self->tiles()->{ $tile_tag };
+        $tile->set_owner_id( -1 );
+        $self->_raw_remove_all_cubes_of_owner( $EV_SUB_ACTION, $tile_tag );
+    }
+
+    $race->in_hand()->add_items( 'influence_token' );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_return_influence_to_track {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $race = $self->race_of_current_user();
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return $race->tag() . ' returned influence to the resource track';
+    }
+
+    $race->in_hand()->remove_item( 'influence_token' );
+
+    $race->resource_track_of( $RES_INFLUENCE )->add_to_track();
+
+    return;
+}
+
+#############################################################################
+
 sub _raw_remove_influence_from_tile {
     my $self        = shift;
     my $source      = shift;
@@ -1015,12 +1087,8 @@ sub _raw_remove_influence_from_tile {
         return $race->tag() . ' removed influence from tile ' . $tile_tag;
     }
 
-    my $tile = $self->tiles()->{ $tile_tag };
-    $tile->set_owner_id( -1 );
-
-    $race->resource_track_of( $RES_INFLUENCE )->add_to_track();
-
-    $self->_raw_remove_all_cubes_of_owner( $EV_SUB_ACTION, $tile_tag );
+    $self->_raw_pick_up_influence( $EV_SUB_ACTION, $tile_tag );
+    $self->_raw_return_influence_to_track( $EV_SUB_ACTION );
 
     return;
 }
@@ -1355,6 +1423,7 @@ sub _raw_use_discovery {
     }
 
     my $discovery_tag   = shift( @args );
+    my $tile_tag        = shift( @args );
     my $flag_as_vp      = shift( @args );
 
     my $race = $self->race_of_current_user();
@@ -1369,11 +1438,10 @@ sub _raw_use_discovery {
         # $race->add_vp_to_category( $VP_DISCOVERIES, 2 );
     }
     else {
-        # TODO need some way to preserve the tile where the discovery originated
-        # $self->use_discovery( $tile_tag, $discovery_tag );
+        $self->use_discovery( $tile_tag, $discovery_tag );
     }
 
-    $race->in_hand()->remove_item( $discovery_tile );
+    $race->in_hand()->remove_item( $tile_tag . ':' . $discovery_tag );
 
     return;
 }
@@ -1420,7 +1488,29 @@ sub _raw_add_to_available_tech {
         return 'tech tiles added to available tech: ' . join( ',', @new_tech );
     }
 
-    push( @{ $self->{'AVAILABLE_TECH'} }, @new_tech );
+    $self->available_tech()->add_items( @new_tech );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_remove_from_available_tech {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $tech_tag = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'tech tile removed from available tech: ' . $tech_tag;
+    }
+
+    $self->available_tech()->remove_item( $tech_tag );
 
     return;
 }
@@ -1461,6 +1551,67 @@ sub _raw_spend_influence {
     }
 
     $race->resource_track_of( $RES_INFLUENCE )->spend_but_keep();
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_spend_resource {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $resource_type   = shift( @args );
+    my $amount          = shift( @args );
+
+    my $race = $self->race_of_current_user();
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return $race->tag() . ' spent ' . $amount . ' ' . text_from_resouce_enum( $resource_type );;
+    }
+
+    $race->add_resource( $resource_type, - $amount );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_upgrade_ship_component {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $template_tag    = shift( @args );
+    my $component_tag   = shift( @args );
+    my $replaces        = shift( @args );
+
+    my $race = $self->race_of_current_user();
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        if ( $replaces eq '' ) {
+            return $race->tag() . ' upgraded template ' . $template_tag . ' with ' . $component_tag;
+        }
+        else {
+            return $race->tag() . ' upgraded template ' . $template_tag . ' replacing ' . $replaces . ' with ' . $component_tag;
+        }
+    }
+
+    my $template = $self->ship_templates()->{ $template_tag };
+
+    my $message_holder = '';
+    $template->add_component( $component_tag, $replaces, \$message_holder );
+
+    $race->component_overflow()->remove_item( $component_tag );
 
     return;
 }
@@ -1560,6 +1711,68 @@ sub _raw_remove_item_from_hand {
     }
 
     $race->in_hand()->remove_item( $item );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_buy_technology {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $tech_tag = shift( @args );
+    my $track_type = shift( @args );
+
+    my $race = $self->race_of_current_user();
+    my $tech = $self->technologies()->{ $tech_tag };
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return $race->tag() . ' researched ' . $tech_tag;
+    }
+
+    my $cost = $self->technologies()->base_cost();
+    my $credit = $race->tech_track_of( $track_type )->current_credit();
+
+    $cost -= $credit;
+    if ( $cost < $tech->min_cost() ) {
+        $cost = $tech->min_cost();
+    }
+
+    $race->add_resource( $RES_SCIENCE, - $cost );
+
+    $self->_raw_remove_from_available_tech( $EV_SUB_ACTION, $tech_tag );
+    $self->_raw_add_to_tech_track( $EV_SUB_ACTION, $tech_tag, $track_type );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_add_to_tech_track {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $race = $self->race_of_current_user();
+
+    my $tech_tag = shift( @args );
+    my $track_type = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return $race->tag() . ' added ' . $tech_tag . ' to tech track ' . text_from_tech_enum( $track_type );
+    }
+
+    $race->tech_track_of( $track_type )->add_techs( $tech_tag );
 
     return;
 }

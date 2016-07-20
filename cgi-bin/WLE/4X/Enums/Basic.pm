@@ -84,7 +84,7 @@ sub enum_from_resource_text {
         }
     }
 
-    if ( text_from_resouce_enum( $RES_WILD ) eq uc( $text ) ) {
+    if ( text_from_resource_enum( $RES_WILD ) eq uc( $text ) ) {
         return $RES_WILD;
     }
 

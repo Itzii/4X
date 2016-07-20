@@ -278,6 +278,9 @@ sub add_component {
     my $replaces_tag    = shift;
     my $r_message       = shift;
 
+    # TODO this needs to be changed. if a starting component is replaced and the new component
+    # is eventually discarded, the original component is now active.
+
     my @new_components = ();
 
     if ( $replaces_tag eq '' ) {

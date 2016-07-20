@@ -66,6 +66,7 @@ sub _init {
     $self->{'ALLOWED_ACTIONS'} = WLE::Objects::Stack->new();
 
     $self->{'IN_HAND'} = WLE::Objects::Stack->new();
+    $self->{'COMPONENT_OVERFLOW'} = WLE::Objects::Stack->new();
 
     $self->{'RESOURCES'} = {
         $RES_MONEY => 2,
@@ -313,6 +314,14 @@ sub colony_ships_available {
 
 #############################################################################
 
+sub component_overflow {
+    my $self        = shift;
+
+    return $self->{'COMPONENT_OVERFLOW'};
+}
+
+#############################################################################
+
 sub in_hand {
     my $self        = shift;
 
@@ -325,8 +334,12 @@ sub has_discovery_in_hand {
     my $self        = shift;
 
     foreach my $item ( $self->in_hand()->items() ) {
-        if ( defined( $self->server()->discoveries()->{ $item } ) ) {
-            return 1;
+        my ( $tile_tag, $discovery_tag ) = split( /:/, $item );
+
+        if ( defined( $discovery_tag ) ) {
+            if ( defined( $self->server()->discoveries()->{ $discovery_tag } ) ) {
+                return 1;
+            }
         }
     }
 
@@ -359,6 +372,20 @@ sub has_technology_in_hand {
     }
 
     return 0;
+}
+
+#############################################################################
+
+sub remove_all_technologies_from_hand {
+    my $self        = shift;
+
+    foreach my $item ( $self->in_hand()->items() ) {
+        if ( defined( $self->server()->technology()->{ $item } ) ) {
+            $self->in_hand()->remove_item( $item );
+        }
+    }
+
+    return;
 }
 
 #############################################################################
@@ -598,6 +625,10 @@ sub from_hash {
         }
     }
 
+    if ( defined( $r_hash->{'COMPONENT_OVERFLOW'} ) ) {
+        $self->{'COMPONENT_OVERFLOW'}->add_items( @{ $r_hash->{'COMPONENT_OVERFLOW'} } );
+    }
+
     if ( defined( $r_hash->{'ACTIONS'} ) ) {
         foreach my $action_tag ( 'EXPLORE', 'INFLUENCE_INF', 'INFLUENCE_COLONY', 'RESEARCH', 'UPGRADE', 'BUILD', 'MOVE' ) {
             if ( WLE::Methods::Simple::looks_like_number( $r_hash->{'ACTIONS'}->{ $action_tag } ) ) {
@@ -728,6 +759,7 @@ sub to_hash {
     }
 
     $r_hash->{'IN_HAND'} = [ $self->in_hand()->items() ];
+    $r_hash->{'COMPONENT_OVERFLOW'} = [ $self->component_overflow()->items() ];
 
     $r_hash->{'ACTIONS'} = {};
     foreach my $action_tag ( 'EXPLORE', 'INFLUENCE_INF', 'INFLUENCE_COLONY', 'RESEARCH', 'UPGRADE', 'BUILD', 'MOVE' ) {

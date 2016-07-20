@@ -5,6 +5,8 @@ use warnings;
 
 use WLE::Methods::Simple;
 
+use WLE::4X::Enums::Basic;
+
 #############################################################################
 
 sub new {
@@ -97,7 +99,7 @@ sub from_hash {
     }
 
     if ( defined( $r_hash->{'OWNER_ID'} ) ) {
-        $self->{'OWNER_ID'} = $r_has->{'OWNER_ID'};
+        $self->{'OWNER_ID'} = $r_hash->{'OWNER_ID'};
     }
 
     if ( defined( $r_hash->{'ADVANCED'} ) ) {

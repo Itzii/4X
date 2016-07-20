@@ -194,11 +194,11 @@ sub do {
         'discard_tile'      => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_explore_discard_tile },
         'unflip_colony_ship'=> { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_influence_unflip_colony_ship },
 
-#        'place_influence_token' => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_interrupt_place_influence_token },
+        'place_influence_token' => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_interrupt_place_influence_token },
         'replace_cube'      => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_interrupt_replace_cube },
         'choose_discovery'  => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_interrupt_choose_discovery },
 #        'place_component'   => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_interrupt_place_component },
-#        'select_free_technology' => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_interrupt_select_technology },
+        'select_free_technology' => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_interrupt_select_technology },
 
 
         'use_colony_ship'   => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'flag_ignore_allowed' => 1, 'method' => \&action_use_colony_ship },

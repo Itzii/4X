@@ -6,6 +6,8 @@ use warnings;
 use WLE::4X::Enums::Basic;
 use WLE::4X::Enums::Status;
 
+use WLE::4X::Objects::ResourceSpace;
+
 use parent 'WLE::4X::Objects::Element';
 
 #############################################################################
@@ -218,6 +220,22 @@ sub ships {
     my $self        = shift;
 
     return @{ $self->{'SHIPS'} };
+}
+
+#############################################################################
+
+sub has_ancient_cruiser { # used for descendant race
+    my $self        = shift;
+
+    foreach my $ship_tag ( $self->ships() ) {
+        my $ship = $self->server()->ships()->{ $ship_tag };
+
+        if ( $ship->class() eq 'class_ancient_cruiser' ) {
+            return 1;
+        }
+    }
+
+    return 0;
 }
 
 #############################################################################

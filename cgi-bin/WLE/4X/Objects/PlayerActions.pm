@@ -309,14 +309,62 @@ sub action_influence {
         return 0;
     }
 
-    # TODO
-    # need to split the getting and placing of the influence
-    # token into two seperate parts - so the influencablility
-    # of the destination tile is determined correctly
-
-
     unless ( defined( $args{'from'} ) ) {
         $self->set_error( 'Missing From Element' );
+        return 0;
+    }
+
+    my $race = $self->race_of_current_user();
+
+    my $influence_from = $args{'from'};
+
+    if ( $influence_from eq 'track' ) {
+
+        if ( $race->resource_track_of( $RES_INFLUENCE )->available_to_spend() < 1 ) {
+            $self->set_error( 'No Influence to spend' );
+            return 0;
+        }
+    }
+    elsif ( $influence_from ne 'nowhere' ) {
+
+        my $tile = $self->tiles()->{ $influence_from };
+
+        unless ( defined( $tile ) ) {
+            $self->set_error( 'Invalid Source Tile' );
+            return 0;
+        }
+
+        unless ( $tile->owner_id() == $race->owner_id() ) {
+            $self->set_error( 'Tile not owned by user' );
+            return 0;
+        }
+    }
+
+    $self->_raw_pick_up_influence( $influence_from );
+
+    $self->_raw_increment_race_action( $EV_FROM_INTERFACE );
+
+    my @allowed = ( 'unflip_colony_ship', 'finish_turn' );
+
+    if ( $race->action_count() < $race->maximum_action_count( 'INFLUENCE_INF' ) ) {
+        push( @allowed, 'action_influence' );
+    }
+
+    $self->_raw_set_allowed_race_actions( @allowed );
+
+    $self->_save_state();
+    $self->_close_all();
+
+    return 1;
+}
+
+#############################################################################
+
+sub action_interrupt_place_influence_token {
+    my $self            = shift;
+    my %args            = @_;
+
+    unless ( $self->_open_for_writing( $self->log_id() ) ) {
         return 0;
     }
 
@@ -327,10 +375,12 @@ sub action_influence {
 
     my $race = $self->race_of_current_user();
 
-    my $influence_from = $args{'from'};
     my $influence_to = $args{'to'};
 
-    if ( $influence_from eq 'track' ) {
+    if ( $influence_to eq 'track' ) {
+        $self->_raw_return_influence_to_track( $EV_FROM_INTERFACE );
+    }
+    else {
         my $tile = $self->tiles()->{ $influence_to };
         unless ( defined( $tile ) ) {
             $self->set_error( 'Invalid Destination' );
@@ -340,11 +390,6 @@ sub action_influence {
         if ( $tile->owner_id() > -1 ) {
             $self->set_error( 'Tile Already Owned' );
             return;
-        }
-
-        if ( $race->resource_track_of( $RES_INFLUENCE )->available_to_spend() < 1 ) {
-            $self->set_error( 'No Influence to spend' );
-            return 0;
         }
 
         my $location_of_tile = $self->board()->location_of_tile( $influence_to );
@@ -361,72 +406,14 @@ sub action_influence {
 
         $self->_raw_influence_tile( $EV_FROM_INTERFACE, $race->tag(), $influence_to );
 
-        unless ( $race->provides( 'spec_descendants' ) ) {
+        unless ( $tile->has_ancient_cruiser() ) {
             foreach my $discovery_tag ( $tile->discoveries() ) {
                 $self->_raw_remove_discovery_from_tile( $EV_FROM_INTERFACE, $influence_to, $discovery_tag );
-                $self->_raw_add_item_to_hand( $EV_FROM_INTERFACE, $discovery_tag );
+                $self->_raw_add_item_to_hand( $EV_FROM_INTERFACE, $tile->tag() . ':' . $discovery_tag );
             }
         }
 
     }
-    elsif ( $influence_from ne 'nowhere' ) {
-
-        my $tile = $self->tiles()->{ $influence_from };
-
-        unless ( defined( $tile ) ) {
-            $self->set_error( 'Invalid Source Tile' );
-            return 0;
-        }
-
-        unless ( $tile->owner_id() == $race->owner_id() ) {
-            $self->set_error( 'Tile not owned by user' );
-            return 0;
-        }
-
-        unless ( $influence_to eq 'track' ) {
-            my $loc_tag = $self->board()->location_of_tile( $influence_to );
-            if ( $loc_tag eq '' ) {
-                $self->set_error( 'Invalid destination Tile' );
-                return 0;
-            }
-
-            if ( $self->tiles()->{ $influence_to }->owner_id() != -1 ) {
-                $self->set_error( 'Tile is already owned' );
-                return 0;
-            }
-        }
-
-        if ( $influence_to ne 'track') {
-            unless ( $self->board()->tile_is_influencible( $influence_to ) ) {
-                $self->set_error( 'No Path Available' );
-                return 0;
-            }
-        }
-
-        $self->_raw_remove_influence_from_tile( $EV_FROM_INTERFACE, $influence_from );
-
-        if ( $influence_to ne 'track') {
-            $self->_raw_influence_tile( $EV_FROM_INTERFACE, $race->tag(), $influence_to );
-
-            unless ( $race->provides( 'spec_descendants' ) ) {
-                foreach my $discovery_tag ( $tile->discoveries() ) {
-                    $self->_raw_remove_discovery_from_tile( $EV_FROM_INTERFACE, $influence_to, $discovery_tag );
-                    $self->_raw_add_item_to_hand( $EV_FROM_INTERFACE, $discovery_tag );
-                }
-            }
-
-        }
-    }
-
-    $self->_raw_increment_race_action( $EV_FROM_INTERFACE );
-
-    my @allowed = ( 'unflip_colony_ship', 'finish_turn' );
-
-    if ( $race->action_count() < $race->maximum_action_count( 'INFLUENCE_INF' ) ) {
-        push( @allowed, 'action_influence' );
-    }
-
-    $self->_raw_set_allowed_race_actions( @allowed );
 
     $self->_save_state();
     $self->_close_all();
@@ -527,12 +514,81 @@ sub action_interrupt_choose_discovery {
 
     my $race = $self->race_of_current_user();
 
-    unless ( $race->in_hand()->contains( $discovery_tag ) ) {
+    my $full_tag = '';
+    my $tile_tag = '';
+
+    foreach my $item ( $race->in_hand()->items() ) {
+        my ( $tile_tag, $tag ) = split( /:/, $item );
+        if ( defined( $tag ) ) {
+            if ( $tag eq $discovery_tag ) {
+                $full_tag = $item;
+            }
+        }
+    }
+
+    if ( $full_tag eq '' ) {
         $self->set_error( 'Not holding Discovery' );
         return 0;
     }
 
-    $self->_raw_use_discovery( $EV_FROM_INTERFACE, $discovery_tag, $flag_as_vp );
+    ( $tile_tag, $discovery_tag ) = split( /:/, $full_tag );
+
+    $self->_raw_use_discovery( $EV_FROM_INTERFACE, $discovery_tag, $tile_tag, $flag_as_vp );
+
+    $self->_save_state();
+    $self->_close_all();
+
+    return 1;
+}
+
+############################################################################
+
+sub action_interrupt_select_technology {
+    my $self            = shift;
+    my %args            = @_;
+
+    unless ( $self->_open_for_writing( $self->log_id() ) ) {
+        return 0;
+    }
+
+    unless ( defined( $args{'chosen_tech'} ) ) {
+        $self->set_error( 'Missing Tech Choice' );
+        return 0;
+    }
+
+    my $race = $self->race_of_current_user();
+
+    my $tech_tag = $args{'chosen_tech'};
+
+    unless ( $race->in_hand()->contains( $tech_tag ) ) {
+        $self->set_error( 'Invalid Tech Choice' );
+        return 0;
+    }
+
+    my $tech_type = $self->technologies()->{ $tech_tag }->category();
+
+    if ( $tech_type == $TECH_WILD ) {
+
+        unless ( defined( $args{'tech_type'} ) ) {
+            $self->set_error( 'No Track Chosen' );
+            return 0;
+        }
+
+        if ( $args{'tech_type'} == $TECH_WILD || $args{'tech_type'} == $TECH_UNKNOWN ) {
+            $self->set_error( 'Invalid Tech Track' );
+            return 0;
+        }
+    }
+
+    foreach my $item ( $race->in_hand()->items() ) {
+        if ( defined( $self->technologies()->{ $item } ) ) {
+            $self->_raw_remove_item_from_hand( $EV_FROM_INTERFACE, $item );
+        }
+    }
+
+    $self->_raw_add_to_tech_track( $EV_FROM_INTERFACE, $tech_tag, $tech_type );
+    $self->_raw_remove_from_available_tech( $EV_FROM_INTERFACE, $tech_tag );
+
 
     $self->_save_state();
     $self->_close_all();
@@ -615,6 +671,12 @@ sub action_research {
 
     unless ( $tech->category() == $TECH_WILD || $tech->category() == $dest_type ) {
         $self->set_error( 'Tech may not be placed there' );
+        return 0;
+    }
+
+    if ( $race->tech_track_of( $dest_type )->available_spaces() < 1 ) {
+        $self->set_error( 'No spaces left on tech track' );
+        return 0;
     }
 
     my $credits = $race->tech_track_of( $dest_type )->current_credit();
@@ -630,13 +692,16 @@ sub action_research {
         return 0;
     }
 
+    $self->_raw_increment_race_action( $EV_FROM_INTERFACE );
 
+    $self->_raw_buy_technology( $EV_FROM_INTERFACE, $tech->tag(), $dest_type );
 
-
-
-
-
-
+    if ( $race->action_count() < $race->maximum_action_count( 'RESEARCH' ) ) {
+        $self->_raw_set_allowed_race_actions( 'action_research', 'finish_turn' );
+    }
+    else {
+        $self->_raw_set_allowed_race_actions( 'finish_turn' );
+    }
 
     $self->_save_state();
     $self->_close_all();
@@ -648,17 +713,71 @@ sub action_research {
 
 sub action_upgrade {
     my $self            = shift;
-
-
-
-
+    my %args            = @_;
 
     unless ( $self->_open_for_writing( $self->log_id() ) ) {
         return 0;
     }
 
+    unless ( defined( $args{'class'} ) ) {
+        $self->set_error( 'Missing Ship Class' );
+        return 0;
+    }
 
+    my $race = $self->race_of_current_user();
 
+    my $template = $race->template_of_class( $args{'class'} );
+
+    unless ( defined( $template ) ) {
+        $self->set_error( 'Invalid Ship Template' );
+        return 0;
+    }
+
+    unless ( defined( $args{'component'} ) ) {
+        $self->set_error( 'Missing Component' );
+        return 0;
+    }
+
+    my $component = $self->ship_components( $args{'component'} );
+
+    unless ( defined( $component ) ) {
+        $self->set_error( 'Invalid Component' );
+        return 0;
+    }
+
+    unless ( $race->component_overflow()->contains( $component->tag() ) ) {
+        if ( $component->tech_required() ne '' ) {
+            unless ( $race->has_technology( $component->tech_required() ) ) {
+                $self->set_error( 'Missing Technology Requirement' );
+                return 0;
+            }
+        }
+    }
+
+    my $replaces_component = '';
+
+    if ( defined( $args{'replaces_component'} ) ) {
+        $replaces_component = $args{'replaces_component'};
+    }
+
+    my $template_copy = $template->copy_of( 'copy_tag' );
+
+    my $error = '';
+    unless ( $template_copy->add_component( $component->tag(), $replaces_component, \$error ) ) {
+        $self->set_error( $error );
+        return 0;
+    }
+
+    $self->_raw_increment_race_action( $EV_FROM_INTERFACE );
+
+    $self->_raw_upgrade_ship_component( $EV_FROM_INTERFACE, $template->tag(), $component->tag(), $replaces_component );
+
+    if ( defined( $args{'as_react'} ) || $race->action_count() >= $race->maximum_action_count( 'UPGRADE' ) ) {
+        $self->_raw_set_allowed_race_actions( 'finish_turn' );
+    }
+    else {
+        $self->_raw_set_allowed_race_actions( 'action_upgrade', 'finish_turn' );
+    }
 
     $self->_save_state();
     $self->_close_all();
@@ -670,17 +789,62 @@ sub action_upgrade {
 
 sub action_build {
     my $self            = shift;
-
-
-
-
+    my %args            = @_;
 
     unless ( $self->_open_for_writing( $self->log_id() ) ) {
         return 0;
     }
 
+    unless ( defined( $args{'tile_tag'} ) ) {
+        $self->set_error( 'Missing Tile Location' );
+        return 0;
+    }
 
+    my $tile_tag = $args{'tile_tag'};
 
+    unless ( defined( $args{'class'} ) ) {
+        $self->set_error( 'Missing Ship Class' );
+        return 0;
+    }
+
+    my $class = $args{'class'};
+
+    my $tile = $self->tiles()->{ $tile_tag };
+
+    unless ( $tile->owner_id() == $self->current_user() ) {
+        $self->set_error( 'Invalid Tile' );
+        return 0;
+    }
+
+    my $race = $self->race_of_current_user();
+
+    my $template = $race->template_of_class( $class );
+
+    unless ( $self->has_option( 'option_unlimited_ships' ) ) {
+        if ( $template->count() == 0 ) {
+            $self->set_error( 'Unable to build another ship of that class' );
+            return 0;
+        }
+    }
+
+    my $cost = $template->cost();
+
+    if ( $cost > $race->resource_count( $RES_MINERALS ) ) {
+        $self->set_error( 'Unable to afford ship of type' );
+        return 0;
+    }
+
+    $self->_raw_increment_race_action( $EV_FROM_INTERFACE );
+
+    $self->_raw_spend_resource( $EV_FROM_INTERFACE, $RES_MINERALS, $template->cost() );
+    $self->_raw_create_ship_on_tile( $EV_FROM_INTERFACE, $tile_tag, $template->tag(), $race->owner_id() );
+
+    if ( defined( $args{'as_react'} ) || $race->action_count() >= $race->maximum_action_count( 'BUILD' ) ) {
+        $self->_raw_set_allowed_race_actions( 'finish_turn' );
+    }
+    else {
+        $self->_raw_set_allowed_race_actions( 'action_build', 'finish_turn' );
+    }
 
     $self->_save_state();
     $self->_close_all();
@@ -688,22 +852,32 @@ sub action_build {
     return 1;
 }
 
-
 #############################################################################
 
 sub action_move {
     my $self            = shift;
 
-
-
-
-
     unless ( $self->_open_for_writing( $self->log_id() ) ) {
         return 0;
     }
 
+    # test
 
 
+
+
+    $self->_raw_increment_race_action( $EV_FROM_INTERFACE );
+
+    # do it
+
+
+
+    if ( defined( $args{'as_react'} ) || $race->action_count() >= $race->maximum_action_count( 'MOVE' ) ) {
+        $self->_raw_set_allowed_race_actions( 'finish_turn' );
+    }
+    else {
+        $self->_raw_set_allowed_race_actions( 'action_move', 'finish_turn' );
+    }
 
     $self->_save_state();
     $self->_close_all();
@@ -715,44 +889,18 @@ sub action_move {
 
 sub action_react_upgrade {
     my $self            = shift;
+    my %args            = @_;
 
-
-
-
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
-
-
-
-
-    $self->_save_state();
-    $self->_close_all();
-
-    return 1;
+    return $self->action_upgrade( %args, 'as_react' => 1 );
 }
 
 #############################################################################
 
 sub action_react_build {
     my $self            = shift;
+    my %args            = @_;
 
-
-
-
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
-
-
-
-
-    $self->_save_state();
-    $self->_close_all();
-
-    return 1;
+    return $self->action_build( %args, 'as_react' => 1 );
 }
 
 
@@ -760,34 +908,10 @@ sub action_react_build {
 
 sub action_react_move {
     my $self            = shift;
+    my %args            = @_;
 
-
-
-
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
-
-
-
-
-    $self->_save_state();
-    $self->_close_all();
-
-    return 1;
+    return $self->action_move( %args, 'as_react' => 1 );
 }
-
-
-
-
-
-
-
-
-
-
-
 
 #############################################################################
 #############################################################################

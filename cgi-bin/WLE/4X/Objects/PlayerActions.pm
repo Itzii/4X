@@ -221,7 +221,7 @@ sub action_explore_place_tile {
 
     $tile->add_starting_ships();
 
-    if ( scalar( $tile->ships() ) < 1 || $race->provides( 'spec_descendants') ) {
+    if ( $tile->ships()->count() < 1 || $race->provides( 'spec_descendants') ) {
         if ( $args{'influence'} eq '1' ) {
             $self->_raw_influence_tile( $race->tag(), $tile_tag );
 
@@ -898,7 +898,7 @@ sub action_move {
         return 0;
     }
 
-    my $destination_tag = $args{'destination'}
+    my $destination_tag = $args{'destination'};
 
     $location = $self->board()->location_of_tile( $destination_tag );
 

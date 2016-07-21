@@ -240,6 +240,8 @@ sub _read_state {
         }
     }
 
+    $self->template_combat_order()->add_items( @{ $VAR1->{'TEMPLATE_COMBAT_ORDER'} } );
+
     # ships
 
     $self->{'SHIPS'} = {};
@@ -390,6 +392,8 @@ sub _save_state {
 
             $data{'SHIP_TEMPLATES'}->{ $template->tag() } = \%template_hash;
         }
+
+        $DATA{'TEMPLATE_COMBAT_ORDER'} = [ $self->template_combat_order()->items() ];
 
         # ships
 

@@ -52,8 +52,8 @@ sub _init {
     $self->{'STARTING_SHIPS'} = [];
     $self->{'DISCOVERIES'} = [];
 
-    $self->{'SHIPS'} = [];
-
+    $self->{'SHIPS'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
+    $self->{'USER_ENTRY_QUEUE'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
 
     $self->{'RESOURCE_SLOTS'} = [];
 
@@ -219,7 +219,7 @@ sub starting_ships {
 sub ships {
     my $self        = shift;
 
-    return @{ $self->{'SHIPS'} };
+    return $self->{'SHIPS'};
 }
 
 #############################################################################
@@ -227,7 +227,7 @@ sub ships {
 sub has_ancient_cruiser { # used for descendant race
     my $self        = shift;
 
-    foreach my $ship_tag ( $self->ships() ) {
+    foreach my $ship_tag ( $self->ships()->items() ) {
         my $ship = $self->server()->ships()->{ $ship_tag };
 
         if ( $ship->class() eq 'class_ancient_cruiser' ) {
@@ -267,7 +267,7 @@ sub unpinned_ship_count {
     my $enemy_count = 0;
     my $friendly_count = 0;
 
-    foreach my $ship_tag ( $self->ships() ) {
+    foreach my $ship_tag ( $self->ships()->items() ) {
         my $ship = $self->server()->ships()->{ $ship_tag };
 
         if ( $ship->class() eq 'class_defense' ) {
@@ -309,7 +309,7 @@ sub user_ship_count {
 
     my $count = 0;
 
-    foreach my $ship_tag ( $self->ships() ) {
+    foreach my $ship_tag ( $self->ships()->items() ) {
         if ( $self->server()->ships()->{ $ship_tag }->owner_id() == $user_id ) {
             $count++;
         }
@@ -326,7 +326,7 @@ sub enemy_ship_count {
 
     my $count = 0;
 
-    foreach my $ship_tag ( $self->ships() ) {
+    foreach my $ship_tag ( $self->ships()->items() ) {
         my $ship = $self->server()->ships()->{ $ship_tag };
 
         if ( $ship->owner_id() != $user_id ) {
@@ -349,12 +349,35 @@ sub enemy_ship_count {
 
 #############################################################################
 
+sub owner_queue {
+    my $self        = shift;
+
+    return $self->{'USER_ENTRY_QUEUE'};
+}
+
+#############################################################################
+
 sub add_ship {
     my $self        = shift;
     my $ship_tag    = shift;
 
-    unless ( WLE::Methods::Simple::matches_any( $ship_tag, @{ $self->{'SHIPS'} } ) ) {
-        push( @{ $self->{'SHIPS'} }, $ship_tag );
+    $self->ships()->add_items( $ship_tag );
+
+    my $owner_id = $self->server()->ships()->{ $ship_tag }->owner_id();
+
+    if ( $owner_id == $self->owner_id() ) {
+        # the owner of the tile is defender against any other player
+        $self->owner_queue()->remove_item( $owner_id );
+        $self->owner_queue()->insert_item( $owner_id, 0 );
+    }
+    else {
+        $self->owner_queue()->add_items( $owner_id );
+    }
+
+    if ( $self->owner_queue()->contains( -1 ) ) {
+        # ancient ships are always considered the defender
+        $self->owner_queue()->remove_item( -1 );
+        $self->owner_queue()->insert_item( -1, 0 );
     }
 
     return;
@@ -366,15 +389,21 @@ sub remove_ship {
     my $self        = shift;
     my $ship_tag    = shift;
 
-    my @holder = ();
+    $self->ships()->remove_item( $ship_tag );
 
-    foreach my $current_tag ( $self->ships() ) {
-        unless ( $current_tag eq $ship_tag ) {
-            push( @holder, $current_tag );
+    my $owner_id = $self->server()->ships()->{ $ship_tag }->owner_id();
+
+    my $flag_has_more_ships = 0;
+
+    foreach my $other_tag ( $self->ships()->items() ) {
+        if ( $self->server()->ships()->{ $other_tag }->owner_id() == $owner_id ) {
+            $flag_has_more_ships = 1;
         }
     }
 
-    $self->{'SHIPS'} = \@holder;
+    unless ( $flag_has_more_ships ) {
+        $self->owner_queue()->remove_item( $owner_id );
+    }
 
     return;
 }
@@ -603,6 +632,36 @@ sub are_new_warp_gates_valid {
 
 #############################################################################
 
+sub has_combat {
+    my $self        = shift;
+
+    if ( $self->owner_queue()->count() <= 1 ) {
+        return 0;
+    }
+
+    # TODO check for alliances
+
+    return 1;
+}
+
+#############################################################################
+
+sub current_combatant_ids {
+    my $self        = shift;
+
+    unless ( $self->has_combat() ) {
+        return ();
+    }
+
+    # TODO check for alliances
+
+    my @owner_ids = $self->owner_queue()->items();
+
+    return ( $owner_ids[ -2 ], $owner_ids[ -1 ] );
+}
+
+#############################################################################
+
 sub from_hash {
     my $self        = shift;
     my $r_hash      = shift;
@@ -659,13 +718,12 @@ sub from_hash {
         }
     }
 
-    my @ships = ();
-
     if ( defined( $r_hash->{'SHIPS'} ) ) {
-        @ships = @{ $r_hash->{'SHIPS'} };
+        $self->ships()->add_items( @{ $r_hash->{'SHIPS'} } );
     }
-
-    $self->{'SHIPS'} = \@ships;
+    if ( defined( $r_hash->{'OWNER_QUEUE'} ) ) {
+        $self->owner_queue()->add_items( @{ $r_hash->{'OWNER_QUEUE'} } );
+    }
 
     return 1;
 }
@@ -686,9 +744,12 @@ sub to_hash {
 
     $r_hash->{'STACK'} = $self->{'STACK'};
 
-    foreach my $tag ( 'VP', 'ANCIENT_LINK', 'HIVE', 'DISCOVERY_COUNT', 'ORBITAL', 'MONOLITH', 'SHIPS' ) {
+    foreach my $tag ( 'VP', 'ANCIENT_LINK', 'HIVE', 'DISCOVERY_COUNT', 'ORBITAL', 'MONOLITH' ) {
         $r_hash->{ $tag } = $self->{ $tag };
     }
+
+    $r_hash->{'SHIPS'} = [ $self->ships()->items() ];
+    $r_hash->{'OWNER_QUEUE'} = [ $self->owner_queue()->items() ];
 
     $r_hash->{'STARTING_SHIPS'} = $self->{'STARTING_SHIPS'};
 

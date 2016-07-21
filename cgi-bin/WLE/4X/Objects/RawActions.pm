@@ -675,7 +675,15 @@ sub _raw_start_combat_phase {
         return 'beginning combat phase';
     }
 
+    my $outermost_combat_tile = $self->board()->outermost_combat_tile();
+
+
+
+
     # TODO start the combat phase
+
+
+
 
     # get a list of tiles that combat is going to take place in.
     # if there are any then we begin the combat phase in the outermost tile
@@ -694,6 +702,41 @@ sub _raw_start_combat_phase {
     $self->_raw_set_status( $EV_SUB_ACTION, $self->status() );
 
     return;
+}
+
+#############################################################################
+
+sub _raw_begin_combat_in_tile {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $tile_tag = shift( @args );
+    my $defender_id = shift( @args );
+    my $attacker_id = shift( @args );
+
+    my $defender_race = undef;
+    my $attacker_race = undef;
+
+    if ( $defender_id > -1 ) {
+        $defender_race = $self->race_of_player_id( $defender_id );
+    }
+
+    if ( $attacker_id > -1 ) {
+        $attacker_race = $self->race_of_player_id( $attacker_id );
+    }
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'tile stack ' . $stack_id . ' created with ' . scalar( @values ) . ' tiles.';
+    }
+
+
+
+
 }
 
 #############################################################################

@@ -528,6 +528,32 @@ sub stack_from_location {
 
 #############################################################################
 
+sub outermost_combat_tile {
+    my $self        = shift;
+
+    my @combat_tiles = ();
+
+    foreach my $column ( keys( %{ $self->{'SPACES'} } ) ) {
+        foreach my $row ( keys( %{ $self->{'SPACES'}->{ $column } } ) ) {
+            my $tile = $self->server()->tiles()->{ $self->{'SPACES'}->{ $column }->{ $row } };
+
+            if ( $tile->has_combat() ) {
+                push( @combat_tiles, $tile );
+            }
+        }
+    }
+
+    unless ( scalar( @combat_tiles ) > 0 ) {
+        return '';
+    }
+
+    @combat_tiles = sort { $a->get_id() <=> $b->get_id() ) @combat_tiles;
+
+    return $combat_tiles[ 0 ]->tag();
+}
+
+#############################################################################
+
 sub from_hash {
     my $self        = shift;
     my $r_hash      = shift;

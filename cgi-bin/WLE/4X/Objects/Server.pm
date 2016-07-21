@@ -120,6 +120,8 @@ sub _init {
     $self->{'DISCOVERY_BAG'} = WLE::Objects::Stack->new();
     $self->{'VP_BAG'} = WLE::Objects::Stack->new();
 
+    $self->{'TEMPLATE_COMBAT_ORDER'} = WLE::Objects::Stack->new();
+
 
     $self->{'STATE'} = {
         'STATE' => $ST_PREGAME,
@@ -699,6 +701,14 @@ sub vp_bag {
     my $self        = shift;
 
     return $self->{'VP_BAG'};
+}
+
+#############################################################################
+
+sub template_combat_order {
+    my $self        = shift;
+
+    return $self->{'template_combat_order'};
 }
 
 #############################################################################

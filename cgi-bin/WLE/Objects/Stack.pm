@@ -82,10 +82,36 @@ sub add_items {
     }
 
     foreach my $item ( @items ) {
-        unless ( matches_any( $item, @{ $self->{'ITEMS'} } ) ) {
+        unless ( matches_any( $item, $self->items() ) ) {
             push( @{ $self->{'ITEMS'} }, $item );
         }
     }
+
+    return;
+}
+
+#############################################################################
+
+sub insert_item {
+    my $self        = shift;
+    my $item        = shift;
+    my $index       = shift;
+
+    if ( $self->{'FLAG_EXCLUSIVE'} ) {
+        if ( matches_any( $item, $self->items() ) ) {
+            return;
+        }
+    }
+
+    if ( $index >= $self->count() ) {
+        $self->add_items( $item );
+        return;
+    }
+
+    my @items = @{ $self->{'ITEMS'} };
+    splice( @items, $index, 0, $item );
+
+    $self->{'ITEMS'} = \@items;
 
     return;
 }

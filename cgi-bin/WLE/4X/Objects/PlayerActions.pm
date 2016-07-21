@@ -856,21 +856,77 @@ sub action_build {
 
 sub action_move {
     my $self            = shift;
+    my %args            = @_;
 
     unless ( $self->_open_for_writing( $self->log_id() ) ) {
         return 0;
     }
 
-    # test
+    unless ( defined( $args{'ship_tag'} ) ) {
+        $self->set_error( 'Missing Ship Tag' );
+        return 0;
+    }
 
+    my $ship = $self->ships()->{ $args{'ship_tag'} };
 
+    unless ( defined( $ship ) ) {
+        $self->set_error( 'Invalid Ship Tag' );
+        return 0;
+    }
 
+    unless ( $ship->owner_id() == $self->current_user() ) {
+        $self->set_error( 'Ship not owned by user' );
+        return 0;
+    }
+
+    unless ( defined( $args{'origin'} ) ) {
+        $self->set_error( 'Missing Origin Tag' );
+        return 0;
+    }
+
+    my $origin_tag = $args{'origin'};
+
+    my $location = $self->board()->location_of_tile( $origin_tag );
+
+    if ( $location eq '' ) {
+        $self->set_error( 'Invalid Origin Tag' );
+        return 0;
+    }
+
+    unless ( defined( $args{'destination'} ) ) {
+        $self->set_error( 'Missing Destination Tag' );
+        return 0;
+    }
+
+    my $destination_tag = $args{'destination'}
+
+    $location = $self->board()->location_of_tile( $destination_tag );
+
+    if ( $location eq '' ) {
+        $self->set_error( 'Invalid Destination Tag' );
+        return 0;
+    }
+
+    my $race = $self->race_of_current_user();
+
+    my $reachable = $self->board()->tile_is_within_distance(
+        $self->current_user(),
+        $origin_tag,
+        $destination_tag,
+        $ship->total_movement(),
+        $ship->template()->provides( 'jump_drive' ),
+        $race->has_technology( 'tech_wormhole_generator' ),
+    );
+
+    unless ( $reachable ) {
+        $self->set_error( 'Tile Not Reachable' );
+        return 0;
+    }
 
     $self->_raw_increment_race_action( $EV_FROM_INTERFACE );
 
-    # do it
-
-
+    $self->_raw_remove_ship_from_tile( $EV_FROM_INTERFACE, $origin_tag, $ship->tag() );
+    $self->_raw_add_ship_to_tile( $EV_FROM_INTERFACE, $destination_tag, $ship->tag() );
 
     if ( defined( $args{'as_react'} ) || $race->action_count() >= $race->maximum_action_count( 'MOVE' ) ) {
         $self->_raw_set_allowed_race_actions( 'finish_turn' );

@@ -158,6 +158,79 @@ sub location_of_tile {
 
 #############################################################################
 
+sub tile_is_within_distance {
+    my $self            = shift;
+    my $user_id         = shift;
+    my $origin_tag      = shift;
+    my $destination_tag = shift;
+    my $max_distance    = shift;
+    my $flag_jump_drive = shift;
+
+    my $race = $self->server()->race_of_player_id( $user_id );
+
+    my $start = $self->location_of_tile( $origin_tag );
+    my ( $loc_x, $loc_y ) = split( /:/, $start );
+
+    my @paths = ( [ '0', $origin_tag ] );
+
+    while ( scalar( @paths ) > 0 ) {
+
+        my @good_paths = ();
+
+        foreach my $path ( @paths ) {
+
+            my $end_point = $path->[ -1 ];
+            my ( $loc_x, $loc_y ) = split( /:/, $self->location_of_tile( $end_point ) );
+
+            foreach my $direction ( 0 .. 5 ) {
+                my ( $loc_x2, $loc_y2 ) = $self->location_in_direction( $loc_x, $loc_y, $direction );
+                my $tile = $self->tile_at_location( $loc_x2, $loc_y2 );
+
+                if ( defined( $tile ) ) {
+
+                    unless ( matches_any( $tile->tag(), @{ $path } ) ) {
+
+                        my $traversable = $self->tile_pair_is_traversable(
+                            $race->tag(),
+                            $loc_x,
+                            $loc_y,
+                            $loc_x2,
+                            $loc_y2,
+                        );
+
+                        if ( $traversable == 0 && $flag_jump_drive && $path->[ 0 ] == '0' ) {
+                            $path->[ 0 ] = '1'; # we've now used the jump drive on this path
+                            $traversable = 1;
+                        }
+
+                        if ( $traversable ) {
+
+                            if ( $tile->unpinned_ship_count( $user_id, 1 ) > 0 ) {
+
+                                my @new_path = ( @{ $path }, $tile->tag() );
+
+                                if ( scalar( @new_path ) < $max_distance ) {
+                                    if ( $tile->tag() eq $destination_tag ) {
+                                        return 1;
+                                    }
+
+                                    push( @good_paths, \@new_path );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        @paths = @good_paths;
+    }
+
+    return 0;
+}
+
+#############################################################################
+
 sub server {
     my $self        = shift;
 
@@ -216,6 +289,9 @@ sub explorable_spaces_for_race {
 }
 
 #############################################################################
+#
+# only takes into account wormholes and wormhole generators
+#
 
 sub tile_pair_is_traversable {
     my $self        = shift;

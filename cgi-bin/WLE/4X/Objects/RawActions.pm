@@ -46,6 +46,7 @@ my %actions = (
     \&_raw_place_cube_on_tile           => 'place_cube_on_tile',
     \&_raw_create_ship_on_tile          => 'create_ship_on_tile',
     \&_raw_add_ship_to_tile             => 'add_ship_to_tile',
+    \&_raw_remove_ship_from_tile        => 'remove_ship_from_tile',
     \&_raw_add_discovery_to_tile        => 'add_discovery_to_tile',
     \&_raw_remove_discovery_from_tile   => 'remove_discovery_from_tile',
     \&_raw_add_slot_to_tile             => 'add_slot_to_tile',
@@ -1261,6 +1262,36 @@ sub _raw_add_ship_to_tile {
 
     my $tile = $self->tiles()->{ $tile_tag };
     $tile->add_ship( $ship_tag );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_remove_ship_from_tile {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $tile_tag = shift( @args );
+    my $ship_tag = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        my $race_tag = $self->race_tag_of_current_user();
+        if ( $race_tag eq '' ) {
+            $race_tag = 'game';
+        }
+
+        return $race_tag . ' removed ship ' . $ship_tag . ' from tile ' . $tile_tag;
+    }
+
+
+    my $tile = $self->tiles()->{ $tile_tag };
+    $tile->remove_ship( $ship_tag );
 
     return;
 }

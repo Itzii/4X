@@ -260,8 +260,9 @@ sub has_explorer {
 #############################################################################
 
 sub unpinned_ship_count {
-    my $self        = shift;
-    my $user_id     = shift;
+    my $self            = shift;
+    my $user_id         = shift;
+    my $flag_add_one    = shift; $flag_add_one = 0          unless defined( $flag_add_one );
 
     my $enemy_count = 0;
     my $friendly_count = 0;
@@ -279,6 +280,10 @@ sub unpinned_ship_count {
         else {
             $enemy_count++;
         }
+    }
+
+    if ( $flag_add_one ) {
+        $friendly_count++;
     }
 
     if ( $friendly_count == 0 || $enemy_count == 0 ) {

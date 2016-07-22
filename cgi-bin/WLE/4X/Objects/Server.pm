@@ -114,7 +114,8 @@ sub _init {
     $self->{'DISCOVERIES'} = {};
     $self->{'DEVELOPMENTS'} = {};
 
-    $self->{'COMBAT_HITS'} = [];
+    $self->{'COMBAT_HITS'} = WLE::Objects::Stack->new();
+    $self->{'MISSILE_DEFENSE_HITS'} = 0;
 
     $self->{'DIE_ROLLS'} = [];
 
@@ -174,45 +175,48 @@ sub do {
         'status'            => { 'method' => \&action_status, 'flag_anytime' => 1 },
         'exchange'          => { 'method' => \&action_exchange, 'flag_anytime' => 1 },
 
-        'create_game'       => { 'flag_req_status' => $ST_PREGAME, 'method' => \&action_create_game },
-        'add_source'        => { 'flag_req_status' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_add_source },
-        'remove_source'     => { 'flag_req_status' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_remove_source },
-        'add_option'        => { 'flag_req_status' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_add_option },
-        'remove_option'     => { 'flag_req_status' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_remove_option },
-        'add_player'        => { 'flag_req_status' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_add_player },
-        'remove_player'     => { 'flag_req_status' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_remove_player },
-        'begin'             => { 'flag_req_status' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_begin },
+        'create_game'       => { 'flag_req_state' => $ST_PREGAME, 'method' => \&action_create_game },
+        'add_source'        => { 'flag_req_state' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_add_source },
+        'remove_source'     => { 'flag_req_state' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_remove_source },
+        'add_option'        => { 'flag_req_state' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_add_option },
+        'remove_option'     => { 'flag_req_state' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_remove_option },
+        'add_player'        => { 'flag_req_state' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_add_player },
+        'remove_player'     => { 'flag_req_state' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_remove_player },
+        'begin'             => { 'flag_req_state' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_begin },
 
-        'select_race'       => { 'flag_req_status' => $ST_RACESELECTION, 'flag_active_player' => 1, 'method' => \&action_select_race_and_location },
+        'select_race'       => { 'flag_req_state' => $ST_RACESELECTION, 'flag_active_player' => 1, 'method' => \&action_select_race_and_location },
 
-        'action_pass'       => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_pass_action },
-        'action_explore'    => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_explore },
-        'action_influence'  => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_influence },
-        'action_research'   => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_research },
-        'action_upgrade'    => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_upgrade },
-        'action_build'      => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_build },
-        'action_move'       => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_move },
+        'action_pass'       => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_pass_action },
+        'action_explore'    => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_explore },
+        'action_influence'  => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_influence },
+        'action_research'   => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_research },
+        'action_upgrade'    => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_upgrade },
+        'action_build'      => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_build },
+        'action_move'       => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_move },
 
-        'action_react_upgrade'    => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_react_upgrade },
-        'action_react_build'      => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_react_build },
-        'action_react_move'       => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_react_move },
+        'action_react_upgrade' => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_react_upgrade },
+        'action_react_build' => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_react_build },
+        'action_react_move' => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_react_move },
 
-        'place_tile'        => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_explore_place_tile },
-        'discard_tile'      => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_explore_discard_tile },
-        'unflip_colony_ship'=> { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_influence_unflip_colony_ship },
+        'place_tile'        => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_explore_place_tile },
+        'discard_tile'      => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_explore_discard_tile },
+        'unflip_colony_ship'=> { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_influence_unflip_colony_ship },
 
-        'place_influence_token' => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_interrupt_place_influence_token },
-        'replace_cube'      => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_interrupt_replace_cube },
-        'choose_discovery'  => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_interrupt_choose_discovery },
-#        'place_component'   => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_interrupt_place_component },
-        'select_free_technology' => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_interrupt_select_technology },
+        'place_influence_token' => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_interrupt_place_influence_token },
+        'replace_cube'      => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_interrupt_replace_cube },
+        'choose_discovery'  => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_interrupt_choose_discovery },
+#        'place_component'   => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_interrupt_place_component },
+        'select_free_technology' => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_interrupt_select_technology },
 
-        'attack'            => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_COMBAT, 'method' => \&action_attack },
-        'retreat'           => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_COMBAT, 'method' => \&action_retreat },
+        'attack'            => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_COMBAT, 'method' => \&action_attack },
+        'retreat'           => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_COMBAT, 'method' => \&action_retreat },
+        'allocate_hits'     => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_COMBAT, 'method' => \&action_allocate_hits },
+        'allocate_defense_hits' => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_COMBAT, 'method' => \&action_allocate_defense_hits },
+        'acknowledge_hits'  => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_COMBAT, 'method' => \&action_acknowledge_hits },
 
 
-        'use_colony_ship'   => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'flag_ignore_allowed' => 1, 'method' => \&action_use_colony_ship },
-#        'finish_turn'       => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_finish_turn },
+        'use_colony_ship'   => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'flag_ignore_allowed' => 1, 'method' => \&action_use_colony_ship },
+#        'finish_turn'       => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_finish_turn },
 
     );
 
@@ -226,9 +230,9 @@ sub do {
 
     unless ( defined( $action->{'flag_anytime'} ) ) {
 
-        if ( defined( $action->{'flag_req_status'} ) ) {
-            if ( $self->state() != $action->{'flag_req_status'} ) {
-                return ( 'success' => 0, 'message' => 'Invalid status for action.' );
+        if ( defined( $action->{'flag_req_state'} ) ) {
+            if ( $self->state() != $action->{'flag_req_state'} ) {
+                return ( 'success' => 0, 'message' => 'Invalid state for action.' );
             }
         }
 
@@ -772,6 +776,33 @@ sub template_combat_order {
 
 #############################################################################
 
+sub combat_hits {
+    my $self        = shift;
+
+    return $self->{'COMBAT_HITS'};
+}
+
+#############################################################################
+
+sub missile_defense_hits {
+    my $self        = shift;
+
+    return $self->{'MISSILE_DEFENSE_HITS'};
+}
+
+#############################################################################
+
+sub set_missile_defense_hits {
+    my $self        = shift;
+    my $value       = shift;
+
+    $self->{'MISSILE_DEFENSE_HITS'} = $value;
+
+    return;
+}
+
+#############################################################################
+
 sub tile_from_tag {
     my $self        = shift;
     my $tag         = shift;
@@ -868,14 +899,6 @@ sub roll_die {
     push( @{ $self->{'DIE_ROLLS'} }, $roll );
 
     return $roll;
-}
-
-#############################################################################
-
-sub combat_rolls {
-    my $self        = shift;
-
-    return $self->{'COMBAT_ROLLS'};
 }
 
 #############################################################################

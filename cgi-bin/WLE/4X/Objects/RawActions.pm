@@ -72,8 +72,17 @@ my %actions = (
     \&_raw_spend_resource               => 'spend_resource',
     \&_raw_upgrade_ship_component       => 'upgrade_ship',
 
-
+    \&_raw_set_pending_player           => 'set_pending_player',
     \&_raw_start_combat_phase           => 'start_combat_phase',
+    \&_raw_begin_combat_in_tile         => 'begin_combat_in_tile',
+    \&_raw_prepare_to_retreat_ships     => 'set_ships_as_retreating',
+    \&_raw_make_attack_rolls            => 'make_attack_rolls',
+    \&_raw_set_defense_hits             => 'set_defense_hits',
+    \&_raw_destroy_ship                 => 'destroy_ship',
+    \&_raw_allocate_hits                => 'allocate_hits',
+    \&_raw_apply_combat_hits            => 'apply_combat_hits',
+    \&_raw_next_combat_ships            => 'next_set_of_ships',
+
 
 );
 
@@ -662,6 +671,30 @@ sub _raw_add_players_to_next_round {
 
 #############################################################################
 
+sub _raw_set_pending_player {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $pending_id = shift( @args );
+
+    my $race = $self->race_of_player_id( $pending_id );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'now waiting on ' . $race->tag();
+    }
+
+    $self->set_waiting_on_player_id( $pending_id );
+
+    return;
+}
+
+#############################################################################
+
 sub _raw_start_combat_phase {
     my $self        = shift;
     my $source      = shift;
@@ -714,6 +747,167 @@ sub _raw_begin_combat_in_tile {
 
     return;
 }
+
+#############################################################################
+
+sub _raw_make_attack_rolls {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my @rolls = @args;
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'combat rolls are made: ' . join( ',', @rolls );
+    }
+
+    $self->combat_rolls()->clear();
+    $self->combat_rolls()->add_items( @rolls );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_set_defense_hits {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $hit_count = shift( @args );
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return $hit_count ' missile defense rolls succeeded.';
+    }
+
+    $self->set_missile_defense_hits( $hit_count );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_destroy_ship {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $tile_tag = shift( @args );
+    my $ship_tag = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return $ship_tag . ' is destroyed';
+    }
+
+    $self->_raw_remove_ship_from_tile( $EV_SUB_ACTION, $tile_tag, $ship_tag );
+
+    my $template = $self->templates()->{ $ship->template()->tag() };
+    $template->set_count( $template->count() + 1 );
+
+    delete( $self->ships()->{ $ship_tag } );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_allocate_hits {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my @hits = @args;
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'combat rolls are allocated: ' . join( ',', @hits );
+    }
+
+    $self->combat_rolls()->clear();
+    $self->combat_rolls()->add_items( @hits );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_apply_combat_hits {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'combat damage is being applied';
+    }
+
+    $self->apply_combat_hits();
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_next_combat_ships {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'moving to next set of ship initiatives';
+    }
+
+    $self->next_combat_ships();
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_prepare_to_retreat_ships {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $tile_tag = shift( @args );
+    my $template_tag = shift( @args );
+
+    my $race = $self->race_of_current_user();
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return $race->tag() . ' begins retreating ships of type ' . $template_tag;
+    }
+
+    $self->tag_ships_to_retreat( $tile_tag, $template_tag );
+
+    return;
+}
+
 
 #############################################################################
 

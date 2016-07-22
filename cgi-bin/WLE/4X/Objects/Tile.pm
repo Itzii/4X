@@ -57,6 +57,9 @@ sub _init {
 
     $self->{'RESOURCE_SLOTS'} = [];
 
+    $self->{'ATTACKER_ID'} = -1;
+    $self->{'DEFENDER_ID'} = -1;
+
     if ( defined( $args{'hash'} ) ) {
         if ( $self->from_hash( $args{'hash'} ) ) {
             return $self;
@@ -646,7 +649,7 @@ sub has_combat {
 
 #############################################################################
 
-sub current_combatant_ids {
+sub set_combatant_ids {
     my $self        = shift;
 
     unless ( $self->has_combat() ) {
@@ -657,7 +660,17 @@ sub current_combatant_ids {
 
     my @owner_ids = $self->owner_queue()->items();
 
-    return ( $owner_ids[ -2 ], $owner_ids[ -1 ] );
+    $self->{'DEFENDER_ID'} = $owners_id[ -2 ];
+    $self->{'ATTACKER_ID'} = $owners_id[ -1 ];
+
+}
+
+#############################################################################
+
+sub current_combatant_ids {
+    my $self        = shift;
+
+    return ( $self->{'DEFENDER_ID'}, $self->{'ATTACKER_ID'} );
 }
 
 #############################################################################
@@ -689,7 +702,7 @@ sub from_hash {
 
     $self->{'STACK'} = $r_hash->{'STACK'};
 
-    foreach my $tag ( 'VP', 'ANCIENT_LINK', 'HIVE', 'DISCOVERY_COUNT', 'ORBITAL', 'MONOLITH' ) {
+    foreach my $tag ( 'VP', 'ANCIENT_LINK', 'HIVE', 'DISCOVERY_COUNT', 'ORBITAL', 'MONOLITH', 'DEFENDER_ID', 'ATTACKER_ID' ) {
         if ( defined( $r_hash->{ $tag } ) ) {
             if ( WLE::Methods::Simple::looks_like_number( $r_hash->{ $tag } ) ) {
                 $self->{ $tag } = $r_hash->{ $tag };
@@ -744,7 +757,7 @@ sub to_hash {
 
     $r_hash->{'STACK'} = $self->{'STACK'};
 
-    foreach my $tag ( 'VP', 'ANCIENT_LINK', 'HIVE', 'DISCOVERY_COUNT', 'ORBITAL', 'MONOLITH' ) {
+    foreach my $tag ( 'VP', 'ANCIENT_LINK', 'HIVE', 'DISCOVERY_COUNT', 'ORBITAL', 'MONOLITH', 'ATTACKER_ID', 'DEFENDER_ID' ) {
         $r_hash->{ $tag } = $self->{ $tag };
     }
 

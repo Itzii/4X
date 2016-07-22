@@ -120,6 +120,8 @@ sub _init {
         'ANY' => 4,
     };
 
+    $self->{'VP_DRAWS'} = 0;
+
     $self->{'COST_ORBITAL'} = 5;
 
     $self->{'COST_MONUMENT'} = 10;
@@ -401,6 +403,26 @@ sub has_cube_in_hand {
 
     return 0;
 }
+
+#############################################################################
+
+sub vp_draws {
+    my $self        = shift;
+
+    return $self->{'VP_DRAWS'};
+}
+
+#############################################################################
+
+sub set_vp_draws {
+    my $self        = shift;
+    my $value       = shift;
+
+    $self->{'VP_DRAWS'} = $value;
+
+    return;
+}
+
 #############################################################################
 
 sub exchange_rate {
@@ -619,7 +641,7 @@ sub from_hash {
 
     $self->{'HOME'} = $r_hash->{'HOME'};
 
-    foreach my $value ( 'FLAG_PASSED', 'EXCLUDE_RACE', 'COLONY_COUNT', 'COLONY_USED', 'EXCHANGE', 'ACTION_COUNT', 'ACTION_FLIP_COLONY_COUNT', 'IN_HAND' ) {
+    foreach my $value ( 'FLAG_PASSED', 'EXCLUDE_RACE', 'COLONY_COUNT', 'COLONY_USED', 'EXCHANGE', 'ACTION_COUNT', 'ACTION_FLIP_COLONY_COUNT', 'IN_HAND', 'VP_DRAWS' ) {
         if ( defined( $r_hash->{ $value } ) ) {
             $self->{ $value } = $r_hash->{ $value };
         }
@@ -754,7 +776,7 @@ sub to_hash {
         return 0;
     }
 
-    foreach my $tag ( 'HOME', 'EXCLUDE_RACE', 'COLONY_COUNT', 'COLONY_USED', 'EXCHANGE', 'COST_ORBITAL', 'COST_MONUMENT', 'FLAG_PASSED', 'ACTION_COUNT', 'ACTION_FLIP_COLONY_COUNT' ) {
+    foreach my $tag ( 'HOME', 'EXCLUDE_RACE', 'COLONY_COUNT', 'COLONY_USED', 'EXCHANGE', 'COST_ORBITAL', 'COST_MONUMENT', 'FLAG_PASSED', 'ACTION_COUNT', 'ACTION_FLIP_COLONY_COUNT', 'VP_DRAWS' ) {
         $r_hash->{ $tag } = $self->{ $tag };
     }
 

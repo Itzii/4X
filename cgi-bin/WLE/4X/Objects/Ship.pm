@@ -41,6 +41,7 @@ sub _init {
     $self->{'TEMPLATE_TAG'} = $args{'template'}->tag();
 
     $self->{'DAMAGE'} = 0;
+    $self->{'FLAG_RETREAT'} = 0;
 
     if ( defined( $args{'hash'} ) ) {
         if ( $self->from_hash( $args{'hash'} ) ) {
@@ -138,6 +139,28 @@ sub provides {
 
 #############################################################################
 
+sub does_provide {
+    my $self        = shift;
+    my $tag         = shift;
+
+    foreach my $provide_tag ( $self->provides() ) {
+        if ( $tag eq $provide_tag ) {
+            return 1;
+        }
+    }
+
+    if ( $self->owner_id() ) {
+        my $race = $self->server()->race_of_player_id( $self->owner_id() );
+        if ( $race->has_technology( $tag ) ) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+#############################################################################
+
 sub total_missile_attacks {
     my $self        = shift;
 
@@ -146,10 +169,77 @@ sub total_missile_attacks {
 
 #############################################################################
 
+sub roll_missile_attacks {
+    my $self        = shift;
+
+    return $self->_roll_attacks( 1 );
+}
+
+#############################################################################
+
 sub total_beam_attacks {
     my $self        = shift;
 
     return $self->template()->total_beam_attacks();
+}
+
+#############################################################################
+
+sub roll_beam_attacks {
+    my $self        = shift;
+
+    return $self->_roll_attacks( 0 );
+}
+
+#############################################################################
+
+sub _roll_attacks {
+    my $self            = shift;
+    my $flag_missile    = shift;
+
+    my %total_attacks = ();
+
+    if ( $flag_missile ) {
+        %total_attacks = $self->total_missile_attacks();
+    }
+    else {
+        %total_attacks = $self->total_beam_attacks();
+    }
+
+    my @attack_rolls = ();
+
+    foreach my $strength ( keys( %total_attacks ) ) {
+        for ( 1 .. $total_attacks{ $strength } ) {
+            push( @attack_rolls, { 'strength' => $strength, 'roll' => $self->server()->roll_die() } );
+        }
+    }
+
+    return @attack_rolls;
+}
+
+#############################################################################
+
+sub roll_missile_defense {
+    my $self            = shift;
+
+    my $missile_defense_hits = 0;
+
+    if ( $self->does_provide( 'tech_missile_defense' ) ) {
+        my @attacks = $self->roll_beam_attacks();
+
+        foreach my $attack ( @attacks ) {
+            if ( $attack->{'roll'} + $self->total_computer() >= 6 ) {
+                if ( $ship->does_provide( 'tech_beam_splitter' ) ) {
+                    $missile_defense_hits += $attack->{'strength'};
+                }
+                else {
+                    $missile_defense_hits += 1;
+                }
+            }
+        }
+    }
+
+    return $missile_defense_hits;
 }
 
 #############################################################################
@@ -166,6 +256,14 @@ sub components {
     my $self        = shift;
 
     return $self->template()->components();
+}
+
+#############################################################################
+
+sub damage {
+    my $self        = shift;
+
+    return $self->{'DAMAGE'};
 }
 
 #############################################################################
@@ -193,14 +291,37 @@ sub clear_damage {
 
 #############################################################################
 
+sub hits_to_kill {
+    my $self        = shift;
+
+    return $self->template()->total_hull_points() + 1 - $self->damage();
+}
+
+#############################################################################
+
 sub is_destroyed {
     my $self        = shift;
 
-    if ( $self->damage() > $self->template()->total_hull_points() + 1 ) {
-        return 1;
-    }
+    return ( $self->hits_to_kill() < 1 );
+}
 
-    return 0;
+#############################################################################
+
+sub is_retreating {
+    my $self        = shift;
+
+    return $self->{'FLAG_RETREAT'};
+}
+
+#############################################################################
+
+sub set_retreating {
+    my $self        = shift;
+    my $value       = shift;
+
+    $self->{'FLAG_RETREAT'} = $value;
+
+    return;
 }
 
 #############################################################################
@@ -224,6 +345,10 @@ sub from_hash {
         $self->{ 'DAMAGE' } = $r_hash->{ 'DAMAGE' };
     }
 
+    if ( looks_like_number( $r_hash->{ 'FLAG_RETREAT' } ) ) {
+        $self->{ 'FLAG_RETREAT' } = $r_hash->{ 'FLAG_RETREAT' };
+    }
+
     return 1;
 }
 
@@ -237,7 +362,7 @@ sub to_hash {
         return 0;
     }
 
-    foreach my $tag ( 'TEMPLATE_TAG', 'DAMAGE' ) {
+    foreach my $tag ( 'TEMPLATE_TAG', 'DAMAGE', 'FLAG_RETREAT' ) {
         $r_hash->{ $tag } = $self->{ $tag };
     }
 

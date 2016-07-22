@@ -1717,7 +1717,7 @@ $VAR1 = {
                 'comp_computer2',
             ],
             'PROVIDES' => [
-                'point_defense',
+                'tech_missile_defense',
             ],
             'VP_DRAW' => 2,
             'VP' => 1,
@@ -1734,7 +1734,7 @@ $VAR1 = {
                 'comp_hull1',
             ],
             'PROVIDES' => [
-                'distortion_shield',
+                'tech_missile_shield2',
             ],
             'VP_DRAW' => 2,
             'VP' => 1,

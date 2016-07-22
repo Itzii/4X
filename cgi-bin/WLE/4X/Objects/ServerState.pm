@@ -293,9 +293,11 @@ sub _read_state {
     # current combat die rolls
 
     if ( defined( $VAR1->{'COMBAT_HITS'} ) ) {
-        foreach my $roll ( @{ $VAR1->{'COMBAT_HITS'} } ) {
-            push( @{ $self->{'COMBAT_HITS'} }, $roll );
-        }
+        $self->combat_hits()->add_items( @{ $VAR1->{'COMBAT_HITS'} } );
+    }
+
+    if ( defined( $VAR1->{'MISSILE_DEFENSE_HITS'} ) ) {
+        $self->set_missile_defense_hits( $VAR1->{'MISSILE_DEFENSE_HITS'} );
     }
 
 
@@ -432,7 +434,8 @@ sub _save_state {
 
         # combat rolls
 
-        $data{'COMBAT_ROLLS'} = [ @{ $self->{'COMBAT_SETTINGS'} } ];
+        $data{'COMBAT_ROLLS'} = [ $self->combat_hits()->items() ];
+        $data{'MISSILE_DEFENSE_HITS'} = $self->missile_defense_hits();
     }
 
     truncate( $self->{'FH_STATE'}, 0 );

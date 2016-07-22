@@ -677,29 +677,7 @@ sub _raw_start_combat_phase {
 
     my $outermost_combat_tile = $self->board()->outermost_combat_tile();
 
-
-
-
-    # TODO start the combat phase
-
-
-
-
-    # get a list of tiles that combat is going to take place in.
-    # if there are any then we begin the combat phase in the outermost tile
-    # otherwise we skip to the upkeep phase
-
-
-
-    $self->{'STATE'} = {
-        'STATE' => $ST_NORMAL,
-        'ROUND' => $self->round(),
-        'PHASE' => $PH_COMBAT,
-        'PLAYER' => -1,
-        'SUBPHASE' => 0,
-    };
-
-    $self->_raw_set_status( $EV_SUB_ACTION, $self->status() );
+    $self->_raw_begin_combat_in_tile( $EV_SUB_ACTION, $outermost_combat_tile );
 
     return;
 }
@@ -716,27 +694,25 @@ sub _raw_begin_combat_in_tile {
     }
 
     my $tile_tag = shift( @args );
-    my $defender_id = shift( @args );
-    my $attacker_id = shift( @args );
+    my $tile = $self->tiles()->{ $tile_tag };
 
-    my $defender_race = undef;
-    my $attacker_race = undef;
+    my ( $defender_id, $attacker_id ) = $tile->current_combatant_ids();
+
+    my $defender_race = 'ancients';
 
     if ( $defender_id > -1 ) {
-        $defender_race = $self->race_of_player_id( $defender_id );
+        $defender_race = $self->race_of_player_id( $defender_id )->tag();
     }
 
-    if ( $attacker_id > -1 ) {
-        $attacker_race = $self->race_of_player_id( $attacker_id );
-    }
+    my $attacker_race = $self->race_of_player_id( $attacker_id );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return 'tile stack ' . $stack_id . ' created with ' . scalar( @values ) . ' tiles.';
+        return $attacker_race . ' attacks ' . $defender_race . ' in ' . $tile_tag;
     }
 
+    $self->start_combat_in_tile( $tile_tag );
 
-
-
+    return;
 }
 
 #############################################################################

@@ -114,6 +114,10 @@ sub _init {
     $self->{'DISCOVERIES'} = {};
     $self->{'DEVELOPMENTS'} = {};
 
+    $self->{'COMBAT_HITS'} = [];
+
+    $self->{'DIE_ROLLS'} = [];
+
     $self->{'BOARD'} = WLE::4X::Objects::Board->new( 'server' => $self );
     $self->{'TECH_BAG'} = WLE::Objects::Stack->new();
     $self->{'AVAILABLE_TECH'} = WLE::Objects::Stack->new();
@@ -129,6 +133,7 @@ sub _init {
         'PHASE' => $PH_PREPARING,
         'PLAYER' => -1,
         'SUBPHASE' => 0,
+        'TILE' => '',
     };
 
     return $self;
@@ -201,6 +206,9 @@ sub do {
         'choose_discovery'  => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_interrupt_choose_discovery },
 #        'place_component'   => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_interrupt_place_component },
         'select_free_technology' => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_interrupt_select_technology },
+
+        'attack'            => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_COMBAT, 'method' => \&action_attack },
+        'retreat'           => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_COMBAT, 'method' => \&action_retreat },
 
 
         'use_colony_ship'   => { 'flag_req_status' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'flag_ignore_allowed' => 1, 'method' => \&action_use_colony_ship },
@@ -413,12 +421,13 @@ sub action_status {
     }
 
     $$r_data = sprintf(
-        '%i:%i:%i:%i:%i',
+        '%i:%i:%i:%i:%i:%s',
         $self->{'STATE'}->{'STATE'},
         $self->{'STATE'}->{'ROUND'},
         $self->{'STATE'}->{'PHASE'},
         $player_id,
         $self->{'STATE'}->{'SUBPHASE'},
+        $self->{'STATE'}->{'TILE'},
     );
 
     return 1;
@@ -468,7 +477,8 @@ sub status {
         $self->round(),
         $self->phase(),
         $self->waiting_on_player_id(),
-        $self->{'STATE'}->{'SUBPHASE'},
+        $self->subphase(),
+        $self->current_tile(),
     );
 }
 
@@ -505,6 +515,17 @@ sub waiting_on_player_id {
 
 #############################################################################
 
+sub set_waiting_on_player_id {
+    my $self        = shift;
+    my $player_id   = shift;
+
+    push( @{ $self->{'SETTINGS'}->{'PLAYERS_PENDING'} }, $player_id );
+
+    return;
+}
+
+#############################################################################
+
 sub round {
     my $self        = shift;
 
@@ -537,6 +558,44 @@ sub set_phase {
     my $new_phase   = shift;
 
     $self->{'STATE'}->{'PHASE'} = $new_phase;
+
+    return;
+}
+
+#############################################################################
+
+sub subphase {
+    my $self        = shift;
+
+    return $self->{'STATE'}->{'SUBPHASE'};
+}
+
+#############################################################################
+
+sub set_subphase {
+    my $self        = shift;
+    my $value       = shift;
+
+    $self->{'STATE'}->{'SUBPHASE'} = $value;
+
+    return;
+}
+
+#############################################################################
+
+sub current_tile {
+    my $self        = shift;
+
+    return $self->{'STATE'}->{'TILE'};
+}
+
+#############################################################################
+
+sub set_current_tile {
+    my $self        = shift;
+    my $value       = shift;
+
+    $self->{'STATE'}->{'TILE'} = $value;
 
     return;
 }
@@ -791,6 +850,33 @@ sub _state_file {
     return $self->_dir_state_files() . '/' . $log_id . '.state';
 }
 
+#############################################################################
+
+sub die_rolls {
+    my $self        = shift;
+
+    return @{ $self->{'DIE_ROLLS'} };
+}
+
+#############################################################################
+
+sub roll_die {
+    my $self        = shift;
+
+    my $roll = (int(rand(6)) + 1);
+
+    push( @{ $self->{'DIE_ROLLS'} }, $roll );
+
+    return $roll;
+}
+
+#############################################################################
+
+sub combat_rolls {
+    my $self        = shift;
+
+    return $self->{'COMBAT_ROLLS'};
+}
 
 #############################################################################
 #############################################################################

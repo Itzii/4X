@@ -450,6 +450,30 @@ sub tile_in_direction {
 
 #############################################################################
 
+sub player_retreat_options {
+    my $self        = shift;
+    my $tile_tag    = shift;
+    my $player_id   = shift;
+
+    my ( $loc_x, $loc_y ) = split( /:/, $self->location_of_tile( $tile_tag ) );
+
+    my @options = ();
+
+    foreach my $direction ( 0 .. 5 ) {
+        my $retreat_tile = $self->tile_in_direction( $loc_x, $loc_y, $direction );
+
+        if ( defined( $retreat_tile ) ) {
+            if ( $retreat_tile->owner_id() == $player_id ) {
+                push( @options, $retreat_tile->tag() );
+            }
+        }
+    }
+
+    return @options;
+}
+
+#############################################################################
+
 sub location_in_direction {
     my $self        = shift;
     my $x_pos       = shift;

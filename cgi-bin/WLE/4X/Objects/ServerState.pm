@@ -290,6 +290,14 @@ sub _read_state {
         }
     }
 
+    # current combat die rolls
+
+    if ( defined( $VAR1->{'COMBAT_HITS'} ) ) {
+        foreach my $roll ( @{ $VAR1->{'COMBAT_HITS'} } ) {
+            push( @{ $self->{'COMBAT_HITS'} }, $roll );
+        }
+    }
+
 
     # using Storable
 
@@ -422,6 +430,9 @@ sub _save_state {
             $data{'RACES'}->{ $race->tag() } = \%race_hash;
         }
 
+        # combat rolls
+
+        $data{'COMBAT_ROLLS'} = [ @{ $self->{'COMBAT_SETTINGS'} } ];
     }
 
     truncate( $self->{'FH_STATE'}, 0 );

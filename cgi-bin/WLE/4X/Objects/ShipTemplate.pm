@@ -405,6 +405,7 @@ sub _problem {
         }
     }
 
+
     if ( $energy_used > $energy_provided ) {
         return 'Energy requirements not met.'
     }
@@ -440,7 +441,8 @@ sub _total_attacks {
     foreach my $component_tag ( $self->components() ) {
         my $component = $self->server()->ship_components()->{ $component_tag };
 
-        if ( defined( $component ) ) {
+        if ( defi
+ned( $component ) ) {
 
             if ( $component->is_missile() == $flag_missile ) {
                 if ( $component->attack_count() > 0 ) {

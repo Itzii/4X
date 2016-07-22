@@ -58,6 +58,10 @@ our @EXPORT = qw(
     $PH_UPKEEP
     $PH_CLEANUP
 
+    $SUB_MISSILE
+    $SUB_BEAM
+    $SUB_PLANETARY
+
 
 
     $EV_FROM_INTERFACE
@@ -81,6 +85,12 @@ our $PH_ACTION          = $i++;
 our $PH_COMBAT          = $i++;
 our $PH_UPKEEP          = $i++;
 our $PH_CLEANUP         = $i++;
+
+$i = 0;
+
+our $SUB_MISSILE        = $i++;
+our $SUB_BEAM           = $i++;
+our $SUB_PLANETARY      = $i++;
 
 $i = 0;
 

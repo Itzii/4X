@@ -476,7 +476,7 @@ sub status {
     my $self        = shift;
 
     return sprintf(
-        '%i:%i:%i:%i:%i',
+        '%i:%i:%i:%i:%i:%s',
         $self->state(),
         $self->round(),
         $self->phase(),
@@ -771,7 +771,7 @@ sub vp_bag {
 sub template_combat_order {
     my $self        = shift;
 
-    return $self->{'template_combat_order'};
+    return $self->{'TEMPLATE_COMBAT_ORDER'};
 }
 
 #############################################################################

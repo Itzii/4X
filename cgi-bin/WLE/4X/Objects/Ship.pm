@@ -229,7 +229,7 @@ sub roll_missile_defense {
 
         foreach my $attack ( @attacks ) {
             if ( $attack->{'roll'} + $self->total_computer() >= 6 ) {
-                if ( $ship->does_provide( 'tech_beam_splitter' ) ) {
+                if ( $self->does_provide( 'tech_beam_splitter' ) ) {
                     $missile_defense_hits += $attack->{'strength'};
                 }
                 else {

@@ -571,7 +571,7 @@ sub outermost_combat_tile {
         return '';
     }
 
-    @combat_tiles = sort { $a->get_id() <=> $b->get_id() ) @combat_tiles;
+    @combat_tiles = sort { $a->get_id() <=> $b->get_id() } @combat_tiles;
 
     return $combat_tiles[ 0 ]->tag();
 }

@@ -784,7 +784,7 @@ sub _raw_set_defense_hits {
 
     my $hit_count = shift( @args );
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return $hit_count ' missile defense rolls succeeded.';
+        return $hit_count . ' missile defense rolls succeeded.';
     }
 
     $self->set_missile_defense_hits( $hit_count );
@@ -812,7 +812,7 @@ sub _raw_destroy_ship {
 
     $self->_raw_remove_ship_from_tile( $EV_SUB_ACTION, $tile_tag, $ship_tag );
 
-    my $template = $self->templates()->{ $ship->template()->tag() };
+    my $template = $self->templates()->{ $ship_tag };
     $template->set_count( $template->count() + 1 );
 
     delete( $self->ships()->{ $ship_tag } );

@@ -493,7 +493,7 @@ sub add_cube {
             next;
         }
 
-        $slot->set_owner_id() = $owner_id;
+        $slot->set_owner_id( $owner_id );
         return 1;
     }
 
@@ -555,7 +555,7 @@ sub add_slot {
     my $self        = shift;
     my $slot        = shift;
 
-    push( @{ $self->{'RESOURCE_SLOTS'} } );
+    push( @{ $self->{'RESOURCE_SLOTS'} }, $slot );
 
     return;
 }
@@ -660,8 +660,8 @@ sub set_combatant_ids {
 
     my @owner_ids = $self->owner_queue()->items();
 
-    $self->{'DEFENDER_ID'} = $owners_id[ -2 ];
-    $self->{'ATTACKER_ID'} = $owners_id[ -1 ];
+    $self->{'DEFENDER_ID'} = $owner_ids[ -2 ];
+    $self->{'ATTACKER_ID'} = $owner_ids[ -1 ];
 
 }
 

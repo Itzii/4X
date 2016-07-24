@@ -1610,6 +1610,9 @@ $VAR1 = {
                 'comp_hull1',
                 'comp_computer1',
             ],
+            'PROVIDES' => [
+                'tech_bombs',
+            ],
             'VP_DRAW' => 1,
         },
         'shiptemplate_ancient2' => {

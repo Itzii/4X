@@ -82,6 +82,9 @@ my %actions = (
     \&_raw_allocate_hits                => 'allocate_hits',
     \&_raw_apply_combat_hits            => 'apply_combat_hits',
     \&_raw_next_combat_ships            => 'next_set_of_ships',
+    \&_raw_begin_attacking_population   => 'attack_population',
+    \&_raw_start_vp_draws               => 'start_vp_draws',
+    \&_raw_next_vp_draw_player          => 'next_vp_draw',
 
 
 );
@@ -705,16 +708,15 @@ sub _raw_start_combat_phase {
     }
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return 'beginning combat phase';
+        return 'beginning combat phase';_raw_begin_combat_in_tile
     }
 
     my $outermost_combat_tile = $self->board()->outermost_combat_tile();
 
-    $self->_raw_begin_combat_in_tile( $EV_SUB_ACTION, $outermost_combat_tile );
+    $self->_raw_begin_combat_in_tile( $EV_SUB_ACTION, $outermost_combat_tile, 1 );
 
     return;
 }
-
 #############################################################################
 
 sub _raw_begin_combat_in_tile {
@@ -727,6 +729,8 @@ sub _raw_begin_combat_in_tile {
     }
 
     my $tile_tag = shift( @args );
+    my $flag_first_in_tile = shift( @args );
+
     my $tile = $self->tiles()->{ $tile_tag };
 
     my ( $defender_id, $attacker_id ) = $tile->current_combatant_ids();
@@ -743,7 +747,7 @@ sub _raw_begin_combat_in_tile {
         return $attacker_race . ' attacks ' . $defender_race . ' in ' . $tile_tag;
     }
 
-    $self->start_combat_in_tile( $tile_tag );
+    $self->start_combat_in_tile( $tile_tag, $flag_first_in_tile );
 
     return;
 }
@@ -823,7 +827,8 @@ sub _raw_destroy_ship {
 #############################################################################
 
 sub _raw_allocate_hits {
-    my $self        = shift;
+    my $self        = shift;    $tile->set_vp_draw_queue( $tile->owner_queue()->items() );
+
     my $source      = shift;
     my @args        = @_;
 
@@ -908,6 +913,73 @@ sub _raw_prepare_to_retreat_ships {
     return;
 }
 
+#############################################################################
+
+sub _raw_begin_attacking_population {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $tile_tag = shift( @args );
+
+    my $race = $self->race_of_current_user();
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return $race->tag() . ' begins attacking population in ' . $tile_tag;
+    }
+
+    $self->attack_population( $tile_tag );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_start_vp_draws {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $tile_tag = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'vp draws beginning in ' . $tile_tag;
+    }
+
+    $self->start_vp_draws( $tile_tag );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_next_vp_draw_player {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $tile_tag = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'next vp draw in ' . $tile_tag;
+    }
+
+    $self->next_vp_draw( $tile_tag );
+
+    return;
+}
 
 #############################################################################
 

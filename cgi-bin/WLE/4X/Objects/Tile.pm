@@ -54,6 +54,7 @@ sub _init {
 
     $self->{'SHIPS'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
     $self->{'USER_ENTRY_QUEUE'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
+    $self->{'VP_DRAW_QUEUE'} = [];
 
     $self->{'RESOURCE_SLOTS'} = [];
 
@@ -348,6 +349,25 @@ sub enemy_ship_count {
     }
 
     return $count;
+}
+
+#############################################################################
+
+sub vp_draw_queue {
+    my $self        = shift;
+
+    return @{ $self->{'VP_DRAW_QUEUE'} };
+}
+
+#############################################################################
+
+sub set_vp_draw_queue {
+    my $self        = shift;
+    my @values      = @_;
+
+    $self->{'VP_DRAW_QUEUE'} = \@values;
+
+    return;    
 }
 
 #############################################################################
@@ -653,7 +673,7 @@ sub set_combatant_ids {
     my $self        = shift;
 
     unless ( $self->has_combat() ) {
-        return ();
+        return;
     }
 
     # TODO check for alliances
@@ -738,6 +758,10 @@ sub from_hash {
         $self->owner_queue()->add_items( @{ $r_hash->{'OWNER_QUEUE'} } );
     }
 
+    if ( defined( $r_hash->{'VP_DRAW_QUEUE'} ) ) {
+        $self->{'VP_DRAW_QUEUE'} = [ @{ $r_hash->{'VP_DRAW_QUEUE'} } ];
+    }
+
     return 1;
 }
 
@@ -763,6 +787,7 @@ sub to_hash {
 
     $r_hash->{'SHIPS'} = [ $self->ships()->items() ];
     $r_hash->{'OWNER_QUEUE'} = [ $self->owner_queue()->items() ];
+    $r_hash->{'VP_DRAW_QUEUE'} = [ @{ $self->{'VP_DRAW_QUEUE'} } ];
 
     $r_hash->{'STARTING_SHIPS'} = $self->{'STARTING_SHIPS'};
 

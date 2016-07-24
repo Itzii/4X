@@ -66,14 +66,87 @@ sub action_attack {
 
     $self->_raw_make_attack_rolls( $EV_FROM_INTERFACE, @rolls );
 
-    if ( $ship_owner == -1 ) {
-        # TODO npc ships are attacking
+    $self->_raw_set_pending_player( $EV_FROM_INTERFACE, $ship_owner );
+    my $race = $self->race_of_player_id( $ship_owner );
+    $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $race->tag(), 'allocate_hits' );
 
+    $self->_save_state();
+    $self->_close_all();
+
+    return 1;
+}
+
+#############################################################################
+
+sub action_roll_npc {
+    my $self            = shift;
+    my %args            = @_;
+
+    unless ( $self->_open_for_writing( $self->log_id() ) ) {
+        return 0;
+    }
+
+    my $tile_tag = $self->current_tile();
+    my $template_tag = ($self->template_combat_order())[ 0 ];
+
+    my $tile = $self->tiles()->{ $tile_tag };
+
+    my %attacks = ();
+
+    foreach my $ship ( $tile->ships()->items() ) {
+        if ( $ship->template()->tag() eq $template_tag ) {
+            my %ship_attacks = ();
+
+            if ( $self->subphase() == $SUB_MISSILE ) {
+                %ship_attacks = $ship->total_missile_attacks();
+            }
+            else {
+                %ship_attacks = $ship->total_beam_attacks();
+            }
+
+            foreach my $strength ( keys( %ship_attacks ) ) {
+                if ( defined( $attacks{ $strength } ) ) {
+                    $attacks{ $strength } += $ship_attacks{ $strength };
+                }
+                else {
+                    $attacks{ $strength } = $ship_attacks{ $strength };
+                }
+            }
+        }
+    }
+
+    my $enemy_id = $self->real_player_in_combat();
+
+    my @rolls = ();
+
+    foreach my $strength ( sort( keys( %attacks ) ) ) {
+        foreach ( 1 .. $attacks{ $strength } ) {
+            push( @rolls, $strength . ':' . $self->roll_die() );
+        }
+    }
+
+    $self->_raw_make_attack_rolls( $EV_FROM_INTERFACE, @rolls );
+
+    @rolls = $self->ai_descision_allocate_hits( $template_tag, @rolls );
+
+    $self->_raw_allocate_hits( $EV_FROM_INTERFACE, @rolls );
+
+    if ( $self->subphase() == $SUB_MISSILE ) {
+        foreach my $ship ( $tile->ships()->items() ) {
+            if ( $ship->owner_id() == $enemy_id ) {
+                $missile_defense_hits += $ship->roll_missile_defense();
+            }
+        }
+    }
+
+    $self->_raw_set_pending_player( $enemy_id );
+
+    if ( $missile_defense_hits > 0 ) {
+        $self->_raw_set_defense_hits( $EV_FROM_INTERFACE, $missile_defense_hits );
+        $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $self->race_of_player_id( $enemy_id ), 'allocate_defense_hits' );
     }
     else {
-        $self->_raw_set_pending_player( $EV_FROM_INTERFACE, $ship_owner );
-        my $race = $self->race_of_player_id( $ship_owner );
-        $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $race->tag(), 'allocate_hits' );
+        $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $self->race_of_player_id( $enemy_id ), 'acknowledge_hits' );
     }
 
     $self->_save_state();
@@ -295,7 +368,24 @@ sub action_retreat {
     return 1;
 }
 
+#############################################################################
 
+sub action_draw_vp {
+    my $self            = shift;
+    my %args            = @_;
+
+    unless ( $self->_open_for_writing( $self->log_id() ) ) {
+        return 0;
+    }
+
+    # TODO
+
+
+    $self->_save_state();
+    $self->_close_all();
+
+    return 1;
+}
 
 #############################################################################
 # general combat methods
@@ -329,8 +419,25 @@ sub does_roll_hit_ship {
 
 #############################################################################
 
+sub real_player_in_combat {
+    my $self            = shift;
+
+    my ( $combat_id_1, $combat_id_2 ) = $self->tiles()->{ $self->current_tile() }->current_combatant_ids();
+
+    if ( $combat_id_1 == -1 ) {
+        return $combat_id_2;
+    }
+
+    return $combat_id_1;
+}
+
+#############################################################################
+
 sub npc_attacks {
     my $self            = shift;
+
+    # TODO
+
 
 
 
@@ -368,7 +475,7 @@ sub apply_combat_hits {
         }
     }
 
-
+    return;
 }
 
 #############################################################################
@@ -386,6 +493,43 @@ sub next_combat_ships {
         return;
     }
 
+    # check for stalemate
+    # if no one has beam weapons and the attacker has no retreat route then the attacker's
+    # ships are destroyed
+
+    my $flag_someone_has_beam_weapons = 0;
+
+    foreach my $user_id ( $defender_id, $attacker_id ) {
+        foreach my $ship_tag ( $self->tiles()->{ $self->current_tile() }->ships()->items() ) {
+            my $ship = $self->ships()->{ $ship_tag };
+            if ( $ship->owner_id() == $user_id ) {
+                my %beam_attacks = $ship->total_beam_attacks();
+                if ( scalar( keys( %beam_attacks ) ) > 0 ) {
+                    $flag_someone_has_beam_weapons = 1;
+                }
+            }
+        }
+    }
+
+    unless ( $flag_someone_has_beam_weapons ) {
+        my @retreat_options = $self->board()->player_retreat_options( $tile_tag, $player_id );
+
+        if ( scalar( @retreat_options ) == 0 ) {
+            foreach my $ship_tag ( $self->tiles()->{ $self->current_tile() }->ships()->items() ) {
+                my $ship = $self->ships()->{ $ship_tag };
+                if ( $ship->owner_id() == $attacker_id ) {
+                    $self->_raw_destroy_ship( $EV_SUB_ACTION, $self->current_tile(), $ship_tag );
+                }
+            }
+
+            $self->end_combat();
+            return;
+        }
+    }
+
+
+    # if there are no more ship classes to fight with then we end the round
+
     my $done_template = ( $self->template_combat_order()->items() )[ 0 ];
     $self->template_combat_order()->remove_item( $done_template );
 
@@ -393,7 +537,6 @@ sub next_combat_ships {
         $self->end_combat_round();
         return;
     }
-
 
     # still got more fight
 
@@ -405,7 +548,9 @@ sub next_combat_ships {
         return;
     }
     else { # computer player
-        $self->npc_attacks();
+        my $real_player_id = $self->real_player_in_combat();
+        $self->set_waiting_on_player_id( $real_player_id );
+        $self->_raw_set_allowed_race_actions( $self->race_of_player_id( $real_player_id )->tag(), 'roll_npc' );
         return;
     }
 }
@@ -458,7 +603,9 @@ sub start_combat_round {
                 return 1;
             }
             else { # computer player
-                $self->npc_attacks();
+                my $real_player_id = $self->real_player_in_combat();
+                $self->set_waiting_on_player_id( $real_player_id );
+                $self->_raw_set_allowed_race_actions( $self->race_of_player_id( $real_player_id )->tag(), 'roll_npc' );
                 return 1;
             }
         }
@@ -475,18 +622,28 @@ sub start_combat_round {
             return 1;
         }
         else { # computer player
-            $self->npc_attacks();
+            my $real_player_id = $self->real_player_in_combat();
+            $self->set_waiting_on_player_id( $real_player_id );
+            $self->_raw_set_allowed_race_actions( $self->race_of_player_id( $real_player_id )->tag(), 'roll_npc' );
             return 1;
         }
     }
-
-
 
     return 0;
 }
 
 #############################################################################
 
+sub attack_population {
+    my $self            = shift;
+
+
+
+
+
+
+    return;
+}
 
 
 #############################################################################
@@ -495,8 +652,74 @@ sub end_combat {
     my $self            = shift;
 
 
+    # more combats in this tile ?
+
+    my $tile = $self->tiles()->{ $self->current_tile() };
+
+    $tile->set_combatant_ids();
+
+    my ( $defender_id, $attacker_id ) = $tile->current_combatant_ids();
+
+    if ( $defender_id > -1 || $attacker_id > -1 ) {
+        $self->_raw_begin_combat_in_tile( $EV_SUB_ACTION, $tile->tag() );
+        return;
+    }
+
+    # check for population to attack
+
+    if ( $tile->owner_id() > -1 ) {
+
+        # TODO
 
 
+        $self->attack_population();
+
+
+    }
+
+    # no population to attack - we now go to vp draws
+
+    $self->_raw_start_vp_draws( $EV_SUB_ACTION, $tile->tag() );
+
+    return;
+}
+
+#############################################################################
+
+sub start_vp_draws {
+    my $self            = shift;
+    my $tile_tag        = shift;
+
+    my $tile = $self->tiles()->{ $tile_tag };
+
+    my @draw_queue = ();
+    foreach my $user_id ( $tile->vp_draw_queue() ) {
+        if ( $user_id != -1 ) {
+            push( @draw_queue, $user_id );
+        }
+    }
+
+    $self->set_subphase( $SUB_VP_DRAW );
+    $self->set_pending_players( $tile->vp_draw_queue() );
+
+    $self->_raw_next_vp_draw_player( $EV_SUB_ACTION, $tile_tag );
+
+    return;
+}
+
+#############################################################################
+
+sub next_vp_draw {
+    my $self            = shift;
+    my $tile_tag        = shift;
+
+    my $tile = $self->tiles()->{ $tile_tag };
+
+    my $race = $self->race_of_player_id( $self->waiting_on_player_id() );
+
+    $self->_raw_set_allowed_race_actions( $EV_SUB_ACTION, 'draw_vp' );
+
+    return;
 }
 
 #############################################################################
@@ -508,10 +731,25 @@ sub tag_ships_to_retreat {
 
     my $tile = $self->tiles()->{ $tile_tag };
 
+    my $flag_has_more_ships = 0;
+    my $owner_id = $self->ship_templates()->{ $template_tag }->owner_id();
+
     foreach my $ship ( $tile->ships()->items() ) {
         if ( $ship->template()->tag() eq $template_tag ) {
             $ship->set_retreating( 1 );
         }
+        elsif ( $ship->owner_id() == $owner_id ) {
+            $flag_has_more_ships = 1;
+        }
+
+    }
+
+    # if this is the last of the races ships in the battle then
+    # we take away the vp draw for participating in the battle
+
+    unless ( $flag_has_more_ships ) {
+        my $race = $self->race_of_player_id( $owner_id );
+        $race->set_vp_draws( $race->vp_draws() - 1 );
     }
 
     return;
@@ -520,16 +758,34 @@ sub tag_ships_to_retreat {
 #############################################################################
 
 sub start_combat_in_tile {
-    my $self            = shift;
-    my $tile_tag        = shift;
+    my $self                = shift;
+    my $tile_tag            = shift;
+    my $flag_first_in_tile  = shift; $flag_first_in_tile = 0            unless defined( $flag_first_in_tile );
 
     $self->set_phase( $PH_COMBAT );
     $self->set_current_tile( $tile_tag );
 
     my $tile = $self->tiles()->{ $tile_tag };
+    $tile->set_combatant_ids();
+
+    if ( $flag_first_in_tile ) {
+        $tile->set_vp_draw_queue( $tile->owner_queue()->items() );
+    }
 
     foreach my $ship ( $tile->ships()->items() ) {
         $ship->set_retreating( 0 );
+    }
+
+    # give each combatant a vp draw for being in the battle.
+    # if they later retreat their last ships then we'll take it away
+
+    my ( $defender_id, $attacker_id ) = $tile->current_combatant_ids();
+
+    foreach my $user_id ( $defender_id, $attacker_id ) {
+        if ( $user_id > -1 ) {
+            my $user_race = $self->race_of_player_id( $user_id );
+            $user_race->set_vp_draws( $user_race->vp_draws() + 1 );
+        }
     }
 
     return $self->start_combat_round( 1 );
@@ -593,7 +849,8 @@ sub _give_attack_or_retreat_option {
 
     my @allowed = ( 'attack' );
 
-    if ( $self->board()->player_retreat_options( $tile_tag, $player_id ) ) {
+    my @retreat_options = $self->board()->player_retreat_options( $tile_tag, $player_id );
+    if ( scalar( @retreat_options ) > 0 ) {
         push( @allowed, 'retreat' );
     }
 

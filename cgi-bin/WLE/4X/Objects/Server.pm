@@ -209,10 +209,12 @@ sub do {
         'select_free_technology' => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_interrupt_select_technology },
 
         'attack'            => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_COMBAT, 'method' => \&action_attack },
+        'roll_npc'          => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_COMBAT, 'method' => \&action_roll_npc },
         'retreat'           => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_COMBAT, 'method' => \&action_retreat },
         'allocate_hits'     => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_COMBAT, 'method' => \&action_allocate_hits },
         'allocate_defense_hits' => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_COMBAT, 'method' => \&action_allocate_defense_hits },
         'acknowledge_hits'  => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_COMBAT, 'method' => \&action_acknowledge_hits },
+        'draw_vp'           => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_COMBAT, 'method' => \&action_draw_vp },
 
 
         'use_colony_ship'   => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'flag_ignore_allowed' => 1, 'method' => \&action_use_colony_ship },
@@ -524,6 +526,17 @@ sub set_waiting_on_player_id {
     my $player_id   = shift;
 
     push( @{ $self->{'SETTINGS'}->{'PLAYERS_PENDING'} }, $player_id );
+
+    return;
+}
+
+#############################################################################
+
+sub set_pending_players {
+    my $self        = shift;
+    my @pending     = @_;
+
+    $self->{'SETTINGS'}->{'PLAYERS_PENDING'} = [ @pending ];
 
     return;
 }

@@ -67,6 +67,8 @@ sub _init {
 
     $self->{'IN_HAND'} = WLE::Objects::Stack->new();
     $self->{'COMPONENT_OVERFLOW'} = WLE::Objects::Stack->new();
+    $self->{'GRAVEYARD'} = WLE::Objects::Stack->new();
+    $self->{'DISCOVERY_VPS'} = WLE::Objects::Stack->new();
 
     $self->{'RESOURCES'} = {
         $RES_MONEY => 2,
@@ -114,11 +116,12 @@ sub _init {
 
     $self->{'STARTING_SHIPS'} = [ 'class_interceptor' ],
 
-    $self->{'VP_SLOTS'} = {
-        'AMBASSADOR' => 1,
-        'BATTLE' => 0,
-        'ANY' => 4,
+    $self->{'VP_SLOT_COUNTS'} = {
+        $VP_AMBASSADOR => 1,
+        $VP_BATTLE => 0,
+        $VP_ANY => 4,
     };
+    $self->{'VP_SLOTS'} = WLE::Objects::Stack->new();
 
     $self->{'VP_DRAWS'} = 0;
 
@@ -320,6 +323,136 @@ sub component_overflow {
     my $self        = shift;
 
     return $self->{'COMPONENT_OVERFLOW'};
+}
+
+#############################################################################
+
+sub graveyard {
+    my $self        = shift;
+
+    return $self->{'GRAVEYARD'};
+}
+
+#############################################################################
+
+sub discovery_vps {
+    my $self        = shift;
+
+    return $self->{'DISCOVERY_VPS'};
+}
+
+#############################################################################
+
+sub can_add_vp_item {
+    my $self            = shift;
+    my $new_item        = shift;
+    my $replaces_item   = shift; $replaces_item = ''                    unless defined( $replaces_item );
+
+    unless ( $replaces_item eq ''  ) {
+        if ( looks_like_number( $replaces_item ) ) {
+            $replaces_item = $VP_BATTLE . ':' . $replaces_item;
+        }
+        else {
+            $replaces_item = $VP_AMBASSADOR . ':' . $replaces_item;
+        }
+
+        unless ( $self->{'VP_SLOTS'}->contains( $replaces_item ) ) {
+            return 0;
+        }
+    }
+
+    if ( looks_like_number( $new_item ) ) {
+        $new_item = $VP_BATTLE . ':' . $new_item;
+    }
+    else {
+        $new_item = $VP_AMBASSADOR . ':' . $new_item;
+    }
+
+    my @items = ( $new_item );
+
+    foreach my $item ( @{ $self->{'VP_SLOTS'} } ) {
+        unless ( $item eq $replaces_item ) {
+            push( @items, $item );
+        }
+    }
+
+    my $battle_count = $self->{'VP_SLOT_COUNTS'}->{ $VP_BATTLE };
+    my $ambassador_count = $self->{'VP_SLOT_COUNTS'}->{ $VP_AMBASSADOR };
+    my $extra_count = $self->{'VP_SLOT_COUNTS'}->{ $VP_ANY };
+
+    foreach my $item ( @items ) {
+        my ( $type ) = split( /:/, $item );
+        if ( $type == $VP_BATTLE ) {
+            if ( $battle_count > 0 ) {
+                $battle_count--;
+            }
+            else {
+                $extra_count--;
+            }
+        }
+        else {
+            if ( $ambassador_count > 0 ) {
+                $ambassador_count--;
+            }
+            else {
+                $extra_count--;
+            }
+        }
+    }
+
+    if ( $battle_count < 0 || $ambassador_count < 0 || $extra_count < 0 ) {
+        return 0;
+    }
+
+    return 1;
+}
+
+#############################################################################
+
+sub add_vp_item {
+    my $self            = shift;
+    my $item            = shift;
+    my $replaces_item   = shift;
+
+    unless ( $replaces_item eq ''  ) {
+        if ( looks_like_number( $replaces_item ) ) {
+            $replaces_item = $VP_BATTLE . ':' . $replaces_item;
+        }
+        else {
+            $replaces_item = $VP_AMBASSADOR . ':' . $replaces_item;
+        }
+
+        $self->{'VP_SLOTS'}->remove_item( $replaces_item );
+    }
+
+    if ( looks_like_number( $item ) ) {
+        $item = $VP_BATTLE . ':' . $item;
+    }
+    else {
+        $item = $VP_AMBASSADOR . ':' . $item;
+    }
+
+    $self->{'VP_SLOTS'}->add_items( $item );
+
+    return;
+}
+
+#############################################################################
+
+sub remove_vp_item {
+    my $self            = shift;
+    my $item            = shift;
+
+    if ( looks_like_number( $item ) ) {
+        $item = $VP_BATTLE . ':' . $item;
+    }
+    else {
+        $item = $VP_AMBASSADOR . ':' . $item;
+    }
+
+    $self->{'VP_SLOTS'}->remove_item( $item );
+
+    return;
 }
 
 #############################################################################
@@ -648,8 +781,17 @@ sub from_hash {
     }
 
     if ( defined( $r_hash->{'COMPONENT_OVERFLOW'} ) ) {
-        $self->{'COMPONENT_OVERFLOW'}->add_items( @{ $r_hash->{'COMPONENT_OVERFLOW'} } );
+        $self->component_overflow()->fill( @{ $r_hash->{'COMPONENT_OVERFLOW'} } );
     }
+
+    if ( defined( $r_hash->{'GRAVEYARD'} ) ) {
+        $self->graveyard()->fill( @{ $r_hash->{'GRAVEYARD'} } );
+    }
+
+    if ( defined( $r_hash->{'DISCOVERY_VPS'} ) ) {
+        $self->discovery_vps()->fill( @{ $r_hash->{'DISCOVERY_VPS'} } );
+    }
+
 
     if ( defined( $r_hash->{'ACTIONS'} ) ) {
         foreach my $action_tag ( 'EXPLORE', 'INFLUENCE_INF', 'INFLUENCE_COLONY', 'RESEARCH', 'UPGRADE', 'BUILD', 'MOVE' ) {
@@ -702,13 +844,19 @@ sub from_hash {
         $r_hash->{'STARTING_SHIPS'} = \@ships;
     }
 
-    if ( defined( $r_hash->{'VP_SLOTS'} ) ) {
-        foreach my $section_tag ( 'AMBASSADOR', 'BATTLE', 'ANY' ) {
-            if ( WLE::Methods::Simple::looks_like_number( $r_hash->{'VP_SLOTS'}->{ $section_tag } ) ) {
-                $self->{'VP_SLOTS'}->{ $section_tag } = $r_hash->{'VP_SLOTS'}->{ $section_tag };
+    if ( defined( $r_hash->{'VP_SLOT_COUNTS'} ) ) {
+        foreach my $section_enum ( 0 .. $VP_COUNT ) {
+            my $section_tag = text_from_vp_enum( $section_enum );
+            if ( WLE::Methods::Simple::looks_like_number( $r_hash->{'VP_SLOT_COUNTS'}->{ $section_tag } ) ) {
+                $self->{'VP_SLOT_COUNTS'}->{ $section_tag } = $r_hash->{'VP_SLOT_COUNTS'}->{ $section_tag };
             }
         }
     }
+
+    if ( defined( $r_hash->{'VP_SLOTS'} ) ) {
+        $self->{'VP_SLOTS'}->fill( @{ $r_hash->{'VP_SLOTS'} } );
+    }
+
 
     foreach my $tag ( 'COST_ORBITAL', 'COST_MONUMENT' ) {
         if ( WLE::Methods::Simple::looks_like_number( $r_hash->{ $tag } ) ) {
@@ -782,6 +930,8 @@ sub to_hash {
 
     $r_hash->{'IN_HAND'} = [ $self->in_hand()->items() ];
     $r_hash->{'COMPONENT_OVERFLOW'} = [ $self->component_overflow()->items() ];
+    $r_hash->{'GRAVEYARD'} = [ $self->graveyard()->items() ];
+    $r_hash->{'DICOVERY_VPS'} = [ $self->discovery_vps()->items() ];
 
     $r_hash->{'ACTIONS'} = {};
     foreach my $action_tag ( 'EXPLORE', 'INFLUENCE_INF', 'INFLUENCE_COLONY', 'RESEARCH', 'UPGRADE', 'BUILD', 'MOVE' ) {
@@ -814,10 +964,13 @@ sub to_hash {
     my @ships = @{ $self->{'STARTING_SHIPS'} };
     $r_hash->{'STARTING_SHIPS'} = \@ships;
 
-    $r_hash->{'VP_SLOTS'} = {};
-    foreach my $section_tag ( 'AMBASSADOR', 'BATTLE', 'ANY' ) {
-        $r_hash->{'VP_SLOTS'}->{ $section_tag } = $self->{'VP_SLOTS'}->{ $section_tag };
+    $r_hash->{'VP_SLOT_COUNTS'} = {};
+    foreach my $section_enum ( 0 .. $VP_COUNT - 1 ) {
+        my $section_tag = text_from_vp_enum( $section_enum );
+        $r_hash->{'VP_SLOT_COUNTS'}->{ $section_tag } = $self->{'VP_SLOT_COUNTS'}->{ $section_enum };
     }
+
+    $r_hash->{'VP_SLOTS'} = [ $self->{'VP_SLOTS'}->items() ];
 
     $r_hash->{'ALLOWED_ACTIONS'} = [ $self->allowed_actions()->items() ];
 

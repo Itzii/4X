@@ -83,8 +83,15 @@ my %actions = (
     \&_raw_apply_combat_hits            => 'apply_combat_hits',
     \&_raw_next_combat_ships            => 'next_set_of_ships',
     \&_raw_begin_attacking_population   => 'attack_population',
+    \&_raw_dont_kill_population         => 'dont_kill_population',
+    \&_raw_allocate_population_hits     => 'allocate_population_hits',
+    \&_raw_kill_population_cube         => 'kill_population',
+    \&_raw_add_vp_to_hand               => 'add_vp_to_hand',
     \&_raw_start_vp_draws               => 'start_vp_draws',
+    \&_raw_select_vp_token              => 'select_vp_token',
     \&_raw_next_vp_draw_player          => 'next_vp_draw',
+
+    \&_raw_swap_back_ambassadors        => 'swap_back_ambassadors',
 
 
 );
@@ -827,7 +834,7 @@ sub _raw_destroy_ship {
 #############################################################################
 
 sub _raw_allocate_hits {
-    my $self        = shift;    
+    my $self        = shift;
     my $source      = shift;
     my @args        = @_;
 
@@ -938,6 +945,98 @@ sub _raw_begin_attacking_population {
 
 #############################################################################
 
+sub _raw_dont_kill_population {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $race = $self->race_of_current_user();
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return $race->tag() . ' refrains from attacking population in ' . $self->current_tile();
+    }
+
+    $self->next_population_attacker();
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_allocate_population_hits {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my @hits = @args;
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'combat rolls are allocated: ' . join( ',', @hits );
+    }
+
+    $self->combat_rolls()->clear();
+    $self->combat_rolls()->add_items( @hits );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_kill_population {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my @cubes_to_kill = @args;
+
+    my $race = $self->race_of_current_user();
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return $race->tag() . ' kills population in ' . $self->current_tile() . ': ' . join( ',', @cubes_to_kill );
+    }
+
+    $self->kill_population( @cubes_to_kill );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_kill_population_cube {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $tile_tag = shift( @args );
+    my $type = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'population in ' . $tile_tag . ' of type ' . $type . ' is killed';
+    }
+
+    $self->kill_population_cube( $tile_tag, $type );
+
+    return;
+}
+
+#############################################################################
+
 sub _raw_start_vp_draws {
     my $self        = shift;
     my $source      = shift;
@@ -960,6 +1059,73 @@ sub _raw_start_vp_draws {
 
 #############################################################################
 
+sub _raw_add_vp_to_hand {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $race_tag = shift( @args );
+    my @vp_tokens = @args;
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'vp tokens added to ' . $race_tag . ' hand';
+    }
+
+    foreach my $token ( @vp_tokens ) {
+        $self->_raw_add_item_to_hand( $EV_SUB_ACTION, $race_tag, $token );
+        $self->vp_bag()->remove_item( $token );
+    }
+
+    $self->_raw_set_allowed_race_actions( $EV_SUB_ACTION, $race_tag, 'select_vp_token' );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_select_vp_token {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $race_tag = shift( @args );
+    my $new_token = shift( @args );
+    my $old_token = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        if ( $old_token eq '' ) {
+            return $race_tag . ' adds vp token to set: ' . $new_token;
+        }
+        else {
+            return $race_tag . ' replaces ' . $old_token . ' with new token: ' . $new_token;
+        }
+    }
+
+    my $race = $self->races()->{ $race_tag };
+    $race->add_vp_item( $new_token, $old_token );
+
+    unless ( $old_token eq '' ) {
+        if ( looks_like_number( $old_token ) ) {
+            $self->server()->vp_bag()->add_items( $old_token );
+        }
+    }
+
+    $self->server()->vp_bag()->add_items( $race->in_hand()->items() );
+    $race->in_hand()->clear();
+
+    return;
+}
+
+#############################################################################
+
 sub _raw_next_vp_draw_player {
     my $self        = shift;
     my $source      = shift;
@@ -976,6 +1142,33 @@ sub _raw_next_vp_draw_player {
     }
 
     $self->next_vp_draw( $tile_tag );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_swap_back_ambassadors {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $race_tag = shift( @args );
+    my $other_race_tag = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return $race_tag . ' and ' . $other_race_tag . ' swap back ambassadors';
+    }
+
+    $self->races()->{ $other_race_tag }->remove_vp_item( $race_tag );
+    $self->races()->{ $other_race_tag }->in_hand()->add_items( 'cube:' . $RES_WILD );
+
+    $self->races()->{ $race_tag }->remove_vp_item( $other_race_tag );
+    $self->races()->{ $race_tag }->in_hand()->add_items( 'cube:' . $RES_WILD );
 
     return;
 }
@@ -1749,8 +1942,7 @@ sub _raw_use_discovery {
     }
 
     if ( $flag_as_vp ) {
-        # TODO
-        # $race->add_vp_to_category( $VP_DISCOVERIES, 2 );
+        $race->discovery_vps()->add_items( $discovery_tag );
     }
     else {
         $self->use_discovery( $tile_tag, $discovery_tag );

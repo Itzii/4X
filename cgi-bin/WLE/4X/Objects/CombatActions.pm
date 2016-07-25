@@ -370,7 +370,7 @@ sub action_retreat {
 
 #############################################################################
 
-sub action_draw_vp {
+sub action_attack_populace {
     my $self            = shift;
     my %args            = @_;
 
@@ -378,8 +378,25 @@ sub action_draw_vp {
         return 0;
     }
 
-    # TODO
+    my $tile = $self->tiles()->{ $self->current_tile() };
 
+    my @hits = ();
+
+    foreach my $ship ( $tile->ships()->items() ) {
+        if ( $ship->owner_id() == $self->current_user() ) {
+            foreach my $attack ( $ship->roll_beam_attacks() ) {
+                if ( $self->does_roll_hit_ship( $attack->{'roll'}, $ship->template(), undef ) ) {
+                    push( @hits, 'hit:' . $attack->{'strength'} . ':' . $attack->{'roll'} );
+                }
+                else {
+                    push( @hits, 'miss:' . $attack->{'strength'} . ':' . $attack->{'roll'} );
+                }
+            }
+        }
+    }
+
+    $self->_raw_allocate_population_hits( $EV_FROM_INTERFACE, @hits );
+    $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, 'apply_population_hits' );
 
     $self->_save_state();
     $self->_close_all();
@@ -388,7 +405,159 @@ sub action_draw_vp {
 }
 
 #############################################################################
+
+sub action_apply_population_hits {
+    my $self            = shift;
+    my %args            = @_;
+
+    unless ( $self->_open_for_writing( $self->log_id() ) ) {
+        return 0;
+    }
+
+    unless ( defined( $args{'applied_hits'} ) ) {
+        $self->set_error( 'Missing Applied Hits' );
+        return 0;
+    }
+
+    my $total_allowed_hits = 0;
+
+    foreach my $attack ( $self->combat_rolls()->items() ) {
+        my ( $result, $strength, $roll ) = split( /:/, $attack );
+        if ( $result eq 'hit' ) {
+            $total_allowed_hits += $stength;
+        }
+    }
+
+    my @applied_hits = split( /,/, $args{'applied_hits'} );
+    if ( scalar( @applied_hits ) > $total_allowed_hits ) {
+        $self->set_error( 'Invalid Number Of Applied Hits' );
+        return 0;
+    }
+
+    my @types_to_kill = ();
+
+    foreach my $hit ( @applied_hits ) {
+        my $type = enum_from_resource_text( $hit );
+        push( @types_to_kill, $type );
+    }
+
+    $self->_raw_kill_population( $EV_FROM_INTERFACE, @types_to_kill );
+
+    $self->_save_state();
+    $self->_close_all();
+
+    return 1;
+}
+
+#############################################################################
+
+sub action_dont_attack_populace {
+    my $self            = shift;
+    my %args            = @_;
+
+    unless ( $self->_open_for_writing( $self->log_id() ) ) {
+        return 0;
+    }
+
+    $self->_raw_dont_kill_population( $EV_FROM_INTERFACE );
+
+    $self->_save_state();
+    $self->_close_all();
+
+    return 1;
+}
+
+#############################################################################
+
+sub action_draw_vp {
+    my $self            = shift;
+    my %args            = @_;
+
+    unless ( $self->_open_for_writing( $self->log_id() ) ) {
+        return 0;
+    }
+
+    my $race = $self->race_of_current_user();
+
+    my $vp_draws = $race->vp_draws();
+
+    if ( $vp_draws > 5 ) {
+        $vp_draws = 5;
+    }
+
+    my @all_vp_tokens = $server->vp_bag()->items();
+    shuffle_in_place( \@all_vp_tokens );
+
+    if ( scalar( @all_vp_tokens ) < $vp_draws ) {
+        $vp_draws = scalar( @all_vp_tokens );
+    }
+
+    my $player_vp_tokens = ();
+    for ( 1 .. $vp_draws ) {
+        push( @player_vp_tokens, shift( @all_vp_tokens ) );
+    }
+
+    $self->_raw_add_vp_to_hand( $EV_FROM_INTERFACE, $race->tag, @player_vp_tokens );
+
+    $self->_save_state();
+    $self->_close_all();
+
+    return 1;
+}
+
+#############################################################################
+
+sub action_select_vp_token {
+    my $self            = shift;
+    my %args            = @_;
+
+    unless ( $self->_open_for_writing( $self->log_id() ) ) {
+        return 0;
+    }
+
+    unless ( defined( $args{'token'} ) ) {
+        $self->set_error( 'Missing Token Argument' );
+        return 0;
+    }
+
+    my $new_token = $args{'token'};
+
+    my $race = $self->race_of_current_user();
+
+    unless ( $race->in_hand()->contains( $new_token ) ) {
+        $self->set_error( 'Invalid Token Argument' );
+        return 0;
+    }
+
+    my $old_token = '';
+    if ( defined( $args{'replaces'} ) ) {
+        $old_token = $args{'replaces'};
+        unless ( looks_like_number( $old_token ) ) {
+            $self->set_error( 'May Not Replace Ambassadors' );
+            return 0;
+        }
+    }
+
+    if ( $race->can_add_vp_item( $new_token, $old_token ) ) {
+        $self->set_error( 'Invalid VP Type Count' );
+        return 0;
+    }
+
+    $self->_raw_select_vp_token( $EV_FROM_INTERFACE, $race->tag(), $new_token, $old_token );
+
+    $self->_raw_next_vp_draw_player( $EV_FROM_INTERFACE, $self->current_tile() );
+
+    $self->_save_state();
+    $self->_close_all();
+
+    return 1;
+}
+
+
+#############################################################################
 # general combat methods
+#
+# These should only call from _raw_action wrappers or from each other
 #############################################################################
 
 sub does_roll_hit_ship {
@@ -406,7 +575,10 @@ sub does_roll_hit_ship {
     }
 
     $roll += $attacking_template->total_computer();
-    $roll -= $defending_template->total_shields();
+
+    if ( defined( $defending_template ) ) {
+        $roll -= $defending_template->total_shields();
+    }
 
     if ( $self->subphase() == $SUB_MISSILE ) {
         if ( $defending_template->does_provide( 'tech_missile_shield2') ) {
@@ -429,20 +601,6 @@ sub real_player_in_combat {
     }
 
     return $combat_id_1;
-}
-
-#############################################################################
-
-sub npc_attacks {
-    my $self            = shift;
-
-    # TODO
-
-
-
-
-
-
 }
 
 #############################################################################
@@ -636,15 +794,133 @@ sub start_combat_round {
 
 sub attack_population {
     my $self            = shift;
+    my $tile_tag        = shift;
+
+    $self->set_subphase( $SUB_PLANETARY );
 
 
+    my $tile = $self->tiles()->{ $tile_tag };
 
+    my %all_ship_owners = ();
 
+    foreach my $ship_tag ( $tile->ships()->items() ) {
+        my $ship = $self->ships()->{ $ship_tag };
 
+        if ( $ship->total_beam_attacks() > 0 ) {
+            $all_ship_owners{ $ship->owner_id() } = 1;
+        }
+    }
+
+    my @ship_owners = sort{ $a <=> $b } keys( %all_ship_owners );
+
+    # check for alliances
+
+    if ( $ship_owners[ 0 ] == -1 ) {
+
+        my $total_hits = 0;
+
+        foreach my $ship ( $tile->ships()->items() ) {
+            if ( $ship->owner_id() == -1 ) {
+                my @attacks = $ship->roll_beam_attacks();
+                foreach my $attack ( @attacks ) {
+                    if ( $self->does_roll_hit_ship( $attack->{'roll'}, $ship->template(), undef ) ) {
+                        $total_hits += $attack->{'strength'};
+                    }
+                }
+            }
+        }
+
+        if ( $total_hits > 0 ) {
+            foreach my $slot ( $tile->resource_slots() ) {
+                if ( $total_hits > 0 && $slot->owner_id() > -1 ) {
+                    $total_hits--;
+                    $self->_raw_kill_population_cube( $EV_SUB_ACTION, $tile_tag, $slot->resource_type() );
+                }
+            }
+        }
+
+        shift( @ship_owners );
+    }
+
+    if ( scalar( @ship_owners ) > 0 ) {
+        $tile->attack_population_queue()->add_items( @ship_owners );
+
+        my $next_player = $ship_owners[ 0 ];
+        $self->_raw_set_pending_player( $EV_SUB_ACTION, $next_player );
+
+        my $race = $self->race_of_player_id( $next_player );
+
+        $self->_raw_set_allowed_race_actions( $EV_SUB_ACTION, $race->tag(), 'attack_populace', 'dont_attack_populace' );
+        return;
+    }
+
+    $self->_raw_start_vp_draws( $EV_SUB_ACTION, $tile->tag() );
 
     return;
 }
 
+#############################################################################
+
+sub kill_population {
+    my $self            = shift;
+    my @cubes_to_kill   = @_;
+
+    foreach my $type ( @cubes_to_kill ) {
+        $self->_raw_kill_population_cube( $EV_SUB_ACTION, $self->current_tile(), $type );
+    }
+
+    $self->next_population_attacker();
+
+    return;
+}
+
+#############################################################################
+
+sub kill_population_cube {
+    my $self            = shift;
+    my $tile_tag        = shift;
+    my $type            = shift;
+
+    my $tile = $self->tiles()->{ $tile_tag };
+    my $flag_found_cube = 0;
+
+    $flag_found_cube = ( $tile->remove_cube( $type, 1 ) ); # first we attempt to remove a cube of the advanced type
+
+    unless ( $flag_found_cube ) {
+        $tile->remove_cube( $type, 0 ) ); # next we try a basic cube
+    }
+
+    my $race = $self->race_of_player_id( $tile->owner_id() );
+
+    $race->graveyard()->add_items( $type );
+
+    return;
+}
+
+#############################################################################
+
+sub next_population_attacker {
+    my $self            = shift;
+
+    my $tile = $self->tiles()->{ $self->current_tile() };
+
+    my @pending = $tile->attack_population_queue()->items();
+    shift( @pending );
+    $tile->attack_population_queue()->fill( @pending );
+
+    if ( $tile->attack_population_queue()->count() > 0 ) {
+        $self->_raw_set_pending_player( $pending[ 0 ] );
+
+        my $race = $self->race_of_player_id( $pending[ 0 ] );
+        $self->_raw_set_allowed_race_actions( $EV_SUB_ACTION, $race->tag(), 'attack_populace', 'dont_attack_populace' );
+
+        return;
+    }
+
+    $self->_raw_start_vp_draws( $EV_SUB_ACTION, $tile->tag() );
+
+    return;
+}
 
 #############################################################################
 
@@ -667,19 +943,56 @@ sub end_combat {
 
     # check for population to attack
 
-    if ( $tile->owner_id() > -1 ) {
+    if ( $tile->has_population_cubes() ) {
 
-        # TODO
+        my $tile_race = $self->race_of_player_id( $tile->owner_id() );
 
+        # check for bombs
 
-        $self->attack_population();
+        unless ( $tile_race->does_provide( 'tech_bomb_shield' ) ) {
+            foreach my $ship ( $tile->ships()->items() ) {
+                if ( $ship->owner_id() > -1 && $ship->owner_id() != $tile->owner_id() ) { # need to check for alliances here
+                    if ( $ship->does_provide( 'tech_bombs' ) ) {
+                        $self->bomb_all_cubes( $tile->tag() );
+                        last;
+                    }
+                }
+                elsif ( $ship->owner_id() == -1 ) {
+                    unless ( $tile_race->does_provide( 'spec_descendants' ) ) {
+                        $self->bomb_all_cubes( $tile->tag() );
+                        last;
+                    }
+                }
+            }
+        }
 
+        # did population survive bombs ?
+
+        if ( $tile->has_population_cubes() ) {
+            $self->_raw_attack_population( $EV_SUB_ACTION, $tile->tag() );
+            return;
+        }
 
     }
 
     # no population to attack - we now go to vp draws
 
     $self->_raw_start_vp_draws( $EV_SUB_ACTION, $tile->tag() );
+
+    return;
+}
+
+#############################################################################
+
+sub bomb_all_cubes {
+    my $self            = shift;
+    my $tile_tag        = shift;
+
+    foreach my $slot ( $tile->resource_slots() ) {
+        if ( $slot->owner_id() > -1 ) {
+            $self->_raw_kill_population_cube( $EV_SUB_ACTION, $tile->tag(), $slot->resource_type() );
+        }
+    }
 
     return;
 }

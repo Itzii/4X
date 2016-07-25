@@ -684,7 +684,7 @@ $VAR1 = {
             'STARTING_SHIPS' => [
                 'class_interceptor',
             ],
-            'VP_SLOTS' => {
+            'VP_SLOT_COUNTS' => {
                 'AMBASSADOR' => 0,
                 'ANY' => 4,
                 'BATTLE' => 0,
@@ -733,7 +733,7 @@ $VAR1 = {
             'TECH' => {
                 'NANO' => [ 'tech_advanced_science' ],
             },
-            'VP_SLOTS' => {
+            'VP_SLOT_COUNTS' => {
                 'AMBASSADOR' => 1,
                 'ANY' => 3,
                 'BATTLE' => 0,
@@ -785,7 +785,7 @@ $VAR1 = {
             'STARTING_SHIPS' => [
                 'class_interceptor',
             ],
-            'VP_SLOTS' => {
+            'VP_SLOT_COUNTS' => {
                 'AMBASSADOR' => 1,
                 'ANY' => 3,
                 'BATTLE' => 0,
@@ -812,7 +812,9 @@ $VAR1 = {
                     'COST' => 3,
                 },
             ],
-            'PROVIDES' => 'spec_plants',
+            'PROVIDES' => [
+                'spec_plants',
+            ],
         },
         'race_descendants' => {
             'SOURCE_TAG' => 'src_base',
@@ -830,7 +832,7 @@ $VAR1 = {
                 'SCIENCE' => 4,
                 'MINERALS' => 3,
             },
-            'VP_SLOTS' => {
+            'VP_SLOT_COUNTS' => {
                 'AMBASSADOR' => 0,
                 'ANY' => 4,
                 'BATTLE' => 0,
@@ -857,7 +859,9 @@ $VAR1 = {
                     'COST' => 3,
                 },
             ],
-            'PROVIDES' => 'spec_descendants',
+            'PROVIDES' => [
+                'spec_descendants',
+            ],
         },
         'race_cyborgs' => {
             'SOURCE_TAG' => 'src_base',
@@ -880,7 +884,7 @@ $VAR1 = {
             'TECH' => {
                 'GRID' => [ 'tech_computer2' ],
             },
-            'VP_SLOTS' => {
+            'VP_SLOT_COUNTS' => {
                 'AMBASSADOR' => 0,
                 'ANY' => 4,
                 'BATTLE' => 0,
@@ -933,7 +937,7 @@ $VAR1 = {
             'STARTING_SHIPS' => [
                 'class_cruiser',
             ],
-            'VP_SLOTS' => {
+            'VP_SLOT_COUNTS' => {
                 'AMBASSADOR' => 0,
                 'ANY' => 4,
                 'BATTLE' => 1,
@@ -982,7 +986,7 @@ $VAR1 = {
             'TECH' => {
                 'GRID' => [ 'tech_energy6' ],
             },
-            'VP_SLOTS' => {
+            'VP_SLOT_COUNTS' => {
                 'AMBASSADOR' => 0,
                 'ANY' => 4,
                 'BATTLE' => 0,
@@ -1030,7 +1034,7 @@ $VAR1 = {
             'TECH' => {
                 'GRID' => [ 'tech_energy6' ],
             },
-            'VP_SLOTS' => {
+            'VP_SLOT_COUNTS' => {
                 'AMBASSADOR' => 0,
                 'ANY' => 4,
                 'BATTLE' => 0,
@@ -1084,7 +1088,7 @@ $VAR1 = {
                 'class_interceptor',
                 'class_interceptor',
             ],
-            'VP_SLOTS' => {
+            'VP_SLOT_COUNTS' => {
                 'AMBASSADOR' => 0,
                 'ANY' => 2,
                 'BATTLE' => 3,
@@ -1127,7 +1131,7 @@ $VAR1 = {
             'TECH' => {
                 'GRID' => [ 'tech_energy6' ],
             },
-            'VP_SLOTS' => {
+            'VP_SLOT_COUNTS' => {
                 'AMBASSADOR' => 0,
                 'ANY' => 4,
                 'BATTLE' => 0,
@@ -1181,7 +1185,7 @@ $VAR1 = {
             'TECH' => {
                 'NANO' => [ 'tech_ring' ],
             },
-            'VP_SLOTS' => {
+            'VP_SLOT_COUNTS' => {
                 'AMBASSADOR' => 0,
                 'ANY' => 4,
                 'BATTLE' => 0,
@@ -1230,7 +1234,7 @@ $VAR1 = {
             'TECH' => {
                 'GRID' => [ 'tech_energy6' ],
             },
-            'VP_SLOTS' => {
+            'VP_SLOT_COUNTS' => {
                 'AMBASSADOR' => 0,
                 'ANY' => 4,
                 'BATTLE' => 0,
@@ -1278,7 +1282,7 @@ $VAR1 = {
             'TECH' => {
                 'GRID' => [ 'tech_energy6' ],
             },
-            'VP_SLOTS' => {
+            'VP_SLOT_COUNTS' => {
                 'AMBASSADOR' => 0,
                 'ANY' => 4,
                 'BATTLE' => 0,

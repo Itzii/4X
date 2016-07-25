@@ -16,6 +16,9 @@ our @EXPORT = qw(
     text_from_tech_enum
     enum_from_tech_text
 
+    text_from_vp_enum
+    enum_from_vp_text
+
     $RES_MONEY
     $RES_MINERALS
     $RES_SCIENCE
@@ -31,6 +34,11 @@ our @EXPORT = qw(
     $TECH_WILD
     $TECH_UNKNOWN
 
+    $VP_BATTLE
+    $VP_AMBASSADOR
+    $VP_ANY
+    $VP_COUNT
+    $VP_UNKNOWN
 
 );
 
@@ -53,17 +61,27 @@ our $TECH_NANO          = $i++;
 our $TECH_WILD          = $i++;
 our $TECH_UNKNOWN       = $i++;
 
+$i = 0;
+
+our $VP_BATTLE          = $i++;
+our $VP_AMBASSADOR      = $i++;
+our $VP_ANY             = $i++;
+our $VP_COUNT           = $i++;
+our $VP_UNKNOWN         = $i++;
+
+
 #############################################################################
 
 sub text_from_resource_enum {
     my $enum        = shift;
 
     my %values = (
-        $RES_MONEY      => 'MONEY',
-        $RES_MINERALS   => 'MINERALS',
-        $RES_SCIENCE    => 'SCIENCE',
-        $RES_INFLUENCE  => 'INFLUENCE',
-        $RES_WILD       => 'WILD',
+        $RES_MONEY          => 'MONEY',
+        $RES_MINERALS       => 'MINERALS',
+        $RES_SCIENCE        => 'SCIENCE',
+        $RES_INFLUENCE      => 'INFLUENCE',
+        $RES_WILD           => 'WILD',
+        $RES_SCIENCE_MONEY  => 'SCIENCE_MONEY',
     );
 
     if ( defined( $values{ $enum } ) ) {
@@ -122,6 +140,38 @@ sub enum_from_tech_text {
     }
 
     return $TECH_UNKNOWN;
+}
+
+#############################################################################
+
+sub text_from_vp_enum {
+    my $vp_type         = shift;
+
+    my %values = (
+        $VP_BATTLE          => 'BATTLE',
+        $VP_AMBASSADOR      => 'AMBASSADOR',
+        $VP_ANY             => 'ANY',
+    );
+
+    if ( defined( $values{ $vp_type } ) ) {
+        return $values{ $vp_type };
+    }
+
+    return 'UNKNOWN';
+}
+
+#############################################################################
+
+sub enum_from_vp_text {
+    my $text        = shift;
+
+    foreach my $enum ( 0 .. $VP_COUNT - 1 ) {
+        if ( text_from_vp_enum( $enum ) eq uc( $text ) ) {
+            return $enum;
+        }
+    }
+
+    return $VP_UNKNOWN;
 }
 
 #############################################################################

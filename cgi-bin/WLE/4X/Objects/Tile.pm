@@ -54,7 +54,8 @@ sub _init {
 
     $self->{'SHIPS'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
     $self->{'USER_ENTRY_QUEUE'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
-    $self->{'VP_DRAW_QUEUE'} = [];
+    $self->{'VP_DRAW_QUEUE'} = WLE::Objects::Stack->new();
+    $self->{'ATTACK_POPULATION_QUEUE'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
 
     $self->{'RESOURCE_SLOTS'} = [];
 
@@ -228,6 +229,20 @@ sub ships {
 
 #############################################################################
 
+sub ship_owners {
+    my $self        = shift;
+
+    my %ship_owners = ();
+
+    foreach my $ship ( $self->ships()->items() ) {
+        $ship_owners{ $ship->owner_id() } = 1;
+    }
+
+    return keys( %ship_owners );
+}
+
+#############################################################################
+
 sub has_ancient_cruiser { # used for descendant race
     my $self        = shift;
 
@@ -356,7 +371,7 @@ sub enemy_ship_count {
 sub vp_draw_queue {
     my $self        = shift;
 
-    return @{ $self->{'VP_DRAW_QUEUE'} };
+    return $self->{'VP_DRAW_QUEUE'};
 }
 
 #############################################################################
@@ -365,9 +380,17 @@ sub set_vp_draw_queue {
     my $self        = shift;
     my @values      = @_;
 
-    $self->{'VP_DRAW_QUEUE'} = \@values;
+    $self->vp_draw_queue()->fill( @values );
 
-    return;    
+    return;
+}
+
+#############################################################################
+
+sub attack_population_queue {
+    my $self        = shift;
+
+    return $self->{'ATTACK_POPULATION_QUEUE'}->items();
 }
 
 #############################################################################
@@ -464,6 +487,28 @@ sub add_starting_ships {
 
 #############################################################################
 
+sub resource_slots {
+    my $self            = shift;
+
+    return @{ $self->{'RESOURCE_SLOTS'} };
+}
+
+#############################################################################
+
+sub has_population_cubes {
+    my $self            = shift;
+
+    foreach my $slot ( $self->resource_slots() ) {
+        if ( $slot->owner_id() > -1 ) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+#############################################################################
+
 sub available_resource_spots {
     my $self            = shift;
     my $res_type        = shift;
@@ -471,7 +516,7 @@ sub available_resource_spots {
 
     my $count = 0;
 
-    foreach my $slot ( @{ $self->{'RESOURCE_SLOTS'} } ) {
+    foreach my $slot ( $self->resource_slots() ) {
         unless ( $slot->resource_type() == $res_type ) {
             next;
         }
@@ -500,7 +545,7 @@ sub add_cube {
 
     my $type_text = WLE::4X::Enums::Basic::text_from_resource_enum( $type_enum );
 
-    foreach my $slot ( @{ $self->{'RESOURCE_SLOTS'} } ) {
+    foreach my $slot ( $self->resource_slots() ) {
         unless ( $slot->resource_type() == $type_enum ) {
             next;
         }
@@ -529,9 +574,7 @@ sub remove_cube {
     my $type_enum       = shift;
     my $flag_advanced   = shift;
 
-    my $type_text = WLE::4X::Enums::Basic::text_from_resource_enum( $type_enum );
-
-    foreach my $slot ( @{ $self->{'RESOURCE_SLOTS'} } ) {
+    foreach my $slot ( $self->resource_slots() ) {
         unless ( $slot->resource_type() == $type_enum ) {
             next;
         }
@@ -559,7 +602,7 @@ sub remove_all_cubes_of_owner {
 
     my @cubes = ();
 
-    foreach my $slot ( @{ $self->{'RESOURCE_SLOTS'} } ) {
+    foreach my $slot ( $self->resource_slots() ) {
         if ( $slot->owner_id() == $owner_id ) {
             $slot->set_owner_id( -1 );
             push( @cubes, $slot->resource_type() );
@@ -752,14 +795,14 @@ sub from_hash {
     }
 
     if ( defined( $r_hash->{'SHIPS'} ) ) {
-        $self->ships()->add_items( @{ $r_hash->{'SHIPS'} } );
+        $self->ships()->fill( @{ $r_hash->{'SHIPS'} } );
     }
     if ( defined( $r_hash->{'OWNER_QUEUE'} ) ) {
-        $self->owner_queue()->add_items( @{ $r_hash->{'OWNER_QUEUE'} } );
+        $self->owner_queue()->fill( @{ $r_hash->{'OWNER_QUEUE'} } );
     }
 
     if ( defined( $r_hash->{'VP_DRAW_QUEUE'} ) ) {
-        $self->{'VP_DRAW_QUEUE'} = [ @{ $r_hash->{'VP_DRAW_QUEUE'} } ];
+        $self->vp_draw_queue()->fill( @{ $r_hash->{'VP_DRAW_QUEUE'} } );
     }
 
     return 1;
@@ -787,7 +830,7 @@ sub to_hash {
 
     $r_hash->{'SHIPS'} = [ $self->ships()->items() ];
     $r_hash->{'OWNER_QUEUE'} = [ $self->owner_queue()->items() ];
-    $r_hash->{'VP_DRAW_QUEUE'} = [ @{ $self->{'VP_DRAW_QUEUE'} } ];
+    $r_hash->{'VP_DRAW_QUEUE'} = [ $self->vp_draw_queue()->items() ];
 
     $r_hash->{'STARTING_SHIPS'} = $self->{'STARTING_SHIPS'};
 
@@ -795,7 +838,7 @@ sub to_hash {
 
     my @resource_slots = ();
 
-    foreach my $slot ( @{ $self->{'RESOURCE_SLOTS'} } ) {
+    foreach my $slot ( $self->resource_slots() ) {
         my %slot_hash = ();
         $slot->to_hash( \%slot_hash );
         push( @resource_slots, \%slot_hash );

@@ -92,7 +92,6 @@ sub _init {
 
     $self->{'SETTINGS'}->{'LOG_ID'} = '';
     $self->{'SETTINGS'}->{'OWNER_ID'} = 0;
-    $self->{'SETTINGS'}->{'SHIP_INDEX'} = 1;
 
     $self->{'SETTINGS'}->{'SOURCE_TAGS'} = [];
     $self->{'SETTINGS'}->{'OPTION_TAGS'} = [];
@@ -103,6 +102,8 @@ sub _init {
     $self->{'SETTINGS'}->{'PLAYERS_PENDING'} = [];
     $self->{'SETTINGS'}->{'PLAYERS_DONE'} = [];
     $self->{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} = [];
+
+    $self->{'SETTINGS'}->{'CURRENT_TRAITOR'} = '';
 
     $self->{'RACES'} = {};
     $self->{'SHIP_TEMPLATES'} = {};
@@ -214,7 +215,11 @@ sub do {
         'allocate_hits'     => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_COMBAT, 'method' => \&action_allocate_hits },
         'allocate_defense_hits' => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_COMBAT, 'method' => \&action_allocate_defense_hits },
         'acknowledge_hits'  => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_COMBAT, 'method' => \&action_acknowledge_hits },
+        'attack_populace'   => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_COMBAT, 'method' => \&action_attack_populace },
+        'apply_population_hits' => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_COMBAT, 'method' => \&action_apply_population_hits },
+        'dont_attack_populace' => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_COMBAT, 'method' => \&action_dont_attack_populace },
         'draw_vp'           => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_COMBAT, 'method' => \&action_draw_vp },
+        'select_vp_token'   => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_COMBAT, 'method' => \&action_select_vp_token },
 
 
         'use_colony_ship'   => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'flag_ignore_allowed' => 1, 'method' => \&action_use_colony_ship },
@@ -644,6 +649,25 @@ sub long_name {
     my $self        = shift;
 
     return $self->{'SETTINGS'}->{'LONG_NAME'};
+}
+
+#############################################################################
+
+sub current_traitor {
+    my $self        = shift;
+
+    return $self->{'SETTINGS'}->{'CURRENT_TRAITOR'};
+}
+
+#############################################################################
+
+sub set_current_traitor {
+    my $self        = shift;
+    my $value       = shift;
+
+    $self->{'SETTINGS'}->{'CURRENT_TRAITOR'} = $value;
+
+    return;
 }
 
 #############################################################################

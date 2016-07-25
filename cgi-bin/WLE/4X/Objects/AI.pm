@@ -47,93 +47,193 @@ sub ai_descision_allocate_hits {
     my @ships_not_destroyed = @ships_sized;
     my %damage_to_ships = ();
 
-    # distribute damage to destroy the biggest first if possible
+    # try killing any ships with single hits
 
-    while ( scalar( @parsed_hits ) > 0 && scalar( @ships_not_destroyed ) > 0 ) {
-        my $target_ship = $ships_not_destroyed[ 0 ];
+    my @remaining_ships = ();
 
-        my $to_kill = $target_ship->hits_to_kill();
+    foreach my $target_ship ( @ships_not_destroyed ) {
+        my ( $flag_killed, @parsed_hits ) = $self->_ai_try_killing_ship_with_single_hit(
+            $target_ship,
+            $attacking_template,
+            \%damage_to_ships,
+            @parsed_hits,
+        );
 
-        foreach my $hit ( @parsed_hits ) {
-
+        unless ( $flag_killed ) {
+            push( @remaining_ships, $target_ship );
         }
-
-
-
     }
 
+    @ships_not_destroyed = @remaining_ships;
 
+    if ( scalar( @parsed_hits ) == 0 ) {
+        return $self->_ai_formatted_hits( %damage_to_ships );
+    }
+    elsif ( scalar( @ships_not_destroyed ) > 0 ) {
+        # now see if we can kill any ship with multiple hits
 
+        foreach my $target_ship ( @ships_not_destroyed ) {
+            my ( $flag_killed, @parsed_hits ) = $self->_ai_try_killing_ship_with_multiple_hits(
+                $target_ship,
+                $attacking_template,
+                \%damage_to_ships,
+                @parsed_hits,
+            );
 
-
-
-
-
-
-
-}
-
-#############################################################################
-
-sub _ai_can_we_destroy_ship {
-    my $self                = shift;
-    my $defender_ship       = shift;
-    my $attacker_template   = shift;
-    my @rolls               = @_;
-
-    my $hits_to_kill = $defender_ship->hits_to_kill();
-    my @hits_used = ();
-
-    # check to see if we can destroy it in one hit
-
-    @rolls = reverse( @rolls );
-    foreach my $hit ( @rolls ) {
-        if ( $self->does_roll_hit_ship( $hit->{'roll'}, $attacker_template, $defender_ship->template() ) ) {
-            if ( $hit->{'strength'} >= $hits_to_kill ) {
-                push( @hits_used, $hit );
-                return @hits_used;
+            unless ( $flag_killed ) {
+                push( @remaining_ships, $target_ship );
             }
         }
     }
 
-    # it'll take more than one
-    @rolls = reverse( @rolls )
+    if ( scalar( @parsed_hits ) == 0 ) {
+        return $self->_ai_formatted_hits( %damage_to_ships );
+    }
+    else {
+        # allocate remaining damage to the largest ship
+        my $biggest_ship_tag = $ships_sized[ 0 ];
+        foreach my $hit ( @parsed_hits ) {
+            if ( defined( $damage_to_ships{ $biggest_ship_tag } ) ) {
+                push( @{ $damage_to_ships{ $biggest_ship_tag } }, $hit->{'strength'} . ':' . $HIT->{'roll'} );
+            }
+                else {
+                $damage_to_ships{ $biggest_ship_tag } = [ $hit->{'strength'} . ':' . $hit->{'roll'} ];
+            }
+        }
+    }
 
-
-
-
+    return $self->_ai_formatted_hits( %damage_to_ships );
 }
 
 #############################################################################
 
-sub _ai_hits_to_total {
-    my $self            = shift;
-    my $needed_total    = shift;
-    my $min_roll        = shift;
-    my @parsed_hits     = @_;
+sub _ai_try_killing_ship_with_single_hit {
+    my $self                = shift;
+    my $defender_ship       = shift;
+    my $attacker_template   = shift;
+    my $r_damage_to_ships   = shift;
+    my @rolls               = shift;
 
-    my $actual_total = 0;
+    my $hit_to_ship = $self->_ai_smallest_to_destroy( $defender_ship, $attacker_template, 1, @rolls );
 
-    foreach my $hit ( @parsed_hits ) {
-        if ( $hit->{'roll'} >= $min_roll ) {
-            $actual_total += $hit->{'strength'};
+    my @remaining_hits = ();
+
+    unless ( defined( $hit_to_ship ) ) {
+        return ( 0, @remaining_hits );
+    }
+
+    $r_damage_to_ships->{ $defender_ship->tag() } = [ $hit_to_ship->{'strength'} . ':' . $hit_to_ship->{'roll'} ];
+    foreach my $hit ( @rolls ) {
+        unless ( $hit == $hit_to_ship ) {
+            push( @remaining_hits, $hit );
         }
     }
 
-    if ( $actual_total < $needed_total ) {
-        return ();
-    }
-
-
-
-
+    return ( 1, @remaining_hits );
 }
 
+#############################################################################
 
+sub _ai_try_killing_ship_with_multiple_hits {
+    my $self                = shift;
+    my $defender_ship       = shift;
+    my $attacker_template   = shift;
+    my $r_damage_to_ships   = shift;
+    my @rolls               = shift;
 
+    my @usable_hits = ();
 
+    foreach my $hit ( @rolls ) {
+        if ( $self->does_roll_hit_ship( $hit->{'roll'}, $attacker_template, $defender_ship->template() ) ) {
+            push( @usable_hits, $hit );
+        }
+    }
 
+    @usable_hits = sort { $b->{'strength'} <=> $a->{'strength'} } @usable_hits;
 
+    my $hits_to_kill = $defender_ship->hits_to_kill();
+
+    my @applied_hits = ();
+    my $total_damage = 0;
+
+    do {
+        push( @applied_hits, shift( @usable_hits ) );
+        $total_damage += $applied_hits[ -1 ];
+
+        if ( $total_damage < $hits_to_kill ) {
+            foreach my $hit ( reverse( @usable_hits ) ) {
+                if ( $total_damage + $hit->{'strength'} >= $hits_to_kill ) {
+                    push( @applied_hits, $hit );
+                    last;
+                }
+            }
+        }
+
+    } until ( $total_damage >= $hits_to_kill || scalar( @usable_hits ) == 0 );
+
+    foreach my $hit ( @applied_hits ) {
+        if ( defined( $r_damage_to_ships->{ $defender_ship->tag() } ) ) {
+            push( @{ $r_damage_to_ships->{ $defender_ship->tag() } }, $hit->{'strength'} . ':' . $hit->{'roll'} );
+        }
+        else {
+            $r_damage_to_ships->{ $defender_ship->tag() } = [ $hit->{'strength'} . ':' . $hit->{'roll'} ];
+        }
+    }
+
+    my @remaining_hits = ();
+    foreach my $hit ( @rolls ) {
+        unless ( matches_any( $hit, @applied_hits ) ) {
+            push( @remaining_hits, $hit );
+        }
+    }
+
+    return ( ( $total_damage >= $hits_to_kill ) ? 1 : 0, @remaining_hits );
+}
+
+#############################################################################
+
+sub _ai_smallest_to_destroy {
+    my $self                = shift;
+    my $defender_ship       = shift;
+    my $attacker_template   = shift;
+    my $flag_kill_only      = shift;
+    my @rolls               = shift;
+
+    @rolls = sort { $a->{'strength'} <=> $b->{'strength'} } @rolls;
+
+    my $hits_to_kill = $defender_ship->hits_to_kill();
+
+    foreach my $hit ( @rolls ) {
+        if ( $self->does_roll_hit_ship( $hit->{'roll'}, $attacker_template, $defender_ship->template() ) ) {
+            if ( $hit->{'strength'} >= $hits_to_kill ) {
+                return $hit;
+            }
+        }
+    }
+
+    if ( $flag_kill_only ) {
+        return undef;
+    }
+
+    return $rolls[ -1 ];
+}
+
+#############################################################################
+
+sub _ai_formatted_hits {
+    my $self            = shift;
+    my %damage_to_ships = @_;
+
+    my @hits = ();
+
+    foreach my $ship_tag ( keys( %damage_to_ships ) ) {
+        foreach my $hit_on_ship ( @{ $damage_to_ships{ $ship_tag } } ) {
+            push( @hits, $ship_tag . ':' . $hit_on_ship );
+        }
+    }
+
+    return @hits;
+}
 
 #############################################################################
 

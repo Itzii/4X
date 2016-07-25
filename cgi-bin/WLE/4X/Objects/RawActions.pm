@@ -708,7 +708,7 @@ sub _raw_start_combat_phase {
     }
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return 'beginning combat phase';_raw_begin_combat_in_tile
+        return 'beginning combat phase';
     }
 
     my $outermost_combat_tile = $self->board()->outermost_combat_tile();
@@ -827,8 +827,7 @@ sub _raw_destroy_ship {
 #############################################################################
 
 sub _raw_allocate_hits {
-    my $self        = shift;    $tile->set_vp_draw_queue( $tile->owner_queue()->items() );
-
+    my $self        = shift;    
     my $source      = shift;
     my @args        = @_;
 

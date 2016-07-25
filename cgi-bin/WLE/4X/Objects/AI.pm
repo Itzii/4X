@@ -75,6 +75,37 @@ sub ai_descision_allocate_hits {
 
 #############################################################################
 
+sub _ai_can_we_destroy_ship {
+    my $self                = shift;
+    my $defender_ship       = shift;
+    my $attacker_template   = shift;
+    my @rolls               = @_;
+
+    my $hits_to_kill = $defender_ship->hits_to_kill();
+    my @hits_used = ();
+
+    # check to see if we can destroy it in one hit
+
+    @rolls = reverse( @rolls );
+    foreach my $hit ( @rolls ) {
+        if ( $self->does_roll_hit_ship( $hit->{'roll'}, $attacker_template, $defender_ship->template() ) ) {
+            if ( $hit->{'strength'} >= $hits_to_kill ) {
+                push( @hits_used, $hit );
+                return @hits_used;
+            }
+        }
+    }
+
+    # it'll take more than one
+    @rolls = reverse( @rolls )
+
+
+
+
+}
+
+#############################################################################
+
 sub _ai_hits_to_total {
     my $self            = shift;
     my $needed_total    = shift;
@@ -93,7 +124,7 @@ sub _ai_hits_to_total {
         return ();
     }
 
-    
+
 
 
 }

@@ -93,12 +93,12 @@ sub _init {
     $self->{'SETTINGS'}->{'LOG_ID'} = '';
     $self->{'SETTINGS'}->{'OWNER_ID'} = 0;
 
-    $self->{'SETTINGS'}->{'SOURCE_TAGS'} = [];
-    $self->{'SETTINGS'}->{'OPTION_TAGS'} = [];
+    $self->{'SETTINGS'}->{'SOURCE_TAGS'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
+    $self->{'SETTINGS'}->{'OPTION_TAGS'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
 
     $self->{'SETTINGS'}->{'LONG_NAME'} = '';
 
-    $self->{'SETTINGS'}->{'PLAYER_IDS'} = [];
+    $self->{'SETTINGS'}->{'PLAYER_IDS'} = WLE::Objects::Stack->new();
     $self->{'SETTINGS'}->{'PLAYERS_PENDING'} = [];
     $self->{'SETTINGS'}->{'PLAYERS_DONE'} = [];
     $self->{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} = [];
@@ -161,7 +161,7 @@ sub do {
 
     $self->{'ENV'}->{'CURRENT_USER'} = -1;
     my $user_id = 0;
-    foreach my $player_id ( $self->player_ids() ) {
+    foreach my $player_id ( $self->player_ids()->items() ) {
         if ( $args{'user'} eq $player_id ) {
             $self->{'ENV'}->{'CURRENT_USER'} = $user_id;
         }
@@ -306,7 +306,15 @@ sub has_option {
         return 1;
     }
 
-    return matches_any( $option, @{ $self->{'SETTINGS'}->{'OPTION_TAGS'} } );
+    return $self->option_tags()->contains( $option );
+}
+
+#############################################################################
+
+sub source_tags {
+    my $self        = shift;
+
+    return $self->{'SETTINGS'}->{'SOURCE_TAGS'};
 }
 
 #############################################################################
@@ -319,15 +327,7 @@ sub has_source {
         return 1;
     }
 
-    return matches_any( $source, @{ $self->{'SETTINGS'}->{'SOURCE_TAGS'} } );
-}
-
-#############################################################################
-
-sub source_tags {
-    my $self        = shift;
-
-    return @{ $self->{'SETTINGS'}->{'SOURCE_TAGS'} };
+    return $self->source_tags()->contains( $source );
 }
 
 #############################################################################
@@ -335,7 +335,7 @@ sub source_tags {
 sub option_tags {
     my $self        = shift;
 
-    return @{ $self->{'SETTINGS'}->{'OPTION_TAGS'} };
+    return $self->{'SETTINGS'}->{'OPTION_TAGS'};
 }
 
 #############################################################################
@@ -344,13 +344,11 @@ sub item_is_allowed_in_game {
     my $self        = shift;
     my $element     = shift;
 
-    if ( matches_any( $element->source_tag(), $self->source_tags() ) ) {
-        if (
-            $element->required_option() eq ''
-            || matches_any( $element->required_option(), $self->option_tags() )
-        ) {
-            return 1;
-        }
+    if (
+        $self->source_tags()->contains( $element->source_tag() )
+        && $self->option_tags()->contains( $element->required_option() )
+    ) {
+        return 1;
     }
 
     return 0;
@@ -361,7 +359,7 @@ sub item_is_allowed_in_game {
 sub player_ids {
     my $self        = shift;
 
-    return @{ $self->{'SETTINGS'}->{'PLAYER_IDS'} };
+    return $self->{'SETTINGS'}->{'PLAYER_IDS'};
 }
 
 #############################################################################
@@ -424,22 +422,7 @@ sub action_status {
     my %args        = @_;
 
     my $r_data = $args{'__data'};
-
-    my $player_id = -1;
-
-    if ( $self->{'STATE'}->{'PLAYER'} > -1 ) {
-        $player_id = $self->{'SETTINGS'}->{'PLAYER_IDS'}->[ $self->{'STATE'}->{'PLAYER'} ];
-    }
-
-    $$r_data = sprintf(
-        '%i:%i:%i:%i:%i:%s',
-        $self->{'STATE'}->{'STATE'},
-        $self->{'STATE'}->{'ROUND'},
-        $self->{'STATE'}->{'PHASE'},
-        $player_id,
-        $self->{'STATE'}->{'SUBPHASE'},
-        $self->{'STATE'}->{'TILE'},
-    );
+    $$r_data = $self->outsite_status()
 
     return 1;
 }
@@ -475,6 +458,28 @@ sub action_exchange {
     $self->_close_all();
 
     return 1;
+}
+
+#############################################################################
+
+sub outside_status {
+    my $self        = shift;
+
+    my $player_id = -1;
+
+    if ( $self->waiting_on_player_id() > -1 ) {
+        $player_id = ($self->player_ids()->items())[ $self->waiting_on_player_id() ]
+    }
+
+    return sprintf(
+        '%i:%i:%i:%i:%i:%s',
+        $self->state(),
+        $self->round(),
+        $self->phase(),
+        $player_id,
+        $self->subphase(),
+        $self->current_tile(),
+    );
 }
 
 #############################################################################
@@ -704,6 +709,19 @@ sub tiles {
 
 #############################################################################
 
+sub tile_stack_limit {
+    my $self        = shift;
+    my $stack_tag   = shift;
+
+    if ( defined( $self->{'SETTINGS'}->{'TILE_STACK_LIMIT_' . $stack_tag } ) ) {
+        return $self->{'SETTINGS'}->{'TILE_STACK_LIMIT_' . $stack_tag };
+    }
+
+    return -1;
+}
+
+#############################################################################
+
 sub races {
     my $self        = shift;
 
@@ -773,6 +791,44 @@ sub technology {
 
 #############################################################################
 
+sub start_tech_count {
+    my $self        = shift;
+
+    return $self->{'START_TECH_COUNT'};
+}
+
+#############################################################################
+
+sub set_start_tech_count {
+    my $self        = shift;
+    my $value       = shift;
+
+    $self->{'START_TECH_COUNT'} = $value;
+
+    return;
+}
+
+#############################################################################
+
+sub tech_draw_count {
+    my $self        = shift;
+
+    return $self->{'TECH_DRAW_COUNT'}
+}
+
+#############################################################################
+
+sub set_tech_draw_count {
+    my $self        = shift;
+    my $value       = shift;
+
+    $self->{'TECH_DRAW_COUNT'} = $value;
+
+    return;
+}
+
+#############################################################################
+
 sub discoveries {
     my $self        = shift;
 
@@ -793,6 +849,18 @@ sub developments {
     my $self        = shift;
 
     return $self->{'DEVELOPMENTS'};
+}
+
+#############################################################################
+
+sub development_limit {
+    my $self        = shift;
+
+    if ( defined( $self->{'SETTINGS'}->{'DEVELOPMENT_LIMIT'} ) ) {
+        return $self->{'SETTINGS'}->{'DEVELOPMENT_LIMIT'};
+    }
+
+    return -1;
 }
 
 #############################################################################
@@ -836,6 +904,14 @@ sub set_missile_defense_hits {
     $self->{'MISSILE_DEFENSE_HITS'} = $value;
 
     return;
+}
+
+#############################################################################
+
+sub starting_locations {
+    my $self        = shift;
+
+    return @{ $self->{'STARTING_LOCATIONS'} };
 }
 
 #############################################################################

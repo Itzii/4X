@@ -119,7 +119,8 @@ sub _raw_create_game {
     $self->{'SETTINGS'}->{'LONG_NAME'} = $long_name;
     $self->{'SETTINGS'}->{'SOURCE_TAGS'} = [ @{ $r_source_tags } ];
     $self->{'SETTINGS'}->{'OPTION_TAGS'} = [ @{ $r_option_tags } ];
-    $self->{'SETTINGS'}->{'PLAYER_IDS'} = [ $owner_id ];
+
+    $self->player_ids()->fill( $owner_id );
 
     return;
 }
@@ -139,11 +140,12 @@ sub _raw_set_status {
 
     my @values = split( /:/, $status );
 
-    $self->{'STATE'}->{'STATE'} = $values[ 0 ];
-    $self->{'STATE'}->{'ROUND'} = $values[ 1 ];
-    $self->{'STATE'}->{'PHASE'} = $values[ 2 ];
-    $self->{'STATE'}->{'PLAYER'} = $values[ 3 ];
-    $self->{'STATE'}->{'SUBPHASE'} = $values[ 4 ];
+    $self->set_state( $values[ 0 ] );
+    $self->set_round( $values[ 1 ] );
+    $self->set_phase( $values[ 2 ] );
+    $self->set_waiting_on_player_id( $values[ 3 ] );
+    $self->set_subphase( $values[ 4 ] );
+    $self->set_current_tile( $values[ 5 ] );
 
     return;
 }
@@ -192,8 +194,7 @@ sub _raw_add_source {
         return 'added source: ' . $tag;
     }
 
-
-    push( @{ $self->{'SETTINGS'}->{'SOURCE_TAGS'} }, $tag );
+    $self->source_tags()->add_items( $tag );
 
     return;
 }
@@ -216,14 +217,7 @@ sub _raw_remove_source {
         return 'source removed: ' . $tag;
     }
 
-    my @current_tags = $self->source_tags();
-    $self->{'SETTINGS'}->{'SOURCE_TAGS'} = [];
-
-    foreach my $t ( @current_tags ) {
-        unless ( $t eq $tag ) {
-            push( @{ $self->{'SETTINGS'}->{'SOURCE_TAGS'} }, $t );
-        }
-    }
+    $self->source_tags()->remove_item( $tag );
 
     return;
 }
@@ -245,7 +239,7 @@ sub _raw_add_option {
         return 'added option: ' . $tag;
     }
 
-    push( @{ $self->{'SETTINGS'}->{'OPTION_TAGS'} }, $tag );
+    $self->option_tags()->add_items( $tag );
 
     return;
 }
@@ -267,14 +261,7 @@ sub _raw_remove_option {
         return 'option removed: ' . $tag;
     }
 
-    my @current_tags = $self->source_tags();
-    $self->{'SETTINGS'}->{'OPTION_TAGS'} = [];
-
-    foreach my $t ( @current_tags ) {
-        unless ( $t eq $tag ) {
-            push( @{ $self->{'SETTINGS'}->{'OPTION_TAGS'} }, $t );
-        }
-    }
+    $self->option_tags()->remove_item( $tag );
 
     return;
 }
@@ -320,14 +307,7 @@ sub _raw_remove_player {
         return 'player removed: ' . $player_id;
     }
 
-    my @current_ids = $self->player_ids();
-    $self->{'SETTINGS'}->{'PLAYER_IDS'} = [];
-
-    foreach my $id ( @current_ids ) {
-        unless ( $id == $player_id ) {
-            push( @{ $self->{'SETTINGS'}->{'PLAYER_IDS'} }, $id );
-        }
-    }
+    $self->player_ids()->remove_item( $id );
 
     return;
 }
@@ -375,24 +355,24 @@ sub _raw_begin {
         return 0;
     }
 
-    my $settings = $VAR1->{'PLAYER_COUNT_SETTINGS'}->{ scalar( $self->player_ids() ) };
+    my $settings = $VAR1->{'PLAYER_COUNT_SETTINGS'}->{ $self->player_ids()->count() };
 
     unless ( defined( $settings ) ) {
-        $self->set_error( 'Invalid Player Count: ' . scalar( $self->player_ids() ) );
+        $self->set_error( 'Invalid Player Count: ' . $self->player_ids()->count() );
         # print STDERR $self->{'LAST_ERROR'};
         return 0;
     }
 
-    unless ( $self->has_source( $settings->{'SOURCE_TAG'} ) ) {
-        $self->set_error( 'Invalid player count for chosen sources: ' . scalar( $self->player_ids() ) );
+    unless ( $self->source_tags()->contains( $settings->{'SOURCE_TAG'} ) ) {
+        $self->set_error( 'Invalid player count for chosen sources: ' . $self->player_ids()->count() );
         # print STDERR $self->{'LAST_ERROR'};
         return 0;
     }
 
-    $self->{'TECH_DRAW_COUNT'} = $settings->{'ROUND_TECH_COUNT'};
-    $self->{'START_TECH_COUNT'} = $settings->{'START_TECH_COUNT'};
+    $self->set_tech_draw_count( $settings->{'ROUND_TECH_COUNT'} );
+    $self->set_start_tech_count( $settings->{'START_TECH_COUNT'} );
 
-    if ( $self->has_option( 'ancient_homeworlds') ) {
+    if ( $self->option_tags()->contains( 'ancient_homeworlds') ) {
         $self->{'STARTING_LOCATIONS'} = $settings->{'POSITIONS_W_NPC'};
     }
     else {

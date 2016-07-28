@@ -84,7 +84,7 @@ sub action_add_source {
         return 0;
     }
 
-    if ( matches_any( $args{'source_tag'}, $self->source_tags() ) ) {
+    if ( $self->source_tags()->contains( $args{'source_tag'} ) ) {
         $self->set_error( 'Source Tag Already Exists' );
         return 0;
     }
@@ -123,7 +123,7 @@ sub action_remove_source {
         return 0;
     }
 
-    unless ( matches_any( $args{'tag'}, $self->source_tags() ) ) {
+    unless ( $self->source_tags()->contains( $args{'tag'} ) ) {
         $self->set_error( 'Source Tag Doesn\'t Exist' );
         return 0;
     }
@@ -163,7 +163,7 @@ sub action_add_option {
         return 0;
     }
 
-    if ( matches_any( $args{'option_tag'}, $self->option_tags() ) ) {
+    if ( $self->option_tags()->contains( $args{'option_tag'} ) ) {
         $self->set_error( 'Option Tag Already Exists' );
         return 0;
     }
@@ -208,7 +208,7 @@ sub action_remove_option {
         return 0;
     }
 
-    unless ( matches_any( $args{'tag'}, $self->option_tags() ) ) {
+    unless ( $self->option_tags()->contains( $args{'tag'} ) ) {
         $self->set_error( 'Option Tag Doesn\'t Exist' );
         return 0;
     }
@@ -247,7 +247,7 @@ sub action_add_player {
         return 0;
     }
 
-    if ( matches_any( $args{'player_id'}, $self->player_ids() ) ) {
+    if ( $self->player_ids()->contains( $args{'player_id'} ) ) {
         $self->set_error( 'Player ID Already Exists' );
         return 0;
     }
@@ -286,7 +286,7 @@ sub action_remove_player {
         return 0;
     }
 
-    unless ( matches_any( $args{'player_id'}, $self->player_ids() ) ) {
+    unless ( $self->player_ids()->contains( $args{'player_id'} ) ) {
         $self->set_error( 'Player ID Doesn\'t Exist' );
         return 0;
     }
@@ -316,7 +316,7 @@ sub action_begin {
 
     # randomize player order
 
-    my @new_player_order = ( 0 .. scalar( $self->player_ids() ) - 1 );
+    my @new_player_order = ( 0 .. $self->player_ids()->count() - 1 );
     WLE::Methods::Simple::shuffle_in_place( \@new_player_order );
 
     $self->_raw_set_player_order( $EV_FROM_INTERFACE, @new_player_order );
@@ -330,9 +330,9 @@ sub action_begin {
 
         shuffle_in_place( \@stack );
 
-        my $stack_limit = $self->{'SETTINGS'}->{'TILE_STACK_LIMIT_' . $stack_tag };
+        my $stack_limit = $self->tile_stack_limit( $stack_tag );
 
-        if ( defined( $stack_limit ) ) {
+        if ( $stack_limit > -1 ) {
             while ( scalar( @stack ) > $stack_limit ) {
                 shift( @stack );
             }
@@ -361,12 +361,12 @@ sub action_begin {
 
     # draw random developments
 
-    my @developments = keys( %{ $self->{'DEVELOPMENTS'} } );
+    my @developments = keys( %{ $self->developments() } );
 
     WLE::Methods::Simple::shuffle_in_place( \@developments );
 
-    if ( $self->{'SETTINGS'}->{'DEVELOPMENT_LIMIT'} > -1 ) {
-        while ( scalar( @developments ) > $self->{'SETTINGS'}->{'DEVELOPMENT_LIMIT'} ) {
+    if ( $self->development_limit() > -1 ) {
+        while ( scalar( @developments ) > $self->development_limit() ) {
             shift( @developments );
         }
     }
@@ -377,7 +377,7 @@ sub action_begin {
 
     my @available_tech = ();
 
-    foreach ( 1 .. $self->{'START_TECH_COUNT'} ) {
+    foreach ( 1 .. $self->start_tech_count() ) {
         my $tech = $self->tech_bag()->select_random_item();
         $self->_raw_remove_from_tech_bag( $EV_FROM_INTERFACE, $tech );
         $self->_raw_add_to_available_tech( $EV_FROM_INTERFACE, $tech );
@@ -434,7 +434,7 @@ sub action_select_race_and_location {
     my $valid_location = 0;
     my $location_warps = undef;
 
-    foreach my $location ( @{ $self->{'STARTING_LOCATIONS'} } ) {
+    foreach my $location ( $self->starting_locations() ) {
         my ( $x, $y ) = split( ',', $location->{'SPACE'} );
 
         if ( $args{'location_x'} == $x && $args{'location_y'} == $y ) {
@@ -500,7 +500,7 @@ sub _prepare_for_first_round {
 
         # place ancient homeworld tiles
 
-        foreach my $location ( @{ $self->{'STARTING_LOCATIONS'} } ) {
+        foreach my $location ( $self->starting_locations() ) {
             if ( defined( $location->{'NPC'} ) ) {
                 my ( $x, $y ) = split( ',', $location->{'SPACE'} );
                 my $location_warps = $location->{'WARPS'};
@@ -517,7 +517,7 @@ sub _prepare_for_first_round {
         }
     }
 
-    $self->{'STATE'}->{'STATE'} = $ST_NORMAL;
+    $self->set_state( $ST_NORMAL );
 
     $self->_raw_set_status( $EV_FROM_INTERFACE, $self->status() );
 

@@ -19,6 +19,9 @@ our @EXPORT = qw(
     text_from_vp_enum
     enum_from_vp_text
 
+    text_from_action_enum
+    enum_from_action_text
+
     $RES_MONEY
     $RES_MINERALS
     $RES_SCIENCE
@@ -39,6 +42,17 @@ our @EXPORT = qw(
     $VP_ANY
     $VP_COUNT
     $VP_UNKNOWN
+
+    $ACT_EXPLORE
+    $ACT_INFLUENCE
+    $ACT_INFLUENCE_COLONY
+    $ACT_RESEARCH
+    $ACT_UPGRADE
+    $ACT_BUILD
+    $ACT_MOVE
+    $ACT_PASS
+    $ACT_COUNT
+    $ACT_UNKNOWN
 
 );
 
@@ -68,6 +82,19 @@ our $VP_AMBASSADOR      = $i++;
 our $VP_ANY             = $i++;
 our $VP_COUNT           = $i++;
 our $VP_UNKNOWN         = $i++;
+
+$i = 0;
+
+our $ACT_EXPLORE        = $i++;
+our $ACT_INFLUENCE      = $i++;
+our $ACT_INFLUENCE_COLONY = $i++;
+our $ACT_RESEARCH       = $i++;
+our $ACT_UPGRADE        = $i++;
+our $ACT_BUILD          = $i++;
+our $ACT_MOVE           = $i++;
+our $ACT_PASS           = $i++;
+our $ACT_COUNT          = $i++;
+our $ACT_UNKNOWN        = $i++;
 
 
 #############################################################################
@@ -172,6 +199,43 @@ sub enum_from_vp_text {
     }
 
     return $VP_UNKNOWN;
+}
+
+#############################################################################
+
+sub text_from_action_enum {
+    my $act_type         = shift;
+
+    my %values = (
+        $ACT_EXPLORE        => 'EXPLORE',
+        $ACT_INFLUENCE      => 'INFLUENCE',
+        $ACT_INFLUENCE_COLONY => 'INFLUCE_COL',
+        $ACT_RESEARCH       => 'RESEARCH',
+        $ACT_UPGRADE        => 'UPGRADE',
+        $ACT_BUILD          => 'BUILD',
+        $ACT_MOVE           => 'MOVE',
+        $ACT_PASS           => 'PASS',
+    );
+
+    if ( defined( $values{ $act_type } ) ) {
+        return $values{ $act_type };
+    }
+
+    return 'UNKNOWN';
+}
+
+#############################################################################
+
+sub enum_from_action_text {
+    my $text        = shift;
+
+    foreach my $enum ( 0 .. $ACT_COUNT - 1 ) {
+        if ( text_from_action_enum( $enum ) eq uc( $text ) ) {
+            return $enum;
+        }
+    }
+
+    return $ACT_UNKNOWN;
 }
 
 #############################################################################

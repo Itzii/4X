@@ -95,6 +95,7 @@ sub _init {
 
     $self->{'SETTINGS'}->{'SOURCE_TAGS'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
     $self->{'SETTINGS'}->{'OPTION_TAGS'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
+    $self->{'SETTINGS'}->{'STARTING_LOCATIONS'} = WLE::Objects::Stack->new();
 
     $self->{'SETTINGS'}->{'LONG_NAME'} = '';
 
@@ -422,7 +423,7 @@ sub action_status {
     my %args        = @_;
 
     my $r_data = $args{'__data'};
-    $$r_data = $self->outsite_status()
+    $$r_data = $self->outsite_status();
 
     return 1;
 }
@@ -654,6 +655,17 @@ sub long_name {
     my $self        = shift;
 
     return $self->{'SETTINGS'}->{'LONG_NAME'};
+}
+
+#############################################################################
+
+sub set_long_name {
+    my $self        = shift;
+    my $value       = shift;
+
+    $self->{'SETTINGS'}->{'LONG_NAME'} = $value;
+
+    return;
 }
 
 #############################################################################
@@ -911,7 +923,7 @@ sub set_missile_defense_hits {
 sub starting_locations {
     my $self        = shift;
 
-    return @{ $self->{'STARTING_LOCATIONS'} };
+    return $self->{'SETTINGS'}->{'STARTING_LOCATIONS'};
 }
 
 #############################################################################

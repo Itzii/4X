@@ -116,9 +116,9 @@ sub _raw_create_game {
         return 'game created by ' . $owner_id . '. sources used: ' . join( ',', @{ $r_source_tags } ) . '; options used: ' . join( ',', @{ $r_option_tags } );
     }
 
-    $self->{'SETTINGS'}->{'LONG_NAME'} = $long_name;
-    $self->{'SETTINGS'}->{'SOURCE_TAGS'} = [ @{ $r_source_tags } ];
-    $self->{'SETTINGS'}->{'OPTION_TAGS'} = [ @{ $r_option_tags } ];
+    $self->set_long_name( $long_name );
+    $self->source_tags()->fill( @{ $r_source_tags } );
+    $self->option_tags()->fill( @{ $r_option_tags } );
 
     $self->player_ids()->fill( $owner_id );
 
@@ -284,7 +284,7 @@ sub _raw_add_player {
         return 'added player: ' . $player_id;
     }
 
-    push( @{ $self->{'SETTINGS'}->{'PLAYER_IDS'} }, $player_id );
+    $self->player_ids()->add_items( $player_id );
 
     return;
 }
@@ -307,7 +307,7 @@ sub _raw_remove_player {
         return 'player removed: ' . $player_id;
     }
 
-    $self->player_ids()->remove_item( $id );
+    $self->player_ids()->remove_item( $player_id );
 
     return;
 }
@@ -333,7 +333,7 @@ sub _raw_begin {
 
     unless ( open( $fh, '<', $self->_file_resources() ) ) {
         $self->set_error( 'Failed to open file for reading: ' . $self->_file_resources() );
-        print STDERR $self->{'LAST_ERROR'};
+        print STDERR $self->last_error();
         return 0;
     }
 
@@ -373,10 +373,10 @@ sub _raw_begin {
     $self->set_start_tech_count( $settings->{'START_TECH_COUNT'} );
 
     if ( $self->option_tags()->contains( 'ancient_homeworlds') ) {
-        $self->{'STARTING_LOCATIONS'} = $settings->{'POSITIONS_W_NPC'};
+        $self->starting_locations()->fill( @{ $settings->{'POSITIONS_W_NPC'} } );
     }
     else {
-        $self->{'STARTING_LOCATIONS'} = $settings->{'POSITIONS'};
+        $self->starting_locations()->fill( @{ $settings->{'POSITIONS'} } );
     }
 
     # setup ship component tiles

@@ -29,7 +29,7 @@ sub action_use_colony_ship {
         return 0;
     }
 
-    if ( $self->race_of_current_user()->colony_ships_available() > 0 ) {
+    if ( $self->race_of_acting_player()->colony_ships_available() > 0 ) {
         $self->set_error( 'No Available Colony Ships' );
         return 0;
     }
@@ -56,7 +56,7 @@ sub action_use_colony_ship {
         return 0;
     }
 
-    if ( $self->race_of_current_user()->resource_track_of( $type )->available_to_spend() < 1 ) {
+    if ( $self->race_of_acting_player()->resource_track_of( $type )->available_to_spend() < 1 ) {
         $self->set_error( 'No Available Cubes' );
         return 0;
     }
@@ -121,7 +121,7 @@ sub action_explore {
 
     my $stack_id = $self->board()->stack_from_location( $loc_x, $loc_y );
 
-    my $tiles_to_draw = ( $self->race_of_current_user()->provides( 'spec_descendants') ) ? 2 : 1;
+    my $tiles_to_draw = ( $self->race_of_acting_player()->provides( 'spec_descendants') ) ? 2 : 1;
 
     foreach ( 1 .. $tiles_to_draw ) {
         if ( $self->board()->tile_draw_stack( $stack_id )->count() == 0 ) {
@@ -163,7 +163,7 @@ sub action_explore_place_tile {
     }
 
     my $tile_tag_w_loc = $args{'tile_tag'};
-    my $race = $self->race_of_current_user();
+    my $race = $self->race_of_acting();
 
     unless ( $race->in_hand()->contains( $tile_tag_w_loc ) ) {
         $self->set_error( 'Invalid Tile Tag' );
@@ -267,7 +267,7 @@ sub action_explore_discard_tile {
     }
 
     my $tile_tag_w_loc = $args{'tile_tag'};
-    my $race = $self->race_of_current_user();
+    my $race = $self->race_of_acting_player();
 
     unless ( $race->in_hand()->contains( $tile_tag_w_loc ) ) {
         $self->set_error( 'Invalid Tile Tag' );
@@ -314,7 +314,7 @@ sub action_influence {
         return 0;
     }
 
-    my $race = $self->race_of_current_user();
+    my $race = $self->race_of_acting_player();
 
     my $influence_from = $args{'from'};
 
@@ -368,7 +368,7 @@ sub action_influence_unflip_colony_ship {
         return 0;
     }
 
-    my $race = $self->race_of_current_user();
+    my $race = $self->race_of_acting_player();
 
     if ( $race->colony_ships_used() < 1 ) {
         $self->set_error( 'No Colony Ships to flip' );
@@ -411,7 +411,7 @@ sub action_research {
 
     my $provides = $self->techs()->{ $tech_tag }->provides();
 
-    my $race = $self->race_of_current_user();
+    my $race = $self->race_of_acting_player();
 
     if ( $race->has_technology( $provides ) ) {
         $self->set_error( 'Race already has technology' );
@@ -486,7 +486,7 @@ sub action_upgrade {
         return 0;
     }
 
-    my $race = $self->race_of_current_user();
+    my $race = $self->race_of_acting_player();
 
     my $template = $race->template_of_class( $args{'class'} );
 
@@ -578,7 +578,7 @@ sub action_build {
         return 0;
     }
 
-    my $race = $self->race_of_current_user();
+    my $race = $self->race_of_acting_player();
 
     my $template = $race->template_of_class( $class );
 
@@ -669,7 +669,7 @@ sub action_move {
         return 0;
     }
 
-    my $race = $self->race_of_current_user();
+    my $race = $self->race_of_acting_player();
 
     my $reachable = $self->board()->tile_is_within_distance(
         $self->current_user(),
@@ -746,7 +746,7 @@ sub action_interrupt_place_influence_token {
         return 0;
     }
 
-    my $race = $self->race_of_current_user();
+    my $race = $self->race_of_acting_player();
 
     my $influence_to = $args{'to'};
 
@@ -804,7 +804,7 @@ sub action_interrupt_replace_cube {
         return 0;
     }
 
-    my $race = $self->race_of_current_user();
+    my $race = $self->race_of_acting_player();
 
     unless ( $race->in_hand()->count() > 0 ) {
         $self->set_error( 'Nothing in hand' );
@@ -885,7 +885,7 @@ sub action_interrupt_choose_discovery {
         $flag_as_vp = $args{'as_vp'};
     }
 
-    my $race = $self->race_of_current_user();
+    my $race = $self->race_of_acting_player();
 
     my $full_tag = '';
     my $tile_tag = '';
@@ -929,7 +929,7 @@ sub action_interrupt_select_technology {
         return 0;
     }
 
-    my $race = $self->race_of_current_user();
+    my $race = $self->race_of_acting_player();
 
     my $tech_tag = $args{'chosen_tech'};
 

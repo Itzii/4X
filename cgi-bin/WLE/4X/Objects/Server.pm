@@ -66,8 +66,7 @@ sub _init {
     $self->{'ENV'}->{'DIR_STATE_FILES'} =~ s{ /$ }{}xs;
     $self->{'ENV'}->{'DIR_LOG_FILES'} =~ s{ /$ }{}xs;
 
-    $self->{'ENV'}->{'CURRENT_USER'} = -1;
-    $self->{'ENV'}->{'LOG_ID'} = '';
+    $self->{'ENV'}->{'CURRENT_PLAYER_ID'} = -1;
 
 
     unless ( -e $self->_file_resources() ) {
@@ -88,10 +87,20 @@ sub _init {
         return $self;
     }
 
+    $self->reset();
+
+    return $self;
+}
+
+#############################################################################
+
+sub reset {
+    my $self        = shift;
+
+
     $self->{'SETTINGS'} = {};
 
     $self->{'SETTINGS'}->{'LOG_ID'} = '';
-    $self->{'SETTINGS'}->{'OWNER_ID'} = 0;
 
     $self->{'SETTINGS'}->{'SOURCE_TAGS'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
     $self->{'SETTINGS'}->{'OPTION_TAGS'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
@@ -99,10 +108,12 @@ sub _init {
 
     $self->{'SETTINGS'}->{'LONG_NAME'} = '';
 
-    $self->{'SETTINGS'}->{'PLAYER_IDS'} = WLE::Objects::Stack->new();
-    $self->{'SETTINGS'}->{'PLAYERS_PENDING'} = [];
-    $self->{'SETTINGS'}->{'PLAYERS_DONE'} = [];
-    $self->{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} = [];
+    $self->{'SETTINGS'}->{'USER_IDS'} = WLE::Objects::Stack->new();
+
+    $self->{'SETTINGS'}->{'PLAYERS_PENDING'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
+    $self->{'SETTINGS'}->{'PLAYERS_DONE'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
+    $self->{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
+    $self->{'SETTINGS'}->{'WAITING_ON_PLAYER'} = -1;
 
     $self->{'SETTINGS'}->{'CURRENT_TRAITOR'} = '';
 
@@ -125,6 +136,7 @@ sub _init {
     $self->{'TECH_BAG'} = WLE::Objects::Stack->new();
     $self->{'AVAILABLE_TECH'} = WLE::Objects::Stack->new();
     $self->{'DISCOVERY_BAG'} = WLE::Objects::Stack->new();
+    $self->{'DEVELOPMENT_STACK'} = WLE::Objects::Stack->new();
     $self->{'VP_BAG'} = WLE::Objects::Stack->new();
 
     $self->{'TEMPLATE_COMBAT_ORDER'} = WLE::Objects::Stack->new();
@@ -139,7 +151,9 @@ sub _init {
         'TILE' => '',
     };
 
-    return $self;
+
+
+
 }
 
 #############################################################################
@@ -160,14 +174,7 @@ sub do {
         return ( 'success' => 0, 'message' => "Missing 'user' element." );
     }
 
-    $self->{'ENV'}->{'CURRENT_USER'} = -1;
-    my $user_id = 0;
-    foreach my $player_id ( $self->player_ids()->items() ) {
-        if ( $args{'user'} eq $player_id ) {
-            $self->{'ENV'}->{'CURRENT_USER'} = $user_id;
-        }
-        $user_id++;
-    }
+    $self->{'ENV'}->{'CURRENT_PLAYER_ID'} = $self->user_ids()->index_of( $args{'user'} );
 
     my $action_tag = lc( $args{'action'} );
     delete( $args{'action'} );
@@ -251,7 +258,7 @@ sub do {
         if ( defined( $action->{'flag_active_player'} ) ) {
             my $waiting_on = $self->waiting_on_player_id();
 
-            if ( $waiting_on == -1 || ( $waiting_on > -1 && $waiting_on != $self->current_user() ) ) {
+            if ( $waiting_on == -1 || ( $waiting_on > -1 && $waiting_on != $self->current_player_id() ) ) {
                 return ( 'success' => 0, 'message' => 'Action is not allowed by this player at this time.' );
             }
         }
@@ -264,7 +271,7 @@ sub do {
 
         if ( $self->state() == $ST_NORMAL ) {
 
-            $race = $self->race_of_current_user();
+            $race = $self->race_of_current_player();
 
             unless ( defined( $action->{'flag_ignore_allowed'} ) ) {
                 unless ( $race->adjusted_allowed_actions()->contains( $action_tag ) ) {
@@ -357,10 +364,10 @@ sub item_is_allowed_in_game {
 
 #############################################################################
 
-sub player_ids {
+sub user_ids {
     my $self        = shift;
 
-    return $self->{'SETTINGS'}->{'PLAYER_IDS'};
+    return $self->{'SETTINGS'}->{'USER_IDS'};
 }
 
 #############################################################################
@@ -410,10 +417,10 @@ sub race_of_player_id {
 
 #############################################################################
 
-sub race_of_current_user {
+sub race_of_acting_player {
     my $self        = shift;
 
-    return $self->race_of_player_id( $self->current_user() );
+    return $self->race_of_player_id( $self->current_player_id() );
 }
 
 #############################################################################
@@ -523,11 +530,7 @@ sub set_state {
 sub waiting_on_player_id {
     my $self        = shift;
 
-    if ( scalar( @{ $self->{'SETTINGS'}->{'PLAYERS_PENDING'} } ) > 0 ) {
-        return $self->{'SETTINGS'}->{'PLAYERS_PENDING'}->[ 0 ];
-    }
-
-    return -1;
+    return $self->{'SETTINGS'}->{'WAITING_ON_PLAYER'};
 }
 
 #############################################################################
@@ -536,20 +539,33 @@ sub set_waiting_on_player_id {
     my $self        = shift;
     my $player_id   = shift;
 
-    push( @{ $self->{'SETTINGS'}->{'PLAYERS_PENDING'} }, $player_id );
+    $self->{'SETTINGS'}->{'WAITING_ON_PLAYER'} = $player_id;
 
     return;
 }
 
 #############################################################################
 
-sub set_pending_players {
+sub pending_players {
     my $self        = shift;
-    my @pending     = @_;
 
-    $self->{'SETTINGS'}->{'PLAYERS_PENDING'} = [ @pending ];
+    return $self->{'SETTINGS'}->{'PLAYERS_PENDING'};
+}
 
-    return;
+#############################################################################
+
+sub done_players {
+    my $self        = shift;
+
+    return $self->{'SETTINGS'}->{'PLAYERS_DONE'};
+}
+
+#############################################################################
+
+sub players_next_round {
+    my $self        = shift;
+
+    return $self->{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'};
 }
 
 #############################################################################
@@ -721,19 +737,6 @@ sub tiles {
 
 #############################################################################
 
-sub tile_stack_limit {
-    my $self        = shift;
-    my $stack_tag   = shift;
-
-    if ( defined( $self->{'SETTINGS'}->{'TILE_STACK_LIMIT_' . $stack_tag } ) ) {
-        return $self->{'SETTINGS'}->{'TILE_STACK_LIMIT_' . $stack_tag };
-    }
-
-    return -1;
-}
-
-#############################################################################
-
 sub races {
     my $self        = shift;
 
@@ -877,6 +880,25 @@ sub development_limit {
 
 #############################################################################
 
+sub set_development_limit {
+    my $self        = shift;
+    my $value       = shift;
+
+    $self->{'SETTINGS'}->{'DEVELOPMENT_LIMIT'} = $value;
+
+    return;
+}
+
+#############################################################################
+
+sub development_stack {
+    my $self        = shift;
+
+    return $self->{'DEVELOPMENT_STACK'};
+}
+
+#############################################################################
+
 sub vp_bag {
     my $self        = shift;
 
@@ -934,6 +956,19 @@ sub tile_from_tag {
 
     return $self->{'TILES'}->{ $tag };
 }
+
+#############################################################################
+
+sub set_new_player_order {
+    my $self        = shift;
+    my @player_ids  = @_;
+
+    $self->players_done()->clear();
+    $self->players_pending()->fill( @player_ids );
+
+    return;
+}
+
 
 #############################################################################
 

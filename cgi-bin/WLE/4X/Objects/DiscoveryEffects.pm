@@ -16,7 +16,7 @@ sub use_discovery {
     my $discovery_tag   = shift;
 
     my $discovery = $self->discoveries()->{ $discovery_tag };
-    my $race = $self->race_of_current_user();
+    my $race = $self->race_of_acting_player();
 
     if ( $discovery->adds_component() ) {
         $race->add_hand_item( $discovery->component() );

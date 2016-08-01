@@ -39,6 +39,10 @@ sub _init {
     $self->{'SERVER'} = $args{'server'};
 
     $self->{'SPACES'} = {};
+    $self->{'STACKS'} = {};
+    $self->{'STACK_LIMITS'} = {};
+
+    $self->{'STACK_TAGS'} = [ '0', '1', '2', '3', 'homeworlds', 'ancient_homeworlds' ];
 
     $self->clear_all_tile_stacks();
 
@@ -50,7 +54,7 @@ sub _init {
 sub tile_stack_ids {
     my $self        = shift;
 
-    return keys( %{ $self->{'STACKS'} } );
+    return @{ $self->{'STACK_TAGS'} };
 }
 
 #############################################################################
@@ -60,11 +64,30 @@ sub clear_all_tile_stacks {
 
     $self->{'STACKS'} = {};
 
-    foreach ( '0', '1', '2', '3', 'homeworlds', 'ancient_homeworlds' ) {
+    foreach ( $self->tile_stack_ids() ) {
         $self->clear_tile_stack( $_ );
     }
 
     return;
+}
+
+#############################################################################
+
+sub tile_stack_limit {
+    my $self        = shift;
+    my $stack_id    = shift;
+
+    return $self->{'STACK_LIMITS'}->{ $stack_id };
+}
+
+#############################################################################
+
+sub set_tile_stack_limit {
+    my $self        = shift;
+    my $stack_id    = shift;
+    my $limit       = shift;
+
+    $self->{'STACK_LIMITS'}->{ $stack_id } = -1;
 }
 
 #############################################################################
@@ -77,6 +100,8 @@ sub clear_tile_stack {
         'DRAW' => WLE::Objects::Stack->new( 'flag_exclusive' => 1 ),
         'DISCARD' => WLE::Objects::Stack->new( 'flag_exclusive' => 1 ),
     };
+
+    $self->set_tile_stack_limit( $stack_id, -1 );
 
     return;
 }
@@ -361,7 +386,7 @@ sub _explorable_from_location {
         return ();
     }
 
-    my $has_wormhole = $self->server()->race_of_current_user()->has_technology( 'tech_wormhole_generator' );
+    my $has_wormhole = $self->server()->race_of_current_player()->has_technology( 'tech_wormhole_generator' );
 
     my @adjacents = ();
 
@@ -393,7 +418,7 @@ sub tile_is_influencible {
     my $self        = shift;
     my $tile_tag    = shift;
 
-    my $race = $self->server()->race_of_current_user();
+    my $race = $self->server()->race_of_acting_player();
     my ( $loc_x, $loc_y ) = split( /:/, $self->location_of_tile( $tile_tag ) );
 
     my $this_tile = $self->server()->tiles()->{ $tile_tag };
@@ -610,6 +635,8 @@ sub from_hash {
         }
     }
 
+    $self->{'STACK_LIMITS'} = $r_hash->{'STACK_LIMITS'};
+
     return 1;
 }
 
@@ -636,6 +663,8 @@ sub to_hash {
 #        print STDERR "\nsaving $stack_id discard : " . join( ',', @items );
 
     }
+
+    $r_hash->{'STACK_LIMITS'} = $self->{'STACK_LIMITS'};
 
     return 1;
 }

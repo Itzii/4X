@@ -477,7 +477,7 @@ sub action_draw_vp {
         return 0;
     }
 
-    my $race = $self->race_of_current_user();
+    my $race = $self->race_of_acting_player();
 
     my $vp_draws = $race->vp_draws();
 
@@ -1013,7 +1013,7 @@ sub start_vp_draws {
     }
 
     $self->set_subphase( $SUB_VP_DRAW );
-    $self->set_pending_players( $tile->vp_draw_queue() );
+    $self->pending_players()->fill( $tile->vp_draw_queue() );
 
     $self->_raw_next_vp_draw_player( $EV_SUB_ACTION, $tile_tag );
 

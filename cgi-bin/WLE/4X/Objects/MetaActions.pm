@@ -226,7 +226,7 @@ sub action_remove_option {
 #
 # action_add_player - args
 #
-# player_id     : required - integer
+# user_id     : required - integer
 #
 
 sub action_add_player {
@@ -237,22 +237,22 @@ sub action_add_player {
         return 0;
     }
 
-    unless ( defined( $args{'player_id'} ) ) {
-        $self->set_error( 'Missing Player ID' );
+    unless ( defined( $args{'user_id'} ) ) {
+        $self->set_error( 'Missing User ID' );
         return 0;
     }
 
-    unless ( looks_like_number( $args{'player_id'} ) ) {
-        $self->set_error( 'Invalid Player ID' );
+    unless ( looks_like_number( $args{'user_id'} ) ) {
+        $self->set_error( 'Invalid User ID' );
         return 0;
     }
 
-    if ( $self->player_ids()->contains( $args{'player_id'} ) ) {
-        $self->set_error( 'Player ID Already Exists' );
+    if ( $self->user_ids()->contains( $args{'user_id'} ) ) {
+        $self->set_error( 'User ID Already Exists' );
         return 0;
     }
 
-    $self->_raw_add_player( $EV_FROM_INTERFACE, $args{'player_id'} );
+    $self->_raw_add_player( $EV_FROM_INTERFACE, $args{'user_id'} );
 
     $self->_save_state();
 
@@ -265,7 +265,7 @@ sub action_add_player {
 #
 # action_remove_player - args
 #
-# player_id     : required - integer
+# user_id     : required - integer
 #
 
 sub action_remove_player {
@@ -276,22 +276,22 @@ sub action_remove_player {
         return 0;
     }
 
-    unless ( defined( $args{'player_id'} ) ) {
-        $self->set_error( 'Missing Player ID' );
+    unless ( defined( $args{'user_id'} ) ) {
+        $self->set_error( 'Missing User ID' );
         return 0;
     }
 
-    unless ( looks_like_number( $args{'player_id'} ) ) {
-        $self->set_error( 'Invalid Player ID' );
+    unless ( looks_like_number( $args{'user_id'} ) ) {
+        $self->set_error( 'Invalid User ID' );
         return 0;
     }
 
-    unless ( $self->player_ids()->contains( $args{'player_id'} ) ) {
-        $self->set_error( 'Player ID Doesn\'t Exist' );
+    unless ( $self->user_ids()->contains( $args{'user_id'} ) ) {
+        $self->set_error( 'User ID Doesn\'t Exist' );
         return 0;
     }
 
-    $self->_raw_remove_player( $EV_FROM_INTERFACE, $args{'player_id'} );
+    $self->_raw_remove_player( $EV_FROM_INTERFACE, $args{'user_id'} );
 
     $self->_save_state();
 

@@ -176,11 +176,39 @@ sub select_random_item {
 
 #############################################################################
 
+sub index_of {
+    my $self        = shift;
+    my $value       = shift;
+
+    my $index = 0;
+    foreach my $item ( $self->items() ) {
+        if ( looks_like_number( $item ) ) {
+            if ( $item == $value ) {
+                return $index;
+            }
+        }
+        else {
+            if ( $item eq $value ) {
+                return $index;
+            }
+        }
+
+        $index++;
+    }
+
+    return -1;
+}
+
+
+#############################################################################
+
 sub contains {
     my $self        = shift;
     my $value       = shift;
 
-    return ( matches_any( $value, $self->items() ) );
+    my $index = $self->index_of( $value );
+
+    return ( $index > -1 );
 }
 
 #############################################################################

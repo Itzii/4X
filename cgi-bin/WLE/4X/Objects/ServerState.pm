@@ -85,9 +85,43 @@ sub _read_state {
     my $single_line = join( '', @data );
     eval $single_line; warn $@ if $@;
 
+    # settings
+
+    $self->_set_log_id( $VAR1->{'SETTINGS'}->{'LOG_ID'} );
+    $self->set_long_name( $VAR1->{'SETTINGS'}->{'LONG_NAME'} );
+
+    $self->source_tags()->fill( @{ $VAR1->{'SETTINGS'}->{'SOURCE_TAGS'} } );
+    $self->option_tags()->fill( @{ $VAR1->{'SETTINGS'}->{'OPTION_TAGS'} } );
+
+    $self->user_ids()->fill( @{ $VAR1->{'SETTINGS'}->{'USER_IDS'} } );
+
+    $self->pending_players()->fill( @{ $VAR1->{'SETTINGS'}->{'PLAYERS_PENDING'} } );
+    $self->players_done()->fill( @{ $VAR1->{'SETTINGS'}->{'PLAYERS_DONE'} } );
+    $self->players_next_round( @{ $VAR1->{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} } );
+
+    $self->set_waiting_on_player_id( $VAR1->{'SETTINGS'}->{'WAITING_ON_PLAYER'} );
+
+    $self->set_current_traitor( $VAR1->{'SETTINGS'}->{'CURRENT_TRAITOR'} );
+
+
+
+
+    $self->{'SETTINGS'}->{'STARTING_LOCATIONS'} = WLE::Objects::Stack->new();
+
+
+
+
+
+
+
+
+
+
+    $self->{'SETTINGS'} = $VAR1->{'SETTINGS'};
+
     $self->{'STATE'} = $VAR1->{'STATE'};
 
-    $self->{'TECH_DRAW_COUNT'} = $VAR1->{'ROUND_TECH_COUNT'};
+    $self->set_tech_draw_count( $VAR1->{'ROUND_TECH_COUNT'} );
 
     if ( defined( $VAR1->{'STARTING_LOCATIONS'} ) ) {
         $self->{'STARTING_LOCATIONS'} = $VAR1->{'STARTING_LOCATIONS'};
@@ -101,8 +135,6 @@ sub _read_state {
         return 0;
     }
 
-    $self->{'COMPONENTS'} = {};
-
     foreach my $component_key ( keys( %{ $VAR1->{'COMPONENTS'} } ) ) {
         my $component = WLE::4X::Objects::ShipComponent->new(
             'server' => $self,
@@ -111,7 +143,7 @@ sub _read_state {
         );
 
         if ( defined( $component ) ) {
-            $self->{'COMPONENTS'}->{ $component_key } = $component;
+            $self->ship_components()->{ $component_key } = $component;
         }
     }
 
@@ -123,8 +155,6 @@ sub _read_state {
         return 0;
     }
 
-    $self->{'TECHNOLOGY'} = {};
-
     foreach my $tech_key ( keys( %{ $VAR1->{'TECHNOLOGY'} } ) ) {
 
         my $technology = WLE::4X::Objects::Technology->new(
@@ -134,22 +164,20 @@ sub _read_state {
         );
 
         if ( defined( $technology ) ) {
-            $self->{'TECHNOLOGY'}->{ $technology->tag() } = $technology;
+            $self->technology()->{ $technology->tag() } = $technology;
         }
     }
 
-    $self->tech_bag()->add_items( @{ $VAR1->{'TECH_BAG'} } );
-    $self->available_tech()->add_items( @{ $VAR1->{'AVAILABLE_TECH'} } );
+    $self->tech_bag()->fill( @{ $VAR1->{'TECH_BAG'} } );
+    $self->available_tech()->fill( @{ $VAR1->{'AVAILABLE_TECH'} } );
 
     # vp tokens
     # print STDERR "\n  vp tokens ... ";
 
-    $self->vp_bag()->add_items( @{ $VAR1->{'VP_BAG'} } );
+    $self->vp_bag()->fill( @{ $VAR1->{'VP_BAG'} } );
 
     # discoveries
 #    print STDERR "\n  discoveries ... ";
-
-    $self->{'DISCOVERIES'} = {};
 
     foreach my $disc_key ( keys( %{ $VAR1->{'DISCOVERIES'} } ) ) {
 
@@ -160,20 +188,16 @@ sub _read_state {
         );
 
         if ( defined( $discovery ) ) {
-            $self->{'DISCOVERIES'}->{ $discovery->tag() } = $discovery;
+            $self->discoveries()->{ $discovery->tag() } = $discovery;
         }
     }
 
-    $self->discovery_bag()->add_items( @{ $VAR1->{'DISCOVERY_BAG'} } );
+    $self->discovery_bag()->fill( @{ $VAR1->{'DISCOVERY_BAG'} } );
 
     # tiles
 #    print STDERR "\n  tiles ... ";
 
-    $self->{'TILES'} = {};
-
-
-    $self->{'BOARD'} = WLE::4X::Objects::Board->new( 'server' => $self );
-    $self->{'BOARD'}->from_hash( $VAR1->{'BOARD'} );
+    $self->board()->from_hash( $VAR1->{'BOARD'} );
 
 #    print STDERR "\nReading Tiles ... ";
 
@@ -188,14 +212,12 @@ sub _read_state {
 #        print "\nTile: " . $tile->tag();
 
         if ( defined( $tile ) ) {
-            $self->{'TILES'}->{ $tile->tag() } = $tile;
+            $self->tiles()->{ $tile->tag() } = $tile;
         }
     }
 
     # developments
 #    print STDERR "\n  developments ... ";
-
-    $self->{'DEVELOPMENTS'} = {};
 
     foreach my $dev_key ( keys( %{ $VAR1->{'DEVELOPMENTS'} } ) ) {
 
@@ -206,16 +228,12 @@ sub _read_state {
         );
 
         if ( defined( $development ) ) {
-            $self->{'DEVELOPMENTS'}->{ $dev_key } = $development;
+            $self->developments()->{ $dev_key } = $development;
         }
     }
 
-    $self->{'DEVELOPMENT_STACK'} = [ @{ $VAR1->{'DEVELOPMENT_STACK'} } ];
+    $self->development_stack()->fill( @{ $VAR1->{'DEVELOPMENT_STACK'} } );
 
-
-    # settings
-
-    $self->{'SETTINGS'} = $VAR1->{'SETTINGS'};
 
     # setup ship templates
 #    print STDERR "\n  ship templates ... ";
@@ -224,8 +242,6 @@ sub _read_state {
         $self->set_error( 'Missing Section in resource file: SHIP_TEMPLATES' );
         return 0;
     }
-
-    $self->{'SHIP_TEMPLATES'} = {};
 
     foreach my $template_key ( keys( %{ $VAR1->{'SHIP_TEMPLATES'} } ) ) {
 
@@ -236,15 +252,13 @@ sub _read_state {
         );
 
         if ( defined( $template ) ) {
-            $self->{'SHIP_TEMPLATES'}->{ $template->tag() } = $template;
+            $self->ship_templates()->{ $template->tag() } = $template;
         }
     }
 
-    $self->template_combat_order()->add_items( @{ $VAR1->{'TEMPLATE_COMBAT_ORDER'} } );
+    $self->template_combat_order()->fill( @{ $VAR1->{'TEMPLATE_COMBAT_ORDER'} } );
 
     # ships
-
-    $self->{'SHIPS'} = {};
 
     foreach my $ship_key ( keys( %{ $VAR1->{'SHIPS'} } ) ) {
 
@@ -255,7 +269,7 @@ sub _read_state {
         );
 
         if ( defined( $ship ) ) {
-            $self->{'SHIPS'}->{ $ship->tag() } = $ship;
+            $self->ships()->{ $ship->tag() } = $ship;
         }
     }
 
@@ -286,14 +300,14 @@ sub _read_state {
         );
 
         if ( defined( $race ) ) {
-            $self->{'RACES'}->{ $race_tag } = $race;
+            $self->races()->{ $race_tag } = $race;
         }
     }
 
     # current combat die rolls
 
     if ( defined( $VAR1->{'COMBAT_HITS'} ) ) {
-        $self->combat_hits()->add_items( @{ $VAR1->{'COMBAT_HITS'} } );
+        $self->combat_hits()->fill( @{ $VAR1->{'COMBAT_HITS'} } );
     }
 
     if ( defined( $VAR1->{'MISSILE_DEFENSE_HITS'} ) ) {

@@ -69,6 +69,8 @@ sub _read_state {
     my $self        = shift;
     my $log_id      = shift;
 
+#    print STDERR "\nLoading State ... ";
+
     my $fh;
 
     unless ( open( $fh, '<', $self->_state_file() ) ) {
@@ -94,9 +96,10 @@ sub _read_state {
     $self->option_tags()->fill( @{ $VAR1->{'SETTINGS'}->{'OPTION_TAGS'} } );
 
     $self->user_ids()->fill( @{ $VAR1->{'SETTINGS'}->{'USER_IDS'} } );
+    print STDERR "\nLoaded " . scalar( @{ $VAR1->{'SETTINGS'}->{'USER_IDS'} } ) . ' user ids.';
 
     $self->pending_players()->fill( @{ $VAR1->{'SETTINGS'}->{'PLAYERS_PENDING'} } );
-    $self->players_done()->fill( @{ $VAR1->{'SETTINGS'}->{'PLAYERS_DONE'} } );
+    $self->done_players()->fill( @{ $VAR1->{'SETTINGS'}->{'PLAYERS_DONE'} } );
     $self->players_next_round( @{ $VAR1->{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} } );
 
     $self->set_waiting_on_player_id( $VAR1->{'SETTINGS'}->{'WAITING_ON_PLAYER'} );
@@ -351,6 +354,9 @@ sub _save_state {
     $data{'SETTINGS'}->{'LONG_NAME'} = $self->long_name();
 
     $data{'SETTINGS'}->{'USER_IDS'} = [ $self->user_ids()->items() ];
+
+    print STDERR "\nSaved " . $self->user_ids()->count() . ' user ids.';
+
     $data{'SETTINGS'}->{'PLAYERS_PENDING'} = [ $self->pending_players()->items() ];
     $data{'SETTINGS'}->{'PLAYERS_DONE'} = [ $self->done_players()->items() ];
     $data{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} = [ $self->players_next_round() ];
@@ -479,6 +485,7 @@ sub _save_state {
     truncate( $self->{'FH_STATE'}, 0 );
 
     $Data::Dumper::Indent = 1;
+    $Data::Dumper::Sortkeys = 1;
     print { $self->{'FH_STATE'} } Dumper( \%data );
 
     # using Storable

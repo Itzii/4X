@@ -309,7 +309,7 @@ sub unpinned_ship_count {
         return $friendly_count;
     }
 
-    if ( $self->server()->race_of_current_user()->has_technology( 'tech_stealth' ) ) {
+    if ( $self->server()->race_of_acting_player()->has_technology( 'tech_stealth' ) ) {
         $enemy_count = int( $enemy_count / 2 );
     }
 

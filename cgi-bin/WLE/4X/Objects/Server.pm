@@ -174,17 +174,62 @@ sub do {
         return ( 'success' => 0, 'message' => "Missing 'user' element." );
     }
 
-    $self->{'ENV'}->{'CURRENT_PLAYER_ID'} = $self->user_ids()->index_of( $args{'user'} );
-
     my $action_tag = lc( $args{'action'} );
-    delete( $args{'action'} );
+    my $method = undef;
+
+    if ( $action_tag eq 'create_game' ) {
+        $method = \&action_create_game;
+        $self->{'ENV'}->{'ACTING_PLAYER_ID'} = 0;
+    }
+    else {
+        unless ( $self->_read_state( $args{'log_id'} ) ) {
+            return ( 'success' => 0, 'message' => 'Unable to open state file.' );
+        }
+
+        $self->{'ENV'}->{'ACTING_PLAYER_ID'} = $self->user_ids()->index_of( $args{'user'} );
+
+        my $error_message = $self->_check_allowed_action( $action_tag, \$method );
+
+        unless ( $error_message eq '' ) {
+            return ( 'success' => 0, 'message' => $error_message );
+        }
+    }
+
+    my %response = (
+        'success' => 0,
+        'message' => '',
+    );
+
+    my $data = undef;
+    $args{'__data'} = \$data;
+    $response{'success'} = $method->( $self, %args );
+    $response{'message'} = $self->last_error();
+    $response{'data'} = $data;
+    $response{'allowed'} = [];
+
+    my $race = $self->race_of_acting_player();
+
+    if ( defined( $race ) ) {
+        $response{'allowed'} = [ $race->adjusted_allowed_actions() ];
+    }
+
+
+    return %response;
+}
+
+#############################################################################
+
+sub _check_allowed_action {
+    my $self        = shift;
+    my $action_tag  = shift;
+    my $r_method    = shift;
 
     my %actions = (
 
         'status'            => { 'method' => \&action_status, 'flag_anytime' => 1 },
         'exchange'          => { 'method' => \&action_exchange, 'flag_anytime' => 1 },
 
-        'create_game'       => { 'flag_req_state' => $ST_PREGAME, 'method' => \&action_create_game },
+        'create_game'       => { 'method' => \&action_create_game },
         'add_source'        => { 'flag_req_state' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_add_source },
         'remove_source'     => { 'flag_req_state' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_remove_source },
         'add_option'        => { 'flag_req_state' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_add_option },
@@ -235,73 +280,55 @@ sub do {
 
     );
 
-    unless ( defined( $actions{ $action_tag } ) ) {
-        return ( 'success' => 0, 'message' => "Invalid 'action' element." );
-    }
-
     my $action = $actions{ $action_tag };
-    my $race = undef;
 
-
-    unless ( defined( $action->{'flag_anytime'} ) ) {
-
-        if ( defined( $action->{'flag_req_state'} ) ) {
-            if ( $self->state() != $action->{'flag_req_state'} ) {
-                return ( 'success' => 0, 'message' => 'Invalid state for action.' );
-            }
-        }
-
-        if ( defined( $action->{'flag_owner_only'} ) && $self->user_is_owner() == 0 )  {
-            return ( 'success' => 0, 'message' => 'Action is allowed by game owner only.' );
-        }
-
-        if ( defined( $action->{'flag_active_player'} ) ) {
-            my $waiting_on = $self->waiting_on_player_id();
-
-            if ( $waiting_on == -1 || ( $waiting_on > -1 && $waiting_on != $self->current_player_id() ) ) {
-                return ( 'success' => 0, 'message' => 'Action is not allowed by this player at this time.' );
-            }
-        }
-
-        if ( defined( $action->{'flag_req_phase'} ) ) {
-            if ( $self->phase() != $action->{'flag_req_phase'} ) {
-                return ( 'success' => 0, 'message' => 'Wrong phase for action.' );
-            }
-        }
-
-        if ( $self->state() == $ST_NORMAL ) {
-
-            $race = $self->race_of_current_player();
-
-            unless ( defined( $action->{'flag_ignore_allowed'} ) ) {
-                unless ( $race->adjusted_allowed_actions()->contains( $action_tag ) ) {
-                    print STDERR "\nAllowed Actions: " . join( ',', $race->allowed_actions()->items() );
-                    return ( 'success' => 0, 'message' => 'Action is not allowed by player at this time.' );
-                }
-            }
-
-        }
-
+    unless ( defined( $action ) ) {
+        return "Invalid 'action' element.";
     }
 
-    my %response = (
-        'success' => 0,
-        'message' => '',
-    );
+    $$r_method = $action->{'method'};
 
-    my $data = undef;
-    $args{'__data'} = \$data;
-    $response{'success'} = $action->{'method'}->( $self, %args );
-    $response{'message'} = $self->last_error();
-    $response{'data'} = $data;
-    $response{'allowed'} = [];
-
-    if ( defined( $race ) ) {
-        $response{'allowed'} = [ $race->adjusted_allowed_actions() ];
+    if ( defined( $action->{'flag_anytime'} ) ) {
+        return '';
     }
 
+    if ( defined( $action->{'flag_req_state'} ) ) {
+        if ( $self->state() != $action->{'flag_req_state'} ) {
+            return 'Invalid state for action.';
+        }
+    }
 
-    return %response;
+    if ( defined( $action->{'flag_owner_only'} ) && $self->player_is_owner() == 0 )  {
+        return 'Action is allowed by game owner only.';
+    }
+
+    if ( defined( $action->{'flag_active_player'} ) ) {
+        my $waiting_on = $self->waiting_on_player_id();
+
+        if ( $waiting_on == -1 || ( $waiting_on > -1 && $waiting_on != $self->active_player_id() ) ) {
+            return 'Action is not allowed by this player at this time.';
+        }
+    }
+
+    if ( defined( $action->{'flag_req_phase'} ) ) {
+        if ( $self->phase() != $action->{'flag_req_phase'} ) {
+            return 'Wrong phase for action.';
+        }
+    }
+
+    if ( $self->state() == $ST_NORMAL ) {
+
+        my $race = $self->race_of_acting_player();
+
+        unless ( defined( $action->{'flag_ignore_allowed'} ) ) {
+            unless ( $race->adjusted_allowed_actions()->contains( $action_tag ) ) {
+                print STDERR "\nAllowed Actions: " . join( ',', $race->allowed_actions()->items() );
+                return 'Action is not allowed by player at this time.';
+            }
+        }
+    }
+
+    return '';
 }
 
 #############################################################################
@@ -372,26 +399,26 @@ sub user_ids {
 
 #############################################################################
 
-sub current_user {
+sub acting_player_id {
     my $self        = shift;
 
-    return $self->{'ENV'}->{'CURRENT_PLAYER_ID'};
+    return $self->{'ENV'}->{'ACTING_PLAYER_ID'};
 }
 
 #############################################################################
 
-sub user_is_owner {
+sub player_is_owner {
     my $self        = shift;
 
-    return ( $self->current_user() == 0 );
+    return ( $self->acting_player_id() == 0 );
 }
 
 #############################################################################
 
-sub race_tag_of_current_user {
+sub race_tag_of_acting_player {
     my $self        = shift;
 
-    my $race = $self->race_of_player_id( $self->current_user() );
+    my $race = $self->race_of_player_id( $self->current_player_id() );
 
     if ( defined( $race ) ) {
         return $race->tag();
@@ -420,7 +447,7 @@ sub race_of_player_id {
 sub race_of_acting_player {
     my $self        = shift;
 
-    return $self->race_of_player_id( $self->current_player_id() );
+    return $self->race_of_player_id( $self->acting_player_id() );
 }
 
 #############################################################################
@@ -963,8 +990,8 @@ sub set_new_player_order {
     my $self        = shift;
     my @player_ids  = @_;
 
-    $self->players_done()->clear();
-    $self->players_pending()->fill( @player_ids );
+    $self->done_players()->clear();
+    $self->pending_players()->fill( @player_ids );
 
     return;
 }

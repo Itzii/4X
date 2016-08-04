@@ -423,7 +423,7 @@ sub tile_is_influencible {
 
     my $this_tile = $self->server()->tiles()->{ $tile_tag };
 
-    if ( $this_tile->enemy_ship_count( $self->current_user() ) > 0 ) {
+    if ( $this_tile->enemy_ship_count( $self->current_player_id() ) > 0 ) {
         return 0;
     }
 
@@ -434,7 +434,7 @@ sub tile_is_influencible {
 
         if ( defined( $tile ) ) {
             if ( $self->tile_pair_is_traversable( $race->tag(), $loc_x, $loc_y, $loc_x2, $loc_y2 ) ) {
-                if ( $tile->user_ship_count( $self->current_user() ) > 0 ) {
+                if ( $tile->user_ship_count( $self->active_player_id() ) > 0 ) {
                     return 1;
                 }
             }

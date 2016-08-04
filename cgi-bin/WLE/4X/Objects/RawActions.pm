@@ -353,21 +353,22 @@ sub _raw_begin {
 
     unless ( defined( $VAR1->{'PLAYER_COUNT_SETTINGS'} ) ) {
         $self->set_error( 'Missing Section in resource file: PLAYER_COUNT_SETTINGS' );
-        # print STDERR $self->{'LAST_ERROR'};
+        print STDERR $self->last_error();
         return 0;
     }
 
     my $settings = $VAR1->{'PLAYER_COUNT_SETTINGS'}->{ $self->user_ids()->count() };
+    print STDERR "\nPlayer Count: " . $self->user_ids()->count();
 
     unless ( defined( $settings ) ) {
         $self->set_error( 'Invalid Player Count: ' . $self->user_ids()->count() );
-        # print STDERR $self->{'LAST_ERROR'};
+        print STDERR $self->last_error();
         return 0;
     }
 
     unless ( $self->source_tags()->contains( $settings->{'SOURCE_TAG'} ) ) {
         $self->set_error( 'Invalid player count for chosen sources: ' . $self->user_ids()->count() );
-        # print STDERR $self->{'LAST_ERROR'};
+        print STDERR $self->last_error();
         return 0;
     }
 
@@ -475,7 +476,7 @@ sub _raw_begin {
             'hash' => $VAR1->{'TILES'}->{ $tile_key },
         );
 
-#        print "\nTile: " . $tile->tag();
+        print "\nTile: " . $tile->tag();
 
         if ( defined( $tile ) ) {
             if ( $self->item_is_allowed_in_game( $tile ) ) {
@@ -1650,7 +1651,7 @@ sub _raw_create_ship_on_tile {
     my $ship_tag        = $self->new_ship_tag( $template_tag, $owner_id );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        my $race_tag = $self->race_tag_of_current_user();
+        my $race_tag = $self->race_tag_of_acting_player();
         if ( $race_tag eq '' ) {
             $race_tag = 'game';
         }
@@ -1693,7 +1694,7 @@ sub _raw_add_ship_to_tile {
     my $ship_tag = shift( @args );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        my $race_tag = $self->race_tag_of_current_user();
+        my $race_tag = $self->race_tag_of_acting_player();
         if ( $race_tag eq '' ) {
             $race_tag = 'game';
         }
@@ -1723,7 +1724,7 @@ sub _raw_remove_ship_from_tile {
     my $ship_tag = shift( @args );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        my $race_tag = $self->race_tag_of_current_user();
+        my $race_tag = $self->race_tag_of_acting_player();
         if ( $race_tag eq '' ) {
             $race_tag = 'game';
         }

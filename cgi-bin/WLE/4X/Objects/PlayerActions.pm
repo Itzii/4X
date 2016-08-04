@@ -112,7 +112,7 @@ sub action_explore {
     my $loc_y = $args{'loc_y'};
     my $loc_tag = $loc_x . ':' . $loc_y;
 
-    my @explorables = $self->board()->explorable_spaces_for_race( $self->race_tag_of_current_user() );
+    my @explorables = $self->board()->explorable_spaces_for_race( $self->race_tag_of_acting_player() );
 
     unless ( matches_any( $loc_tag, @explorables ) ) {
         $self->set_error( 'Invalid Exploration Location' );
@@ -573,7 +573,7 @@ sub action_build {
 
     my $tile = $self->tiles()->{ $tile_tag };
 
-    unless ( $tile->owner_id() == $self->current_user() ) {
+    unless ( $tile->owner_id() == $self->acting_player() ) {
         $self->set_error( 'Invalid Tile' );
         return 0;
     }
@@ -636,7 +636,7 @@ sub action_move {
         return 0;
     }
 
-    unless ( $ship->owner_id() == $self->current_user() ) {
+    unless ( $ship->owner_id() == $self->acting_player_id() ) {
         $self->set_error( 'Ship not owned by user' );
         return 0;
     }
@@ -672,7 +672,7 @@ sub action_move {
     my $race = $self->race_of_acting_player();
 
     my $reachable = $self->board()->tile_is_within_distance(
-        $self->current_user(),
+        $self->acting_player_id(),
         $origin_tag,
         $destination_tag,
         $ship->total_movement(),

@@ -169,7 +169,7 @@ sub action_allocate_hits {
 
     my $self_id = $attacker_id;
     my $enemy_id = $defender_id;
-    if ( $enemy_id = $self->current_user() ) {
+    if ( $enemy_id = $self->acting_player_id() ) {
         $enemy_id = $attacker_id;
         $self_id = $defender_id;
     }
@@ -303,7 +303,7 @@ sub action_allocate_defense_hits {
     my $self_id = $attacker_id;
     my $enemy_id = $defender_id;
 
-    if ( $enemy_id = $self->current_user() ) {
+    if ( $enemy_id = $self->acting_player_id() ) {
         $enemy_id = $attacker_id;
         $self_id = $defender_id;
     }
@@ -383,7 +383,7 @@ sub action_attack_populace {
     my @hits = ();
 
     foreach my $ship ( $tile->ships()->items() ) {
-        if ( $ship->owner_id() == $self->current_user() ) {
+        if ( $ship->owner_id() == $self->acting_player_id() ) {
             foreach my $attack ( $ship->roll_beam_attacks() ) {
                 if ( $self->does_roll_hit_ship( $attack->{'roll'}, $ship->template(), undef ) ) {
                     push( @hits, 'hit:' . $attack->{'strength'} . ':' . $attack->{'roll'} );
@@ -522,7 +522,7 @@ sub action_select_vp_token {
 
     my $new_token = $args{'token'};
 
-    my $race = $self->race_of_current_user();
+    my $race = $self->race_of_acting_player();
 
     unless ( $race->in_hand()->contains( $new_token ) ) {
         $self->set_error( 'Invalid Token Argument' );

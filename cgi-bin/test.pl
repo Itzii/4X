@@ -269,8 +269,10 @@ sub test_Object_Server {
 		'r_option_tags' => [],
 	);
 
-	# show( $response{'message'} );
 	ok( $response{'success'} == 1, 'create_game successful' );
+	unless( $response{'success'} == 1 ) {
+		show( $response{'message'} );
+	}
 
 	%response = $server->do(
 		'action' 		=> 'add_source',
@@ -278,6 +280,9 @@ sub test_Object_Server {
 		'log_id'		=> $log_id,
 		'source_tag'	=> 'src_test',
 	);
+	unless( $response{'success'} == 1 ) {
+		show( $response{'message'} );
+	}
 
 	%response = $server->do(
 		'action' 		=> 'add_option',
@@ -285,38 +290,49 @@ sub test_Object_Server {
 		'log_id'		=> $log_id,
 		'option_tag'	=> 'option_test',
 	);
+	unless( $response{'success'} == 1 ) {
+		show( $response{'message'} );
+	}
 
 	%response = $server->do(
 		'action' 		=> 'add_player',
 		'user'			=> $owner_id,
 		'log_id'		=> $log_id,
-		'player_id'		=> $user_ids[ 1 ],
+		'user_id'		=> $user_ids[ 1 ],
 	);
+	unless( $response{'success'} == 1 ) {
+		show( $response{'message'} );
+	}
 
 	%response = $server->do(
 		'action' 		=> 'add_player',
 		'user'			=> $owner_id,
 		'log_id'		=> $log_id,
-		'player_id'		=> $user_ids[ 2 ],
+		'user_id'		=> $user_ids[ 2 ],
 	);
+	unless( $response{'success'} == 1 ) {
+		show( $response{'message'} );
+	}
 
 	%response = $server->do(
 		'action' 		=> 'begin',
 		'user'			=> $owner_id,
 		'log_id'		=> $log_id,
 	);
-
-
 	ok( $response{'success'} == 1, 'action_begin successful' );
+	unless( $response{'success'} == 1 ) {
+		show( $response{'message'} );
+	}
 
 	%response = $server->do(
 		'action'		=> 'status',
 		'user'			=> $owner_id,
 		'log_id'		=> $log_id,
 	);
-
 	ok( $response{'success'} == 1, 'get status completed correctly' );
-#	show( $response{'message'} );
+	unless( $response{'success'} == 1 ) {
+		show( $response{'message'} );
+	}
 
 	%response = $server->do(
 		'action'		=> 'select_race',
@@ -326,7 +342,6 @@ sub test_Object_Server {
 		'location_x'	=> 0,
 		'location_y'	=> -2,
 	);
-
 	ok( $response{'success'} == 0, 'select_race failed for invalid user' );
 
 	%response = $server->do(
@@ -334,6 +349,9 @@ sub test_Object_Server {
 		'user'			=> $owner_id,
 		'log_id'		=> $log_id,
 	);
+	unless( $response{'success'} == 1 ) {
+		show( $response{'message'} );
+	}
 
 	my @status = split( /:/, $response{'data'} );
 	my $waiting_for = $status[ 3 ];
@@ -350,14 +368,18 @@ sub test_Object_Server {
 	);
 
 	ok( $response{'success'} == 1, 'select_race successful' );
-#	show( $response{'message'} );
-#	show( $server->status() );
+	unless( $response{'success'} == 1 ) {
+		show( $response{'message'} );
+	}
 
 	%response = $server->do(
 		'action'		=> 'status',
 		'user'			=> $owner_id,
 		'log_id'		=> $log_id,
 	);
+	unless( $response{'success'} == 1 ) {
+		show( $response{'message'} );
+	}
 
 	@status = split( /:/, $response{'data'} );
 	$waiting_for = $status[ 3 ];
@@ -371,6 +393,9 @@ sub test_Object_Server {
 		'location_x'	=> 2,
 		'location_y'	=> 0,
 	);
+	unless( $response{'success'} == 1 ) {
+		show( $response{'message'} );
+	}
 
 	%response = $server->do(
 		'action'		=> 'status',
@@ -391,7 +416,9 @@ sub test_Object_Server {
 		'location_x'	=> -2,
 		'location_y'	=> 2,
 	);
-
+	unless( $response{'success'} == 1 ) {
+		show( $response{'message'} );
+	}
 
 	%response = $server->do(
 		'action'		=> 'status',
@@ -403,6 +430,7 @@ sub test_Object_Server {
 	$waiting_for = $status[ 3 ];
 	show( $server->status() );
 
+
 	%response = $server->do(
 		'action'		=> 'action_pass',
 		'user'			=> '3',
@@ -410,6 +438,8 @@ sub test_Object_Server {
 	);
 
 	ok( $response{'success'} == 0, 'action_pass failed' );
+
+
 
 	%response = $server->do(
 		'action'		=> 'action_pass',

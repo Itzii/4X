@@ -316,8 +316,8 @@ sub action_begin {
 
     # randomize player order
 
-    my @new_player_order = ( 0 .. $self->player_ids()->count() - 1 );
-    WLE::Methods::Simple::shuffle_in_place( \@new_player_order );
+    my @new_player_order = ( 0 .. $self->user_ids()->count() - 1 );
+    shuffle_in_place( \@new_player_order );
 
     $self->_raw_set_player_order( $EV_FROM_INTERFACE, @new_player_order );
     $self->_raw_add_players_to_next_round( $EV_FROM_INTERFACE, @new_player_order );
@@ -330,7 +330,7 @@ sub action_begin {
 
         shuffle_in_place( \@stack );
 
-        my $stack_limit = $self->tile_stack_limit( $stack_tag );
+        my $stack_limit = $self->board()->tile_stack_limit( $stack_tag );
 
         if ( $stack_limit > -1 ) {
             while ( scalar( @stack ) > $stack_limit ) {

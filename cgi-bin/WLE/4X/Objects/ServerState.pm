@@ -103,29 +103,39 @@ sub _read_state {
 
     $self->set_current_traitor( $VAR1->{'SETTINGS'}->{'CURRENT_TRAITOR'} );
 
+    if ( defined( $VAR1->{'STARTING_LOCATIONS'} ) ) {
+        foreach my $location ( @{ $VAR1->{'STARTING_LOCATIONS'} } ) {
+            $self->starting_locations()->add_items( $location );
+        }
+    }
 
+    if ( defined( $VAR1->{'STATE'}->{'STATE'} ) ) {
+        $self->set_state( $VAR1->{'STATE'}->{'STATE'} );
+    }
 
+    if ( defined( $VAR1->{'STATE'}->{'ROUND'} ) ) {
+        $self->set_round( $VAR1->{'STATE'}->{'ROUND'} );
+    }
 
-    $self->{'SETTINGS'}->{'STARTING_LOCATIONS'} = WLE::Objects::Stack->new();
+    if ( defined( $VAR1->{'STATE'}->{'PLAYER'} ) ) {
+        $self->set_waiting_on_player_id( $VAR1->{'STATE'}->{'PLAYER'} );
+    }
 
+    if ( defined( $VAR1->{'STATE'}->{'PHASE'} ) ) {
+        $self->set_phase( $VAR1->{'STATE'}->{'PHASE'} );
+    }
 
+    if ( defined( $VAR1->{'STATE'}->{'SUBPHASE'} ) ) {
+        $self->set_subphase( $VAR1->{'STATE'}->{'SUBPHASE'} );
+    }
 
+    if ( defined( $VAR1->{'STATE'}->{'TILE'} ) ) {
+        $self->set_current_tile( $VAR1->{'STATE'}->{'TILE'} );
+    }
 
-
-
-
-
-
-
-    $self->{'SETTINGS'} = $VAR1->{'SETTINGS'};
-
-    $self->{'STATE'} = $VAR1->{'STATE'};
 
     $self->set_tech_draw_count( $VAR1->{'ROUND_TECH_COUNT'} );
 
-    if ( defined( $VAR1->{'STARTING_LOCATIONS'} ) ) {
-        $self->{'STARTING_LOCATIONS'} = $VAR1->{'STARTING_LOCATIONS'};
-    }
 
     # setup ship component tiles
     # print STDERR "\n  ship components ... ";
@@ -333,18 +343,32 @@ sub _save_state {
 
     my %data = ();
 
-    $data{'SETTINGS'} = $self->{'SETTINGS'};
-    $data{'STATE'} = $self->{'STATE'};
+    $data{'SETTINGS'}->{'LOG_ID'} = $self->log_id();
+
+    $data{'SETTINGS'}->{'SOURCE_TAGS'} = [ $self->source_tags()->items() ];
+    $data{'SETTINGS'}->{'OPTION_TAGS'} = [ $self->option_tags()->items() ];
+
+    $data{'SETTINGS'}->{'LONG_NAME'} = $self->long_name();
+
+    $data{'SETTINGS'}->{'USER_IDS'} = [ $self->user_ids()->items() ];
+    $data{'SETTINGS'}->{'PLAYERS_PENDING'} = [ $self->pending_players()->items() ];
+    $data{'SETTINGS'}->{'PLAYERS_DONE'} = [ $self->done_players()->items() ];
+    $data{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} = [ $self->players_next_round() ];
+
+    $data{'SETTINGS'}->{'CURRENT_TRAITOR'} = $self->current_traitor();
+
+    $data{'STATE'}->{'STATE'} = $self->state();
+    $data{'STATE'}->{'ROUND'} = $self->round();
+    $data{'STATE'}->{'PLAYER'} = $self->waiting_on_player_id();
+    $data{'STATE'}->{'PHASE'} = $self->phase();
+    $data{'STATE'}->{'SUBPHASE'} = $self->subphase();
+    $data{'STATE'}->{'TILE'} = $self->current_tile();
 
     unless ( $self->status() eq '0' ) {
 
-        $data{'TECH_DRAW_COUNT'} = $self->{'TECH_DRAW_COUNT'};
+        $data{'SETTINGS'}->{'STARTING_LOCATIONS'} = [ $self->starting_locations()->items() ];
 
-        if ( defined( $self->{'STARTING_LOCATIONS'} ) ) {
-            if ( scalar( @{ $self->{'STARTING_LOCATIONS'} } ) > 0 ) {
-                $data{'STARTING_LOCATIONS'} = $self->{'STARTING_LOCATIONS'};
-            }
-        }
+        $data{'TECH_DRAW_COUNT'} = $self->tech_draw_count();
 
         # ship components
         $data{'COMPONENTS'} = {};
@@ -403,7 +427,7 @@ sub _save_state {
             $data{'DEVELOPMENTS'}->{ $development->tag() } = \%dev_hash;
         }
 
-        $data{'DEVELOPMENT_STACK'} = [ $self->{'DEVELOPMENT_STACK'} ];
+        $data{'DEVELOPMENT_STACK'} = [ $self->development_stack()->items() ];
 
         # ship templates
 #        print STDERR "\n saving ship_templates ... ";

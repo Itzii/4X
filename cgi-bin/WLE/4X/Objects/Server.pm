@@ -375,7 +375,7 @@ sub user_ids {
 sub current_user {
     my $self        = shift;
 
-    return $self->{'ENV'}->{'CURRENT_USER'};
+    return $self->{'ENV'}->{'CURRENT_PLAYER_ID'};
 }
 
 #############################################################################

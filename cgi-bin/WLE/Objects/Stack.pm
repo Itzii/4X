@@ -3,7 +3,7 @@ package WLE::Objects::Stack;
 use strict;
 use warnings;
 
-use WLE::Methods::Simple qw( shuffle_in_place matches_any );
+use WLE::Methods::Simple qw( shuffle_in_place matches_any looks_like_number );
 
 #############################################################################
 

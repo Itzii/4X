@@ -67,6 +67,7 @@ sub _init {
     $self->{'ENV'}->{'DIR_LOG_FILES'} =~ s{ /$ }{}xs;
 
     $self->{'ENV'}->{'CURRENT_PLAYER_ID'} = -1;
+    $self->{'ENV'}->{'FLAG_READ_ONLY'} = 0;
 
 
     unless ( -e $self->_file_resources() ) {
@@ -182,15 +183,12 @@ sub do {
         $self->{'ENV'}->{'ACTING_PLAYER_ID'} = 0;
     }
     else {
-        unless ( $self->_read_state( $args{'log_id'} ) ) {
-            return ( 'success' => 0, 'message' => 'Unable to open state file.' );
-        }
+        my $error_message = $self->_check_allowed_action( $args{'log_id'}, $action_tag, \$method );
 
         $self->{'ENV'}->{'ACTING_PLAYER_ID'} = $self->user_ids()->index_of( $args{'user'} );
 
-        my $error_message = $self->_check_allowed_action( $action_tag, \$method );
-
         unless ( $error_message eq '' ) {
+            $self->_close_all();
             return ( 'success' => 0, 'message' => $error_message );
         }
     }
@@ -213,6 +211,11 @@ sub do {
         $response{'allowed'} = [ $race->adjusted_allowed_actions() ];
     }
 
+    if ( $response{'success'} == 1 && $self->{'ENV'}->{'FLAG_READ_ONLY'} == 0 ) {
+        $self->_save_state();
+    }
+
+    $self->_close_all();
 
     return %response;
 }
@@ -221,12 +224,13 @@ sub do {
 
 sub _check_allowed_action {
     my $self        = shift;
+    my $log_id      = shift;
     my $action_tag  = shift;
     my $r_method    = shift;
 
     my %actions = (
 
-        'status'            => { 'method' => \&action_status, 'flag_anytime' => 1 },
+        'status'            => { 'method' => \&action_status, 'flag_anytime' => 1, 'flag_read_only' => 1 },
         'exchange'          => { 'method' => \&action_exchange, 'flag_anytime' => 1 },
 
         'create_game'       => { 'method' => \&action_create_game },
@@ -287,6 +291,22 @@ sub _check_allowed_action {
     }
 
     $$r_method = $action->{'method'};
+
+    if ( defined( $action->{'flag_read_only'} ) ) {
+        unless ( $self->_open_for_reading( $log_id ) ) {
+            return $self->last_error();
+        }
+        $self->{'ENV'}->{'FLAG_READ_ONLY'} = 1;
+    }
+    else {
+        unless ( $self->_open_for_writing( $log_id ) ) {
+            return $self->last_error();
+        }
+    }
+
+    unless( $self->_read_state( $log_id ) ) {
+        return $self->last_error();
+    }
 
     if ( defined( $action->{'flag_anytime'} ) ) {
         return '';

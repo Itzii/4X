@@ -26,6 +26,24 @@ sub _log_data {
 
 #############################################################################
 
+sub _open_for_reading {
+    my $self        = shift;
+    my $log_id      = shift;
+
+    $self->set_error( '' );
+
+    unless ( $self->_set_log_id( $log_id ) ) {
+        $self->set_error( 'Invalid Log ID: ' . $log_id );
+        return 0;
+    }
+
+    $self->{'FH_STATE'} = $self->_open_file( $self->_state_file() );
+
+    return defined( $self->{'FH_STATE'} );
+}
+
+#############################################################################
+
 sub _open_for_writing {
     my $self        = shift;
     my $log_id      = shift;
@@ -70,15 +88,6 @@ sub _read_state {
     my $log_id      = shift;
 
 #    print STDERR "\nLoading State ... ";
-
-    my $fh;
-
-    unless ( open( $fh, '<', $self->_state_file() ) ) {
-        $self->set_error( 'Failed to open file for reading: ' . $self->_state_file() );
-        return 0;
-    }
-
-    flock( $fh, LOCK_SH );
 
     # using Data::Dumper
 
@@ -332,8 +341,6 @@ sub _read_state {
 
 #    $self->{'DATA'} = fd_retrieve( $fh );
 
-    close( $fh );
-
     return 1;
 }
 
@@ -504,7 +511,7 @@ sub _open_file_with_lock {
     my $fh;
 
     unless ( -e $file_path ) {
-
+        return undef;
     }
 
     unless ( open( $fh, '+>>', $file_path ) ) {
@@ -520,6 +527,27 @@ sub _open_file_with_lock {
     return $fh;
 }
 
+#############################################################################
+
+sub _open_file {
+    my $self        = shift;
+    my $file_path   = shift;
+
+    my $fh;
+
+    unless ( -e $file_path ) {
+        return undef;
+    }
+
+    unless ( open( $fh, '<', $file_path ) ) {
+        $self->set_error( 'Failed to open file for reading: ' . $file_path );
+        return undef;
+    }
+
+    flock( $fh, LOCK_SH );
+
+    return $fh;
+}
 
 #############################################################################
 #############################################################################

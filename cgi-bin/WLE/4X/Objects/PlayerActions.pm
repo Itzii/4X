@@ -15,10 +15,6 @@ sub action_use_colony_ship {
     my $self            = shift;
     my %args            = @_;
 
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
-
     unless ( defined( $args{'tile_tag'} ) ) {
         $self->set_error( 'Missing Tile Tag' );
         return 0;
@@ -63,9 +59,6 @@ sub action_use_colony_ship {
 
     $self->_raw_use_colony_ship( $EV_FROM_INTERFACE, $tile_tag, $type, $advanced );
 
-    $self->_save_state();
-    $self->_close_all();
-
     return 1;
 }
 
@@ -76,19 +69,12 @@ sub action_use_colony_ship {
 sub action_pass_action {
     my $self            = shift;
 
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
-
     $self->_raw_player_pass_action( $EV_FROM_INTERFACE );
     $self->_raw_next_player( $EV_FROM_INTERFACE );
 
     if ( $self->waiting_on_player_id() == -1 ) {
         $self->_raw_start_combat_phase( $EV_FROM_INTERFACE );
     }
-
-    $self->_save_state();
-    $self->_close_all();
 
     return 1;
 }
@@ -98,10 +84,6 @@ sub action_pass_action {
 sub action_explore {
     my $self            = shift;
     my %args            = @_;
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
 
     unless ( defined( $args{'loc_x'} ) && defined( $args{'loc_y'} ) ) {
         $self->set_error( 'Missing Location Information' );
@@ -141,9 +123,6 @@ sub action_explore {
     $self->_raw_spend_influence( $EV_FROM_INTERFACE );
     $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, 'place_tile', 'discard_tile' );
 
-    $self->_save_state();
-    $self->_close_all();
-
     return 1;
 }
 
@@ -152,10 +131,6 @@ sub action_explore {
 sub action_explore_place_tile {
     my $self            = shift;
     my %args            = @_;
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
 
     unless ( defined( $args{'tile_tag'} ) ) {
         $self->set_error( 'Missing Tile Tag' );
@@ -245,9 +220,6 @@ sub action_explore_place_tile {
         $self->_raw_set_allowed_race_actions( 'finish_turn' );
     }
 
-    $self->_save_state();
-    $self->_close_all();
-
     return 1;
 }
 
@@ -256,10 +228,6 @@ sub action_explore_place_tile {
 sub action_explore_discard_tile {
     my $self            = shift;
     my %args            = @_;
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
 
     unless ( defined( $args{'tile_tag'} ) ) {
         $self->set_error( 'Missing Tile Tag' );
@@ -293,9 +261,6 @@ sub action_explore_discard_tile {
         $self->_raw_set_allowed_race_actions( 'finish_turn' );
     }
 
-    $self->_save_state();
-    $self->_close_all();
-
     return 1;
 }
 
@@ -304,10 +269,6 @@ sub action_explore_discard_tile {
 sub action_influence {
     my $self            = shift;
     my %args            = @_;
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
 
     unless ( defined( $args{'from'} ) ) {
         $self->set_error( 'Missing From Element' );
@@ -352,9 +313,6 @@ sub action_influence {
 
     $self->_raw_set_allowed_race_actions( @allowed );
 
-    $self->_save_state();
-    $self->_close_all();
-
     return 1;
 }
 
@@ -363,10 +321,6 @@ sub action_influence {
 sub action_influence_unflip_colony_ship {
     my $self            = shift;
     my %args            = @_;
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
 
     my $race = $self->race_of_acting_player();
 
@@ -381,9 +335,6 @@ sub action_influence_unflip_colony_ship {
         $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, 'action_influence', 'finish_turn' );
     }
 
-    $self->_save_state();
-    $self->_close_all();
-
     return 1;
 }
 
@@ -392,10 +343,6 @@ sub action_influence_unflip_colony_ship {
 sub action_research {
     my $self            = shift;
     my %args            = @_;
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
 
     unless ( defined( $args{'tech_tag'} ) ) {
         $self->set_error( 'Missing Tech Item' );
@@ -465,9 +412,6 @@ sub action_research {
         $self->_raw_set_allowed_race_actions( 'finish_turn' );
     }
 
-    $self->_save_state();
-    $self->_close_all();
-
     return 1;
 }
 
@@ -476,10 +420,6 @@ sub action_research {
 sub action_upgrade {
     my $self            = shift;
     my %args            = @_;
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
 
     unless ( defined( $args{'class'} ) ) {
         $self->set_error( 'Missing Ship Class' );
@@ -541,9 +481,6 @@ sub action_upgrade {
         $self->_raw_set_allowed_race_actions( 'action_upgrade', 'finish_turn' );
     }
 
-    $self->_save_state();
-    $self->_close_all();
-
     return 1;
 }
 
@@ -552,10 +489,6 @@ sub action_upgrade {
 sub action_build {
     my $self            = shift;
     my %args            = @_;
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
 
     unless ( defined( $args{'tile_tag'} ) ) {
         $self->set_error( 'Missing Tile Location' );
@@ -608,9 +541,6 @@ sub action_build {
         $self->_raw_set_allowed_race_actions( 'action_build', 'finish_turn' );
     }
 
-    $self->_save_state();
-    $self->_close_all();
-
     return 1;
 }
 
@@ -619,10 +549,6 @@ sub action_build {
 sub action_move {
     my $self            = shift;
     my %args            = @_;
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
 
     unless ( defined( $args{'ship_tag'} ) ) {
         $self->set_error( 'Missing Ship Tag' );
@@ -697,9 +623,6 @@ sub action_move {
         $self->_raw_set_allowed_race_actions( 'action_move', 'finish_turn' );
     }
 
-    $self->_save_state();
-    $self->_close_all();
-
     return 1;
 }
 
@@ -736,10 +659,6 @@ sub action_react_move {
 sub action_interrupt_place_influence_token {
     my $self            = shift;
     my %args            = @_;
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
 
     unless ( defined( $args{'to'} ) ) {
         $self->set_error( 'Missing To Element' );
@@ -788,9 +707,6 @@ sub action_interrupt_place_influence_token {
 
     }
 
-    $self->_save_state();
-    $self->_close_all();
-
     return 1;
 }
 
@@ -799,10 +715,6 @@ sub action_interrupt_place_influence_token {
 sub action_interrupt_replace_cube {
     my $self            = shift;
     my %args            = @_;
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
 
     my $race = $self->race_of_acting_player();
 
@@ -857,9 +769,6 @@ sub action_interrupt_replace_cube {
 
     $self->_raw_set_allowed_race_actions( @allowed );
 
-    $self->_save_state();
-    $self->_close_all();
-
     return 1;
 }
 
@@ -868,10 +777,6 @@ sub action_interrupt_replace_cube {
 sub action_interrupt_choose_discovery {
     my $self            = shift;
     my %args            = @_;
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
 
     unless ( defined( $args{'discovery_tag'} ) ) {
         $self->set_error( 'Missing Discovery tag' );
@@ -908,9 +813,6 @@ sub action_interrupt_choose_discovery {
 
     $self->_raw_use_discovery( $EV_FROM_INTERFACE, $discovery_tag, $tile_tag, $flag_as_vp );
 
-    $self->_save_state();
-    $self->_close_all();
-
     return 1;
 }
 
@@ -919,10 +821,6 @@ sub action_interrupt_choose_discovery {
 sub action_interrupt_select_technology {
     my $self            = shift;
     my %args            = @_;
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
 
     unless ( defined( $args{'chosen_tech'} ) ) {
         $self->set_error( 'Missing Tech Choice' );
@@ -961,10 +859,6 @@ sub action_interrupt_select_technology {
 
     $self->_raw_add_to_tech_track( $EV_FROM_INTERFACE, $tech_tag, $tech_type );
     $self->_raw_remove_from_available_tech( $EV_FROM_INTERFACE, $tech_tag );
-
-
-    $self->_save_state();
-    $self->_close_all();
 
     return 1;
 }

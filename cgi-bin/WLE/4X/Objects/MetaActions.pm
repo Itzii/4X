@@ -52,10 +52,6 @@ sub action_create_game {
         $args{'r_option_tags'},
     );
 
-    $self->_save_state();
-
-    $self->_close_all();
-
     return 1;
 }
 
@@ -69,10 +65,6 @@ sub action_create_game {
 sub action_add_source {
     my $self        = shift;
     my %args        = @_;
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
 
     unless ( defined( $args{'source_tag'} ) ) {
         $self->set_error( 'Missing Source Tag' );
@@ -90,9 +82,6 @@ sub action_add_source {
     }
 
     $self->_raw_add_source( $EV_FROM_INTERFACE, $args{'source_tag'} );
-    $self->_save_state();
-
-    $self->_close_all();
 
     return 1;
 
@@ -108,10 +97,6 @@ sub action_add_source {
 sub action_remove_source {
     my $self        = shift;
     my %args        = @_;
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
 
     unless ( defined( $args{'source_tag'} ) ) {
         $self->set_error( 'Missing Source Tag' );
@@ -130,10 +115,6 @@ sub action_remove_source {
 
     $self->_raw_remove_source( $EV_FROM_INTERFACE, $args{'source_tag'} );
 
-    $self->_save_state();
-
-    $self->_close_all();
-
     return 1;
 }
 
@@ -148,10 +129,6 @@ sub action_remove_source {
 sub action_add_option {
     my $self        = shift;
     my %args        = @_;
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
 
     unless ( defined( $args{'option_tag'} ) ) {
         $self->set_error( 'Missing Option Tag' );
@@ -170,10 +147,6 @@ sub action_add_option {
 
     $self->_raw_add_option( $EV_FROM_INTERFACE, $args{'option_tag'} );
 
-    $self->_save_state();
-
-    $self->_close_all();
-
     return 1;
 
 }
@@ -188,10 +161,6 @@ sub action_add_option {
 sub action_remove_option {
     my $self        = shift;
     my %args        = @_;
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
 
     unless ( defined( $args{'option_tag'} ) ) {
         $self->set_error( 'Missing Option Tag' );
@@ -215,10 +184,6 @@ sub action_remove_option {
 
     $self->_raw_remove_option( $EV_FROM_INTERFACE, $args{'option_tag'} );
 
-    $self->_save_state();
-
-    $self->_close_all();
-
     return 1;
 }
 
@@ -232,10 +197,6 @@ sub action_remove_option {
 sub action_add_player {
     my $self        = shift;
     my %args        = @_;
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
 
     unless ( defined( $args{'user_id'} ) ) {
         $self->set_error( 'Missing User ID' );
@@ -254,10 +215,6 @@ sub action_add_player {
 
     $self->_raw_add_player( $EV_FROM_INTERFACE, $args{'user_id'} );
 
-    $self->_save_state();
-
-    $self->_close_all();
-
     return 1;
 }
 
@@ -271,10 +228,6 @@ sub action_add_player {
 sub action_remove_player {
     my $self        = shift;
     my %args        = @_;
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
 
     unless ( defined( $args{'user_id'} ) ) {
         $self->set_error( 'Missing User ID' );
@@ -293,10 +246,6 @@ sub action_remove_player {
 
     $self->_raw_remove_player( $EV_FROM_INTERFACE, $args{'user_id'} );
 
-    $self->_save_state();
-
-    $self->_close_all();
-
     return 1;
 }
 
@@ -305,10 +254,6 @@ sub action_remove_player {
 sub action_begin {
     my $self        = shift;
     my %args        = @_;
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
 
     # create the base item set
 
@@ -389,10 +334,6 @@ sub action_begin {
 
     $self->_raw_set_status( $EV_FROM_INTERFACE, $self->status() );
 
-    $self->_save_state();
-
-    $self->_close_all();
-
     return 1;
 }
 
@@ -401,10 +342,6 @@ sub action_begin {
 sub action_select_race_and_location {
     my $self            = shift;
     my %args            = @_;
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
 
     unless ( defined( $args{'race_tag'} ) ) {
         $self->set_error( 'Missing Race Tag' );
@@ -475,11 +412,6 @@ sub action_select_race_and_location {
         $self->_prepare_for_first_round();
         $self->_raw_start_next_round( $EV_FROM_INTERFACE );
     }
-
-
-    $self->_save_state();
-
-    $self->_close_all();
 
     return 1;
 }

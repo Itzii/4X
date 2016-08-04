@@ -15,10 +15,6 @@ sub action_attack {
     my $self            = shift;
     my %args            = @_;
 
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
-
     my $tile_tag = $self->current_tile();
     my $template_tag = ($self->template_combat_order())[ 0 ];
     my $ship_owner = $self->ship_templates()->{ $template_tag }->owner_id();
@@ -70,9 +66,6 @@ sub action_attack {
     my $race = $self->race_of_player_id( $ship_owner );
     $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $race->tag(), 'allocate_hits' );
 
-    $self->_save_state();
-    $self->_close_all();
-
     return 1;
 }
 
@@ -81,10 +74,6 @@ sub action_attack {
 sub action_roll_npc {
     my $self            = shift;
     my %args            = @_;
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
 
     my $tile_tag = $self->current_tile();
     my $template_tag = ($self->template_combat_order())[ 0 ];
@@ -149,9 +138,6 @@ sub action_roll_npc {
         $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $self->race_of_player_id( $enemy_id ), 'acknowledge_hits' );
     }
 
-    $self->_save_state();
-    $self->_close_all();
-
     return 1;
 }
 
@@ -160,10 +146,6 @@ sub action_roll_npc {
 sub action_allocate_hits {
     my $self            = shift;
     my %args            = @_;
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
 
     my ( $defender_id, $attacker_id ) = $self->tiles()->{ $self->current_tile() }->current_combatant_ids();
 
@@ -255,9 +237,6 @@ sub action_allocate_hits {
 
     $self->_raw_allocate_hits( $EV_FROM_INTERFACE, @current_hits );
 
-    $self->_save_state();
-    $self->_close_all();
-
     return 1;
 }
 
@@ -266,10 +245,6 @@ sub action_allocate_hits {
 sub action_allocate_defense_hits {
     my $self            = shift;
     my %args            = @_;
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
 
     unless ( defined( $args{'hits'} ) ) {
         $self->set_error( 'Missing Hits Argument' );
@@ -319,9 +294,6 @@ sub action_allocate_defense_hits {
         $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $self->race_of_player_id( $enemy_id ), 'acknowledge_hits' );
     }
 
-    $self->_save_state();
-    $self->_close_all();
-
     return 1;
 }
 
@@ -331,18 +303,12 @@ sub action_acknowledge_hits {
     my $self            = shift;
     my %args            = @_;
 
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
 
     $self->_raw_apply_combat_hits( $EV_FROM_INTERFACE );
 
 
 
     $self->_raw_next_combat_ships( $EV_FROM_INTERFACE );
-
-    $self->_save_state();
-    $self->_close_all();
 
     return 1;
 }
@@ -353,17 +319,10 @@ sub action_retreat {
     my $self            = shift;
     my %args            = @_;
 
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
-
     my $tile_tag = $self->current_tile();
     my $template_tag = ($self->template_combat_order())[ 0 ];
 
     $self->_raw_prepare_to_retreat_ships( $EV_FROM_INTERFACE, $tile_tag, $template_tag );
-
-    $self->_save_state();
-    $self->_close_all();
 
     return 1;
 }
@@ -373,10 +332,6 @@ sub action_retreat {
 sub action_attack_populace {
     my $self            = shift;
     my %args            = @_;
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
 
     my $tile = $self->tiles()->{ $self->current_tile() };
 
@@ -398,9 +353,6 @@ sub action_attack_populace {
     $self->_raw_allocate_population_hits( $EV_FROM_INTERFACE, @hits );
     $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, 'apply_population_hits' );
 
-    $self->_save_state();
-    $self->_close_all();
-
     return 1;
 }
 
@@ -409,10 +361,6 @@ sub action_attack_populace {
 sub action_apply_population_hits {
     my $self            = shift;
     my %args            = @_;
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
 
     unless ( defined( $args{'applied_hits'} ) ) {
         $self->set_error( 'Missing Applied Hits' );
@@ -443,9 +391,6 @@ sub action_apply_population_hits {
 
     $self->_raw_kill_population( $EV_FROM_INTERFACE, @types_to_kill );
 
-    $self->_save_state();
-    $self->_close_all();
-
     return 1;
 }
 
@@ -455,14 +400,7 @@ sub action_dont_attack_populace {
     my $self            = shift;
     my %args            = @_;
 
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
-
     $self->_raw_dont_kill_population( $EV_FROM_INTERFACE );
-
-    $self->_save_state();
-    $self->_close_all();
 
     return 1;
 }
@@ -472,10 +410,6 @@ sub action_dont_attack_populace {
 sub action_draw_vp {
     my $self            = shift;
     my %args            = @_;
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
 
     my $race = $self->race_of_acting_player();
 
@@ -499,9 +433,6 @@ sub action_draw_vp {
 
     $self->_raw_add_vp_to_hand( $EV_FROM_INTERFACE, $race->tag, @player_vp_tokens );
 
-    $self->_save_state();
-    $self->_close_all();
-
     return 1;
 }
 
@@ -510,10 +441,6 @@ sub action_draw_vp {
 sub action_select_vp_token {
     my $self            = shift;
     my %args            = @_;
-
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
-        return 0;
-    }
 
     unless ( defined( $args{'token'} ) ) {
         $self->set_error( 'Missing Token Argument' );
@@ -546,9 +473,6 @@ sub action_select_vp_token {
     $self->_raw_select_vp_token( $EV_FROM_INTERFACE, $race->tag(), $new_token, $old_token );
 
     $self->_raw_next_vp_draw_player( $EV_FROM_INTERFACE, $self->current_tile() );
-
-    $self->_save_state();
-    $self->_close_all();
 
     return 1;
 }

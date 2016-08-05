@@ -139,6 +139,7 @@ sub _raw_set_status {
     my $status = shift( @args );
 
     my @values = split( /:/, $status );
+    push( @values, '' );
 
     $self->set_state( $values[ 0 ] );
     $self->set_round( $values[ 1 ] );
@@ -339,7 +340,7 @@ sub _raw_begin {
 
     flock( $fh, LOCK_SH );
 
-    $self->reset();
+    $self->reset( 0 );
 
 #    print STDERR "\nparsing ... ";
 
@@ -358,7 +359,7 @@ sub _raw_begin {
     }
 
     my $settings = $VAR1->{'PLAYER_COUNT_SETTINGS'}->{ $self->user_ids()->count() };
-    print STDERR "\nPlayer Count: " . $self->user_ids()->count();
+#    print STDERR "\nPlayer Count: " . $self->user_ids()->count();
 
     unless ( defined( $settings ) ) {
         $self->set_error( 'Invalid Player Count: ' . $self->user_ids()->count() );
@@ -475,8 +476,6 @@ sub _raw_begin {
             'tag' => $tile_key,
             'hash' => $VAR1->{'TILES'}->{ $tile_key },
         );
-
-        print "\nTile: " . $tile->tag();
 
         if ( defined( $tile ) ) {
             if ( $self->item_is_allowed_in_game( $tile ) ) {

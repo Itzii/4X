@@ -32,6 +32,7 @@ sub action_create_game {
     }
 
     unless ( $self->_set_log_id( $args{'log_id'} ) ) {
+        $self->set_error( "Failed to set Log ID to '" . $args{'log_id'} . "'");
         return 0;
     }
 
@@ -40,7 +41,8 @@ sub action_create_game {
         return 0;
     }
 
-    unless ( $self->_open_for_writing( $self->log_id() ) ) {
+    unless ( $self->_open_for_writing( $self->log_id(), 1 ) ) {
+        print STDERR "Failed to open for writing.";
         return 0;
     }
 
@@ -331,6 +333,9 @@ sub action_begin {
 
     $self->set_state( $ST_RACESELECTION );
     $self->set_phase( $PH_PREPARING );
+    $self->set_round( 0 );
+    $self->set_subphase( $SUB_NULL );
+    $self->set_current_tile( '' );
 
     $self->_raw_set_status( $EV_FROM_INTERFACE, $self->status() );
 

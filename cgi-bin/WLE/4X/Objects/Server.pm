@@ -97,26 +97,29 @@ sub _init {
 
 sub reset {
     my $self        = shift;
+    my $flag_hard   = shift; $flag_hard = 1             unless defined( $flag_hard );
 
+    if ( $flag_hard ) {
 
     $self->{'SETTINGS'} = {};
 
-    $self->{'SETTINGS'}->{'LOG_ID'} = '';
+        $self->{'SETTINGS'}->{'LOG_ID'} = '';
 
-    $self->{'SETTINGS'}->{'SOURCE_TAGS'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
-    $self->{'SETTINGS'}->{'OPTION_TAGS'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
-    $self->{'SETTINGS'}->{'STARTING_LOCATIONS'} = WLE::Objects::Stack->new();
+        $self->{'SETTINGS'}->{'SOURCE_TAGS'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
+        $self->{'SETTINGS'}->{'OPTION_TAGS'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
+        $self->{'SETTINGS'}->{'STARTING_LOCATIONS'} = WLE::Objects::Stack->new();
 
-    $self->{'SETTINGS'}->{'LONG_NAME'} = '';
+        $self->{'SETTINGS'}->{'LONG_NAME'} = '';
 
-    $self->{'SETTINGS'}->{'USER_IDS'} = WLE::Objects::Stack->new();
+        $self->{'SETTINGS'}->{'USER_IDS'} = WLE::Objects::Stack->new();
 
-    $self->{'SETTINGS'}->{'PLAYERS_PENDING'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
-    $self->{'SETTINGS'}->{'PLAYERS_DONE'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
-    $self->{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
-    $self->{'SETTINGS'}->{'WAITING_ON_PLAYER'} = -1;
+        $self->{'SETTINGS'}->{'PLAYERS_PENDING'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
+        $self->{'SETTINGS'}->{'PLAYERS_DONE'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
+        $self->{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
+        $self->{'SETTINGS'}->{'WAITING_ON_PLAYER'} = -1;
 
-    $self->{'SETTINGS'}->{'CURRENT_TRAITOR'} = '';
+        $self->{'SETTINGS'}->{'CURRENT_TRAITOR'} = '';
+    }
 
     $self->{'RACES'} = {};
     $self->{'SHIP_TEMPLATES'} = {};
@@ -304,10 +307,6 @@ sub _check_allowed_action {
         }
     }
 
-    unless( $self->_read_state( $log_id ) ) {
-        return $self->last_error();
-    }
-
     if ( defined( $action->{'flag_anytime'} ) ) {
         return '';
     }
@@ -401,7 +400,7 @@ sub item_is_allowed_in_game {
 
     if (
         $self->source_tags()->contains( $element->source_tag() )
-        && $self->option_tags()->contains( $element->required_option() )
+        && ( $element->required_option() eq '' || $self->option_tags()->contains( $element->required_option() ) )
     ) {
         return 1;
     }
@@ -477,7 +476,7 @@ sub action_status {
     my %args        = @_;
 
     my $r_data = $args{'__data'};
-    $$r_data = $self->outsite_status();
+    $$r_data = $self->outside_status();
 
     return 1;
 }
@@ -520,10 +519,10 @@ sub action_exchange {
 sub outside_status {
     my $self        = shift;
 
-    my $player_id = -1;
+    my $user_id = -1;
 
     if ( $self->waiting_on_player_id() > -1 ) {
-        $player_id = ($self->player_ids()->items())[ $self->waiting_on_player_id() ]
+        $user_id = ($self->player_ids()->items())[ $self->waiting_on_player_id() ]
     }
 
     return sprintf(
@@ -531,7 +530,7 @@ sub outside_status {
         $self->state(),
         $self->round(),
         $self->phase(),
-        $player_id,
+        $user_id,
         $self->subphase(),
         $self->current_tile(),
     );

@@ -62,6 +62,7 @@ our @EXPORT = qw(
     $SUB_BEAM
     $SUB_PLANETARY
     $SUB_VP_DRAW
+    $SUB_NULL
 
 
 
@@ -93,6 +94,7 @@ our $SUB_MISSILE        = $i++;
 our $SUB_BEAM           = $i++;
 our $SUB_PLANETARY      = $i++;
 our $SUB_VP_DRAW        = $i++;
+our $SUB_NULL           = $i++;
 
 $i = 0;
 

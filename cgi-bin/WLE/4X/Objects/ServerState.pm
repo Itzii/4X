@@ -47,6 +47,7 @@ sub _open_for_reading {
 sub _open_for_writing {
     my $self        = shift;
     my $log_id      = shift;
+    my $flag_create = shift; $flag_create = 0           unless defined( $flag_create );
 
     $self->set_error( '' );
 
@@ -55,11 +56,16 @@ sub _open_for_writing {
         return 0;
     }
 
-    $self->{'FH_LOG'} = $self->_open_file_with_lock( $self->_log_file() );
+    $self->{'FH_LOG'} = $self->_open_file_with_lock( $self->_log_file(), $flag_create );
 
-    $self->{'FH_STATE'} = $self->_open_file_with_lock( $self->_state_file() );
+    $self->{'FH_STATE'} = $self->_open_file_with_lock( $self->_state_file(), $flag_create );
 
     if ( defined( $self->{'FH_LOG'} ) && defined( $self->{'FH_STATE'} ) ) {
+
+        unless ( $flag_create ) {
+            $self->_read_state( $log_id );
+        }
+
         return 1;
     }
 
@@ -91,6 +97,10 @@ sub _read_state {
 
     # using Data::Dumper
 
+    my $fh = $self->{'FH_STATE'};
+
+    seek( $fh, 0, 0 );
+
     my $VAR1;
     my @data = <$fh>;
     my $single_line = join( '', @data );
@@ -105,7 +115,6 @@ sub _read_state {
     $self->option_tags()->fill( @{ $VAR1->{'SETTINGS'}->{'OPTION_TAGS'} } );
 
     $self->user_ids()->fill( @{ $VAR1->{'SETTINGS'}->{'USER_IDS'} } );
-    print STDERR "\nLoaded " . scalar( @{ $VAR1->{'SETTINGS'}->{'USER_IDS'} } ) . ' user ids.';
 
     $self->pending_players()->fill( @{ $VAR1->{'SETTINGS'}->{'PLAYERS_PENDING'} } );
     $self->done_players()->fill( @{ $VAR1->{'SETTINGS'}->{'PLAYERS_DONE'} } );
@@ -274,7 +283,7 @@ sub _read_state {
         );
 
         if ( defined( $template ) ) {
-            $self->ship_templates()->{ $template->tag() } = $template;
+            $self->templates()->{ $template->tag() } = $template;
         }
     }
 
@@ -362,11 +371,9 @@ sub _save_state {
 
     $data{'SETTINGS'}->{'USER_IDS'} = [ $self->user_ids()->items() ];
 
-    print STDERR "\nSaved " . $self->user_ids()->count() . ' user ids.';
-
     $data{'SETTINGS'}->{'PLAYERS_PENDING'} = [ $self->pending_players()->items() ];
     $data{'SETTINGS'}->{'PLAYERS_DONE'} = [ $self->done_players()->items() ];
-    $data{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} = [ $self->players_next_round() ];
+    $data{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} = [ $self->players_next_round()->items() ];
 
     $data{'SETTINGS'}->{'CURRENT_TRAITOR'} = $self->current_traitor();
 
@@ -507,11 +514,15 @@ sub _save_state {
 sub _open_file_with_lock {
     my $self        = shift;
     my $file_path   = shift;
+    my $flag_create = shift; $flag_create = 0           unless defined( $flag_create );
 
     my $fh;
 
-    unless ( -e $file_path ) {
-        return undef;
+    unless ( $flag_create ) {
+        unless ( -e $file_path ) {
+            $self->set_error( 'Non-existant file: ' . $file_path );
+            return undef;
+        }
     }
 
     unless ( open( $fh, '+>>', $file_path ) ) {

@@ -274,6 +274,8 @@ sub test_Object_Server {
 		show( $response{'message'} );
 	}
 
+#	return;
+
 	%response = $server->do(
 		'action' 		=> 'add_source',
 		'user'			=> $owner_id,
@@ -283,6 +285,8 @@ sub test_Object_Server {
 	unless( $response{'success'} == 1 ) {
 		show( $response{'message'} );
 	}
+
+#	return;
 
 	%response = $server->do(
 		'action' 		=> 'add_option',
@@ -304,6 +308,8 @@ sub test_Object_Server {
 		show( $response{'message'} );
 	}
 
+#	return;
+
 	%response = $server->do(
 		'action' 		=> 'add_player',
 		'user'			=> $owner_id,
@@ -313,6 +319,8 @@ sub test_Object_Server {
 	unless( $response{'success'} == 1 ) {
 		show( $response{'message'} );
 	}
+
+#	return;
 
 	%response = $server->do(
 		'action' 		=> 'begin',
@@ -333,6 +341,9 @@ sub test_Object_Server {
 	unless( $response{'success'} == 1 ) {
 		show( $response{'message'} );
 	}
+	show( $response{'data'} );
+
+#	return;
 
 	%response = $server->do(
 		'action'		=> 'select_race',

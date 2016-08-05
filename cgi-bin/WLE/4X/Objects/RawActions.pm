@@ -1316,7 +1316,7 @@ sub _raw_select_race_and_location {
 
     my $race = $self->races()->{ $race_tag };
 
-    $race->set_owner_id( $self->current_player_id() );
+    $race->set_owner_id( $self->acting_player_id() );
 
     unless ( $self->has_option( 'all_races' ) ) {
         my $backing_race = $race->excludes();
@@ -2292,11 +2292,11 @@ sub _raw_next_player {
     }
 
     my $done_player = $self->waiting_on_player_id();
-    $self->players_pending()->remove_item( $done_player );
+    $self->pending_players()->remove_item( $done_player );
     $self->done_players()->add_items( $done_player );
 
-    if ( $self->players_pending()->count() > 0 ) {
-        my $current_player = ( $self->players_pending()->items() )[ 0 ];
+    if ( $self->pending_players()->count() > 0 ) {
+        my $current_player = ( $self->pending_players()->items() )[ 0 ];
 
         $race = $self->race_of_player_id( $current_player );
         if ( defined( $race ) ) {

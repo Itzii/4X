@@ -268,6 +268,7 @@ sub action_begin {
 
     $self->_raw_set_player_order( $EV_FROM_INTERFACE, @new_player_order );
     $self->_raw_add_players_to_next_round( $EV_FROM_INTERFACE, @new_player_order );
+    $self->_raw_set_pending_player( $EV_FROM_INTERFACE, $new_player_order[ 0 ] );
 
     # fill tile stacks with random tiles
 
@@ -376,7 +377,7 @@ sub action_select_race_and_location {
     my $valid_location = 0;
     my $location_warps = undef;
 
-    foreach my $location ( $self->starting_locations() ) {
+    foreach my $location ( $self->starting_locations()->items() ) {
         my ( $x, $y ) = split( ',', $location->{'SPACE'} );
 
         if ( $args{'location_x'} == $x && $args{'location_y'} == $y ) {
@@ -413,7 +414,11 @@ sub action_select_race_and_location {
 
     $self->_raw_next_player( $EV_FROM_INTERFACE );
 
+#    print STDERR "\nNext User: " . $self->user_id_of_player_id( $self->waiting_on_player_id() );
+#    print STDERR "\nNext Player: " . $self->waiting_on_player_id();
+
     if ( $self->waiting_on_player_id() == -1 ) {
+        print STDERR "\nStarting next round ... ";
         $self->_prepare_for_first_round();
         $self->_raw_start_next_round( $EV_FROM_INTERFACE );
     }

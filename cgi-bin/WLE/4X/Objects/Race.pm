@@ -774,10 +774,14 @@ sub from_hash {
 
     $self->{'HOME'} = $r_hash->{'HOME'};
 
-    foreach my $value ( 'FLAG_PASSED', 'EXCLUDE_RACE', 'COLONY_COUNT', 'COLONY_USED', 'EXCHANGE', 'ACTION_COUNT', 'ACTION_FLIP_COLONY_COUNT', 'IN_HAND', 'VP_DRAWS' ) {
+    foreach my $value ( 'FLAG_PASSED', 'EXCLUDE_RACE', 'COLONY_COUNT', 'COLONY_USED', 'EXCHANGE', 'ACTION_COUNT', 'ACTION_FLIP_COLONY_COUNT', 'VP_DRAWS' ) {
         if ( defined( $r_hash->{ $value } ) ) {
             $self->{ $value } = $r_hash->{ $value };
         }
+    }
+
+    if ( defined( $r_hash->{'IN_HAND'} ) ) {
+        $self->in_hand()->fill( @{ $r_hash->{'IN_HAND'} } );
     }
 
     if ( defined( $r_hash->{'COMPONENT_OVERFLOW'} ) ) {
@@ -897,19 +901,23 @@ sub from_hash {
                                 push( @{ $self->{'SHIP_TEMPLATES'} }, $tag );
                             }
                         }
+                        else {
+                            print STDERR "\nBase Template not defined: " . $template_section->{'TAG'};
+                        }
                     }
 
                     $template_index++;
                 }
                 else {
-
-                    push( @{ $self->{'SHIP_TEMPLATES'} }, $template_section );
+                    push( @templates, $template_section );
                 }
             }
         }
     }
 
     $self->{'SHIP_TEMPLATES'} = \@templates;
+
+#    print STDERR "\nTemplates for " . $self->tag() . " : " . join( ',', @templates );
 
     return 1;
 }

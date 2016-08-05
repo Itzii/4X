@@ -186,9 +186,7 @@ sub do {
         $self->{'ENV'}->{'ACTING_PLAYER_ID'} = 0;
     }
     else {
-        my $error_message = $self->_check_allowed_action( $args{'log_id'}, $action_tag, \$method );
-
-        $self->{'ENV'}->{'ACTING_PLAYER_ID'} = $self->user_ids()->index_of( $args{'user'} );
+        my $error_message = $self->_check_allowed_action( $args{'log_id'}, $args{'user'}, $action_tag, \$method );
 
         unless ( $error_message eq '' ) {
             $self->_close_all();
@@ -228,6 +226,7 @@ sub do {
 sub _check_allowed_action {
     my $self        = shift;
     my $log_id      = shift;
+    my $user_id     = shift;
     my $action_tag  = shift;
     my $r_method    = shift;
 
@@ -307,6 +306,8 @@ sub _check_allowed_action {
         }
     }
 
+    $self->{'ENV'}->{'ACTING_PLAYER_ID'} = $self->user_ids()->index_of( $user_id );
+
     if ( defined( $action->{'flag_anytime'} ) ) {
         return '';
     }
@@ -324,7 +325,9 @@ sub _check_allowed_action {
     if ( defined( $action->{'flag_active_player'} ) ) {
         my $waiting_on = $self->waiting_on_player_id();
 
-        if ( $waiting_on == -1 || ( $waiting_on > -1 && $waiting_on != $self->active_player_id() ) ) {
+        if ( $waiting_on == -1 || ( $waiting_on > -1 && $waiting_on != $self->acting_player_id() ) ) {
+            print STDERR "\nWaiting On: " . $waiting_on;
+            print STDERR "\nActive: " . $self->acting_player_id();
             return 'Action is not allowed by this player at this time.';
         }
     }
@@ -414,6 +417,19 @@ sub user_ids {
     my $self        = shift;
 
     return $self->{'SETTINGS'}->{'USER_IDS'};
+}
+
+#############################################################################
+
+sub user_id_of_player_id {
+    my $self        = shift;
+    my $player_id   = shift;
+
+    if ( $player_id < 0 || $player_id > $self->user_ids()->count() - 1 ) {
+        return -1;
+    }
+
+    return ($self->user_ids()->items())[ $player_id ]
 }
 
 #############################################################################
@@ -519,18 +535,12 @@ sub action_exchange {
 sub outside_status {
     my $self        = shift;
 
-    my $user_id = -1;
-
-    if ( $self->waiting_on_player_id() > -1 ) {
-        $user_id = ($self->player_ids()->items())[ $self->waiting_on_player_id() ]
-    }
-
     return sprintf(
         '%i:%i:%i:%i:%i:%s',
         $self->state(),
         $self->round(),
         $self->phase(),
-        $user_id,
+        $self->user_id_of_player_id( $self->waiting_on_player_id() ),
         $self->subphase(),
         $self->current_tile(),
     );

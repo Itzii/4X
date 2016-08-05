@@ -201,6 +201,17 @@ sub test_Object_Board {
 
 #############################################################################
 
+sub test_server {
+
+	return WLE::4X::Objects::Server->new(
+		'resource_file'		=> "../resources/official.res",
+		'state_files'		=> "../statefiles",
+		'log_files'			=> "../statefiles",
+	);
+}
+
+#############################################################################
+
 sub test_Object_Server {
 
 	my $log_id = 'testid123';
@@ -208,42 +219,38 @@ sub test_Object_Server {
 	unlink( '../statefiles/' . $log_id . '.log' );
 	unlink( '../statefiles/' . $log_id . '.state' );
 
-	my $server = WLE::4X::Objects::Server->new(
-		'resource_file'		=> "../resources/official.res",
-		'state_files'		=> "../statefiles",
-		'log_files'			=> "../statefiles",
-	);
+	my $test_server = test_server();
 
 	my $owner_id = 55;
 	my @user_ids = ( $owner_id, 200, 300 );
 
-	ok( defined( $server ) && ref( $server ) eq 'WLE::4X::Objects::Server', 'server object created');
+	ok( defined( $test_server ) && ref( $test_server ) eq 'WLE::4X::Objects::Server', 'server object created');
 
-	ok( $server->last_error() eq '', 'no errors found' );
+	ok( $test_server->last_error() eq '', 'no errors found' );
 
 	my %response;
 
-	%response = $server->do(
+	%response = test_server()->do(
 		'action' 		=> 'create_game',
 	);
 
 	ok( $response{'success'} == 0, 'action_create_game failed with no arguments' );
 
-	%response = $server->do(
+	%response = test_server()->do(
 		'action' 		=> 'create_game',
 		'log_id'		=> 'test  id',
 	);
 
 	ok( $response{'success'} == 0, 'action_create_game failed with invalid log_id' );
 
-	%response = $server->do(
+	%response = test_server()->do(
 		'action' 		=> 'create_game',
 		'log_id'		=> $log_id,
 	);
 
 	ok( $response{'success'} == 0, 'action_create_game failed with missing owner_id' );
 
-	%response = $server->do(
+	%response = test_server()->do(
 		'action' 		=> 'create_game',
 		'user'			=> 'kdkd',
 		'log_id'		=> 'testid',
@@ -251,7 +258,7 @@ sub test_Object_Server {
 
 	ok( $response{'success'} == 0, 'action_create_game failed with invalid owner_id' );
 
-	%response = $server->do(
+	%response = test_server()->do(
 		'action' 		=> 'create_game',
 		'user'			=> $owner_id,
 		'log_id'		=> $log_id,
@@ -261,7 +268,7 @@ sub test_Object_Server {
 
 	ok( $response{'success'} == 0, 'action_create_game failed with missing source tag' );
 
-	%response = $server->do(
+	%response = test_server()->do(
 		'action' 		=> 'create_game',
 		'user'			=> $owner_id,
 		'log_id'		=> $log_id,
@@ -276,7 +283,7 @@ sub test_Object_Server {
 
 #	return;
 
-	%response = $server->do(
+	%response = test_server()->do(
 		'action' 		=> 'add_source',
 		'user'			=> $owner_id,
 		'log_id'		=> $log_id,
@@ -288,7 +295,7 @@ sub test_Object_Server {
 
 #	return;
 
-	%response = $server->do(
+	%response = test_server()->do(
 		'action' 		=> 'add_option',
 		'user'			=> $owner_id,
 		'log_id'		=> $log_id,
@@ -298,7 +305,7 @@ sub test_Object_Server {
 		show( $response{'message'} );
 	}
 
-	%response = $server->do(
+	%response = test_server()->do(
 		'action' 		=> 'add_player',
 		'user'			=> $owner_id,
 		'log_id'		=> $log_id,
@@ -310,7 +317,7 @@ sub test_Object_Server {
 
 #	return;
 
-	%response = $server->do(
+	%response = test_server()->do(
 		'action' 		=> 'add_player',
 		'user'			=> $owner_id,
 		'log_id'		=> $log_id,
@@ -322,7 +329,7 @@ sub test_Object_Server {
 
 #	return;
 
-	%response = $server->do(
+	%response = test_server()->do(
 		'action' 		=> 'begin',
 		'user'			=> $owner_id,
 		'log_id'		=> $log_id,
@@ -332,7 +339,7 @@ sub test_Object_Server {
 		show( $response{'message'} );
 	}
 
-	%response = $server->do(
+	%response = test_server()->do(
 		'action'		=> 'status',
 		'user'			=> $owner_id,
 		'log_id'		=> $log_id,
@@ -341,11 +348,11 @@ sub test_Object_Server {
 	unless( $response{'success'} == 1 ) {
 		show( $response{'message'} );
 	}
-	show( $response{'data'} );
+#	show( $response{'data'} );
 
 #	return;
 
-	%response = $server->do(
+	%response = test_server()->do(
 		'action'		=> 'select_race',
 		'user'			=> 999,
 		'log_id'		=> $log_id,
@@ -355,7 +362,7 @@ sub test_Object_Server {
 	);
 	ok( $response{'success'} == 0, 'select_race failed for invalid user' );
 
-	%response = $server->do(
+	%response = test_server()->do(
 		'action'		=> 'status',
 		'user'			=> $owner_id,
 		'log_id'		=> $log_id,
@@ -369,7 +376,7 @@ sub test_Object_Server {
 
 #	show( $response{'data'} );
 
-	%response = $server->do(
+	%response = test_server()->do(
 		'action'		=> 'select_race',
 		'user'			=> $waiting_for,
 		'log_id'		=> $log_id,
@@ -380,10 +387,13 @@ sub test_Object_Server {
 
 	ok( $response{'success'} == 1, 'select_race successful' );
 	unless( $response{'success'} == 1 ) {
+#		print STDERR "\nSending User ID: " . $waiting_for;
 		show( $response{'message'} );
 	}
 
-	%response = $server->do(
+#	return;
+
+	%response = test_server()->do(
 		'action'		=> 'status',
 		'user'			=> $owner_id,
 		'log_id'		=> $log_id,
@@ -391,12 +401,18 @@ sub test_Object_Server {
 	unless( $response{'success'} == 1 ) {
 		show( $response{'message'} );
 	}
+#	show( $response{'data'} );
 
 	@status = split( /:/, $response{'data'} );
 	$waiting_for = $status[ 3 ];
 
+#	return;
 
-	%response = $server->do(
+
+	print STDERR "\n" . test_server()->outside_status();
+#	print STDERR "\n" . test_server()->status();
+	print STDERR "\nSending User ID: " . $waiting_for;
+	%response = test_server()->do(
 		'action'		=> 'select_race',
 		'user'			=> $waiting_for,
 		'log_id'		=> $log_id,
@@ -408,7 +424,9 @@ sub test_Object_Server {
 		show( $response{'message'} );
 	}
 
-	%response = $server->do(
+	return;
+
+	%response = test_server()->do(
 		'action'		=> 'status',
 		'user'			=> $owner_id,
 		'log_id'		=> $log_id,
@@ -416,10 +434,10 @@ sub test_Object_Server {
 
 	@status = split( /:/, $response{'data'} );
 	$waiting_for = $status[ 3 ];
-	show( $server->status() );
 
 
-	%response = $server->do(
+	print STDERR "\n" . test_server()->outside_status();
+	%response = test_server()->do(
 		'action'		=> 'select_race',
 		'user'			=> $waiting_for,
 		'log_id'		=> $log_id,
@@ -431,7 +449,7 @@ sub test_Object_Server {
 		show( $response{'message'} );
 	}
 
-	%response = $server->do(
+	%response = test_server()->do(
 		'action'		=> 'status',
 		'user'			=> $owner_id,
 		'log_id'		=> $log_id,
@@ -439,10 +457,10 @@ sub test_Object_Server {
 
 	@status = split( /:/, $response{'data'} );
 	$waiting_for = $status[ 3 ];
-	show( $server->status() );
+	show( test_server()->status() );
 
 
-	%response = $server->do(
+	%response = test_server()->do(
 		'action'		=> 'action_pass',
 		'user'			=> '3',
 		'log_id'		=> $log_id,
@@ -452,7 +470,7 @@ sub test_Object_Server {
 
 
 
-	%response = $server->do(
+	%response = test_server()->do(
 		'action'		=> 'action_pass',
 		'user'			=> $waiting_for,
 		'log_id'		=> $log_id,

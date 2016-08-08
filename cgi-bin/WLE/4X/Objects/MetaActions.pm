@@ -386,6 +386,7 @@ sub action_select_race_and_location {
                 if ( defined( $location->{'WARPS'} ) ) {
                     $location_warps = $location->{'WARPS'};
                 }
+                last;
             }
         }
     }
@@ -412,13 +413,14 @@ sub action_select_race_and_location {
         $location_warps,
     );
 
+    $self->_raw_player_pass_action( $EV_FROM_INTERFACE );
     $self->_raw_next_player( $EV_FROM_INTERFACE );
 
 #    print STDERR "\nNext User: " . $self->user_id_of_player_id( $self->waiting_on_player_id() );
 #    print STDERR "\nNext Player: " . $self->waiting_on_player_id();
 
     if ( $self->waiting_on_player_id() == -1 ) {
-        print STDERR "\nStarting next round ... ";
+#        print STDERR "\nStarting next round ... ";
         $self->_prepare_for_first_round();
         $self->_raw_start_next_round( $EV_FROM_INTERFACE );
     }

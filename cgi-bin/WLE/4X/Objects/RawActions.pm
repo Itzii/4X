@@ -384,12 +384,14 @@ sub _raw_begin {
     }
 
     # setup ship component tiles
-    # print STDERR "\n  ship components ... ";
+#    print STDERR "\n  ship components ... ";
 
     unless ( defined( $VAR1->{'COMPONENTS'} ) ) {
         $self->set_error( 'Missing Section in resource file: COMPONENTS' );
         return 0;
     }
+
+#    print STDERR " found the section ... ";
 
     foreach my $component_key ( keys( %{ $VAR1->{'COMPONENTS'} } ) ) {
         my $component = WLE::4X::Objects::ShipComponent->new(
@@ -537,6 +539,7 @@ sub _raw_begin {
 
         if ( defined( $template ) ) {
             if ( $self->item_is_allowed_in_game( $template ) ) {
+#                print STDERR " added template.";
                 $base_templates{ $template->tag() } = $template;
             }
         }
@@ -2306,15 +2309,25 @@ sub _raw_next_player {
         $self->set_waiting_on_player_id( $current_player );
         return;
     }
+    else {
+        my $flag_continue_round = 0;
 
-    foreach my $race ( values( %{ $self->races() } ) ) {
-        unless ( $race->has_passed() ) {
+        foreach my $race ( values( %{ $self->races() } ) ) {
+            unless ( $race->has_passed() ) {
+                $flag_continue_round = 1;
+                last;
+            }
+        }
+
+        if ( $flag_continue_round ) {
             $self->players_pending()->fill( $self->players_done()->items() );
             $self->players_done()->clear();
-
-            return;
+        }
+        else {
+            $self->set_waiting_on_player_id( -1 );
         }
     }
+
 
     return;
 }

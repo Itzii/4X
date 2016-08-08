@@ -281,7 +281,7 @@ sub test_Object_Server {
 		show( $response{'message'} );
 	}
 
-#	return;
+# return;
 
 	%response = test_server()->do(
 		'action' 		=> 'add_source',
@@ -350,7 +350,7 @@ sub test_Object_Server {
 	}
 #	show( $response{'data'} );
 
-#	return;
+#    return;
 
 	%response = test_server()->do(
 		'action'		=> 'select_race',
@@ -409,9 +409,9 @@ sub test_Object_Server {
 #	return;
 
 
-	print STDERR "\n" . test_server()->outside_status();
+#	print STDERR "\n" . test_server()->outside_status();
 #	print STDERR "\n" . test_server()->status();
-	print STDERR "\nSending User ID: " . $waiting_for;
+#	print STDERR "\nSending User ID: " . $waiting_for;
 	%response = test_server()->do(
 		'action'		=> 'select_race',
 		'user'			=> $waiting_for,
@@ -424,7 +424,7 @@ sub test_Object_Server {
 		show( $response{'message'} );
 	}
 
-	return;
+#	return;
 
 	%response = test_server()->do(
 		'action'		=> 'status',
@@ -434,9 +434,9 @@ sub test_Object_Server {
 
 	@status = split( /:/, $response{'data'} );
 	$waiting_for = $status[ 3 ];
+	show( $response{'data'} );
 
 
-	print STDERR "\n" . test_server()->outside_status();
 	%response = test_server()->do(
 		'action'		=> 'select_race',
 		'user'			=> $waiting_for,
@@ -457,7 +457,7 @@ sub test_Object_Server {
 
 	@status = split( /:/, $response{'data'} );
 	$waiting_for = $status[ 3 ];
-	show( test_server()->status() );
+	show( $response{'data'} );
 
 
 	%response = test_server()->do(

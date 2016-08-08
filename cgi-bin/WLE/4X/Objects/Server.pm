@@ -298,12 +298,14 @@ sub _check_allowed_action {
         unless ( $self->_open_for_reading( $log_id ) ) {
             return $self->last_error();
         }
+#        print STDERR "\n ( " . $self->outside_status() . " )";
         $self->{'ENV'}->{'FLAG_READ_ONLY'} = 1;
     }
     else {
         unless ( $self->_open_for_writing( $log_id ) ) {
             return $self->last_error();
         }
+#        print STDERR "\n ( " . $self->outside_status() . " )";
     }
 
     $self->{'ENV'}->{'ACTING_PLAYER_ID'} = $self->user_ids()->index_of( $user_id );
@@ -326,8 +328,10 @@ sub _check_allowed_action {
         my $waiting_on = $self->waiting_on_player_id();
 
         if ( $waiting_on == -1 || ( $waiting_on > -1 && $waiting_on != $self->acting_player_id() ) ) {
-            print STDERR "\nWaiting On: " . $waiting_on;
-            print STDERR "\nActive: " . $self->acting_player_id();
+#            print STDERR "\nUser IDs: " . join( ',', $self->user_ids()->items() );
+#            print STDERR "\nActive User ID: " . $user_id;
+#            print STDERR "\nWaiting On: " . $waiting_on;
+#            print STDERR "\nActive: " . $self->acting_player_id();
             return 'Action is not allowed by this player at this time.';
         }
     }

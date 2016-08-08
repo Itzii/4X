@@ -39,6 +39,8 @@ sub _open_for_reading {
 
     $self->{'FH_STATE'} = $self->_open_file( $self->_state_file() );
 
+    $self->_read_state( $log_id );
+
     return defined( $self->{'FH_STATE'} );
 }
 
@@ -124,8 +126,8 @@ sub _read_state {
 
     $self->set_current_traitor( $VAR1->{'SETTINGS'}->{'CURRENT_TRAITOR'} );
 
-    if ( defined( $VAR1->{'STARTING_LOCATIONS'} ) ) {
-        foreach my $location ( @{ $VAR1->{'STARTING_LOCATIONS'} } ) {
+    if ( defined( $VAR1->{'SETTINGS'}->{'STARTING_LOCATIONS'} ) ) {
+        foreach my $location ( @{ $VAR1->{'SETTINGS'}->{'STARTING_LOCATIONS'} } ) {
             $self->starting_locations()->add_items( $location );
         }
     }
@@ -276,6 +278,8 @@ sub _read_state {
 
     foreach my $template_key ( keys( %{ $VAR1->{'SHIP_TEMPLATES'} } ) ) {
 
+#        print STDERR "\n     " . $template_key;
+
         my $template = WLE::4X::Objects::ShipTemplate->new(
             'server' => $self,
             'tag' => $template_key,
@@ -283,6 +287,7 @@ sub _read_state {
         );
 
         if ( defined( $template ) ) {
+#            print STDERR " added.";
             $self->templates()->{ $template->tag() } = $template;
         }
     }

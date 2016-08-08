@@ -706,11 +706,18 @@ sub template_of_class {
     my $self        = shift;
     my $class       = shift;
 
+#    print STDERR "\nAll Template Keys: " . join( ',', keys( %{ $self->server()->templates() } ) );
+
     foreach my $template_tag ( $self->ship_templates() ) {
+
+#        print STDERR "\n   looking for template " . $template_tag;
 
         my $template = $self->server()->templates()->{ $template_tag };
 
         if ( defined( $template ) ) {
+
+#            print STDERR " ... class " . $template->class();
+
             if ( $template->class() eq $class ) {
                 return $template;
             }
@@ -902,7 +909,7 @@ sub from_hash {
                             }
                         }
                         else {
-                            print STDERR "\nBase Template not defined: " . $template_section->{'TAG'};
+#                            print STDERR "\nBase Template not defined: " . $template_section->{'TAG'};
                         }
                     }
 

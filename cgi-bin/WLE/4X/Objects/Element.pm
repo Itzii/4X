@@ -32,7 +32,7 @@ sub _init {
     $self->{'SERVER'} = undef;
 
     $self->{'TAG'} = '';
-    $self->{'SOURCE'} = '';
+    $self->{'SOURCE_TAG'} = '';
 
     $self->{'LONG_NAME'} = '';
     $self->{'FLAVOR'} = '';
@@ -279,7 +279,7 @@ sub copy_of {
 
     my $copy = WLE::4X::Objects::Element->new( 'server' => $self->server(), 'tag' => $new_tag );
 
-    $copy->{'SOURCE'} = $self->{'SOURCE'};
+    $copy->{'SOURCE_TAG'} = $self->{'SOURCE_TAG'};
     $copy->{'TYPE'} = $self->{'TYPE'};
 
     $copy->{'LONG_NAME'} = $self->{'LONG_NAME'};

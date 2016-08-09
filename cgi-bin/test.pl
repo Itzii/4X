@@ -370,11 +370,11 @@ sub test_Object_Server {
 	unless( $response{'success'} == 1 ) {
 		show( $response{'message'} );
 	}
-
 	my @status = split( /:/, $response{'data'} );
 	my $waiting_for = $status[ 3 ];
-
 #	show( $response{'data'} );
+
+#	return;
 
 	%response = test_server()->do(
 		'action'		=> 'select_race',
@@ -424,8 +424,6 @@ sub test_Object_Server {
 		show( $response{'message'} );
 	}
 
-#	return;
-
 	%response = test_server()->do(
 		'action'		=> 'status',
 		'user'			=> $owner_id,
@@ -436,6 +434,7 @@ sub test_Object_Server {
 	$waiting_for = $status[ 3 ];
 	show( $response{'data'} );
 
+#	return;
 
 	%response = test_server()->do(
 		'action'		=> 'select_race',

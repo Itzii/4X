@@ -121,6 +121,8 @@ sub _read_state {
     $self->pending_players()->fill( @{ $VAR1->{'SETTINGS'}->{'PLAYERS_PENDING'} } );
     $self->done_players()->fill( @{ $VAR1->{'SETTINGS'}->{'PLAYERS_DONE'} } );
     $self->players_next_round( @{ $VAR1->{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} } );
+    print STDERR "\nLoading Players Next Round: " . join( ',', $self->players_next_round()->items() );
+
 
     $self->set_waiting_on_player_id( $VAR1->{'SETTINGS'}->{'WAITING_ON_PLAYER'} );
 
@@ -236,15 +238,16 @@ sub _read_state {
 
     foreach my $tile_key ( keys( %{ $VAR1->{'TILES'} } ) ) {
 
+#        print "\nReading Tile: " . $tile_key . ' ...';
+
         my $tile = WLE::4X::Objects::Tile->new(
             'server' => $self,
             'tag' => $tile_key,
             'hash' => $VAR1->{'TILES'}->{ $tile_key },
         );
 
-#        print "\nTile: " . $tile->tag();
-
         if ( defined( $tile ) ) {
+#            print " storing.";
             $self->tiles()->{ $tile->tag() } = $tile;
         }
     }
@@ -437,6 +440,8 @@ sub _save_state {
         }
 
         # tiles
+
+#        print STDERR "\nSaved Tiles: " . join( ',', keys( %{ $self->tiles() } ) );
 
         foreach my $tile ( values( %{ $self->tiles() } ) ) {
             $data{'TILES'}->{ $tile->tag() } = {};

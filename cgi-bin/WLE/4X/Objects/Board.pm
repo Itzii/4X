@@ -185,13 +185,13 @@ sub location_of_tile {
 
 sub tile_is_within_distance {
     my $self            = shift;
-    my $user_id         = shift;
+    my $player_id       = shift;
     my $origin_tag      = shift;
     my $destination_tag = shift;
     my $max_distance    = shift;
     my $flag_jump_drive = shift;
 
-    my $race = $self->server()->race_of_player_id( $user_id );
+    my $race = $self->server()->race_of_player_id( $player_id );
 
     my $start = $self->location_of_tile( $origin_tag );
     my ( $loc_x, $loc_y ) = split( /:/, $start );
@@ -230,7 +230,7 @@ sub tile_is_within_distance {
 
                         if ( $traversable ) {
 
-                            if ( $tile->unpinned_ship_count( $user_id, 1 ) > 0 ) {
+                            if ( $tile->unpinned_ship_count( $player_id, 1 ) > 0 ) {
 
                                 my @new_path = ( @{ $path }, $tile->tag() );
 

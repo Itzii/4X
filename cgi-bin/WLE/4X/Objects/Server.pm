@@ -472,6 +472,13 @@ sub race_of_player_id {
     my $self        = shift;
     my $player_id   = shift;
 
+    unless ( defined( $player_id ) ) {
+        my ($package, $filename, $line) = caller;
+        print STDERR "\nPackage: " . $package;
+        print STDERR "\nFilename: " . $filename;
+        print STDERR "\nLine: " . $line;
+    }
+
     foreach my $race ( values( %{ $self->races() } ) ) {
         if ( $race->owner_id() eq $player_id ) {
             return $race;

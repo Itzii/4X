@@ -37,7 +37,7 @@ sub _init {
     $self->{'LONG_NAME'} = '';
     $self->{'FLAVOR'} = '';
 
-    $self->{'OWNER_ID'} = '';
+    $self->{'OWNER_ID'} = -1;
 
     $self->{'REQUIRED_OPTION'} = '';
 

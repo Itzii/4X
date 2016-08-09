@@ -19,6 +19,7 @@ my %actions = (
     \&_raw_add_player                   => 'add_player',
     \&_raw_remove_player                => 'remove_player',
     \&_raw_begin                        => 'begin',
+    \&_raw_prepare_for_first_round      => 'prepare_first_round',
 
     \&_raw_set_player_order             => 'set_player_order',
     \&_raw_add_players_to_next_round    => 'queue_next_round',
@@ -479,8 +480,13 @@ sub _raw_begin {
             'hash' => $VAR1->{'TILES'}->{ $tile_key },
         );
 
+#        print STDERR "\n   " . $tile_key;
+
         if ( defined( $tile ) ) {
             if ( $self->item_is_allowed_in_game( $tile ) ) {
+
+#                print STDERR ' added ' . $tile->tag();
+
                 $self->tiles()->{ $tile->tag() } = $tile;
                 $self->board()->add_to_draw_stack( $tile->which_stack(), $tile->tag() );
             }
@@ -663,7 +669,12 @@ sub _raw_set_pending_player {
     my $race = $self->race_of_player_id( $pending_id );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return 'now waiting on ' . $race->tag();
+        if ( defined( $race ) ) {
+            return 'now waiting on ' . $race->tag();
+        }
+        else {
+            return 'now waiting on no one.';
+        }
     }
 
     $self->set_waiting_on_player_id( $pending_id );
@@ -2334,6 +2345,27 @@ sub _raw_next_player {
 
 #############################################################################
 
+sub _raw_prepare_for_first_round {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'preparing first round';
+    }
+
+
+    $self->_prepare_for_first_round();
+
+    return;
+}
+
+#############################################################################
+
 sub _raw_start_next_round {
     my $self        = shift;
     my $source      = shift;
@@ -2347,15 +2379,17 @@ sub _raw_start_next_round {
         return 'starting new round';
     }
 
+    print STDERR "\nNext Round: " . join( ',', $self->players_next_round()->items() );
+
     my @ready = $self->players_next_round()->items();
     $self->players_next_round()->clear();
-    $self->players_done()->clear();
+    $self->done_players()->clear();
 
-    $self->players_pending()->fill( @ready );
+    $self->pending_players()->fill( @ready );
 
     my $new_round = $self->round() + 1;
 
-    my $next_player = ( $self->players_pending()->items() )[ 0 ];
+    my $next_player = ( $self->pending_players()->items() )[ 0 ];
 
 
     my $race = $self->race_of_player_id( $next_player );

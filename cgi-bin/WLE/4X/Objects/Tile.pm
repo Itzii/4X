@@ -3,6 +3,8 @@ package WLE::4X::Objects::Tile;
 use strict;
 use warnings;
 
+use Data::Dumper;
+
 use WLE::4X::Enums::Basic;
 use WLE::4X::Enums::Status;
 
@@ -744,22 +746,27 @@ sub from_hash {
     my $flag_m      = shift; $flag_m = 1                unless defined( $flag_m );
 
     unless( $self->WLE::4X::Objects::Element::from_hash( $r_hash ) ) {
+        print STDERR "\nfailed to parse element from hash.";
         return 0;
     }
 
     unless ( defined( $r_hash->{'ID'} ) ) {
+        print STDERR "\nmissing ID element in hash";
         return 0;
     }
 
     $self->{'ID'} = $r_hash->{'ID'};
 
     unless ( defined( $r_hash->{'WARPS'} ) ) {
+        print STDERR "\nmissing warps in hash";
+        print STDERR "\n" . Dumper( $r_hash );
         return 0;
     }
 
     $self->{'WARPS'} = $r_hash->{'WARPS'};
 
     unless ( defined( $r_hash->{'STACK'} ) ) {
+        print STDERR "\nmissing stack element in hash";
         return 0;
     }
 
@@ -820,11 +827,12 @@ sub to_hash {
 
     $r_hash->{'ID'} = sprintf( '%03i', $self->tile_id() );
 
-    $r_hash->{'WARPS'} = $self->{'WARPS'};
+#    unless( defined( $self->{'WARPS'} ) ) {
+#        print "\nTile: " . $self->tag() . ' has no defined warps.';
+#        exit();
+#    }
 
-    $r_hash->{'STACK'} = $self->{'STACK'};
-
-    foreach my $tag ( 'VP', 'ANCIENT_LINK', 'HIVE', 'DISCOVERY_COUNT', 'ORBITAL', 'MONOLITH', 'ATTACKER_ID', 'DEFENDER_ID' ) {
+    foreach my $tag ( 'STACK', 'VP', 'ANCIENT_LINK', 'HIVE', 'DISCOVERY_COUNT', 'ORBITAL', 'MONOLITH', 'ATTACKER_ID', 'DEFENDER_ID', 'WARPS' ) {
         $r_hash->{ $tag } = $self->{ $tag };
     }
 

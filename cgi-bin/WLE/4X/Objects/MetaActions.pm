@@ -268,7 +268,6 @@ sub action_begin {
 
     $self->_raw_set_player_order( $EV_FROM_INTERFACE, @new_player_order );
     $self->_raw_add_players_to_next_round( $EV_FROM_INTERFACE, @new_player_order );
-    $self->_raw_set_pending_player( $EV_FROM_INTERFACE, $new_player_order[ 0 ] );
 
     # fill tile stacks with random tiles
 
@@ -291,10 +290,11 @@ sub action_begin {
 
     # place galactic center
 
-    my $start_tile = $self->board()->tile_draw_stack( '0' )->select_random_item();
+    my $center_tile_tag = $self->board()->tile_draw_stack( '0' )->select_random_item();
+    my $center_tile = $self->tiles()->{ $center_tile_tag };
 
-    $self->_raw_remove_tile_from_stack( $EV_FROM_INTERFACE, $start_tile );
-    $self->_raw_place_tile_on_board( $EV_FROM_INTERFACE, $start_tile, 0, 0 );
+    $self->_raw_remove_tile_from_stack( $EV_FROM_INTERFACE, $center_tile->tag() );
+    $self->_raw_place_tile_on_board( $EV_FROM_INTERFACE, $center_tile->tag(), 0, 0, $center_tile->warps() );
 
 
     # add discoveries to tiles
@@ -338,6 +338,7 @@ sub action_begin {
     $self->set_subphase( $SUB_NULL );
     $self->set_current_tile( '' );
 
+    $self->_raw_set_pending_player( $EV_FROM_INTERFACE, $new_player_order[ 0 ] );
     $self->_raw_set_status( $EV_FROM_INTERFACE, $self->status() );
 
     return 1;
@@ -414,15 +415,24 @@ sub action_select_race_and_location {
     );
 
     $self->_raw_player_pass_action( $EV_FROM_INTERFACE );
+
     $self->_raw_next_player( $EV_FROM_INTERFACE );
 
 #    print STDERR "\nNext User: " . $self->user_id_of_player_id( $self->waiting_on_player_id() );
 #    print STDERR "\nNext Player: " . $self->waiting_on_player_id();
 
+    print STDERR "\nAfter selecting race Next Round: " . join( ',', $self->players_next_round()->items() );
+
+
     if ( $self->waiting_on_player_id() == -1 ) {
 #        print STDERR "\nStarting next round ... ";
-        $self->_prepare_for_first_round();
+
+        $self->_raw_prepare_for_first_round( $EV_FROM_INTERFACE );
+        print STDERR "\nAfter preparing for first Round: " . join( ',', $self->players_next_round()->items() );
+
         $self->_raw_start_next_round( $EV_FROM_INTERFACE );
+        print STDERR "\nAfter starting next Round: " . join( ',', $self->players_next_round()->items() );
+
     }
 
     return 1;
@@ -436,6 +446,8 @@ sub _prepare_for_first_round {
     $self->_raw_remove_non_playing_races( $EV_FROM_INTERFACE );
 
     # place galactic defense
+
+#    print STDERR "\n" . Dumper( $self->board()->{'SPACES'} );
 
     my $tile = $self->board()->tile_at_location( 0, 0 );
     $tile->add_starting_ships();

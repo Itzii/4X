@@ -339,6 +339,8 @@ sub test_Object_Server {
 		show( $response{'message'} );
 	}
 
+	return;
+
 	%response = test_server()->do(
 		'action'		=> 'status',
 		'user'			=> $owner_id,

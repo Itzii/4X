@@ -59,10 +59,11 @@ sub _open_for_writing {
     }
 
     $self->{'FH_LOG'} = $self->_open_file_with_lock( $self->_log_file(), $flag_create );
-
     $self->{'FH_STATE'} = $self->_open_file_with_lock( $self->_state_file(), $flag_create );
 
     if ( defined( $self->{'FH_LOG'} ) && defined( $self->{'FH_STATE'} ) ) {
+        $self->{'FH_LOG'}->autoflush;
+        $self->{'FH_STATE'}->autoflush;
 
         unless ( $flag_create ) {
             $self->_read_state( $log_id );
@@ -382,6 +383,9 @@ sub _save_state {
     $data{'SETTINGS'}->{'PLAYERS_PENDING'} = [ $self->pending_players()->items() ];
     $data{'SETTINGS'}->{'PLAYERS_DONE'} = [ $self->done_players()->items() ];
     $data{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} = [ $self->players_next_round()->items() ];
+    print STDERR "\nSaving Players Next Round: " . join( ',', @{ $data{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} } );
+
+    print STDERR "\nDump of list: " . Dumper( $data{'SETTINGS'} );
 
     $data{'SETTINGS'}->{'CURRENT_TRAITOR'} = $self->current_traitor();
 
@@ -511,6 +515,12 @@ sub _save_state {
     $Data::Dumper::Indent = 1;
     $Data::Dumper::Sortkeys = 1;
     print { $self->{'FH_STATE'} } Dumper( \%data );
+
+#    print STDERR Dumper( \%data );
+    if ( scalar( @{ $data{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} } ) > 0 ) {
+        $self->_close_all();
+        exit();
+    }
 
     # using Storable
 

@@ -161,7 +161,7 @@ sub tiles_on_board {
         }
     }
 
-    return;
+    return @tags;
 }
 
 #############################################################################
@@ -668,6 +668,95 @@ sub to_hash {
 
     return 1;
 }
+
+#############################################################################
+
+sub as_ascii {
+    my $self        = shift;
+
+
+    # what is the lowest and highest column and row values
+
+    my $lowest_x = 500;
+    my $lowest_y = 500;
+
+    my $highest_x = -500;
+    my $highest_y = -500;
+
+    foreach my $column ( keys( %{ $self->{'SPACES'} } ) ) {
+        foreach my $row ( keys( %{ $self->{'SPACES'}->{ $column } } ) ) {
+            if ( $column < $lowest_x ) {
+                $lowest_x = $column;
+            }
+            elsif ( $column > $highest_x ) {
+                $highest_x = $column;
+            }
+
+            if ( $row < $lowest_y ) {
+                $lowest_y = $row;
+            }
+            elsif ( $row > $highest_y ) {
+                $highest_y = $row;
+            }
+        }
+    }
+
+    # now we get the size of the map in hex columns and rows
+
+    my $width = $highest_x - $lowest_x;
+    my $height = $highest_y - $lowest_y;
+
+    my $x_offset = - $lowest_x;
+    my $y_offset = - $lowest_y;
+
+    # get the size and offset values for an individual hex
+
+    my @tile_0 = $self->tile_at_location( 0, 0 )->as_ascii();
+
+    my $hex_width = length( $tile_0[ 0 ] );
+    my $hex_height = scalar( @tile_0 );
+
+    my $hex_height_offset = ( $hex_height - 1 ) / 2;
+    my $hex_width_offset = $hex_height_offset - 1;
+
+    # create a blank canvas
+
+    my @grid = ();
+    my $line_height = ( $hex_height * $height ) + ( $hex_height_offset * $width );
+    foreach ( 1 .. $line_height ) {
+        push( @grid, ' ' x ( $width * ( $hex_width - $hex_width_offset ) + $hex_width_offset ) );
+    }
+
+    print STDERR "\nGrid Height: " . scalar( @grid ) . "\n";
+
+    # now overlay the ascii text from each hex onto the grid
+
+    foreach my $column ( keys( %{ $self->{'SPACES'} } ) ) {
+        foreach my $row ( keys( %{ $self->{'SPACES'}->{ $column } } ) ) {
+            my $tile = $self->tile_at_location( $column, $row );
+
+            my $x = ( $column + $x_offset ) * ( $hex_width - $hex_width_offset );
+            my $y = ( ( $row + $y_offset ) * $hex_height ) + ( $column * $hex_height_offset );
+
+            my @hex_text = $tile->as_ascii();
+
+            foreach my $hex_line ( @hex_text ) {
+
+                #count and remove the '?' placeholder characters at the beginning of the line
+                my @c = $hex_line =~ m{ \? }xsg;
+                my $short_offset = @c;
+                $hex_line =~ s{ ^\?+ }{}xsg;
+
+                substr( $grid[ $y ], $x + $short_offset, length( $hex_line ) ) = $hex_line;
+
+                $y++;
+            }
+        }
+    }
+
+    return @grid;
+}
+
 
 #############################################################################
 #############################################################################

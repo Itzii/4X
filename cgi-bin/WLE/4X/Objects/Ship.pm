@@ -3,6 +3,10 @@ package WLE::4X::Objects::Ship;
 use strict;
 use warnings;
 
+use Data::Dumper;
+
+use WLE::Methods::Simple qw( looks_like_number );
+
 use parent 'WLE::4X::Objects::Element';
 
 #############################################################################
@@ -29,16 +33,16 @@ sub _init {
     $args{'type'} = 'ship';
 
     unless ( $self->WLE::4X::Objects::Element::_init( %args ) ) {
+#        print STDERR ' failed to parse element for ship.';
         return undef;
     }
 
-    unless ( defined( $args{'template'} ) ) {
+    unless ( defined( $args{'template'} ) || defined( $args{'hash'} ) ) {
+#        print STDERR ' no template defined for ship.';
         return undef;
     }
 
     $self->set_owner_id( $args{'owner_id'} );
-
-    $self->{'TEMPLATE_TAG'} = $args{'template'}->tag();
 
     $self->{'DAMAGE'} = 0;
     $self->{'FLAG_RETREAT'} = 0;
@@ -48,6 +52,9 @@ sub _init {
             return $self;
         }
         return undef;
+    }
+    else {
+        $self->{'TEMPLATE_TAG'} = $args{'template'}->tag();
     }
 
     return $self;
@@ -70,7 +77,7 @@ sub create_from_template {
 sub template {
     my $self        = shift;
 
-    return $self->server()->templates( $self->{'TEMPLATE_TAG'} );
+    return $self->server()->templates()->{ $self->{'TEMPLATE_TAG'} };
 }
 
 #############################################################################
@@ -78,7 +85,13 @@ sub template {
 sub class {
     my $self        = shift;
 
-    return $self->template()->class();
+    if ( defined( $self->template() ) ) {
+        return $self->template()->class();
+    }
+
+    print STDERR "Undefined ship template '" . $self->{'TEMPLATE_TAG'} . "' for ship '" . $self->tag() . "'";
+
+    return ''
 }
 
 #############################################################################

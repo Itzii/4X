@@ -291,16 +291,22 @@ sub unpinned_ship_count {
     foreach my $ship_tag ( $self->ships()->items() ) {
         my $ship = $self->server()->ships()->{ $ship_tag };
 
-        if ( $ship->class() eq 'class_defense' ) {
-            return 0;
-        }
+        if ( defined( $ship ) ) {
+            if ( $ship->class() eq 'class_defense' ) {
+                return 0;
+            }
 
-        if ( $ship->owner_id() == $user_id ) {
-            $friendly_count++;
+            if ( $ship->owner_id() == $user_id ) {
+                $friendly_count++;
+            }
+            else {
+                $enemy_count++;
+            }
         }
         else {
-            $enemy_count++;
+            print STDERR "\nUndefined ship for tag '" . $ship_tag . "' on tile '" . $self->tag() . "'";            
         }
+
     }
 
     if ( $flag_add_one ) {
@@ -863,18 +869,19 @@ sub as_ascii {
     my $self        = shift;
 
     my @display = (
-        '     -------------',
-        '    / XXX  0 HIVE \\',
-        '   / MON WORM ORB  \\',
-        '  /5               1\\',
-        ' /                   \\',
+        '?????-------------',
+        '????/ XXX  0 HIVE \\',
+        '???/ MON WORM ORB  \\',
+        '??/5               1\\',
+        '?/                   \\',
         '/ s   m   c   w       \\',
+        '                       ',
         '\ s+  m+  c+  W       /',
-        ' \                   /',
-        '  \4  ANC    DISC  2/',
-        '   \xxxxxxxxxxxxxxx/',
-        '    \      3      /',
-        '     -------------',
+        '?\                   /',
+        '??\4  ANC    DISC  2/',
+        '???\xxxxxxxxxxxxxxx/',
+        '????\      3      /',
+        '?????-------------',
     );
 
     my $id = sprintf( '%03i', $self->tile_id() );
@@ -936,7 +943,7 @@ sub as_ascii {
 
 
 
-    return join( "\n", @display );
+    return @display;
 }
 
 #############################################################################

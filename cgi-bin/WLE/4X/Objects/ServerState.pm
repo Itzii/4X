@@ -121,8 +121,8 @@ sub _read_state {
 
     $self->pending_players()->fill( @{ $VAR1->{'SETTINGS'}->{'PLAYERS_PENDING'} } );
     $self->done_players()->fill( @{ $VAR1->{'SETTINGS'}->{'PLAYERS_DONE'} } );
-    $self->players_next_round( @{ $VAR1->{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} } );
-    print STDERR "\nLoading Players Next Round: " . join( ',', $self->players_next_round()->items() );
+    $self->players_next_round->fill( @{ $VAR1->{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} } );
+#    print STDERR "\nLoading Players Next Round: " . join( ',', $self->players_next_round()->items() );
 
 
     $self->set_waiting_on_player_id( $VAR1->{'SETTINGS'}->{'WAITING_ON_PLAYER'} );
@@ -302,6 +302,8 @@ sub _read_state {
 
     foreach my $ship_key ( keys( %{ $VAR1->{'SHIPS'} } ) ) {
 
+#        print STDERR "\nReading ship data " . $ship_key . " ... ";
+
         my $ship = WLE::4X::Objects::Ship->new(
             'server' => $self,
             'tag' => $ship_key,
@@ -309,6 +311,7 @@ sub _read_state {
         );
 
         if ( defined( $ship ) ) {
+#            print STDERR 'added.';
             $self->ships()->{ $ship->tag() } = $ship;
         }
     }
@@ -383,9 +386,9 @@ sub _save_state {
     $data{'SETTINGS'}->{'PLAYERS_PENDING'} = [ $self->pending_players()->items() ];
     $data{'SETTINGS'}->{'PLAYERS_DONE'} = [ $self->done_players()->items() ];
     $data{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} = [ $self->players_next_round()->items() ];
-    print STDERR "\nSaving Players Next Round: " . join( ',', @{ $data{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} } );
+#    print STDERR "\nSaving Players Next Round: " . join( ',', @{ $data{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} } );
 
-    print STDERR "\nDump of list: " . Dumper( $data{'SETTINGS'} );
+#    print STDERR "\nDump of list: " . Dumper( $data{'SETTINGS'} );
 
     $data{'SETTINGS'}->{'CURRENT_TRAITOR'} = $self->current_traitor();
 
@@ -480,9 +483,11 @@ sub _save_state {
         # ships
 
         $data{'SHIPS'} = {};
+#        print STDERR "\nShip Keys: " . join( ',', keys( %{ $self->ships() } ) );
         foreach my $ship ( values( %{ $self->ships() } ) ) {
             my %ship_hash = ();
             $ship->to_hash( \%ship_hash );
+#            print STDERR "\nSaving ship data " . $ship->tag() . ' ... ';
             $data{'SHIPS'}->{ $ship->tag() } = \%ship_hash;
         }
 
@@ -517,10 +522,10 @@ sub _save_state {
     print { $self->{'FH_STATE'} } Dumper( \%data );
 
 #    print STDERR Dumper( \%data );
-    if ( scalar( @{ $data{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} } ) > 0 ) {
-        $self->_close_all();
-        exit();
-    }
+#    if ( scalar( @{ $data{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} } ) > 0 ) {
+#        $self->_close_all();
+#        exit();
+#    }
 
     # using Storable
 

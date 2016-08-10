@@ -350,6 +350,8 @@ sub action_select_race_and_location {
     my $self            = shift;
     my %args            = @_;
 
+#    print STDERR "\nAdding Race '" . $args{'race_tag'} . "' - Current Ship Tags: " . join( ',', keys( %{ $self->ships() } ) );
+
     unless ( defined( $args{'race_tag'} ) ) {
         $self->set_error( 'Missing Race Tag' );
         return 0;
@@ -421,17 +423,17 @@ sub action_select_race_and_location {
 #    print STDERR "\nNext User: " . $self->user_id_of_player_id( $self->waiting_on_player_id() );
 #    print STDERR "\nNext Player: " . $self->waiting_on_player_id();
 
-    print STDERR "\nAfter selecting race Next Round: " . join( ',', $self->players_next_round()->items() );
+#    print STDERR "\nAfter selecting race Next Round: " . join( ',', $self->players_next_round()->items() );
 
 
     if ( $self->waiting_on_player_id() == -1 ) {
 #        print STDERR "\nStarting next round ... ";
 
         $self->_raw_prepare_for_first_round( $EV_FROM_INTERFACE );
-        print STDERR "\nAfter preparing for first Round: " . join( ',', $self->players_next_round()->items() );
+#        print STDERR "\nAfter preparing for first Round: " . join( ',', $self->players_next_round()->items() );
 
         $self->_raw_start_next_round( $EV_FROM_INTERFACE );
-        print STDERR "\nAfter starting next Round: " . join( ',', $self->players_next_round()->items() );
+#        print STDERR "\nAfter starting next Round: " . join( ',', $self->players_next_round()->items() );
 
     }
 

@@ -56,6 +56,7 @@ sub _init {
     $self->{'FH_STATE'} = undef;
     $self->{'FH_LOG'} = undef;
     $self->{'LAST_ERROR'} = '';
+    $self->{'RETURN_DATA'} = undef;
 
     $self->{'ENV'} = {};
 
@@ -199,11 +200,9 @@ sub do {
         'message' => '',
     );
 
-    my $data = undef;
-    $args{'__data'} = \$data;
     $response{'success'} = $method->( $self, %args );
     $response{'message'} = $self->last_error();
-    $response{'data'} = $data;
+    $response{'data'} = $self->returned_data();
     $response{'allowed'} = [];
 
     my $race = $self->race_of_acting_player();
@@ -232,8 +231,10 @@ sub _check_allowed_action {
 
     my %actions = (
 
-        'status'            => { 'method' => \&action_status, 'flag_anytime' => 1, 'flag_read_only' => 1 },
-        'exchange'          => { 'method' => \&action_exchange, 'flag_anytime' => 1 },
+        'status'            => { 'flag_anytime' => 1, 'flag_read_only' => 1, 'method' => \&action_status },
+        'exchange'          => { 'flag_anytime' => 1, 'method' => \&action_exchange },
+
+        'info_board'        => { 'flag_anytime' => 1, 'method' => \&info_board },
 
         'create_game'       => { 'method' => \&action_create_game },
         'add_source'        => { 'flag_req_state' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_add_source },
@@ -355,6 +356,25 @@ sub _check_allowed_action {
     }
 
     return '';
+}
+
+#############################################################################
+
+sub returned_data {
+    my $self        = shift;
+
+    return $self->{'RETURN_DATA'};
+}
+
+#############################################################################
+
+sub set_returned_data {
+    my $self        = shift;
+    my $value       = shift;
+
+    $self->{'RETURN_DATA'} = $value;
+
+    return;
 }
 
 #############################################################################
@@ -502,8 +522,7 @@ sub action_status {
     my $self        = shift;
     my %args        = @_;
 
-    my $r_data = $args{'__data'};
-    $$r_data = $self->outside_status();
+    $self->set_returned_data( $self->outside_status() );
 
     return 1;
 }

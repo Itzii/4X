@@ -339,7 +339,7 @@ sub test_Object_Server {
 		show( $response{'message'} );
 	}
 
-	return;
+#	return;
 
 	%response = test_server()->do(
 		'action'		=> 'status',
@@ -479,6 +479,19 @@ sub test_Object_Server {
 
 	ok( $response{'success'} == 1, 'action_pass succeeded' );
 	show( $response{'message'} );
+
+
+	%response = test_server()->do(
+		'action'		=> 'info_board',
+		'user'			=> 100,
+		'log_id'		=> $log_id,
+		'flag_ascii'	=> 1,
+	);
+
+	print STDERR $response{'data'};
+
+
+
 
 
 	return;

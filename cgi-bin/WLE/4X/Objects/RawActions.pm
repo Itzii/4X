@@ -2379,7 +2379,7 @@ sub _raw_start_next_round {
         return 'starting new round';
     }
 
-    print STDERR "\nNext Round: " . join( ',', $self->players_next_round()->items() );
+#    print STDERR "\nNext Round: " . join( ',', $self->players_next_round()->items() );
 
     my @ready = $self->players_next_round()->items();
     $self->players_next_round()->clear();
@@ -2400,7 +2400,7 @@ sub _raw_start_next_round {
     $self->set_phase( $PH_ACTION );
     $self->set_waiting_on_player_id( $next_player );
     $self->set_subphase( 0 );
-    $self->set_tile( '' );
+    $self->set_current_tile( '' );
 
     $self->_raw_set_status( $EV_SUB_ACTION, $self->status() );
 

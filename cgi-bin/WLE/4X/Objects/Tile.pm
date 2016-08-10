@@ -304,7 +304,7 @@ sub unpinned_ship_count {
             }
         }
         else {
-            print STDERR "\nUndefined ship for tag '" . $ship_tag . "' on tile '" . $self->tag() . "'";            
+            print STDERR "\nUndefined ship for tag '" . $ship_tag . "' on tile '" . $self->tag() . "'";
         }
 
     }
@@ -933,15 +933,38 @@ sub as_ascii {
     }
 
 
+    return @display;
+}
 
+#############################################################################
 
+sub empty_ascii {
+    my $x           = shift;
+    my $y           = shift;
 
+    my @display = (
+        '?????.           .',
+        '????               ',
+        '???                 ',
+        '??                   ',
+        '?                     ',
+        '                       ',
+        '        xxx,yyy        ',
+        '                       ',
+        '?                     ',
+        '??                   ',
+        '???                 ',
+        '????               ',
+        '?????.           .',
+    );
 
+    my $x_text = sprintf( '%+02i', $x);
+    my $y_text = sprintf( '%+02i', $y);
 
-
-
-
-
+    foreach $_ ( @display ) {
+        $_ =~ s{xxx}{$x_text}xs;
+        $_ =~ s{yyy}{$y_text}xs;
+    }
 
     return @display;
 }

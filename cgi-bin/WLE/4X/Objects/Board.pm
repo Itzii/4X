@@ -674,37 +674,46 @@ sub to_hash {
 sub as_ascii {
     my $self        = shift;
 
+    my @tile_0 = $self->tile_at_location( 0, 0 )->as_ascii();
+
+    my $hex_height = scalar( @tile_0 );
+    my $hex_width = length( $tile_0[ $hex_height / 2 ] );
+
+    my $hex_height_offset = ( ( $hex_height - 1 ) / 2 );
+    my $hex_width_offset = $hex_height_offset - 1;
+
+
+    my @grid = ();
+
+
+
+    q{
 
     # what is the lowest and highest column and row values
 
-    my $lowest_x = 500;
-    my $lowest_y = 500;
-
-    my $highest_x = -500;
-    my $highest_y = -500;
+    my @all_x = ();
+    my @all_y = ();
 
     foreach my $column ( keys( %{ $self->{'SPACES'} } ) ) {
         foreach my $row ( keys( %{ $self->{'SPACES'}->{ $column } } ) ) {
-            if ( $column < $lowest_x ) {
-                $lowest_x = $column;
-            }
-            elsif ( $column > $highest_x ) {
-                $highest_x = $column;
-            }
-
-            if ( $row < $lowest_y ) {
-                $lowest_y = $row;
-            }
-            elsif ( $row > $highest_y ) {
-                $highest_y = $row;
-            }
+            push( @all_x, $column );
+            push( @all_y, $row );
         }
     }
 
+    @all_x = sort { $a <=> $b } @all_x;
+    @all_y = sort { $a <=> $b } @all_y;
+
+    my $highest_x = $all_x[ -1 ];
+    my $highest_y = $all_y[ -1 ];
+
+    my $lowest_x = $all_x[ 0 ];
+    my $lowest_y = $all_y[ 0 ];
+
     # now we get the size of the map in hex columns and rows
 
-    my $width = $highest_x - $lowest_x;
-    my $height = $highest_y - $lowest_y;
+    my $width = $highest_x - $lowest_x + 1;
+    my $height = $highest_y - $lowest_y + 1;
 
     my $x_offset = - $lowest_x;
     my $y_offset = - $lowest_y;
@@ -713,11 +722,13 @@ sub as_ascii {
 
     my @tile_0 = $self->tile_at_location( 0, 0 )->as_ascii();
 
-    my $hex_width = length( $tile_0[ 0 ] );
     my $hex_height = scalar( @tile_0 );
+    my $hex_width = length( $tile_0[ $hex_height / 2 ] );
 
-    my $hex_height_offset = ( $hex_height - 1 ) / 2;
+    my $hex_height_offset = ( ( $hex_height - 1 ) / 2 );
     my $hex_width_offset = $hex_height_offset - 1;
+
+#    print STDERR "\n";
 
     # create a blank canvas
 
@@ -727,7 +738,21 @@ sub as_ascii {
         push( @grid, ' ' x ( $width * ( $hex_width - $hex_width_offset ) + $hex_width_offset ) );
     }
 
-    print STDERR "\nGrid Height: " . scalar( @grid ) . "\n";
+#    print STDERR "\nGrid Height: " . scalar( @grid ) . "\n";
+
+    # overlay empty hexes
+
+    foreach my $column ( $lowest_x .. $highest_x ) {
+        foreach my $row ( $lowest_y .. $highest_y ) {
+
+            my @hex_text = WLE::4X::Objects::Tile::empty_ascii( $column, $row );
+
+            my $x = ( $column + $x_offset ) * ( $hex_width - $hex_width_offset );
+            my $y = ( ( $row + $y_offset ) * ( $hex_height - 1 ) ) + ( $column * ( $hex_height_offset ) );
+
+            $self->_overlay_text( \@grid, \@hex_text, $x, $y );
+        }
+    }
 
     # now overlay the ascii text from each hex onto the grid
 
@@ -735,28 +760,42 @@ sub as_ascii {
         foreach my $row ( keys( %{ $self->{'SPACES'}->{ $column } } ) ) {
             my $tile = $self->tile_at_location( $column, $row );
 
-            my $x = ( $column + $x_offset ) * ( $hex_width - $hex_width_offset );
-            my $y = ( ( $row + $y_offset ) * $hex_height ) + ( $column * $hex_height_offset );
-
             my @hex_text = $tile->as_ascii();
 
-            foreach my $hex_line ( @hex_text ) {
+            my $x = ( $column + $x_offset ) * ( $hex_width - $hex_width_offset );
+            my $y = ( ( $row + $y_offset ) * ( $hex_height - 1 ) ) + ( $column * ( $hex_height_offset ) );
 
-                #count and remove the '?' placeholder characters at the beginning of the line
-                my @c = $hex_line =~ m{ \? }xsg;
-                my $short_offset = @c;
-                $hex_line =~ s{ ^\?+ }{}xsg;
-
-                substr( $grid[ $y ], $x + $short_offset, length( $hex_line ) ) = $hex_line;
-
-                $y++;
-            }
+            $self->_overlay_text( \@grid, \@hex_text, $x, $y );
         }
     }
+
+    };
 
     return @grid;
 }
 
+#############################################################################
+
+sub _overlay_text {
+    my $self        = shift;
+    my $r_grid      = shift;
+    my $r_text      = shift;
+    my $x           = shift;
+    my $y           = shift;
+
+    foreach my $hex_line ( @{ $r_text } ) {
+
+        #count and remove the '?' placeholder characters at the beginning of the line
+        my @c = $hex_line =~ m{ \? }xsg;
+        my $short_offset = @c;
+        $hex_line =~ s{ ^\?+ }{}xsg;
+
+        substr( $r_grid->[ $y ], $x + $short_offset, length( $hex_line ) ) = $hex_line;
+
+        $y++;
+    }
+
+}
 
 #############################################################################
 #############################################################################

@@ -876,10 +876,10 @@ sub as_ascii {
         '???/ MON      WORM \\',
         '??/5   OOOOOOOOO   1\\',
         '?/                   \\',
-        '/                     \\',
-        '                       ',
-        '\                     /',
-        '?\                   /',
+        '/ SSSSSSSSSSSSSSSSSSS \\',
+        '  SSSSSSSSSSSSSSSSSSS  ',
+        '\ SSSSSSSSSSSSSSSSSSS /',
+        '?\      DDDDDDDD     /',
         '??\4 CCCCCCCCCCCCC 2/',
         '???\xxxxxxxxxxxxxxx/',
         '????\ ANC  3 DISC /',
@@ -923,6 +923,51 @@ sub as_ascii {
         $colony_text .= $text;
     }
 
+    my %class_letters = (
+        'class_interceptor'         => 'I',
+        'class_cruiser'             => 'C',
+        'class_dreadnought'         => 'D',
+        'class_starbase'            => 'S',
+        'class_ancient_cruiser'     => 'Ac',
+        'class_ancient_destroyer'   => 'Ad',
+        'class_ancient_dreadnought' => 'An',
+        'class_defense'             => 'G',
+    );
+
+    my $defender_text = '';
+    my %defender_types = ();
+
+    foreach my $ship_tag ( $self->ships()->items() ) {
+        my $ship = $self->server()->ships()->{ $ship_tag };
+        if ( $ship->owner_id() == $self->owner_id() ) {
+            if ( defined( $defender_types{ $ship->template()->class() } ) ) {
+                $defender_types{ $ship->template()->class() }++;
+            }
+            else {
+                $defender_types{ $ship->template()->class() } = 1;
+            }
+        }
+    }
+
+    foreach my $class (
+        'class_interceptor',
+        'class_cruiser',
+        'class_dreadnought',
+        'class_starbase',
+        'class_ancient_cuiser',
+        'class_ancient_destroyer',
+        'class_ancient_dreadnought',
+        'class_defense',
+    ) {
+        if ( defined( $defender_types{ $class } ) ) {
+            $defender_text .= $class_letters{ $class } . $defender_types{ $class };
+        }
+    }
+
+
+
+
+
     foreach $_ ( @display ) {
 
         my $buffer = '';
@@ -945,19 +990,26 @@ sub as_ascii {
                 $owner = $self->owner_id();
             }
             $owner = center_text( $owner, length( $buffer ) );
-            $_ =~ s{ O{2,} }{$owner};
+            $_ =~ s{ O{2,} }{$owner}xs;
         }
 
         if ( $_ =~ m{ (x{2,}) }xs ) {
             $buffer = $1;
-            my $name = sprintf( '%-*s', length( $buffer ), $self->long_name() );
+            my $name = center_text( $self->long_name(), length( $buffer ), 1 );
             $_ =~ s{ x{2,} }{$name}xs;
+        }
+
+        if ( $_ =~ m{ (D{2,}) }xs ) {
+            $buffer = $1;
+            $defender_text = center_text( $defender_text, length( $buffer ) );
+            $_ =~ s{ D{2,} }{$defender_text}xs;
         }
 
 
         if ( $_ =~ m{ (C{2,}) }xs ) {
             $buffer = $1;
-            $colony_text = sprintf( '%-*s', length( $buffer ), $colony_text );
+            $colony_text =~ s{ \s $ }{}xs;
+            $colony_text = center_text( $colony_text, length( $buffer ) );
             $_ =~ s{ C{2,} }{$colony_text}xs;
         }
 

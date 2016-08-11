@@ -127,6 +127,11 @@ sub rotate_bits_right {
 sub center_text {
     my $text        = shift;
     my $width       = shift;
+    my $flag_crop   = shift; $flag_crop = 0         unless defined( $flag_crop );
+
+    if ( $flag_crop && length( $text ) > $width ) {
+        return substr( $text, 0, $width );
+    }
 
     if ( length( $text ) >= $width ) {
         return $text;

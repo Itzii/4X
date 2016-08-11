@@ -116,6 +116,13 @@ sub test_Methods_Simple {
 
 	ok( $value == $shifted_value, 'right shift of short byte is correct' );
 
+	$value = WLE::Methods::Simple::center_text( 'X', 7 );
+	ok( $value eq '   X   ', 'text centered correctly' );
+
+	$value = WLE::Methods::Simple::center_text( 'X', 4 );
+	ok( $value eq ' X  ', 'text centered unevenly correctly' );
+
+
 	return;
 }
 

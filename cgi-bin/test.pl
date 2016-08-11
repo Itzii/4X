@@ -43,6 +43,7 @@ my @_test_methods = (
 
 
 	[ 'WLE::4X::Objects::Server'						, \&test_Object_Server ],
+	[ 'WLE::4X::Objects::ASCII_Server'					, \&test_Object_Ascii_Server ],
 
 
 );
@@ -488,23 +489,44 @@ sub test_Object_Server {
 	show( $response{'message'} );
 
 
-	%response = test_server()->do(
-		'action'		=> 'info_board',
-		'user'			=> 100,
-		'log_id'		=> $log_id,
-		'flag_ascii'	=> 1,
-	);
-
-	print $response{'data'};
-
-
-
-
-
 	return;
 }
 
+#############################################################################
 
+sub ascii_server {
+
+	return WLE::4X::Objects::ASCII_Server->new(
+		'resource_file'		=> "../resources/official.res",
+		'state_files'		=> "../statefiles",
+		'log_files'			=> "../statefiles",
+	);
+}
+
+#############################################################################
+
+sub test_Object_Ascii_Server {
+
+	my $log_id = 'testid123';
+	my $owner_id = 55;
+	my @user_ids = ( $owner_id, 200, 300 );
+
+	my $test_server = ascii_server();
+
+	ok( defined( $test_server ) && ref( $test_server ) eq 'WLE::4X::Objects::ASCII_Server', 'ascii server object created');
+
+	my %response = ascii_server()->do(
+		'action'		=> 'info',
+		'user'			=> -1,
+		'log_id'		=> $log_id,
+	);
+
+	unless( $response{'success'} == 1 ) {
+		show( $response{'message'} );
+	}
+	print "\n" . $response{'data'} . "\n";
+
+}
 
 #############################################################################
 #############################################################################
@@ -544,7 +566,9 @@ sub test {
 
 			no strict 'refs';
 
-			eval "require $module_name";
+			unless( eval "require $module_name" ) {
+				print "\nUnable to load module: " . $module_name;
+			}
 			my $version = ${ $module_name . '::VERSION' };
 			unless ( defined( $version ) ) {
 				$version = 'unknown';

@@ -33,7 +33,7 @@ sub _init {
 
     $self->{'TECH_REQUIRED'} = '';
 
-    $self->{'ENERGY_USED'} = 0;
+    $self->{'ENERGY_USE'} = 0;
 
     $self->{'INITIATIVE'} = 0;
     $self->{'ENERGY'} = 0;
@@ -86,7 +86,7 @@ sub energy {
 sub energy_used {
     my $self        = shift;
 
-    return $self->{'ENERGY_USED'};
+    return $self->{'ENERGY_USE'};
 }
 
 #############################################################################
@@ -159,7 +159,7 @@ sub from_hash {
         $self->{'TECH_REQUIRED'} = $r_hash->{'REQUIRES'};
     }
 
-    foreach my $tag ( 'INITIATIVE', 'ENERGY', 'HULL_POINTS', 'COMPUTER', 'MOVEMENT', 'SHIELD', 'ATTACK_COUNT', 'ATTACK_DAMAGE', 'IS_MISSILE' ) {
+    foreach my $tag ( 'INITIATIVE', 'ENERGY', 'ENERGY_USE', 'HULL_POINTS', 'COMPUTER', 'MOVEMENT', 'SHIELD', 'ATTACK_COUNT', 'ATTACK_DAMAGE', 'IS_MISSILE' ) {
         if ( WLE::Methods::Simple::looks_like_number( $r_hash->{ $tag } ) ) {
             $self->{ $tag } = $r_hash->{ $tag };
         }
@@ -182,6 +182,7 @@ sub to_hash {
 
     $r_hash->{'INITIATIVE'} = $self->initiative();
     $r_hash->{'ENERGY'} = $self->energy();
+    $r_hash->{'ENERGY_USE'} = $self->energy_used();
     $r_hash->{'HULL_POINTS'} = $self->hull_points();
     $r_hash->{'COMPUTER'} = $self->computer();
     $r_hash->{'MOVEMENT'} = $self->movement();

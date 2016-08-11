@@ -13,7 +13,6 @@ use WLE::Methods::Simple;
 use WLE::4X::Enums::Status;
 
 use WLE::4X::Objects::MetaActions;
-use WLE::4X::Objects::InfoActions;
 use WLE::4X::Objects::PlayerActions;
 use WLE::4X::Objects::RawActions;
 use WLE::4X::Objects::ServerState;
@@ -156,9 +155,7 @@ sub reset {
         'TILE' => '',
     };
 
-
-
-
+    return;
 }
 
 #############################################################################
@@ -233,8 +230,6 @@ sub _check_allowed_action {
 
         'status'            => { 'flag_anytime' => 1, 'flag_read_only' => 1, 'method' => \&action_status },
         'exchange'          => { 'flag_anytime' => 1, 'method' => \&action_exchange },
-
-        'info_board'        => { 'flag_anytime' => 1, 'method' => \&info_board },
 
         'create_game'       => { 'method' => \&action_create_game },
         'add_source'        => { 'flag_req_state' => $ST_PREGAME, 'flag_owner_only' => 1, 'method' => \&action_add_source },

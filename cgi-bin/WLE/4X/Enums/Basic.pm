@@ -22,6 +22,8 @@ our @EXPORT = qw(
     text_from_action_enum
     enum_from_action_text
 
+    desc_from_class
+
     $RES_MONEY
     $RES_MINERALS
     $RES_SCIENCE
@@ -101,21 +103,22 @@ our $ACT_UNKNOWN        = $i++;
 
 sub text_from_resource_enum {
     my $enum        = shift;
+    my $flag_short  = shift; $flag_short = 0            unless defined( $flag_short );
 
     my %values = (
-        $RES_MONEY          => 'MONEY',
-        $RES_MINERALS       => 'MINERALS',
-        $RES_SCIENCE        => 'SCIENCE',
-        $RES_INFLUENCE      => 'INFLUENCE',
-        $RES_WILD           => 'WILD',
-        $RES_SCIENCE_MONEY  => 'SCIENCE_MONEY',
+        $RES_MONEY          => [ 'MONEY', 'C' ],
+        $RES_MINERALS       => [ 'MINERALS', 'M' ],
+        $RES_SCIENCE        => [ 'SCIENCE', 'S' ],
+        $RES_INFLUENCE      => [ 'INFLUENCE', 'I' ],
+        $RES_WILD           => [ 'WILD', 'W' ],
+        $RES_SCIENCE_MONEY  => [ 'SCIENCE_MONEY', 'O' ],
     );
 
     if ( defined( $values{ $enum } ) ) {
-        return $values{ $enum },
+        return $values{ $enum }->[ $flag_short ],
     }
 
-    return 'UNKNOWN';
+    return ( $flag_short ) ? '?' : 'UNKNOWN';
 }
 
 #############################################################################
@@ -140,19 +143,20 @@ sub enum_from_resource_text {
 
 sub text_from_tech_enum {
     my $tech_type       = shift;
+    my $flag_short      = shift; $flag_short = 0            unless defined( $flag_short );
 
     my %values = (
-        $TECH_MILITARY  => 'MILITARY',
-        $TECH_GRID      => 'GRID',
-        $TECH_NANO      => 'NANO',
-        $TECH_WILD      => 'WILD',
+        $TECH_MILITARY  => [ 'MILITARY', 'MILI' ],
+        $TECH_GRID      => [ 'GRID', 'GRID' ],
+        $TECH_NANO      => [ 'NANO', 'NANO' ],
+        $TECH_WILD      => [ 'WILD', 'WILD' ],
     );
 
     if ( defined( $values{ $tech_type } ) ) {
-        return $values{ $tech_type },
+        return $values{ $tech_type }->[ $flag_short ],
     }
 
-    return 'UNKNOWN';
+    return ( $flag_short ) ? '????' : 'UNKNOWN';
 }
 
 #############################################################################
@@ -209,7 +213,7 @@ sub text_from_action_enum {
     my %values = (
         $ACT_EXPLORE        => 'EXPLORE',
         $ACT_INFLUENCE      => 'INFLUENCE',
-        $ACT_INFLUENCE_COLONY => 'INFLUCE_COL',
+        $ACT_INFLUENCE_COLONY => 'INFLUENCE_COL',
         $ACT_RESEARCH       => 'RESEARCH',
         $ACT_UPGRADE        => 'UPGRADE',
         $ACT_BUILD          => 'BUILD',
@@ -237,6 +241,31 @@ sub enum_from_action_text {
 
     return $ACT_UNKNOWN;
 }
+
+#############################################################################
+
+sub desc_from_class {
+    my $class_tag       = shift;
+    my $flag_short      = shift; $flag_short = 0            unless defined( $flag_short );
+
+    my %values = (
+        'class_interceptor'         => ['Interceptor', 'I' ],
+        'class_cruiser'             => ['Cruiser', 'C' ],
+        'class_dreadnought'         => ['Dreadnought', 'D' ],
+        'class_starbase'            => ['Starbase', 'S' ],
+        'class_ancient_cuiser'      => ['Ancient Cruiser', 'Ac' ],
+        'class_ancient_destroyer'   => ['Ancient Destroyer', 'Ad' ],
+        'class_ancient_dreadnought' => ['Ancient Dreadnought', 'An' ],
+        'class_defense'             => ['Galactic Defense', 'G' ],
+    );
+
+    if ( defined( $values{ $class_tag } ) ) {
+        return $values{ $class_tag }->[ $flag_short ];
+    }
+
+    return ( $flag_short ) ? 'Unknown Class' : '?';
+}
+
 
 #############################################################################
 #############################################################################

@@ -3,7 +3,7 @@ package WLE::4X::Objects::TechTrack;
 use strict;
 use warnings;
 
-use WLE::Methods::Simple qw( shuffle_in_place matches_any );
+use WLE::Objects::Stack;
 
 #############################################################################
 
@@ -22,7 +22,7 @@ sub _init {
     my $self		= shift;
     my %args		= @_;
 
-    $self->{'TECHS'} = [];
+    $self->{'TECHS'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
     $self->{'CREDITS'} = [ 0, -1, -2, -3, -4, -6, -8 ];
     $self->{'VP'} = [ 0, 0, 0, 0, 1, 2, 3, 5 ];
 
@@ -34,7 +34,7 @@ sub _init {
 sub current_credit {
     my $self        = shift;
 
-    my $credit_count = scalar( @{ $self->{'TECHS'} } );
+    my $credit_count = $self->{'TECHS'}->count();
 
     if ( $credit_count > scalar( $self->{'CREDITS'} - 1 ) ) {
         return $self->{'CREDITS'}->[ -1 ];
@@ -48,7 +48,7 @@ sub current_credit {
 sub vp_total {
     my $self        = shift;
 
-    my $vp_count = scalar( @{ $self->{'TECHS'} } );
+    my $vp_count = $self->{'TECHS'}->count();
 
     if ( $vp_count > scalar( $self->{'VP'} ) ) {
         return $self->{'VP'}->[ -1 ];
@@ -63,7 +63,7 @@ sub add_techs {
     my $self        = shift;
     my @tech_tags   = @_;
 
-    push( @{ $self->{'TECHS'} }, @tech_tags );
+    $self->{'TECHS'}->add_items( @tech_tags );
 
     return;
 }
@@ -73,7 +73,7 @@ sub add_techs {
 sub techs {
     my $self        = shift;
 
-    return @{ $self->{'TECHS'} };
+    return $self->{'TECHS'}->items();
 }
 
 #############################################################################
@@ -89,7 +89,7 @@ sub available_spaces {
 sub clear {
     my $self        = shift;
 
-    $self->{'TECHS'} = [];
+    $self->{'TECHS'}->clear();
 
     return;
 }
@@ -100,7 +100,7 @@ sub contains {
     my $self        = shift;
     my $value       = shift;
 
-    return matches_any( $value, @{ $self->{'TECHS'} } );
+    return $self->{'TECHS'}->contains( $value );
 }
 
 #############################################################################

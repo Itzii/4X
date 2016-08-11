@@ -3,6 +3,8 @@ package WLE::4X::Objects::ShipTemplate;
 use strict;
 use warnings;
 
+use WLE::4X::Enums::Basic;
+
 use parent 'WLE::4X::Objects::Element';
 
 #############################################################################
@@ -181,7 +183,7 @@ sub total_shields {
         my $component = $self->server()->ship_components()->{ $component_tag };
 
         if ( defined( $component ) ) {
-            $shields += $component->shields();
+            $shields += $component->shield();
         }
     }
 

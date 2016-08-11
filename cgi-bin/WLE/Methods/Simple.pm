@@ -10,6 +10,7 @@ our @EXPORT    = qw(
     matches_any
     shuffle_in_place
     center_text
+    word_wrap
 
 );
 
@@ -146,6 +147,42 @@ sub center_text {
     }
 
     return $text;
+}
+
+#############################################################################
+
+sub word_wrap {
+    my $text        = shift;
+    my $max_width   = shift;
+
+    my @lines = ();
+
+    do {
+        $text =~ s{ ^ \s+ }{}xsg;
+        $text =~ s{ \s+ $ }{}xsg;
+
+        if ( length( $text ) <= $max_width ) {
+            push( @lines, $text );
+            return @lines;
+        }
+
+        my $index = $max_width;
+        while ( substr( $text, $index, 1 ) !~ m{ \s }xs && $index > 0 ) {
+            $index--;
+        }
+
+        if ( $index == 0 ) {
+            $index = $max_width;
+        }
+
+        my $temp = substr( $text, 0, $index );
+        $text =~ s{ ^\Q$temp }{}xs;
+        $temp =~ s{ \s+ $ }{}xsg;
+        push( @lines, $temp );
+
+    } while ( length( $text ) > 0 );
+
+    return @lines;
 }
 
 #############################################################################

@@ -457,6 +457,23 @@ sub remove_vp_item {
 
 #############################################################################
 
+sub vp_items {
+    my $self            = shift;
+
+    return $self->{'VP_SLOTS'}->items();
+}
+
+#############################################################################
+
+sub vp_slot_count {
+    my $self            = shift;
+    my $slot_type       = shift;
+
+    return $self->{'VP_SLOT_COUNTS'}->{ $slot_type };
+}
+
+#############################################################################
+
 sub in_hand {
     my $self        = shift;
 
@@ -992,6 +1009,63 @@ sub to_hash {
     $r_hash->{'SHIP_TEMPLATES'} = $self->{'SHIP_TEMPLATES'};
 
     return 1;
+}
+
+#############################################################################
+
+sub as_ascii {
+    my $self            = shift;
+
+    my @lines = ();
+
+    my $waiting_on_text = ( $self->server()->waiting_on_player_id() == $self->owner_id() ) ? ' *waiting on*' : '';
+
+    push(
+        @lines,
+        $self->owner_id() . ') '
+            . $self->long_name()
+            . ' [' . ($self->server()->user_ids()->items())[ $self->owner_id() ] . ']'
+            . $waiting_on_text
+    );
+
+    foreach my $tech_type ( $TECH_MILITARY, $TECH_NANO, $TECH_GRID ) {
+        my @tech_names = ();
+
+        foreach my $tech_tag ( $self->tech_track_of( $tech_type )->techs() ) {
+            my $tech = $self->server()->technology()->{ $tech_tag };
+            if ( defined( $tech ) ) {
+                push( @tech_names, $tech->long_name() );
+            }
+        }
+
+        push(
+            @lines,
+            text_from_tech_enum( $tech_type, 1 )
+                . ' ' . $self->tech_track_of( $tech_type )->current_credit() . '/'
+                . $self->tech_track_of( $tech_type )->vp_total() . 'vp : '
+                . join( ',', @tech_names )
+        );
+    }
+
+    foreach my $res_type ( $RES_SCIENCE, $RES_MINERALS, $RES_MONEY ) {
+
+        push(
+            @lines,
+            text_from_resource_enum( $res_type, 1 ) . ': ' . $self->resource_count( $res_type )
+                . ' : ' . $self->resource_track_of( $res_type )->track_value()
+                . ' : ' . $self->resource_track_of( $res_type )->available_to_spend()
+        );
+    }
+
+    foreach my $class ( 'class_interceptor', 'class_cruiser', 'class_dreadnought', 'class_starbase' ) {
+        my $template = $self->template_of_class( $class );
+
+        if ( defined( $template ) ) {
+            push( @lines, $template->as_ascii() );
+        }
+    }
+
+    return @lines;
 }
 
 #############################################################################

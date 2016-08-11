@@ -5,6 +5,8 @@ use warnings;
 
 use Data::Dumper;
 
+use WLE::Methods::Simple qw( center_text );
+
 use WLE::4X::Enums::Basic;
 use WLE::4X::Enums::Status;
 
@@ -871,25 +873,59 @@ sub as_ascii {
     my @display = (
         '?????-------------',
         '????/ XXX  0 HIVE \\',
-        '???/ MON WORM ORB  \\',
-        '??/5               1\\',
+        '???/ MON      WORM \\',
+        '??/5   OOOOOOOOO   1\\',
         '?/                   \\',
-        '/ s   m   c   w       \\',
+        '/                     \\',
         '                       ',
-        '\ s+  m+  c+  W       /',
+        '\                     /',
         '?\                   /',
-        '??\4  ANC    DISC  2/',
+        '??\4 CCCCCCCCCCCCC 2/',
         '???\xxxxxxxxxxxxxxx/',
-        '????\      3      /',
+        '????\ ANC  3 DISC /',
         '?????-------------',
     );
 
     my $id = sprintf( '%03i', $self->tile_id() );
-    my $name = substr( sprintf( '%-15s', $self->long_name() ), 0, 15 );
 #    my $ancient_count = $self->ancient_count();
     my $disc_count = $self->discovery_count();
 
+    my $colony_text = '';
+    foreach my $slot ( $self->resource_slots() ) {
+        my $text = '';
+        if ( $slot->resource_type() == $RES_MONEY ) {
+            $text = 'c';
+        }
+        elsif ( $slot->resource_type() == $RES_MINERALS ) {
+            $text = 'm';
+        }
+        elsif ( $slot->resource_type() == $RES_SCIENCE ) {
+            $text = 's';
+        }
+        elsif ( $slot->resource_type() == $RES_WILD ) {
+            $text = 'w';
+        }
+        elsif ( $slot->resource_type() == $RES_SCIENCE_MONEY ) {
+            $text = 'o';
+        }
+
+        if ( $slot->is_advanced() ) {
+            $text = uc( $text );
+        }
+
+        if ( $slot->owner_id() > -1 ) {
+            $text .= '*';
+        }
+        else {
+            $text .= ' ';
+        }
+
+        $colony_text .= $text;
+    }
+
     foreach $_ ( @display ) {
+
+        my $buffer = '';
 
         foreach my $direction ( 0 .. 5 ) {
             if ( $self->has_warp_on_side( $direction ) ) {
@@ -902,22 +938,40 @@ sub as_ascii {
 
         $_ =~ s{ XXX }{$id}xsm;
 
-        $_ =~ s{ xxxxxxxxxxxxxxx }{$name}xs;
+        if ( $_ =~ m{ (O{2,}) }xs ) {
+            $buffer = $1;
+            my $owner = '';
+            if ( $self->owner_id() > -1 ) {
+                $owner = $self->owner_id();
+            }
+            $owner = center_text( $owner, length( $buffer ) );
+            $_ =~ s{ O{2,} }{$owner};
+        }
+
+        if ( $_ =~ m{ (x{2,}) }xs ) {
+            $buffer = $1;
+            my $name = sprintf( '%-*s', length( $buffer ), $self->long_name() );
+            $_ =~ s{ x{2,} }{$name}xs;
+        }
+
+
+        if ( $_ =~ m{ (C{2,}) }xs ) {
+            $buffer = $1;
+            $colony_text = sprintf( '%-*s', length( $buffer ), $colony_text );
+            $_ =~ s{ C{2,} }{$colony_text}xs;
+        }
 
         unless ( $self->monolith_count() > 0 ) {
             $_ =~ s{MON}{   }xs;
         }
 
-        unless ( $self->orbital_count() > 0 ) {
-            $_ =~ s{ORB}{   }xs;
+        if ( $self->ancient_links() > 0 ) {
+            my $ancient_count = $self->ancient_links();
+            $_ =~ s{ANC\s}{ANC$ancient_count}xs;
         }
-
-#        if ( $ancient_count > 0 ) {
-#            $_ =~ s{ANC\s}{ANC$ancient_count}xs;
-#        }
-#        else {
-#            $_ =~ s{ANC\s}{    }xs;
-#        }
+        else {
+            $_ =~ s{ANC\s}{    }xs;
+        }
 
         unless ( $disc_count > 0 ) {
             $_ =~ s{DISC}{    }xs;
@@ -943,19 +997,19 @@ sub empty_ascii {
     my $y           = shift;
 
     my @display = (
-        '?????.           .',
-        '????               ',
-        '???                 ',
-        '??                   ',
-        '?                     ',
-        '                       ',
-        '        xxx,yyy        ',
-        '                       ',
-        '?                     ',
-        '??                   ',
-        '???                 ',
-        '????               ',
-        '?????.           .',
+        '??????.           .',
+        '?????               ',
+        '????                 ',
+        '???                   ',
+        '??                     ',
+        '?                       ',
+        '.        xxx,yyy          .',
+        '?                       ',
+        '??                     ',
+        '???                   ',
+        '????                 ',
+        '?????               ',
+        '??????.           .',
     );
 
     my $x_text = sprintf( '%+02i', $x);

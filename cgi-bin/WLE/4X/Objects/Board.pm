@@ -682,79 +682,39 @@ sub as_ascii {
     my $hex_height_offset = ( ( $hex_height - 1 ) / 2 );
     my $hex_width_offset = $hex_height_offset - 1;
 
+    my $default_w_h = 60;
 
     my @grid = ();
 
+    my $line_height = $hex_height * $default_w_h;
+    my $line_width = $default_w_h * ( $hex_width - $hex_width_offset );
+    foreach ( 1 .. $line_height ) {
+        push( @grid, ' ' x $line_width );
+    }
 
+    my $center_x = int( $line_width / 2 );
+    my $center_y = int( $line_height / 2 );
 
-    q{
-
-    # what is the lowest and highest column and row values
-
-    my @all_x = ();
-    my @all_y = ();
+    # first we draw empty hexes around the spaces the tiles occupy
 
     foreach my $column ( keys( %{ $self->{'SPACES'} } ) ) {
         foreach my $row ( keys( %{ $self->{'SPACES'}->{ $column } } ) ) {
-            push( @all_x, $column );
-            push( @all_y, $row );
+            my $tile = $self->tile_at_location( $column, $row );
+
+            foreach my $direction ( 0 .. 5 ) {
+                my ( $hex_column, $hex_row ) = $self->location_in_direction( $column, $row, $direction );
+
+                my @empty_hex_text = WLE::4X::Objects::Tile::empty_ascii( $hex_column, $hex_row );
+
+                my $x = $hex_column * ( $hex_width - $hex_width_offset );
+                my $y = ( $hex_row * ( $hex_height - 1 ) ) + ( $hex_column * $hex_height_offset );
+
+                $self->_overlay_text( \@grid, \@empty_hex_text, $center_x + $x - 1, $center_y + $y );
+            }
         }
     }
 
-    @all_x = sort { $a <=> $b } @all_x;
-    @all_y = sort { $a <=> $b } @all_y;
-
-    my $highest_x = $all_x[ -1 ];
-    my $highest_y = $all_y[ -1 ];
-
-    my $lowest_x = $all_x[ 0 ];
-    my $lowest_y = $all_y[ 0 ];
-
-    # now we get the size of the map in hex columns and rows
-
-    my $width = $highest_x - $lowest_x + 1;
-    my $height = $highest_y - $lowest_y + 1;
-
-    my $x_offset = - $lowest_x;
-    my $y_offset = - $lowest_y;
-
-    # get the size and offset values for an individual hex
-
-    my @tile_0 = $self->tile_at_location( 0, 0 )->as_ascii();
-
-    my $hex_height = scalar( @tile_0 );
-    my $hex_width = length( $tile_0[ $hex_height / 2 ] );
-
-    my $hex_height_offset = ( ( $hex_height - 1 ) / 2 );
-    my $hex_width_offset = $hex_height_offset - 1;
-
-#    print STDERR "\n";
-
-    # create a blank canvas
-
-    my @grid = ();
-    my $line_height = ( $hex_height * $height ) + ( $hex_height_offset * $width );
-    foreach ( 1 .. $line_height ) {
-        push( @grid, ' ' x ( $width * ( $hex_width - $hex_width_offset ) + $hex_width_offset ) );
-    }
-
-#    print STDERR "\nGrid Height: " . scalar( @grid ) . "\n";
-
-    # overlay empty hexes
-
-    foreach my $column ( $lowest_x .. $highest_x ) {
-        foreach my $row ( $lowest_y .. $highest_y ) {
-
-            my @hex_text = WLE::4X::Objects::Tile::empty_ascii( $column, $row );
-
-            my $x = ( $column + $x_offset ) * ( $hex_width - $hex_width_offset );
-            my $y = ( ( $row + $y_offset ) * ( $hex_height - 1 ) ) + ( $column * ( $hex_height_offset ) );
-
-            $self->_overlay_text( \@grid, \@hex_text, $x, $y );
-        }
-    }
-
-    # now overlay the ascii text from each hex onto the grid
+    # now we draw the actual tiles
 
     foreach my $column ( keys( %{ $self->{'SPACES'} } ) ) {
         foreach my $row ( keys( %{ $self->{'SPACES'}->{ $column } } ) ) {
@@ -762,14 +722,36 @@ sub as_ascii {
 
             my @hex_text = $tile->as_ascii();
 
-            my $x = ( $column + $x_offset ) * ( $hex_width - $hex_width_offset );
-            my $y = ( ( $row + $y_offset ) * ( $hex_height - 1 ) ) + ( $column * ( $hex_height_offset ) );
+            my $x = $column * ( $hex_width - $hex_width_offset );
+            my $y = ( $row * ( $hex_height - 1 ) ) + ( $column * $hex_height_offset );
 
-            $self->_overlay_text( \@grid, \@hex_text, $x, $y );
+            $self->_overlay_text( \@grid, \@hex_text, $center_x + $x, $center_y + $y );
         }
     }
 
-    };
+    # now we the top empty rows
+    while ( $grid[ 0 ] =~ m{ ^ \s+ $ }xs ) {
+        shift( @grid );
+    }
+
+    # remove the bottom empty rows
+    while ( $grid[ -1 ] =~ m{ ^\s+ $ }xs ) {
+        pop( @grid );
+    }
+
+
+    # remove the left empty columns
+    my @widths = ();
+    foreach ( @grid ) {
+        $_ =~ m{ ^ ( \s* ) }xs;
+        push( @widths, $1 );
+    }
+    @widths = sort { length( $a ) <=> length( $b ) } @widths;
+    my $trim_string = $widths[ 0 ];
+    @grid = map { $_ =~ s{^\Q$trim_string}{}x; $_ } @grid;
+
+    # remove trailing spaces
+    @grid = map { $_ =~ s{ \s+$}{}x; $_ } @grid;
 
     return @grid;
 }

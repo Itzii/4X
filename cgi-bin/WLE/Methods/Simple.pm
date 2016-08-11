@@ -9,6 +9,7 @@ our @EXPORT    = qw(
     looks_like_number
     matches_any
     shuffle_in_place
+    center_text
 
 );
 
@@ -119,6 +120,27 @@ sub rotate_bits_right {
     }
 
     return $value;
+}
+
+#############################################################################
+
+sub center_text {
+    my $text        = shift;
+    my $width       = shift;
+
+    if ( length( $text ) >= $width ) {
+        return $text;
+    }
+
+    while ( length( $text ) < $width ) {
+        $text .= ' ';
+        if ( length( $text ) == $width ) {
+            return $text;
+        }
+        $text = ' ' . $text;
+    }
+
+    return $text;
 }
 
 #############################################################################

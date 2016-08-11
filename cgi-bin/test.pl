@@ -488,7 +488,7 @@ sub test_Object_Server {
 		'flag_ascii'	=> 1,
 	);
 
-	print STDERR $response{'data'};
+	print $response{'data'};
 
 
 

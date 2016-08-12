@@ -2331,14 +2331,13 @@ sub _raw_next_player {
         }
 
         if ( $flag_continue_round ) {
-            $self->players_pending()->fill( $self->players_done()->items() );
-            $self->players_done()->clear();
+            $self->pending_players()->fill( $self->done_players()->items() );
+            $self->done_players()->clear();
         }
         else {
             $self->set_waiting_on_player_id( -1 );
         }
     }
-
 
     return;
 }
@@ -2399,7 +2398,7 @@ sub _raw_start_next_round {
     $self->set_round( $new_round );
     $self->set_phase( $PH_ACTION );
     $self->set_waiting_on_player_id( $next_player );
-    $self->set_subphase( 0 );
+    $self->set_subphase( $SUB_NULL );
     $self->set_current_tile( '' );
 
     $self->_raw_set_status( $EV_SUB_ACTION, $self->status() );

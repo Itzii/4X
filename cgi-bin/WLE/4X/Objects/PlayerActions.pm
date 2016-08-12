@@ -73,7 +73,16 @@ sub action_pass_action {
     $self->_raw_next_player( $EV_FROM_INTERFACE );
 
     if ( $self->waiting_on_player_id() == -1 ) {
-        $self->_raw_start_combat_phase( $EV_FROM_INTERFACE );
+
+        my $combat_tile = $self->board()->outermost_combat_tile();
+
+        unless ( $combat_tile eq '' ) {
+            $self->_raw_start_combat_phase( $EV_FROM_INTERFACE );
+        }
+
+        
+
+
     }
 
     return 1;

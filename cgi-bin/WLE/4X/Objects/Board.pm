@@ -301,12 +301,12 @@ sub explorable_spaces_for_race {
 
     my %explorable = ();
 
-    foreach my $column ( keys( %{ $self->{'SPACES'} } ) ) {
-        foreach my $row ( keys( %{ $self->{'SPACES'}->{ $column } } ) ) {
+    foreach my $tile_tag ( $self->tiles_on_board() ) {
 
-            foreach my $adjacent_location ( $self->_explorable_from_location( $race_tag, $column, $row ) ) {
-                $explorable{ $adjacent_location } = 1;
-            }
+        my ( $column, $row ) = split( /:/, $self->location_of_tile( $tile_tag ) );
+
+        foreach my $adjacent_location ( $self->_explorable_from_location( $race_tag, $column, $row ) ) {
+            $explorable{ $adjacent_location } = 1;
         }
     }
 
@@ -386,7 +386,7 @@ sub _explorable_from_location {
         return ();
     }
 
-    my $has_wormhole = $self->server()->race_of_current_player()->has_technology( 'tech_wormhole_generator' );
+    my $has_wormhole = $self->server()->race_of_acting_player()->has_technology( 'tech_wormhole_generator' );
 
     my @adjacents = ();
 
@@ -394,7 +394,7 @@ sub _explorable_from_location {
         if ( $has_wormhole || $tile->has_warp_on_side( $direction ) ) {
             my $remote_tile = $self->tile_in_direction( $x_pos, $y_pos, $direction );
             unless ( defined( $remote_tile ) ) {
-                my ( $adj_x, $adj_y ) = $self->location_in_direction( $direction );
+                my ( $adj_x, $adj_y ) = $self->location_in_direction( $x_pos, $y_pos, $direction );
 
                 my $stack_id = $self->stack_from_location( $adj_x, $adj_y );
 
@@ -619,18 +619,18 @@ sub from_hash {
 
     $self->clear_all_tile_stacks();
 
-    if ( defined( $r_hash->{'STACKS'} ) ) {
+    if ( defined( $r_hash->{'TILE_STACKS'} ) ) {
 
-        foreach my $stack_id ( keys( %{ $r_hash->{'STACKS'} } ) ) {
+        foreach my $stack_id ( keys( %{ $r_hash->{'TILE_STACKS'} } ) ) {
 
             my $stack = $self->tile_draw_stack( $stack_id );
             if ( defined( $stack ) ) {
-                $stack->add_items( @{ $r_hash->{'STACKS'}->{ $stack_id }->{'DRAW'} } );
+                $stack->add_items( @{ $r_hash->{'TILE_STACKS'}->{ $stack_id }->{'DRAW'} } );
             }
 
             $stack = $self->tile_discard_stack( $stack_id );
             if ( defined( $stack ) ) {
-                $stack->add_items( @{ $r_hash->{'STACKS'}->{ $stack_id }->{'DISCARD'} } );
+                $stack->add_items( @{ $r_hash->{'TILE_STACKS'}->{ $stack_id }->{'DISCARD'} } );
             }
         }
     }

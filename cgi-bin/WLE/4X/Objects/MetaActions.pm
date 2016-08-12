@@ -325,10 +325,16 @@ sub action_begin {
 
     my @available_tech = ();
 
-    foreach ( 1 .. $self->start_tech_count() ) {
+    my $tech_count = 0;
+    while ( $tech_count < $self->start_tech_count() && $self->tech_bag()->count() > 0 ) {
         my $tech = $self->tech_bag()->select_random_item();
+
         $self->_raw_remove_from_tech_bag( $EV_FROM_INTERFACE, $tech );
         $self->_raw_add_to_available_tech( $EV_FROM_INTERFACE, $tech );
+
+        unless ( $self->technology()->category() == $TECH_WILD ) {
+            $tech_count++;
+        }
     }
 
 
@@ -476,6 +482,11 @@ sub _prepare_for_first_round {
     }
 
     $self->set_state( $ST_NORMAL );
+    $self->set_subphase( $SUB_NULL );
+
+    foreach my $race ( values( %{ $self->races() } ) ) {
+        $race->set_flag_passed( 0 );
+    }
 
     $self->_raw_set_status( $EV_FROM_INTERFACE, $self->status() );
 

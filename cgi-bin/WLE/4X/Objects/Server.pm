@@ -55,7 +55,7 @@ sub _init {
     $self->{'FH_STATE'} = undef;
     $self->{'FH_LOG'} = undef;
     $self->{'LAST_ERROR'} = '';
-    $self->{'RETURN_DATA'} = undef;
+    $self->{'RETURN_DATA'} = '';
 
     $self->{'ENV'} = {};
 
@@ -205,7 +205,7 @@ sub do {
     my $race = $self->race_of_acting_player();
 
     if ( defined( $race ) ) {
-        $response{'allowed'} = [ $race->adjusted_allowed_actions() ];
+        $response{'allowed'} = [ $race->adjusted_allowed_actions()->items() ];
     }
 
     if ( $response{'success'} == 1 && $self->{'ENV'}->{'FLAG_READ_ONLY'} == 0 ) {

@@ -6,6 +6,7 @@ use warnings;
 use WLE::Methods::Simple;
 
 use WLE::4X::Enums::Basic;
+use WLE::4X::Enums::Status qw( state_text_from_enum phase_text_from_enum subphase_text_from_enum );
 
 use parent 'WLE::4X::Objects::Server';
 
@@ -37,24 +38,24 @@ sub do {
     my $self        = shift;
     my %args        = @_;
 
-    unless ( defined( $args{'action'} ) ) {
-        return ( 'success' => 0, 'message' => "Missing 'action' element." );
-    }
-
     unless ( defined( $args{'log_id'} ) ) {
         return ( 'success' => 0, 'message' => "Missing 'log_id' element.")
     }
 
-    unless ( defined( $args{'user'} ) ) {
-        return ( 'success' => 0, 'message' => "Missing 'user' element." );
+    unless ( defined( $args{'action'} ) ) {
+        $args{'action'} = 'info';
     }
 
-    my $action = $args{'action'};
+    my %response = ();
 
-    if ( $action eq 'info' ) {
+    if ( $args{'action'} eq 'info' ) {
         $args{'action'} = 'status';
 
-        my %response = $self->do( %args );
+        unless ( defined( $args{'user'} ) ) {
+            $args{'user'} = -1;
+        }
+
+        %response = $self->do( %args );
 
         $self->_fill_text_data();
 
@@ -66,7 +67,14 @@ sub do {
         return %response;
     }
 
-    return $self->WLE::4X::Objects::Server::do( %args );
+    %response = $self->WLE::4X::Objects::Server::do( %args );
+
+    # testing only
+    $self->_fill_text_data();
+    print STDERR "\n" . $self->returned_data();
+    #
+
+    return %response;
 }
 
 #############################################################################
@@ -75,6 +83,21 @@ sub _fill_text_data {
     my $self        = shift;
 
     my @lines = $self->_info_board();
+
+    my $tile = $self->tiles()->{ $self->current_tile() };
+    my $tile_name = ( defined( $tile ) ) ? $tile->long_name() : '';
+
+    my $status_text = sprintf(
+        '%s - %s - %s - %s - %s - %s',
+        state_text_from_enum( $self->state() ),
+        $self->round(),
+        phase_text_from_enum( $self->phase() ),
+        $self->user_id_of_player_id( $self->waiting_on_player_id() ),
+        subphase_text_from_enum( $self->subphase() ),
+        $tile_name,
+    );
+
+    push( @lines, 'Current Game State: ' . $status_text );
 
     push( @lines, $self->_info_available_tech() );
 
@@ -98,7 +121,7 @@ sub _info_board {
     my @tile_0 = $self->_empty_tile_ascii( 0, 0 );
 
     my $hex_height = scalar( @tile_0 );
-    my $hex_width = length( $tile_0[ $hex_height / 2 ] );
+    my $hex_width = length( $tile_0[ $hex_height / 2 ] ) - 2;
 
     my $hex_height_offset = ( ( $hex_height - 1 ) / 2 );
     my $hex_width_offset = $hex_height_offset - 1;
@@ -497,7 +520,11 @@ sub _race_ascii {
 
     my @lines = ( "\n" );
 
-    my $waiting_on_text = ( $self->waiting_on_player_id() == $race->owner_id() ) ? ' *waiting on*' : '';
+    my $waiting_on_text = '';
+
+    if ( $self->waiting_on_player_id() == $race->owner_id() ) {
+        $waiting_on_text = ' *waiting on* ' . join( ',', $race->allowed_actions()->items() );
+    }
 
     push(
         @lines,
@@ -506,6 +533,33 @@ sub _race_ascii {
             . ' [' . ($self->user_ids()->items())[ $race->owner_id() ] . ']'
             . $waiting_on_text
     );
+
+    my %vp_items = $race->vp_items_in_slots();
+    my @vps_formatted = ();
+    my %vp_formats = ( $VP_AMBASSADOR => '[%s]', $VP_BATTLE => '(%s)', $VP_ANY => '{%s}' );
+
+    foreach my $vp_category ( $VP_AMBASSADOR, $VP_BATTLE, $VP_ANY ) {
+
+        foreach my $vp_item ( @{ $vp_items{ $vp_category } } ) {
+            my $text = '';
+            if ( looks_like_number( $vp_item ) ) {
+                $text =  ( $self->acting_player_id() == $race->owner_id() ) ? $vp_item : '?';
+            }
+            else {
+                $text = 'Dip - ' . $self->races()->{ $vp_item }->long_name();
+            }
+
+            push( @vps_formatted, sprintf( $vp_formats{ $vp_category }, $text ) );
+        }
+
+        my $empty_count = $race->vp_slot_count( $vp_category ) - scalar( @{ $vp_items{ $vp_category } } );
+        foreach ( 1 .. $empty_count ) {
+            push( @vps_formatted, sprintf( $vp_formats{ $vp_category }, '' ) );
+        }
+    }
+
+    push( @lines, 'VP ' . join( ', ', @vps_formatted ) );
+
 
     foreach my $tech_type ( $TECH_MILITARY, $TECH_NANO, $TECH_GRID ) {
         my @tech_names = ();
@@ -551,8 +605,6 @@ sub _race_ascii {
             push( @lines, $self->_ship_template_ascii( $template ) );
         }
     }
-
-    
 
 
 

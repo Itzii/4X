@@ -11,11 +11,11 @@ use lib ".";
 
 use Data::Dumper;
 
-use WLE::4X::Objects::Server;
+use WLE::4X::Objects::ASCII_Server;
 
 my %args = _parse_commandline();
 
-my $server = WLE::4X::Objects::Server->new(
+my $server = WLE::4X::Objects::ASCII_Server->new(
     'resource_file'		=> "../resources/official.res",
     'state_files'		=> "../statefiles",
     'log_files'			=> "../statefiles",
@@ -23,7 +23,14 @@ my $server = WLE::4X::Objects::Server->new(
 
 my %response = $server->do( %args );
 
-print "\n" . Dumper( \%response ) . "\n";
+unless ( $response{'success'} == 1 ) {
+    print "\nCommand Failed: " . $response{'message'};
+    exit();
+}
+
+print "\n" . $response{'message'};
+print "\n\n" . $response{'data'};
+print "\n";
 
 
 #############################################################################

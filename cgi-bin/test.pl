@@ -469,24 +469,24 @@ sub test_Object_Server {
 	show( $response{'data'} );
 
 
-	%response = test_server()->do(
-		'action'		=> 'action_pass',
-		'user'			=> '3',
-		'log_id'		=> $log_id,
-	);
+#	%response = test_server()->do(
+#		'action'		=> 'action_pass',
+#		'user'			=> '3',
+#		'log_id'		=> $log_id,
+#	);
+#
+#	ok( $response{'success'} == 0, 'action_pass failed' );
 
-	ok( $response{'success'} == 0, 'action_pass failed' );
 
 
-
-	%response = test_server()->do(
-		'action'		=> 'action_pass',
-		'user'			=> $waiting_for,
-		'log_id'		=> $log_id,
-	);
-
-	ok( $response{'success'} == 1, 'action_pass succeeded' );
-	show( $response{'message'} );
+#	%response = test_server()->do(
+#		'action'		=> 'action_pass',
+#		'user'			=> $waiting_for,
+#		'log_id'		=> $log_id,
+#	);
+#
+#	ok( $response{'success'} == 1, 'action_pass succeeded' );
+#	show( $response{'message'} );
 
 
 	return;

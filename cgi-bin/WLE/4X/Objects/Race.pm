@@ -343,6 +343,32 @@ sub discovery_vps {
 
 #############################################################################
 
+sub vp_items_in_slots {
+    my $self            = shift;
+
+    my %slots = (
+        $VP_BATTLE => [],
+        $VP_AMBASSADOR => [],
+        $VP_ANY => [],
+    );
+
+    foreach my $item ( $self->{'VP_SLOTS'}->items() ) {
+        my ( $type, $value ) = split( /:/, $item );
+
+        if ( scalar( @{ $slots{ $type } } ) < $self->{'VP_SLOT_COUNTS'}->{ $type } ) {
+            push( @{ $slots{ $type } }, $value )
+        }
+        else {
+            push( @{ $slots{ $VP_ANY } }, $value )
+        }
+    }
+
+    return %slots;
+}
+
+
+#############################################################################
+
 sub can_add_vp_item {
     my $self            = shift;
     my $new_item        = shift;
@@ -370,7 +396,7 @@ sub can_add_vp_item {
 
     my @items = ( $new_item );
 
-    foreach my $item ( @{ $self->{'VP_SLOTS'} } ) {
+    foreach my $item ( $self->{'VP_SLOTS'}->items() ) {
         unless ( $item eq $replaces_item ) {
             push( @items, $item );
         }
@@ -666,7 +692,6 @@ sub start_turn {
             'action_research',
             'action_upgrade',
             'action_build',
-            'use_colony_ship',
         );
 
         if ( $self->can_explore() ) {

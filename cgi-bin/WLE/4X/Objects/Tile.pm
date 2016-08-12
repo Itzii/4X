@@ -270,10 +270,12 @@ sub has_explorer {
 
     my $flag_explorer_available = 0;
 
-    if ( $self->owner_id() == $self->races()->{ $race_tag }->owner_id() ) {
+    my $exploring_player = $self->server()->races()->{ $race_tag }->owner_id();
+
+    if ( $self->owner_id() == $exploring_player ) {
         return 1;
     }
-    elsif ( $self->unpinned_ship_count() > 0 ) {
+    elsif ( $self->unpinned_ship_count( $exploring_player ) > 0 ) {
         return 1;
     }
 
@@ -284,7 +286,7 @@ sub has_explorer {
 
 sub unpinned_ship_count {
     my $self            = shift;
-    my $user_id         = shift;
+    my $player_id       = shift;
     my $flag_add_one    = shift; $flag_add_one = 0          unless defined( $flag_add_one );
 
     my $enemy_count = 0;
@@ -298,7 +300,7 @@ sub unpinned_ship_count {
                 return 0;
             }
 
-            if ( $ship->owner_id() == $user_id ) {
+            if ( $ship->owner_id() == $player_id ) {
                 $friendly_count++;
             }
             else {

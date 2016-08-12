@@ -6,6 +6,10 @@ use Exporter;
 
 our @ISA	= qw( Exporter );
 our @EXPORT_OK = qw(
+
+    state_text_from_enum
+    phase_text_from_enum
+    subphase_text_from_enum
 );
 
 my $notes = <<'END';
@@ -33,14 +37,8 @@ V::WW::XX::YYY::ZZ
         $PH_CLEANUP
 
     YYY -
-        in pre-game indicates current player id
+        current player id
 
-        in normal round
-            action phase - player id
-
-            combat phase - tile id
-
-            upkeep phase - player id
 
 END
 
@@ -102,6 +100,67 @@ our $EV_FROM_LOG                = $i++;
 our $EV_FROM_INTERFACE          = $i++;
 our $EV_FROM_LOG_FOR_DISPLAY    = $i++;
 our $EV_SUB_ACTION              = $i++;
+
+
+#############################################################################
+
+sub state_text_from_enum {
+    my $state           = shift;
+
+    my %values = (
+        $ST_PREGAME         => 'Pre-Game Configuration',
+        $ST_RACESELECTION   => 'Race Selection',
+        $ST_NORMAL          => 'Round',
+        $ST_FINISHED        => 'Finished',
+    );
+
+    if ( defined( $values{ $state } ) ) {
+        return $values{ $state };
+    }
+
+    return 'Unknown';
+}
+
+#############################################################################
+
+sub phase_text_from_enum {
+    my $phase           = shift;
+
+    my %values = (
+        $PH_PREPARING   => 'Preparing',
+        $PH_ACTION      => 'Action Phase',
+        $PH_COMBAT      => 'Combat Phase',
+        $PH_UPKEEP      => 'Upkeep Phase',
+        $PH_CLEANUP     => 'Cleanup Phase',
+    );
+
+    if ( defined( $values{ $phase } ) ) {
+        return $values{ $phase };
+    }
+
+    return 'Unknown';
+}
+
+#############################################################################
+
+sub subphase_text_from_enum {
+    my $subphase        = shift;
+
+    my %values = (
+        $SUB_MISSILE    => 'Missile Attacks',
+        $SUB_BEAM       => 'Beam Attacks',
+        $SUB_PLANETARY  => 'Planetary Bombardment',
+        $SUB_VP_DRAW    => 'VP Draw',
+        $SUB_NULL       => '',
+    );
+
+    if ( defined( $values{ $subphase } ) ) {
+        return $values{ $subphase };
+    }
+
+    return 'Unknown';
+}
+
 
 
 #############################################################################

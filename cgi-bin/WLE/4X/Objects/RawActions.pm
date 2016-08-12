@@ -2014,7 +2014,7 @@ sub _raw_increment_race_action {
 
     my $race = $self->race_of_acting_player();
 
-    $race->set_action_count( $self->action_count() + 1 );
+    $race->set_action_count( $race->action_count() + 1 );
 
     return;
 }

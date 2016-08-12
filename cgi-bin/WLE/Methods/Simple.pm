@@ -9,6 +9,8 @@ our @EXPORT    = qw(
     looks_like_number
     matches_any
     shuffle_in_place
+    rotate_bits_left
+    rotate_bits_right
     center_text
     word_wrap
 
@@ -92,7 +94,7 @@ sub rotate_bits_left {
 
     my $limit = ( 2 ** $bitcount ) - 1;
 
-    for ( 1 .. $places ) {
+    foreach ( 1 .. $places ) {
 
         $value = $value << 1;
 
@@ -112,7 +114,7 @@ sub rotate_bits_right {
     my $bitcount    = shift; $bitcount = 8          unless defined( $bitcount );
     my $places      = shift; $places = 1            unless defined( $places );
 
-    for ( 1 .. $places ) {
+    foreach ( 1 .. $places ) {
         my $right_bit = $value & 1;
         $right_bit = $right_bit << ( $bitcount - 1 );
 

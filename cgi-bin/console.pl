@@ -21,6 +21,14 @@ my $server = WLE::4X::Objects::ASCII_Server->new(
     'log_files'			=> "../statefiles",
 );
 
+foreach my $arg_tag ( keys( %args ) ) {
+    if ( $args{ $arg_tag } =~ m{,}x ) {
+        my @value_list = split( /,/, $args{ $arg_tag } );
+        $args{ $arg_tag } = \@value_list;
+    }
+}
+
+
 my %response = $server->do( %args );
 
 unless ( $response{'success'} == 1 ) {
@@ -44,7 +52,7 @@ sub _parse_commandline {
 
 	foreach my $arg ( @ARGV ) {
 
-		if ( $arg =~ m{ ^ -(.*) }xms ) {
+		if ( $arg =~ m{ ^ \+(.*) }xms ) {
 			$arg = $1; # ~ s{ ^ - }{}xmsg;
 			$previousname = $arg;
 			$buffer{ $previousname } = 1;

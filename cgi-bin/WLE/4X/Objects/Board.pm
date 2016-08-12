@@ -38,7 +38,8 @@ sub _init {
 
     $self->{'SERVER'} = $args{'server'};
 
-    $self->{'SPACES'} = {};
+    $self->{'TILES'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
+
     $self->{'STACKS'} = {};
     $self->{'STACK_LIMITS'} = {};
 
@@ -47,6 +48,14 @@ sub _init {
     $self->clear_all_tile_stacks();
 
     return $self;
+}
+
+#############################################################################
+
+sub tiles {
+    my $self        = shift;
+
+    return $self->{'TILES'};
 }
 
 #############################################################################
@@ -153,15 +162,7 @@ sub tile_discard_stack {
 sub tiles_on_board {
     my $self        = shift;
 
-    my @tags = ();
-
-    foreach my $column ( keys( %{ $self->{'SPACES'} } ) ) {
-        foreach my $row ( keys( %{ $self->{'SPACES'}->{ $column } } ) ) {
-            push( @tags, $self->{'SPACES'}->{ $column }->{ $row } );
-        }
-    }
-
-    return @tags;
+    return $self->tiles()->items();
 }
 
 #############################################################################
@@ -170,12 +171,10 @@ sub location_of_tile {
     my $self        = shift;
     my $tile_tag    = shift;
 
-    foreach my $column ( keys( %{ $self->{'SPACES'} } ) ) {
-        foreach my $row ( keys( %{ $self->{'SPACES'}->{ $column } } ) ) {
-            if ( $self->{'SPACES'}->{ $column }->{ $row } eq $tile_tag ) {
-                return $column . ':' . $row;
-            }
-        }
+    my $tile = $self->server()->tiles()->{ $tile_tag };
+
+    if ( defined( $tile ) ) {
+        return $tile->board_location();
     }
 
     return '';
@@ -278,17 +277,23 @@ sub place_tile {
         return 0;
     }
 
-    unless ( defined( $self->{'SPACES'}->{ $x_pos } ) ) {
-        $self->{'SPACES'}->{ $x_pos } = {};
-    }
+    my $location = $x_pos . ':' . $y_pos;
 
-    if ( defined( $self->{'SPACES'}->{ $x_pos }->{ $y_pos } ) ) {
-        unless ( $self->{'SPACES'}->{ $x_pos }->{ $y_pos } eq '' ) {
+    foreach my $existing_tag ( $self->tiles_on_board() ) {
+        if ( $self->location_of_tile( $existing_tag ) eq $location ) {
+            # there's already a tile here
             return 0;
         }
     }
 
-    $self->{'SPACES'}->{ $x_pos }->{ $y_pos } = $tile_tag;
+    my $tile = $self->server()->tiles()->{ $tile_tag };
+    unless ( defined( $tile ) ) {
+        return 0;
+    }
+
+    $tile->set_board_location( $location );
+
+    $self->tiles()->add_items( $tile_tag );
 
     return 1;
 }
@@ -451,11 +456,18 @@ sub tile_at_location {
     my $x_pos       = shift;
     my $y_pos       = shift;
 
-    unless ( defined( $self->{'SPACES'}->{ $x_pos }->{ $y_pos } ) ) {
-        return undef;
+    my $location = $x_pos . ':' . $y_pos;
+
+    foreach my $tile_tag ( $self->tiles_on_board() ) {
+        my $tile = $self->server()->tiles()->{ $tile_tag };
+        if ( defined( $tile ) ) {
+            if ( $location eq $tile->board_location() ) {
+                return $tile;
+            }
+        }
     }
 
-    return $self->server()->tile_from_tag( $self->{'SPACES'}->{ $x_pos }->{ $y_pos } );
+    return undef;
 }
 
 #############################################################################
@@ -582,10 +594,9 @@ sub outermost_combat_tile {
 
     my @combat_tiles = ();
 
-    foreach my $column ( keys( %{ $self->{'SPACES'} } ) ) {
-        foreach my $row ( keys( %{ $self->{'SPACES'}->{ $column } } ) ) {
-            my $tile = $self->server()->tiles()->{ $self->{'SPACES'}->{ $column }->{ $row } };
-
+    foreach my $tile_tag ( $self->tiles_on_board() ) {
+        my $tile = $self->server()->tiles()->{ $tile_tag };
+        if ( defined( $tile ) ) {
             if ( $tile->has_combat() ) {
                 push( @combat_tiles, $tile );
             }
@@ -611,11 +622,9 @@ sub from_hash {
         return 0;
     }
 
-    unless ( defined( $r_hash->{'SPACES'} ) ) {
-        return 0;
+    if ( defined( $r_hash->{'TILES'} ) ) {
+        $self->tiles()->fill( @{ $r_hash->{'TILES'} } );
     }
-
-    $self->{'SPACES'} = $r_hash->{'SPACES'};
 
     $self->clear_all_tile_stacks();
 
@@ -650,7 +659,8 @@ sub to_hash {
         return 0;
     }
 
-    $r_hash->{'SPACES'} = $self->{'SPACES'};
+    $r_hash->{'TILES'} = [ $self->tiles_on_board() ];
+
     $r_hash->{'TILE_STACKS'} = {};
 
     foreach my $stack_id ( $self->tile_stack_ids() ) {

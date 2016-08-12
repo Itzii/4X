@@ -80,7 +80,7 @@ sub action_pass_action {
             $self->_raw_start_combat_phase( $EV_FROM_INTERFACE );
         }
 
-        
+
 
 
     }
@@ -130,7 +130,7 @@ sub action_explore {
     }
 
     $self->_raw_spend_influence( $EV_FROM_INTERFACE );
-    $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, 'place_tile', 'discard_tile' );
+    $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $self->race_tag_of_acting_player(), 'place_tile', 'discard_tile' );
 
     return 1;
 }
@@ -147,7 +147,7 @@ sub action_explore_place_tile {
     }
 
     my $tile_tag_w_loc = $args{'tile_tag'};
-    my $race = $self->race_of_acting();
+    my $race = $self->race_of_acting_player();
 
     unless ( $race->in_hand()->contains( $tile_tag_w_loc ) ) {
         $self->set_error( 'Invalid Tile Tag' );
@@ -161,32 +161,45 @@ sub action_explore_place_tile {
 
     my ( $loc_x, $loc_y, $tile_tag ) = split( /:/, $tile_tag_w_loc, 3 );
 
-    my $tile = $self->server()->tiles()->{ $tile_tag };
+    my $tile = $self->tiles()->{ $tile_tag };
 
     unless ( $tile->are_new_warp_gates_valid( $args{'warp'} ) ) {
         $self->set_error( 'Invalid Rotation Information' );
         return 0;
     }
 
+    $tile->set_warps( $args{'warp'} );
+
     my $valid_rotation = 0;
     my $has_wormhole = $race->has_technology( 'tech_wormhole_generator' );
 
     foreach my $direction ( 0 .. 5 ) {
+#        print STDERR "\nChecking direction $direction ... ";
+
         my $comp_direction = ( $direction + 3 ) % 6;
 
         my $adjacent_tile = $self->board()->tile_in_direction( $loc_x, $loc_y, $direction );
 
         if ( defined( $adjacent_tile ) ) {
+
+#            print STDERR "found tile " . $adjacent_tile->tag() . ' ... ';
+
             if ( $adjacent_tile->has_explorer( $race->tag() ) ) {
+
+#                print STDERR "has explorer ... ";
 
                 my $here_warp = $tile->has_warp_on_side( $direction );
                 my $there_warp = $adjacent_tile->has_warp_on_side( $comp_direction );
 
+#                print STDERR 'here: ' . $here_warp . '  there: ' . $there_warp . ' ... ';
+
                 if ( $here_warp && $there_warp ) {
+#                    print STDERR 'has matching warps ... ';
                     $valid_rotation = 1;
                     last;
                 }
                 elsif ( $has_wormhole && ( $here_warp || $there_warp ) ) {
+#                    print STDERR "has wormhole and one warp ... ";
                     $valid_rotation = 1;
                     last;
                 }
@@ -201,14 +214,15 @@ sub action_explore_place_tile {
 
     $self->_raw_remove_item_from_hand( $EV_FROM_INTERFACE, $tile_tag_w_loc );
 
-    $self->_raw_place_tile_on_board( $tile_tag, $loc_x, $loc_y, $args{'warp'} );
+    $self->_raw_place_tile_on_board( $EV_FROM_INTERFACE, $tile_tag, $loc_x, $loc_y, $args{'warp'} );
 
     $tile->add_starting_ships();
 
     if ( $tile->ships()->count() < 1 || $race->provides( 'spec_descendants') ) {
-        if ( $args{'influence'} eq '1' ) {
-            $self->_raw_influence_tile( $race->tag(), $tile_tag );
-
+        if ( defined( $args{'influence'} ) ) {
+            if ( $args{'influence'} eq '1' ) {
+                $self->_raw_influence_tile( $EV_FROM_INTERFACE, $race->tag(), $tile_tag );
+            }
         }
     }
 
@@ -216,17 +230,17 @@ sub action_explore_place_tile {
 
     my @tiles_still_in_hand = $race->in_hand()->items();
     foreach my $tile_tag ( @tiles_still_in_hand ) {
-        $self->_raw_remove_item_from_hand( $tile_tag );
-        $self->_raw_discard_tile( $tile_tag );
+        $self->_raw_remove_item_from_hand( $EV_FROM_INTERFACE, $tile_tag );
+        $self->_raw_discard_tile( $EV_FROM_INTERFACE, $tile_tag );
     }
 
     if ( $race->action_count() < $race->maximum_action_count( $ACT_EXPLORE ) ) {
         if ( $race->can_explore() ) {
-            $self->_raw_set_allowed_race_actions( 'action_explore', 'finish_turn' );
+            $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $race->tag(), 'action_explore', 'finish_turn' );
         }
     }
     else {
-        $self->_raw_set_allowed_race_actions( 'finish_turn' );
+        $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $race->tag(), 'finish_turn' );
     }
 
     return 1;
@@ -259,15 +273,15 @@ sub action_explore_discard_tile {
     $self->_raw_increment_race_action( $EV_FROM_INTERFACE );
 
     if ( $race->in_hand()->count() > 0 ) {
-        $self->_raw_set_allowed_race_actions( 'discard_tile', 'place_tile' );
+        $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $race->tag(), 'discard_tile', 'place_tile' );
     }
     elsif ( $race->action_count() < $race->maximum_action_count( $ACT_EXPLORE ) ) {
         if ( $race->can_explore() ) {
-            $self->_raw_set_allowed_race_actions( 'action_explore', 'finish_turn' );
+            $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $race->tag(), 'action_explore', 'finish_turn' );
         }
     }
     else {
-        $self->_raw_set_allowed_race_actions( 'finish_turn' );
+        $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $race->tag(), 'finish_turn' );
     }
 
     return 1;
@@ -320,7 +334,7 @@ sub action_influence {
         push( @allowed, 'action_influence' );
     }
 
-    $self->_raw_set_allowed_race_actions( @allowed );
+    $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $race->tag(), @allowed );
 
     return 1;
 }
@@ -341,7 +355,7 @@ sub action_influence_unflip_colony_ship {
     $self->_raw_unuse_colony_ship( $EV_FROM_INTERFACE, $race->tag() );
 
     if ( $race->colony_ships_used() == 0 || $race->colony_flip_count() >= $race->maximum_colony_flip_count() ) {
-        $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, 'action_influence', 'finish_turn' );
+        $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $race->tag(), 'action_influence', 'finish_turn' );
     }
 
     return 1;
@@ -415,10 +429,10 @@ sub action_research {
     $self->_raw_buy_technology( $EV_FROM_INTERFACE, $tech->tag(), $dest_type );
 
     if ( $race->action_count() < $race->maximum_action_count( $ACT_RESEARCH ) ) {
-        $self->_raw_set_allowed_race_actions( 'action_research', 'finish_turn' );
+        $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $race->tag(), 'action_research', 'finish_turn' );
     }
     else {
-        $self->_raw_set_allowed_race_actions( 'finish_turn' );
+        $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $race->tag(), 'finish_turn' );
     }
 
     return 1;
@@ -484,10 +498,10 @@ sub action_upgrade {
     $self->_raw_upgrade_ship_component( $EV_FROM_INTERFACE, $template->tag(), $component->tag(), $replaces_component );
 
     if ( defined( $args{'as_react'} ) || $race->action_count() >= $race->maximum_action_count( $ACT_UPGRADE ) ) {
-        $self->_raw_set_allowed_race_actions( 'finish_turn' );
+        $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $race->tag(), 'finish_turn' );
     }
     else {
-        $self->_raw_set_allowed_race_actions( 'action_upgrade', 'finish_turn' );
+        $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $race->tag(), 'action_upgrade', 'finish_turn' );
     }
 
     return 1;
@@ -544,10 +558,10 @@ sub action_build {
     $self->_raw_create_ship_on_tile( $EV_FROM_INTERFACE, $tile_tag, $template->tag(), $race->owner_id() );
 
     if ( defined( $args{'as_react'} ) || $race->action_count() >= $race->maximum_action_count( $ACT_BUILD ) ) {
-        $self->_raw_set_allowed_race_actions( 'finish_turn' );
+        $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $race->tag(), 'finish_turn' );
     }
     else {
-        $self->_raw_set_allowed_race_actions( 'action_build', 'finish_turn' );
+        $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $race->tag(), 'action_build', 'finish_turn' );
     }
 
     return 1;
@@ -626,14 +640,26 @@ sub action_move {
     $self->_raw_add_ship_to_tile( $EV_FROM_INTERFACE, $destination_tag, $ship->tag() );
 
     if ( defined( $args{'as_react'} ) || $race->action_count() >= $race->maximum_action_count( $ACT_MOVE ) ) {
-        $self->_raw_set_allowed_race_actions( 'finish_turn' );
+        $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $race->tag(), 'finish_turn' );
     }
     else {
-        $self->_raw_set_allowed_race_actions( 'action_move', 'finish_turn' );
+        $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $race->tag(), 'action_move', 'finish_turn' );
     }
 
     return 1;
 }
+
+#############################################################################
+
+sub action_finish_turn {
+    my $self            = shift;
+    my %args            = @_;
+
+    $self->_raw_next_player( $EV_FROM_INTERFACE );
+
+    return 1;
+}
+
 
 #############################################################################
 
@@ -776,7 +802,7 @@ sub action_interrupt_replace_cube {
         push( @allowed, 'action_influence' );
     }
 
-    $self->_raw_set_allowed_race_actions( @allowed );
+    $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $race->tag(), @allowed );
 
     return 1;
 }

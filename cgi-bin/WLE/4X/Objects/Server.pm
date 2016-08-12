@@ -278,7 +278,7 @@ sub _check_allowed_action {
 
 
         'use_colony_ship'   => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'flag_ignore_allowed' => 1, 'method' => \&action_use_colony_ship },
-#        'finish_turn'       => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_finish_turn },
+        'finish_turn'       => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_finish_turn },
 
     );
 
@@ -472,7 +472,7 @@ sub player_is_owner {
 sub race_tag_of_acting_player {
     my $self        = shift;
 
-    my $race = $self->race_of_player_id( $self->current_player_id() );
+    my $race = $self->race_of_player_id( $self->acting_player_id() );
 
     if ( defined( $race ) ) {
         return $race->tag();
@@ -486,13 +486,6 @@ sub race_tag_of_acting_player {
 sub race_of_player_id {
     my $self        = shift;
     my $player_id   = shift;
-
-    unless ( defined( $player_id ) ) {
-        my ($package, $filename, $line) = caller;
-        print STDERR "\nPackage: " . $package;
-        print STDERR "\nFilename: " . $filename;
-        print STDERR "\nLine: " . $line;
-    }
 
     foreach my $race ( values( %{ $self->races() } ) ) {
         if ( $race->owner_id() eq $player_id ) {

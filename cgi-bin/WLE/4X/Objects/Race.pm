@@ -530,7 +530,7 @@ sub has_component_in_hand {
     my $self        = shift;
 
     foreach my $item ( $self->in_hand()->items() ) {
-        if ( defined( $self->server()->components()->{ $item } ) ) {
+        if ( defined( $self->server()->ship_components()->{ $item } ) ) {
             return 1;
         }
     }

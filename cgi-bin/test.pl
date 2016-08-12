@@ -111,6 +111,12 @@ sub test_Methods_Simple {
 
 	ok( $value == $shifted_value, 'left shift of short byte is correct' );
 
+	$value = 0b00101101;
+	foreach ( 1 .. 6 ) {
+		$value = WLE::Methods::Simple::rotate_bits_left( $value, 6 );
+		show( sprintf( '%02i', $value ) );
+	}
+
 	$value = 0b00000111;
 	$shifted_value = 0b00100011;
 	$value = WLE::Methods::Simple::rotate_bits_right( $value, 6 );
@@ -270,8 +276,8 @@ sub test_Object_Server {
 		'action' 		=> 'create_game',
 		'user'			=> $owner_id,
 		'log_id'		=> $log_id,
-		'r_source_tags' => [],
-		'r_option_tags' => [],
+		'source_tags'   => '',
+		'option_tags'   => '',
 	);
 
 	ok( $response{'success'} == 0, 'action_create_game failed with missing source tag' );
@@ -280,8 +286,8 @@ sub test_Object_Server {
 		'action' 		=> 'create_game',
 		'user'			=> $owner_id,
 		'log_id'		=> $log_id,
-		'r_source_tags' => [ 'src_base' ],
-		'r_option_tags' => [],
+		'source_tags'   => 'src_base',
+		'option_tags'   => '',
 	);
 
 	ok( $response{'success'} == 1, 'create_game successful' );
@@ -366,7 +372,7 @@ sub test_Object_Server {
 		'action'		=> 'select_race',
 		'user'			=> 999,
 		'log_id'		=> $log_id,
-		'race_tag'		=> 'race_terran5',
+		'race_tag'		=> 'race_human5',
 		'location_x'	=> 0,
 		'location_y'	=> -2,
 	);

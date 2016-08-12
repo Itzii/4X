@@ -5,7 +5,7 @@ use warnings;
 
 use Data::Dumper;
 
-use WLE::Methods::Simple qw( center_text word_wrap );
+use WLE::Methods::Simple qw( center_text word_wrap rotate_bits_left );
 
 use WLE::4X::Enums::Basic;
 use WLE::4X::Enums::Status;
@@ -57,11 +57,13 @@ sub _init {
     $self->{'DISCOVERIES'} = [];
 
     $self->{'SHIPS'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
-    $self->{'USER_ENTRY_QUEUE'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
+    $self->{'OWNER_QUEUE'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
     $self->{'VP_DRAW_QUEUE'} = WLE::Objects::Stack->new();
     $self->{'ATTACK_POPULATION_QUEUE'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
 
     $self->{'RESOURCE_SLOTS'} = [];
+
+    $self->{'BOARD_LOCATION'} = '';
 
     $self->{'ATTACKER_ID'} = -1;
     $self->{'DEFENDER_ID'} = -1;
@@ -90,6 +92,25 @@ sub which_stack {
     my $self        = shift;
 
     return $self->{'STACK'};
+}
+
+#############################################################################
+
+sub board_location {
+    my $self        = shift;
+
+    return $self->{'BOARD_LOCATION'};
+}
+
+#############################################################################
+
+sub set_board_location {
+    my $self        = shift;
+    my $location    = shift;
+
+    $self->{'BOARD_LOCATION'} = $location;
+
+    return;
 }
 
 #############################################################################
@@ -410,7 +431,7 @@ sub attack_population_queue {
 sub owner_queue {
     my $self        = shift;
 
-    return $self->{'USER_ENTRY_QUEUE'};
+    return $self->{'OWNER_QUEUE'};
 }
 
 #############################################################################
@@ -697,12 +718,12 @@ sub are_new_warp_gates_valid {
     my $self        = shift;
     my $value       = shift;
 
-    for ( 1 .. 6 ) {
+    foreach ( 1 .. 6 ) {
         if ( $value == $self->{'WARPS'} ) {
             return 1;
         }
 
-        $value = rotate_bits_left( $value );
+        $value = rotate_bits_left( $value, 6 );
     }
 
     return 0;
@@ -756,31 +777,15 @@ sub from_hash {
     my $flag_m      = shift; $flag_m = 1                unless defined( $flag_m );
 
     unless( $self->WLE::4X::Objects::Element::from_hash( $r_hash ) ) {
-        print STDERR "\nfailed to parse element from hash.";
+#        print STDERR "\nfailed to parse element from hash.";
         return 0;
     }
 
-    unless ( defined( $r_hash->{'ID'} ) ) {
-        print STDERR "\nmissing ID element in hash";
-        return 0;
+    foreach my $tag ( 'ID', 'WARPS', 'STACK' ) {
+        unless ( defined( $r_hash->{ $tag } ) ) {
+            return 0;
+        }
     }
-
-    $self->{'ID'} = $r_hash->{'ID'};
-
-    unless ( defined( $r_hash->{'WARPS'} ) ) {
-        print STDERR "\nmissing warps in hash";
-        print STDERR "\n" . Dumper( $r_hash );
-        return 0;
-    }
-
-    $self->{'WARPS'} = $r_hash->{'WARPS'};
-
-    unless ( defined( $r_hash->{'STACK'} ) ) {
-        print STDERR "\nmissing stack element in hash";
-        return 0;
-    }
-
-    $self->{'STACK'} = $r_hash->{'STACK'};
 
     foreach my $tag ( 'VP', 'ANCIENT_LINK', 'HIVE', 'DISCOVERY_COUNT', 'ORBITAL', 'MONOLITH', 'DEFENDER_ID', 'ATTACKER_ID' ) {
         if ( defined( $r_hash->{ $tag } ) ) {
@@ -790,15 +795,23 @@ sub from_hash {
         }
     }
 
-    if ( defined( $r_hash->{'STARTING_SHIPS'} ) ) {
-        my @starting = @{ $r_hash->{'STARTING_SHIPS'} };
-        $self->{'STARTING_SHIPS'} = \@starting;
+    foreach my $tag ( 'ID', 'WARPS', 'STACK', 'BOARD_LOCATION' ) {
+        if ( defined( $r_hash->{ $tag } ) ) {
+            $self->{ $tag } = $r_hash->{ $tag };
+        }
     }
 
-    if ( defined( $r_hash->{'DISCOVERIES'} ) ) {
-        my @starting = @{ $r_hash->{'DISCOVERIES'} };
-        $self->{'DISCOVERIES'} = \@starting;
+    foreach my $tag ( 'STARTING_SHIPS', 'DISCOVERIES' ) {
+        if ( defined( $r_hash->{ $tag } ) ) {
+            my @temp_array = @{ $r_hash->{ $tag } };
+            $self->{ $tag } = \@temp_array;
+        }
     }
+
+    foreach my $tag ( 'SHIPS', 'OWNER_QUEUE', 'VP_DRAW_QUEUE' ) {
+        $self->{ $tag }->fill( @{ $r_hash->{ $tag } } );
+    }
+
 
     if ( defined( $r_hash->{'RESOURCES'} ) ) {
         if ( ref( $r_hash->{'RESOURCES'} ) eq 'ARRAY' ) {
@@ -809,17 +822,6 @@ sub from_hash {
                 $self->add_slot( $slot );
             }
         }
-    }
-
-    if ( defined( $r_hash->{'SHIPS'} ) ) {
-        $self->ships()->fill( @{ $r_hash->{'SHIPS'} } );
-    }
-    if ( defined( $r_hash->{'OWNER_QUEUE'} ) ) {
-        $self->owner_queue()->fill( @{ $r_hash->{'OWNER_QUEUE'} } );
-    }
-
-    if ( defined( $r_hash->{'VP_DRAW_QUEUE'} ) ) {
-        $self->vp_draw_queue()->fill( @{ $r_hash->{'VP_DRAW_QUEUE'} } );
     }
 
     return 1;
@@ -842,17 +844,17 @@ sub to_hash {
 #        exit();
 #    }
 
-    foreach my $tag ( 'STACK', 'VP', 'ANCIENT_LINK', 'HIVE', 'DISCOVERY_COUNT', 'ORBITAL', 'MONOLITH', 'ATTACKER_ID', 'DEFENDER_ID', 'WARPS' ) {
+    foreach my $tag ( 'STACK', 'VP', 'ANCIENT_LINK', 'HIVE', 'DISCOVERY_COUNT', 'ORBITAL', 'MONOLITH', 'ATTACKER_ID', 'DEFENDER_ID', 'WARPS', 'BOARD_LOCATION' ) {
         $r_hash->{ $tag } = $self->{ $tag };
     }
 
-    $r_hash->{'SHIPS'} = [ $self->ships()->items() ];
-    $r_hash->{'OWNER_QUEUE'} = [ $self->owner_queue()->items() ];
-    $r_hash->{'VP_DRAW_QUEUE'} = [ $self->vp_draw_queue()->items() ];
+    foreach my $tag ( 'SHIPS', 'OWNER_QUEUE', 'VP_DRAW_QUEUE' ) {
+        $r_hash->{ $tag } = [ $self->{ $tag }->items() ];
+    }
 
-    $r_hash->{'STARTING_SHIPS'} = $self->{'STARTING_SHIPS'};
-
-    $r_hash->{'DISCOVERIES'} = $self->{'DISCOVERIES'};
+    foreach my $tag ( 'STARTING_SHIPS', 'DISCOVERIES' ) {
+        $r_hash->{ $tag } = [ @{ $self->{ $tag } } ];
+    }
 
     my @resource_slots = ();
 

@@ -350,8 +350,10 @@ sub action_attack_populace {
         }
     }
 
+    my $race = $self->race_of_player_id( $tile->owner_id() );
+
     $self->_raw_allocate_population_hits( $EV_FROM_INTERFACE, @hits );
-    $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, 'apply_population_hits' );
+    $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $race->tag(), 'apply_population_hits' );
 
     return 1;
 }
@@ -632,7 +634,7 @@ sub next_combat_ships {
     else { # computer player
         my $real_player_id = $self->real_player_in_combat();
         $self->set_waiting_on_player_id( $real_player_id );
-        $self->_raw_set_allowed_race_actions( $self->race_of_player_id( $real_player_id )->tag(), 'roll_npc' );
+        $self->_raw_set_allowed_race_actions( $EV_SUB_ACTION, $self->race_of_player_id( $real_player_id )->tag(), 'roll_npc' );
         return;
     }
 }
@@ -687,7 +689,7 @@ sub start_combat_round {
             else { # computer player
                 my $real_player_id = $self->real_player_in_combat();
                 $self->set_waiting_on_player_id( $real_player_id );
-                $self->_raw_set_allowed_race_actions( $self->race_of_player_id( $real_player_id )->tag(), 'roll_npc' );
+                $self->_raw_set_allowed_race_actions( $EV_SUB_ACTION, $self->race_of_player_id( $real_player_id )->tag(), 'roll_npc' );
                 return 1;
             }
         }
@@ -706,7 +708,7 @@ sub start_combat_round {
         else { # computer player
             my $real_player_id = $self->real_player_in_combat();
             $self->set_waiting_on_player_id( $real_player_id );
-            $self->_raw_set_allowed_race_actions( $self->race_of_player_id( $real_player_id )->tag(), 'roll_npc' );
+            $self->_raw_set_allowed_race_actions( $EV_SUB_ACTION, $self->race_of_player_id( $real_player_id )->tag(), 'roll_npc' );
             return 1;
         }
     }
@@ -954,7 +956,7 @@ sub next_vp_draw {
 
     my $race = $self->race_of_player_id( $self->waiting_on_player_id() );
 
-    $self->_raw_set_allowed_race_actions( $EV_SUB_ACTION, 'draw_vp' );
+    $self->_raw_set_allowed_race_actions( $EV_SUB_ACTION, $race->tag(), 'draw_vp' );
 
     return;
 }

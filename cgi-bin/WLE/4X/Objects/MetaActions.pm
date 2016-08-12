@@ -5,6 +5,8 @@ use warnings;
 
 use WLE::Methods::Simple qw( matches_any );
 
+use WLE::4X::Enums::Basic;
+
 use WLE::4X::Objects::Element;
 use WLE::4X::Objects::ShipComponent;
 
@@ -36,7 +38,12 @@ sub action_create_game {
         return 0;
     }
 
-    if ( scalar( @{ $args{'r_source_tags'} } ) == 0 ) {
+    unless ( defined( $args{'source_tags'} ) ) {
+        $self->set_error( 'Missing Source Tags' );
+        return 0;
+    }
+
+    if ( $args{'source_tags'} eq '' ) {
         $self->set_error( 'Must have at least one source tag.' );
         return 0;
     }
@@ -46,12 +53,19 @@ sub action_create_game {
         return 0;
     }
 
+    my @source_tags = split( ',', $args{'source_tags'} );
+    my @option_tags = ();
+
+    if ( defined( $args{'option_tags'} ) ) {
+        @option_tags = split( ',', $args{'option_tags'} );
+    }
+
     $self->_raw_create_game(
         $EV_FROM_INTERFACE,
         $args{'user'},
         $args{'long_name'},
-        $args{'r_source_tags'},
-        $args{'r_option_tags'},
+        \@source_tags,
+        \@option_tags,
     );
 
     return 1;
@@ -327,12 +341,12 @@ sub action_begin {
 
     my $tech_count = 0;
     while ( $tech_count < $self->start_tech_count() && $self->tech_bag()->count() > 0 ) {
-        my $tech = $self->tech_bag()->select_random_item();
+        my $tech_tag = $self->tech_bag()->select_random_item();
 
-        $self->_raw_remove_from_tech_bag( $EV_FROM_INTERFACE, $tech );
-        $self->_raw_add_to_available_tech( $EV_FROM_INTERFACE, $tech );
+        $self->_raw_remove_from_tech_bag( $EV_FROM_INTERFACE, $tech_tag );
+        $self->_raw_add_to_available_tech( $EV_FROM_INTERFACE, $tech_tag );
 
-        unless ( $self->technology()->category() == $TECH_WILD ) {
+        unless ( $self->technology()->{ $tech_tag }->category() == $TECH_WILD ) {
             $tech_count++;
         }
     }

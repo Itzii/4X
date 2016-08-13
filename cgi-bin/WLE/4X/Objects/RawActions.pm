@@ -2333,6 +2333,10 @@ sub _raw_next_player {
         if ( $flag_continue_round ) {
             $self->pending_players()->fill( $self->done_players()->items() );
             $self->done_players()->clear();
+            $self->set_waiting_on_player_id( ( $self->pending_players()->items() )[ 0 ] );
+
+            $race = $self->race_of_player_id ( $self->waiting_on_player_id() );
+            $race->start_turn();
         }
         else {
             $self->set_waiting_on_player_id( -1 );

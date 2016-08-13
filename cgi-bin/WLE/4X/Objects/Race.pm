@@ -508,6 +508,21 @@ sub in_hand {
 
 #############################################################################
 
+sub bare_in_hand {
+    my $self        = shift;
+
+    my @items = ();
+
+    foreach my $item ( $self->in_hand()->items() ) {
+        my @parts = split( /:/, $item );
+        push( @items, $parts[ -1 ] );
+    }
+
+    return @items;
+}
+
+#############################################################################
+
 sub has_discovery_in_hand {
     my $self        = shift;
 
@@ -546,6 +561,32 @@ sub has_technology_in_hand {
     foreach my $item ( $self->in_hand()->items() ) {
         if ( defined( $self->server()->technology()->{ $item } ) ) {
             return 1;
+        }
+    }
+
+    return 0;
+}
+
+#############################################################################
+
+sub has_tile_in_hand {
+    my $self        = shift;
+    my $r_loc_x     = shift; # optional
+    my $r_loc_y     = shift; # optional
+
+    foreach my $item ( $self->in_hand()->items() ) {
+        my ( $loc_x, $loc_y, $tile_tag ) = split( /:/, $item );
+        if ( defined( $tile_tag ) ) {
+            if ( defined( $self->server()->tiles()->{ $tile_tag } ) ) {
+
+                if ( defined( $r_loc_x ) ) {
+                    $$r_loc_x = $loc_x;
+                }
+                if ( defined( $r_loc_y ) ) {
+                    $$r_loc_y = $loc_y;
+                }
+                return 1;
+            }
         }
     }
 

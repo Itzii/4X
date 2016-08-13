@@ -146,10 +146,21 @@ sub action_explore_place_tile {
         return 0;
     }
 
-    my $tile_tag_w_loc = $args{'tile_tag'};
+    my $tile_tag = $args{'tile_tag'};
     my $race = $self->race_of_acting_player();
 
-    unless ( $race->in_hand()->contains( $tile_tag_w_loc ) ) {
+    my $flag_tile_in_hand = 0;
+    my $tile_tag_w_loc = '';
+
+    foreach my $in_hand ( $race->in_hand()->items() ) {
+        if ( $in_hand =~ m { : $tile_tag $ }xs ) {
+            $flag_tile_in_hand = 1;
+            $tile_tag_w_loc = $in_hand;
+            last;
+        }
+    }
+
+    unless ( $flag_tile_in_hand ) {
         $self->set_error( 'Invalid Tile Tag' );
         return 0;
     }
@@ -159,16 +170,25 @@ sub action_explore_place_tile {
         return 0;
     }
 
-    my ( $loc_x, $loc_y, $tile_tag ) = split( /:/, $tile_tag_w_loc, 3 );
+    my $warps = $args{'warp'};
+
+    my ( $loc_x, $loc_y ) = split( /:/, $tile_tag_w_loc );
 
     my $tile = $self->tiles()->{ $tile_tag };
 
-    unless ( $tile->are_new_warp_gates_valid( $args{'warp'} ) ) {
+    if ( length( $warps ) == 6 ) {
+#        print STDERR "\nConverting $warps to ";
+        $warps = unpack( "N", pack( "B32", substr( "0" x 32 . reverse( $warps ), -32 ) ) );
+#        print STDERR $warps;
+    }
+
+    unless ( $tile->are_new_warp_gates_valid( $warps ) ) {
         $self->set_error( 'Invalid Rotation Information' );
         return 0;
     }
 
-    $tile->set_warps( $args{'warp'} );
+    my $original_warps = $tile->warps();
+    $tile->set_warps( $warps );
 
     my $valid_rotation = 0;
     my $has_wormhole = $race->has_technology( 'tech_wormhole_generator' );
@@ -208,13 +228,14 @@ sub action_explore_place_tile {
     }
 
     unless ( $valid_rotation ) {
+        $tile->set_warps( $original_warps );
         $self->set_error( 'Invalid Rotation for Location' );
         return 0;
     }
 
     $self->_raw_remove_item_from_hand( $EV_FROM_INTERFACE, $tile_tag_w_loc );
 
-    $self->_raw_place_tile_on_board( $EV_FROM_INTERFACE, $tile_tag, $loc_x, $loc_y, $args{'warp'} );
+    $self->_raw_place_tile_on_board( $EV_FROM_INTERFACE, $tile_tag, $loc_x, $loc_y, $warps );
 
     $tile->add_starting_ships();
 

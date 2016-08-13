@@ -3,10 +3,12 @@ package WLE::4X::Objects::ASCII_Server;
 use strict;
 use warnings;
 
+use Data::Dumper;
+
 use WLE::Methods::Simple;
 
 use WLE::4X::Enums::Basic;
-use WLE::4X::Enums::Status qw( state_text_from_enum phase_text_from_enum subphase_text_from_enum );
+use WLE::4X::Enums::Status; # qw( state_text_from_enum phase_text_from_enum subphase_text_from_enum );
 
 use parent 'WLE::4X::Objects::Server';
 
@@ -87,14 +89,20 @@ sub _fill_text_data {
     my $tile = $self->tiles()->{ $self->current_tile() };
     my $tile_name = ( defined( $tile ) ) ? $tile->long_name() : '';
 
+    my $waiting_on = ' ';
+    if ( $self->waiting_on_player_id() > -1 ) {
+        $waiting_on = 'Waiting on ' . $self->user_id_of_player_id( $self->waiting_on_player_id() );
+    }
+
     my $status_text = sprintf(
-        '%s - %s - %s - %s - %s - %s',
+        '%s - %s - %s - %s - %s - %s ',
         state_text_from_enum( $self->state() ),
         $self->round(),
         phase_text_from_enum( $self->phase() ),
-        $self->user_id_of_player_id( $self->waiting_on_player_id() ),
+        $waiting_on,
         subphase_text_from_enum( $self->subphase() ),
         $tile_name,
+
     );
 
     push( @lines, 'Current Game State: ' . $status_text );
@@ -139,6 +147,7 @@ sub _info_board {
     my $center_x = int( $line_width / 2 );
     my $center_y = int( $line_height / 2 );
 
+
     # first we draw empty hexes around the spaces the tiles occupy
 
     foreach my $tile_tag ( $self->board()->tiles_on_board() ) {
@@ -154,6 +163,44 @@ sub _info_board {
             my $y = ( $hex_row * ( $hex_height - 1 ) ) + ( $hex_column * $hex_height_offset );
 
             $self->_overlay_text( \@grid, \@empty_hex_text, $center_x + $x - 1, $center_y + $y );
+        }
+    }
+
+    # now we check to see if any hex is selected for tile placement
+
+    my $flag_a_hex_is_selected = 0;
+    my $selected_x = undef;
+    my $selected_y = undef;
+
+    if ( $self->state() == $ST_NORMAL ) {
+        foreach my $player_id ( 0 .. $self->user_ids()->count() - 1 ) {
+            my $race = $self->race_of_player_id( $player_id );
+            if ( $race->has_tile_in_hand( \$selected_x, \$selected_y ) ) {
+
+                my @selected_hex_text = $self->_empty_tile_ascii( $selected_x, $selected_y, 0, 0, 1 );
+
+                my $x = $selected_x * ( $hex_width - $hex_width_offset );
+                my $y = ( $selected_y * ( $hex_height - 1 ) ) + ( $selected_x * $hex_height_offset );
+
+                $self->_overlay_text( \@grid, \@selected_hex_text, $center_x + $x - 1, $center_y + $y );
+                last;
+            }
+        }
+    }
+
+
+    # if we're in the race-selection mode - show the starting hexes
+    if ( $self->state() == $ST_RACESELECTION ) {
+        foreach my $location ( $self->starting_locations()->items() ) {
+
+            my ( $hex_column, $hex_row ) = split( ',', $location->{'SPACE'} );
+
+            my @start_hex_text = $self->_empty_tile_ascii( $hex_column, $hex_row, $location->{'WARPS'}, $location->{'NPC'} );
+
+            my $x = $hex_column * ( $hex_width - $hex_width_offset );
+            my $y = ( $hex_row * ( $hex_height - 1 ) ) + ( $hex_column * $hex_height_offset );
+
+            $self->_overlay_text( \@grid, \@start_hex_text, $center_x + $x - 1, $center_y + $y );
         }
     }
 
@@ -228,27 +275,67 @@ sub _empty_tile_ascii {
     my $self        = shift;
     my $x           = shift;
     my $y           = shift;
+    my $warps       = shift; $warps = 0             unless defined( $warps );
+    my $flag_npc    = shift; $flag_npc = 0          unless defined( $flag_npc );
+    my $flag_select = shift; $flag_select = 0       unless defined( $flag_select );
 
     my @display = (
         '??????.           .',
-        '?????               ',
-        '????                 ',
-        '???                   ',
-        '??                     ',
+        '?????  *    0    *  ',
+        '????    *       *    ',
+        '??? 5               1 ',
+        '??       <start>       ',
         '?                       ',
-        '.        xxx,yyy          .',
+        '. * *    xxx,yyy     * *  .',
         '?                       ',
-        '??                     ',
-        '???                   ',
-        '????                 ',
-        '?????               ',
+        '??        <npc>        ',
+        '??? 4               2 ',
+        '????    *       *    ',
+        '?????  *    3    *  ',
         '??????.           .',
     );
+
+    my $flag_show_starting = 0;
+    my $flag_show_npc = 0;
+
+    if ( $self->state() == $ST_RACESELECTION ) {
+        foreach my $location ( $self->starting_locations()->items() ) {
+            if ( $location->{'SPACE'} eq $x . ',' . $y ) {
+                $flag_show_starting = 1;
+            }
+        }
+    }
 
     my $x_text = sprintf( '%+02i', $x);
     my $y_text = sprintf( '%+02i', $y);
 
     foreach $_ ( @display ) {
+
+        unless ( $flag_select ) {
+            $_ =~ s{ \* }{ }xsg;
+        }
+
+        if ( $flag_show_starting ) {
+            foreach my $direction ( 0 .. 5 ) {
+                my $bit_mask = 2 ** $direction;
+                if ( $warps & $bit_mask ) {
+                    $_ =~ s{ $direction }{O}xs;
+                }
+                else {
+                    $_ =~ s{ $direction }{ }xs;
+                }
+            }
+        }
+        else {
+            $_ =~ s{ [012345] }{ }xsg;
+        }
+
+        unless ( $flag_show_starting ) {
+            $_ =~ s{<start>}{       }x;
+        }
+        unless ( $flag_show_npc ) {
+            $_ =~ s{<npc>}{     }x;
+        }
         $_ =~ s{xxx}{$x_text}xs;
         $_ =~ s{yyy}{$y_text}xs;
     }
@@ -271,8 +358,8 @@ sub _tile_ascii {
         '/  SSSSSSSSSSSSSSSSS  \\',
         '   SSSSSSSSSSSSSSSSS   ',
         '\  SSSSSSSSSSSSSSSSS  /',
-        '?\      DDDDDDDD     /',
-        '??\4 CCCCCCCCCCCCC 2/',
+        '?\ CCCCCCCCCCCCCCCCC /',
+        '??\4    DDDDDDDD   2/',
         '???\xxxxxxxxxxxxxxx/',
         '????\ ANC  3 DISC /',
         '?????-------------',
@@ -524,6 +611,19 @@ sub _race_ascii {
 
     if ( $self->waiting_on_player_id() == $race->owner_id() ) {
         $waiting_on_text = ' *waiting on* ' . join( ',', $race->allowed_actions()->items() );
+
+
+        if ( $race->has_tile_in_hand() ) {
+            my @tile_texts = ();
+
+            foreach ( $race->bare_in_hand() ) {
+                my $tile = $self->tiles()->{ $_ };
+                push( @tile_texts, $tile->tag() . ' [' . reverse( sprintf( '%06b', $tile->warps() ) ) . ']' );
+            }
+
+            $waiting_on_text .= ' (' . join( ',', @tile_texts ) . ')';
+        }
+
     }
 
     push(

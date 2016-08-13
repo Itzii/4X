@@ -6,10 +6,6 @@ use Exporter;
 
 our @ISA	= qw( Exporter );
 our @EXPORT_OK = qw(
-
-    state_text_from_enum
-    phase_text_from_enum
-    subphase_text_from_enum
 );
 
 my $notes = <<'END';
@@ -43,6 +39,10 @@ V::WW::XX::YYY::ZZ
 END
 
 our @EXPORT = qw(
+
+    state_text_from_enum
+    phase_text_from_enum
+    subphase_text_from_enum
 
     $ST_PREGAME
     $ST_RACESELECTION

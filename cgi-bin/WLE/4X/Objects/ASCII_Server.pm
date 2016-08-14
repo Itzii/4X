@@ -109,7 +109,7 @@ sub _fill_text_data {
 
     push( @lines, $self->_info_available_tech() );
 
-    push( @lines, $self->_info_races() );
+    push( @lines, $self->_info_players() );
 
 
 
@@ -173,9 +173,8 @@ sub _info_board {
     my $selected_y = undef;
 
     if ( $self->state() == $ST_NORMAL ) {
-        foreach my $player_id ( 0 .. $self->user_ids()->count() - 1 ) {
-            my $race = $self->race_of_player_id( $player_id );
-            if ( $race->has_tile_in_hand( \$selected_x, \$selected_y ) ) {
+        foreach my $player ( values( %{ $self->players() } ) ) {
+            if ( $player->has_tile_in_hand( \$selected_x, \$selected_y ) ) {
 
                 my @selected_hex_text = $self->_empty_tile_ascii( $selected_x, $selected_y, 0, 0, 1 );
 
@@ -218,14 +217,17 @@ sub _info_board {
         $self->_overlay_text( \@grid, \@hex_text, $center_x + $x, $center_y + $y );
     }
 
-    # now we the top empty rows
-    while ( $grid[ 0 ] =~ m{ ^ \s+ $ }xs ) {
-        shift( @grid );
-    }
+    if ( @grid ) {
 
-    # remove the bottom empty rows
-    while ( $grid[ -1 ] =~ m{ ^\s+ $ }xs ) {
-        pop( @grid );
+        # now we the top empty rows
+        while ( scalar( @grid ) > 0 && $grid[ 0 ] =~ m{ ^ \s+ $ }xs ) {
+            shift( @grid );
+        }
+
+        # remove the bottom empty rows
+        while ( scalar( @grid ) > 0 && $grid[ -1 ] =~ m{ ^\s+ $ }xs ) {
+            pop( @grid );
+        }
     }
 
 
@@ -581,19 +583,13 @@ sub _info_available_tech {
 
 #############################################################################
 
-sub _info_races {
+sub _info_players {
     my $self            = shift;
-
-    my @ids = ( 0 .. $self->user_ids()->count() - 1 );
 
     my @lines = ();
 
-    foreach my $player_id ( @ids ) {
-        my $race = $self->race_of_player_id( $player_id );
-
-        if ( defined( $race ) ) {
-            push( @lines, join( "\n", $self->_race_ascii( $race ) ) );
-        }
+    foreach my $id ( 0 .. scalar( keys( %{ $self->players() } ) - 1 ) ) {
+        push( @lines, join( "\n", $self->_player_ascii( $self->players()->{ $id } ) ) );
     }
 
     return @lines;
@@ -601,22 +597,22 @@ sub _info_races {
 
 #############################################################################
 
-sub _race_ascii {
+sub _player_ascii {
     my $self            = shift;
-    my $race            = shift;
+    my $player          = shift;
 
     my @lines = ( "\n" );
 
     my $waiting_on_text = '';
 
-    if ( $self->waiting_on_player_id() == $race->owner_id() ) {
-        $waiting_on_text = ' *waiting on* ' . join( ',', $race->allowed_actions()->items() );
+    if ( $self->waiting_on_player_id() == $player->id() ) {
+        $waiting_on_text = ' *waiting on* ' . join( ',', $player->allowed_actions()->items() );
 
 
-        if ( $race->has_tile_in_hand() ) {
+        if ( $player->has_tile_in_hand() ) {
             my @tile_texts = ();
 
-            foreach ( $race->bare_in_hand() ) {
+            foreach ( $player->bare_in_hand() ) {
                 my $tile = $self->tiles()->{ $_ };
                 push( @tile_texts, $tile->tag() . ' [' . reverse( sprintf( '%06b', $tile->warps() ) ) . ']' );
             }
@@ -626,15 +622,24 @@ sub _race_ascii {
 
     }
 
+    if ( $player->race_tag() eq '' ) {
+        push(
+            @lines,
+            $player->id() . ') (no race selected) [' . $player->user_id() . ']' . $waiting_on_text
+        );
+
+        return @lines;
+    }
+
     push(
         @lines,
-        $race->owner_id() . ') '
-            . $race->long_name()
-            . ' [' . ($self->user_ids()->items())[ $race->owner_id() ] . ']'
+        $player->id() . ') '
+            . $player->race()->long_name()
+            . ' [' . $player->user_id() . ']'
             . $waiting_on_text
     );
 
-    my %vp_items = $race->vp_items_in_slots();
+    my %vp_items = $player->race()->vp_items_in_slots();
     my @vps_formatted = ();
     my %vp_formats = ( $VP_AMBASSADOR => '[%s]', $VP_BATTLE => '(%s)', $VP_ANY => '{%s}' );
 
@@ -643,7 +648,7 @@ sub _race_ascii {
         foreach my $vp_item ( @{ $vp_items{ $vp_category } } ) {
             my $text = '';
             if ( looks_like_number( $vp_item ) ) {
-                $text =  ( $self->acting_player_id() == $race->owner_id() ) ? $vp_item : '?';
+                $text =  ( $self->acting_player()->id() == $player->id() ) ? $vp_item : '?';
             }
             else {
                 $text = 'Dip - ' . $self->races()->{ $vp_item }->long_name();
@@ -652,7 +657,7 @@ sub _race_ascii {
             push( @vps_formatted, sprintf( $vp_formats{ $vp_category }, $text ) );
         }
 
-        my $empty_count = $race->vp_slot_count( $vp_category ) - scalar( @{ $vp_items{ $vp_category } } );
+        my $empty_count = $player->race()->vp_slot_count( $vp_category ) - scalar( @{ $vp_items{ $vp_category } } );
         foreach ( 1 .. $empty_count ) {
             push( @vps_formatted, sprintf( $vp_formats{ $vp_category }, '' ) );
         }
@@ -664,7 +669,7 @@ sub _race_ascii {
     foreach my $tech_type ( $TECH_MILITARY, $TECH_NANO, $TECH_GRID ) {
         my @tech_names = ();
 
-        foreach my $tech_tag ( $race->tech_track_of( $tech_type )->techs() ) {
+        foreach my $tech_tag ( $player->race()->tech_track_of( $tech_type )->techs() ) {
             my $tech = $self->technology()->{ $tech_tag };
             if ( defined( $tech ) ) {
                 push( @tech_names, $tech->long_name() );
@@ -674,19 +679,19 @@ sub _race_ascii {
         push(
             @lines,
             text_from_tech_enum( $tech_type, 1 )
-                . ' ' . $race->tech_track_of( $tech_type )->current_credit() . '/'
-                . $race->tech_track_of( $tech_type )->vp_total() . 'vp : '
+                . ' ' . $player->race()->tech_track_of( $tech_type )->current_credit() . '/'
+                . $player->race()->tech_track_of( $tech_type )->vp_total() . 'vp : '
                 . join( ',', @tech_names )
         );
     }
 
     foreach my $res_type ( $RES_SCIENCE, $RES_MINERALS, $RES_MONEY, $RES_INFLUENCE ) {
 
-        my $track = $race->resource_track_of( $res_type );
+        my $track = $player->race()->resource_track_of( $res_type );
 
         my $text = text_from_resource_enum( $res_type );
         unless ( $res_type == $RES_INFLUENCE ) {
-            $text .= ' : ' . $race->resource_count( $res_type );
+            $text .= ' : ' . $player->race()->resource_count( $res_type );
         }
 
         $text .= ' : ' . $track->track_value() . ' : ' . $track->available_to_spend();
@@ -699,14 +704,12 @@ sub _race_ascii {
     }
 
     foreach my $class ( 'class_interceptor', 'class_cruiser', 'class_dreadnought', 'class_starbase' ) {
-        my $template = $race->template_of_class( $class );
+        my $template = $player->race()->template_of_class( $class );
 
         if ( defined( $template ) ) {
             push( @lines, $self->_ship_template_ascii( $template ) );
         }
     }
-
-
 
     return @lines;
 }

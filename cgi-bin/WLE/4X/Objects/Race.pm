@@ -63,8 +63,6 @@ sub _init {
     $self->{'ACTION_COUNT'} = 0;
     $self->{'ACTION_FLIP_COLONY_COUNT'} = 0;
 
-    $self->{'ALLOWED_ACTIONS'} = WLE::Objects::Stack->new();
-
     $self->{'IN_HAND'} = WLE::Objects::Stack->new();
     $self->{'COMPONENT_OVERFLOW'} = WLE::Objects::Stack->new();
     $self->{'GRAVEYARD'} = WLE::Objects::Stack->new();
@@ -131,8 +129,6 @@ sub _init {
 
     $self->{'SHIP_TEMPLATES'} = [];
 
-    $self->{'FLAG_PASSED'} = 0;
-
     if ( defined( $args{'hash'} ) ) {
         if ( $self->from_hash( $args{'hash'} ) ) {
             return $self;
@@ -158,73 +154,6 @@ sub excludes {
 
     return $self->{'EXCLUDE_RACE'};
 }
-
-#############################################################################
-
-sub has_passed {
-    my $self        = shift;
-
-    return ( $self->{'FLAG_PASSED'} == 1 );
-}
-
-#############################################################################
-
-sub set_flag_passed {
-    my $self        = shift;
-    my $value       = shift;
-
-    $self->{'FLAG_PASSED'} = $value;
-
-    return;
-}
-
-#############################################################################
-
-sub allowed_actions {
-    my $self        = shift;
-
-    return $self->{'ALLOWED_ACTIONS'};
-}
-
-#############################################################################
-
-sub adjusted_allowed_actions {
-    my $self        = shift;
-
-    my $list = WLE::Objects::Stack->new();
-
-    # has discoveries in hand from influencing tile
-    if ( $self->has_discovery_in_hand() ) {
-        $list->add_items( 'choose_discovery' );
-    }
-
-    # has influence token in hand from influence action
-    elsif ( $self->in_hand()->contains( 'influence_token' ) ) {
-        $list->add_items( 'place_influence_token' );
-    }
-
-    # has multiple technologies in hand from discovery tile
-    elsif ( $self->has_technology_in_hand() ) {
-        $list->add_items( 'select_free_technology' );
-    }
-
-    # component is in hand from either upgrade action or discovery tile
-    elsif ( $self->has_component_in_hand() ) {
-        $list->add_items( 'place_component' );
-    }
-
-    # cube in hand from de-influencing tile
-    elsif ( $self->has_cube_in_hand() ) {
-        $list->add_items( 'replace_cube' );
-    }
-
-    else {
-        return $self->allowed_actions();
-    }
-
-    return $list;
-}
-
 
 #############################################################################
 
@@ -500,129 +429,6 @@ sub vp_slot_count {
 
 #############################################################################
 
-sub in_hand {
-    my $self        = shift;
-
-    return $self->{'IN_HAND'};
-}
-
-#############################################################################
-
-sub bare_in_hand {
-    my $self        = shift;
-
-    my @items = ();
-
-    foreach my $item ( $self->in_hand()->items() ) {
-        my @parts = split( /:/, $item );
-        push( @items, $parts[ -1 ] );
-    }
-
-    return @items;
-}
-
-#############################################################################
-
-sub has_discovery_in_hand {
-    my $self        = shift;
-
-    foreach my $item ( $self->in_hand()->items() ) {
-        my ( $tile_tag, $discovery_tag ) = split( /:/, $item );
-
-        if ( defined( $discovery_tag ) ) {
-            if ( defined( $self->server()->discoveries()->{ $discovery_tag } ) ) {
-                return 1;
-            }
-        }
-    }
-
-    return 0;
-}
-
-#############################################################################
-
-sub has_component_in_hand {
-    my $self        = shift;
-
-    foreach my $item ( $self->in_hand()->items() ) {
-        if ( defined( $self->server()->ship_components()->{ $item } ) ) {
-            return 1;
-        }
-    }
-
-    return 0;
-}
-
-#############################################################################
-
-sub has_technology_in_hand {
-    my $self        = shift;
-
-    foreach my $item ( $self->in_hand()->items() ) {
-        if ( defined( $self->server()->technology()->{ $item } ) ) {
-            return 1;
-        }
-    }
-
-    return 0;
-}
-
-#############################################################################
-
-sub has_tile_in_hand {
-    my $self        = shift;
-    my $r_loc_x     = shift; # optional
-    my $r_loc_y     = shift; # optional
-
-    foreach my $item ( $self->in_hand()->items() ) {
-        my ( $loc_x, $loc_y, $tile_tag ) = split( /:/, $item );
-        if ( defined( $tile_tag ) ) {
-            if ( defined( $self->server()->tiles()->{ $tile_tag } ) ) {
-
-                if ( defined( $r_loc_x ) ) {
-                    $$r_loc_x = $loc_x;
-                }
-                if ( defined( $r_loc_y ) ) {
-                    $$r_loc_y = $loc_y;
-                }
-                return 1;
-            }
-        }
-    }
-
-    return 0;
-}
-
-#############################################################################
-
-sub remove_all_technologies_from_hand {
-    my $self        = shift;
-
-    foreach my $item ( $self->in_hand()->items() ) {
-        if ( defined( $self->server()->technology()->{ $item } ) ) {
-            $self->in_hand()->remove_item( $item );
-        }
-    }
-
-    return;
-}
-
-#############################################################################
-
-sub has_cube_in_hand {
-    my $self        = shift;
-
-    foreach my $item ( $self->in_hand()->items() ) {
-        if ( $item =~ m{ ^ cube: }xs ) {
-            return 1;
-        }
-    }
-
-    return 0;
-}
-
-#############################################################################
-
 sub vp_draws {
     my $self        = shift;
 
@@ -696,76 +502,6 @@ sub exchange_resources {
     return 1;
 }
 
-
-#############################################################################
-
-sub start_turn {
-    my $self        = shift;
-
-    $self->{'ACTION_COUNT'} = 0;
-    $self->{'ACTION_FLIP_COLONY_COUNT'} = 0;
-    $self->allowed_actions()->clear();
-
-    my $has_movable_ships = 0;
-
-    foreach my $tile_tag ( $self->server()->board()->tiles_on_board() ) {
-        if ( $self->server()->tiles()->{ $tile_tag }->unpinned_ship_count( $self->owner_id() ) ) {
-            $has_movable_ships = 1;
-            last;
-        }
-    }
-
-    if ( $self->has_passed() ) {
-        $self->allowed_actions()->add_items(
-            'action_pass',
-            'action_react_upgrade',
-            'action_react_build',
-        );
-
-        if ( $has_movable_ships ) {
-            $self->allowed_actions()->add_items( 'action_react_move' );
-        }
-    }
-    else {
-        $self->allowed_actions()->add_items(
-            'action_pass',
-            'action_influence',
-            'action_research',
-            'action_upgrade',
-            'action_build',
-        );
-
-        if ( $self->can_explore() ) {
-            $self->allowed_actions()->add_items( 'action_explore' );
-        }
-
-        if ( $has_movable_ships ) {
-            $self->allowed_actions()->add_items( 'action_move' );
-        }
-
-    }
-
-    return;
-}
-
-#############################################################################
-
-sub can_explore {
-    my $self        = shift;
-
-    my @explorable_locations = $self->server()->board()->explorable_spaces_for_race( $self->tag() );
-    return ( scalar( @explorable_locations ) > 0 );
-}
-
-#############################################################################
-
-sub end_turn {
-    my $self        = shift;
-
-    $self->allowed_actions()->clear();
-
-    return;
-}
 
 #############################################################################
 
@@ -864,14 +600,10 @@ sub from_hash {
 
     $self->{'HOME'} = $r_hash->{'HOME'};
 
-    foreach my $value ( 'FLAG_PASSED', 'EXCLUDE_RACE', 'COLONY_COUNT', 'COLONY_USED', 'EXCHANGE', 'ACTION_COUNT', 'ACTION_FLIP_COLONY_COUNT', 'VP_DRAWS' ) {
+    foreach my $value ( 'EXCLUDE_RACE', 'COLONY_COUNT', 'COLONY_USED', 'EXCHANGE', 'ACTION_COUNT', 'ACTION_FLIP_COLONY_COUNT', 'VP_DRAWS' ) {
         if ( defined( $r_hash->{ $value } ) ) {
             $self->{ $value } = $r_hash->{ $value };
         }
-    }
-
-    if ( defined( $r_hash->{'IN_HAND'} ) ) {
-        $self->in_hand()->fill( @{ $r_hash->{'IN_HAND'} } );
     }
 
     if ( defined( $r_hash->{'COMPONENT_OVERFLOW'} ) ) {
@@ -958,10 +690,6 @@ sub from_hash {
         }
     }
 
-    if ( defined( $r_hash->{'ALLOWED_ACTIONS'} ) ) {
-        $self->allowed_actions()->add_items( @{ $r_hash->{'ALLOWED_ACTIONS'} } );
-    }
-
     my @templates = ();
 
     if ( defined( $r_hash->{'SHIP_TEMPLATES'} ) ) {
@@ -1022,11 +750,10 @@ sub to_hash {
         return 0;
     }
 
-    foreach my $tag ( 'HOME', 'EXCLUDE_RACE', 'COLONY_COUNT', 'COLONY_USED', 'EXCHANGE', 'COST_ORBITAL', 'COST_MONUMENT', 'FLAG_PASSED', 'ACTION_COUNT', 'ACTION_FLIP_COLONY_COUNT', 'VP_DRAWS' ) {
+    foreach my $tag ( 'HOME', 'EXCLUDE_RACE', 'COLONY_COUNT', 'COLONY_USED', 'EXCHANGE', 'COST_ORBITAL', 'COST_MONUMENT', 'ACTION_COUNT', 'ACTION_FLIP_COLONY_COUNT', 'VP_DRAWS' ) {
         $r_hash->{ $tag } = $self->{ $tag };
     }
 
-    $r_hash->{'IN_HAND'} = [ $self->in_hand()->items() ];
     $r_hash->{'COMPONENT_OVERFLOW'} = [ $self->component_overflow()->items() ];
     $r_hash->{'GRAVEYARD'} = [ $self->graveyard()->items() ];
     $r_hash->{'DICOVERY_VPS'} = [ $self->discovery_vps()->items() ];
@@ -1070,68 +797,9 @@ sub to_hash {
 
     $r_hash->{'VP_SLOTS'} = [ $self->{'VP_SLOTS'}->items() ];
 
-    $r_hash->{'ALLOWED_ACTIONS'} = [ $self->allowed_actions()->items() ];
-
     $r_hash->{'SHIP_TEMPLATES'} = $self->{'SHIP_TEMPLATES'};
 
     return 1;
-}
-
-#############################################################################
-
-sub as_ascii {
-    my $self            = shift;
-
-    my @lines = ();
-
-    my $waiting_on_text = ( $self->server()->waiting_on_player_id() == $self->owner_id() ) ? ' *waiting on*' : '';
-
-    push(
-        @lines,
-        $self->owner_id() . ') '
-            . $self->long_name()
-            . ' [' . ($self->server()->user_ids()->items())[ $self->owner_id() ] . ']'
-            . $waiting_on_text
-    );
-
-    foreach my $tech_type ( $TECH_MILITARY, $TECH_NANO, $TECH_GRID ) {
-        my @tech_names = ();
-
-        foreach my $tech_tag ( $self->tech_track_of( $tech_type )->techs() ) {
-            my $tech = $self->server()->technology()->{ $tech_tag };
-            if ( defined( $tech ) ) {
-                push( @tech_names, $tech->long_name() );
-            }
-        }
-
-        push(
-            @lines,
-            text_from_tech_enum( $tech_type, 1 )
-                . ' ' . $self->tech_track_of( $tech_type )->current_credit() . '/'
-                . $self->tech_track_of( $tech_type )->vp_total() . 'vp : '
-                . join( ',', @tech_names )
-        );
-    }
-
-    foreach my $res_type ( $RES_SCIENCE, $RES_MINERALS, $RES_MONEY ) {
-
-        push(
-            @lines,
-            text_from_resource_enum( $res_type, 1 ) . ': ' . $self->resource_count( $res_type )
-                . ' : ' . $self->resource_track_of( $res_type )->track_value()
-                . ' : ' . $self->resource_track_of( $res_type )->available_to_spend()
-        );
-    }
-
-    foreach my $class ( 'class_interceptor', 'class_cruiser', 'class_dreadnought', 'class_starbase' ) {
-        my $template = $self->template_of_class( $class );
-
-        if ( defined( $template ) ) {
-            push( @lines, $template->as_ascii() );
-        }
-    }
-
-    return @lines;
 }
 
 #############################################################################

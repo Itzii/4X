@@ -121,8 +121,6 @@ sub _raw_create_game {
     $self->source_tags()->fill( @{ $r_source_tags } );
     $self->option_tags()->fill( @{ $r_option_tags } );
 
-    $self->user_ids()->fill( $owner_id );
-
     return;
 }
 
@@ -286,7 +284,13 @@ sub _raw_add_player {
         return 'added player: ' . $user_id;
     }
 
-    $self->user_ids()->add_items( $user_id );
+    my $id = 0;
+    while ( defined( $self->players()->{ $id } ) ) {
+        $id++;
+    }
+
+    my $new_player = WLE::4X::Objects::Player->new( 'server' => $self, 'user_id' => $user_id, 'id' => $id );
+    $self->players()->{ $id } = $new_player;
 
     return;
 }
@@ -309,7 +313,11 @@ sub _raw_remove_player {
         return 'player removed: ' . $user_id;
     }
 
-    $self->user_ids()->remove_item( $user_id );
+    foreach my $player ( $self->player_list() ) {
+        if ( $player->user_id() eq $user_id ) {
+            delete( $self->players()->{ $player->id() } );
+        }
+    }
 
     return;
 }
@@ -359,17 +367,17 @@ sub _raw_begin {
         return 0;
     }
 
-    my $settings = $VAR1->{'PLAYER_COUNT_SETTINGS'}->{ $self->user_ids()->count() };
-#    print STDERR "\nPlayer Count: " . $self->user_ids()->count();
+    my $settings = $VAR1->{'PLAYER_COUNT_SETTINGS'}->{ scalar( $self->players_list() ) };
+#    print STDERR "\nPlayer Count: " . scalar( $self->players_list() );
 
     unless ( defined( $settings ) ) {
-        $self->set_error( 'Invalid Player Count: ' . $self->user_ids()->count() );
+        $self->set_error( 'Invalid Player Count: ' . scalar( $self->players_list() ) );
         print STDERR $self->last_error();
         return 0;
     }
 
     unless ( $self->source_tags()->contains( $settings->{'SOURCE_TAG'} ) ) {
-        $self->set_error( 'Invalid player count for chosen sources: ' . $self->user_ids()->count() );
+        $self->set_error( 'Invalid player count for chosen sources: ' . scalar( $self->players_list() ) );
         print STDERR $self->last_error();
         return 0;
     }
@@ -1327,17 +1335,14 @@ sub _raw_select_race_and_location {
         return 'player ' . $self->current_player_id() . ' has selected ' . $race_tag . ' as race and is beginning at location ' . $location_x . ',' . $location_y;
     }
 
-
-    my $race = $self->races()->{ $race_tag };
-
-    $race->set_owner_id( $self->acting_player_id() );
+    $self->acting_player()->set_race_tag( $race_tag );
 
     unless ( $self->has_option( 'all_races' ) ) {
-        my $backing_race = $race->excludes();
+        my $backing_race = $self->acting_player()->race()->excludes();
         delete ( $self->races()->{ $backing_race } );
     }
 
-    my $start_hex_tag = $race->home_tile();
+    my $start_hex_tag = $self->acting_player()->race()->home_tile();
 
     my $start_hex = $self->tiles()->{ $start_hex_tag };
 
@@ -1358,31 +1363,31 @@ sub _raw_select_race_and_location {
         my $open_slots = $start_hex->available_resource_spots( $type->[ 0 ], 0 );
 
         foreach ( 1 .. $open_slots ) {
-            $start_hex->add_cube( $race->owner_id(), $type->[ 0 ], 0 )
+            $start_hex->add_cube( $self->acting_player()->id(), $type->[ 0 ], 0 )
         }
 
-        if ( $race->has_technology( $type->[ 1 ] ) ) {
+        if ( $self->acting_player()->race()->has_technology( $type->[ 1 ] ) ) {
 
             $open_slots = $start_hex->available_resource_spots( $type->[ 0 ], 1 );
 
             foreach ( 1 .. $open_slots ) {
-                $race->resource_track_of( $type->[ 0 ] )->spend();
-                $start_hex->add_cube( $race->owner_id(), $type->[ 0 ], 1 )
+                $self->acting_player()->race()->resource_track_of( $type->[ 0 ] )->spend();
+                $start_hex->add_cube( $self->acting_player()->id(), $type->[ 0 ], 1 )
             }
         }
     }
 
     # build and place initial racial ships
 
-    foreach my $ship_class ( $race->starting_ships() ) {
+    foreach my $ship_class ( $self->acting_player()->race()->starting_ships() ) {
 
-        my $template = $race->template_of_class( $ship_class );
+        my $template = $self->acting_player()->race()->template_of_class( $ship_class );
 
         $self->_raw_create_ship_on_tile(
             $EV_SUB_ACTION,
             $start_hex->tag(),
             $template->tag(),
-            $race->owner_id(),
+            $self->acting_player()->id(),
         );
     }
 

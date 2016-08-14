@@ -18,6 +18,7 @@ use WLE::4X::Objects::RawActions;
 use WLE::4X::Objects::ServerState;
 
 use WLE::4X::Objects::Element;
+use WLE::4X::Objects::Player;
 use WLE::4X::Objects::ShipComponent;
 use WLE::4X::Objects::Technology;
 use WLE::4X::Objects::Development;
@@ -66,7 +67,7 @@ sub _init {
     $self->{'ENV'}->{'DIR_STATE_FILES'} =~ s{ /$ }{}xs;
     $self->{'ENV'}->{'DIR_LOG_FILES'} =~ s{ /$ }{}xs;
 
-    $self->{'ENV'}->{'CURRENT_PLAYER_ID'} = -1;
+    $self->{'ENV'}->{'ACTING_PLAYER'} = undef;
     $self->{'ENV'}->{'FLAG_READ_ONLY'} = 0;
 
 
@@ -111,7 +112,7 @@ sub reset {
 
         $self->{'SETTINGS'}->{'LONG_NAME'} = '';
 
-        $self->{'SETTINGS'}->{'USER_IDS'} = WLE::Objects::Stack->new();
+        $self->{'SETTINGS'}->{'PLAYERS'} = {};
 
         $self->{'SETTINGS'}->{'PLAYERS_PENDING'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
         $self->{'SETTINGS'}->{'PLAYERS_DONE'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
@@ -181,7 +182,11 @@ sub do {
 
     if ( $action_tag eq 'create_game' ) {
         $method = \&action_create_game;
-        $self->{'ENV'}->{'ACTING_PLAYER_ID'} = 0;
+        my $owning_player = WLE::4X::Objects::Player->new( 'server' => $self, 'id' => 0, 'user_id' => $args{'user'} );;
+        $owning_player->set_is_owner( 1 );
+
+        $self->{'SETTINGS'}->{'PLAYERS'}->{ '0' } = $owning_player;
+        $self->{'ENV'}->{'ACTING_PLAYER'} = $owning_player;
     }
     else {
         my $error_message = $self->_check_allowed_action( $args{'log_id'}, $args{'user'}, $action_tag, \$method );
@@ -200,13 +205,11 @@ sub do {
     $response{'success'} = $method->( $self, %args );
     $response{'message'} = $self->last_error();
     $response{'data'} = $self->returned_data();
-    $response{'allowed'} = [];
 
-    my $race = $self->race_of_acting_player();
+    print STDERR "\nActing Player Type - Bare : " . ref( $self->{'ENV'}->{'ACTING_PLAYER'} );
+    print STDERR "\nActing Player Type: " . ref( $self->acting_player() );
 
-    if ( defined( $race ) ) {
-        $response{'allowed'} = [ $race->adjusted_allowed_actions()->items() ];
-    }
+    $response{'allowed'} = [ $self->acting_player()->adjusted_allowed_actions()->items() ];
 
     if ( $response{'success'} == 1 && $self->{'ENV'}->{'FLAG_READ_ONLY'} == 0 ) {
         $self->_save_state();
@@ -304,7 +307,7 @@ sub _check_allowed_action {
 #        print STDERR "\n ( " . $self->outside_status() . " )";
     }
 
-    $self->{'ENV'}->{'ACTING_PLAYER_ID'} = $self->user_ids()->index_of( $user_id );
+    $self->{'ENV'}->{'ACTING_PLAYER'} = $self->player_of_user_id( $user_id );
 
     if ( defined( $action->{'flag_anytime'} ) ) {
         return '';
@@ -316,18 +319,14 @@ sub _check_allowed_action {
         }
     }
 
-    if ( defined( $action->{'flag_owner_only'} ) && $self->player_is_owner() == 0 )  {
+    if ( defined( $action->{'flag_owner_only'} ) && $self->acting_player()->is_owner() == 0 )  {
         return 'Action is allowed by game owner only.';
     }
 
     if ( defined( $action->{'flag_active_player'} ) ) {
         my $waiting_on = $self->waiting_on_player_id();
 
-        if ( $waiting_on == -1 || ( $waiting_on > -1 && $waiting_on != $self->acting_player_id() ) ) {
-#            print STDERR "\nUser IDs: " . join( ',', $self->user_ids()->items() );
-#            print STDERR "\nActive User ID: " . $user_id;
-#            print STDERR "\nWaiting On: " . $waiting_on;
-#            print STDERR "\nActive: " . $self->acting_player_id();
+        if ( $waiting_on == -1 || ( $waiting_on > -1 && $waiting_on != $self->acting_player()->id() ) ) {
             return 'Action is not allowed by this player at this time.';
         }
     }
@@ -340,17 +339,55 @@ sub _check_allowed_action {
 
     if ( $self->state() == $ST_NORMAL ) {
 
-        my $race = $self->race_of_acting_player();
-
         unless ( defined( $action->{'flag_ignore_allowed'} ) ) {
-            unless ( $race->adjusted_allowed_actions()->contains( $action_tag ) ) {
-                print STDERR "\nAllowed Actions: " . join( ',', $race->allowed_actions()->items() );
+            unless ( $self->acting_player()->adjusted_allowed_actions()->contains( $action_tag ) ) {
+                print STDERR "\nAllowed Actions: " . join( ',', $self->acting_player()->allowed_actions()->items() );
                 return 'Action is not allowed by player at this time.';
             }
         }
     }
 
     return '';
+}
+
+#############################################################################
+
+sub players {
+    my $self        = shift;#!/usr/bin/env perl
+
+    return $self->{'SETTINGS'}->{'PLAYERS'};
+}
+
+#############################################################################
+
+sub acting_player {
+    my $self        = shift;
+
+    return $self->{'ENV'}->{'ACTING_PLAYER'};
+}
+
+#############################################################################
+
+sub player_of_user_id {
+    my $self        = shift;
+    my $user_id     = shift;
+
+    foreach my $player ( values( %{ $self->players() } ) ) {
+        if ( $player->user_id() eq $user_id ) {
+            return $player;
+        }
+    }
+
+}
+
+#############################################################################
+
+sub player_list {
+    my $self        = shift;
+
+    my @players = sort { $a->id() <=> $b->id() } values( %{ $self->players() } );
+
+    return @players;
 }
 
 #############################################################################
@@ -432,53 +469,17 @@ sub item_is_allowed_in_game {
 
 #############################################################################
 
-sub user_ids {
-    my $self        = shift;
-
-    return $self->{'SETTINGS'}->{'USER_IDS'};
-}
-
-#############################################################################
-
 sub user_id_of_player_id {
     my $self        = shift;
     my $player_id   = shift;
 
-    if ( $player_id < 0 || $player_id > $self->user_ids()->count() - 1 ) {
-        return -1;
+    foreach my $player ( values( %{ $self->players() } ) ) {
+        if ( $player->id() == $player_id ) {
+            return $player->user_id();
+        }
     }
 
-    return ($self->user_ids()->items())[ $player_id ]
-}
-
-#############################################################################
-
-sub acting_player_id {
-    my $self        = shift;
-
-    return $self->{'ENV'}->{'ACTING_PLAYER_ID'};
-}
-
-#############################################################################
-
-sub player_is_owner {
-    my $self        = shift;
-
-    return ( $self->acting_player_id() == 0 );
-}
-
-#############################################################################
-
-sub race_tag_of_acting_player {
-    my $self        = shift;
-
-    my $race = $self->race_of_player_id( $self->acting_player_id() );
-
-    if ( defined( $race ) ) {
-        return $race->tag();
-    }
-
-    return '';
+    return -1;
 }
 
 #############################################################################
@@ -494,14 +495,6 @@ sub race_of_player_id {
     }
 
     return undef;
-}
-
-#############################################################################
-
-sub race_of_acting_player {
-    my $self        = shift;
-
-    return $self->race_of_player_id( $self->acting_player_id() );
 }
 
 #############################################################################

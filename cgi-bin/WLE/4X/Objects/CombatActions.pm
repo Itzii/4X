@@ -63,6 +63,7 @@ sub action_attack {
     $self->_raw_make_attack_rolls( $EV_FROM_INTERFACE, @rolls );
 
     $self->_raw_set_pending_player( $EV_FROM_INTERFACE, $ship_owner );
+
     my $race = $self->race_of_player_id( $ship_owner );
     $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $race->tag(), 'allocate_hits' );
 
@@ -151,7 +152,7 @@ sub action_allocate_hits {
 
     my $self_id = $attacker_id;
     my $enemy_id = $defender_id;
-    if ( $enemy_id = $self->acting_player_id() ) {
+    if ( $enemy_id = $self->acting_player()->id() ) {
         $enemy_id = $attacker_id;
         $self_id = $defender_id;
     }
@@ -278,7 +279,7 @@ sub action_allocate_defense_hits {
     my $self_id = $attacker_id;
     my $enemy_id = $defender_id;
 
-    if ( $enemy_id = $self->acting_player_id() ) {
+    if ( $enemy_id = $self->acting_player()->id() ) {
         $enemy_id = $attacker_id;
         $self_id = $defender_id;
     }
@@ -338,7 +339,7 @@ sub action_attack_populace {
     my @hits = ();
 
     foreach my $ship ( $tile->ships()->items() ) {
-        if ( $ship->owner_id() == $self->acting_player_id() ) {
+        if ( $ship->owner_id() == $self->acting_player->id() ) {
             foreach my $attack ( $ship->roll_beam_attacks() ) {
                 if ( $self->does_roll_hit_ship( $attack->{'roll'}, $ship->template(), undef ) ) {
                     push( @hits, 'hit:' . $attack->{'strength'} . ':' . $attack->{'roll'} );
@@ -413,9 +414,7 @@ sub action_draw_vp {
     my $self            = shift;
     my %args            = @_;
 
-    my $race = $self->race_of_acting_player();
-
-    my $vp_draws = $race->vp_draws();
+    my $vp_draws = $self->acting_player()->race()->vp_draws();
 
     if ( $vp_draws > 5 ) {
         $vp_draws = 5;
@@ -433,7 +432,7 @@ sub action_draw_vp {
         push( @player_vp_tokens, shift( @all_vp_tokens ) );
     }
 
-    $self->_raw_add_vp_to_hand( $EV_FROM_INTERFACE, $race->tag, @player_vp_tokens );
+    $self->_raw_add_vp_to_hand( $EV_FROM_INTERFACE, $self->acting_player()->race_tag, @player_vp_tokens );
 
     return 1;
 }
@@ -451,9 +450,7 @@ sub action_select_vp_token {
 
     my $new_token = $args{'token'};
 
-    my $race = $self->race_of_acting_player();
-
-    unless ( $race->in_hand()->contains( $new_token ) ) {
+    unless ( $self->acting_player()->in_hand()->contains( $new_token ) ) {
         $self->set_error( 'Invalid Token Argument' );
         return 0;
     }
@@ -467,12 +464,12 @@ sub action_select_vp_token {
         }
     }
 
-    if ( $race->can_add_vp_item( $new_token, $old_token ) ) {
+    if ( $self->acting_player()->race()->can_add_vp_item( $new_token, $old_token ) ) {
         $self->set_error( 'Invalid VP Type Count' );
         return 0;
     }
 
-    $self->_raw_select_vp_token( $EV_FROM_INTERFACE, $race->tag(), $new_token, $old_token );
+    $self->_raw_select_vp_token( $EV_FROM_INTERFACE, $self->acting_player()->race_tag(), $new_token, $old_token );
 
     $self->_raw_next_vp_draw_player( $EV_FROM_INTERFACE, $self->current_tile() );
 

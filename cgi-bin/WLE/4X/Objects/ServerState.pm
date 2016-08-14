@@ -117,7 +117,12 @@ sub _read_state {
     $self->source_tags()->fill( @{ $VAR1->{'SETTINGS'}->{'SOURCE_TAGS'} } );
     $self->option_tags()->fill( @{ $VAR1->{'SETTINGS'}->{'OPTION_TAGS'} } );
 
-    $self->user_ids()->fill( @{ $VAR1->{'SETTINGS'}->{'USER_IDS'} } );
+    foreach my $player_id ( keys( %{ $VAR1->{'SETTINGS'}->{'PLAYERS'} } ) ) {
+        my $player = WLE::4X::Objects::Player->new( 'server' => $self );
+        if ( $player->from_hash( $VAR1->{'SETTINGS'}->{'PLAYERS'}->{ $player_id } ) ) {
+            $self->players()->{ $player->id() } = $player;
+        }
+    }
 
     $self->pending_players()->fill( @{ $VAR1->{'SETTINGS'}->{'PLAYERS_PENDING'} } );
     $self->done_players()->fill( @{ $VAR1->{'SETTINGS'}->{'PLAYERS_DONE'} } );
@@ -381,7 +386,12 @@ sub _save_state {
 
     $data{'SETTINGS'}->{'LONG_NAME'} = $self->long_name();
 
-    $data{'SETTINGS'}->{'USER_IDS'} = [ $self->user_ids()->items() ];
+    foreach my $player ( $self->player_list() ) {
+        my %player_hash = ();
+        if ( $player->to_hash( \%player_hash ) ) {
+            $data{'SETTINGS'}->{'PLAYERS'}->{ $player->id() } = \%player_hash;
+        }
+    }
 
     $data{'SETTINGS'}->{'PLAYERS_PENDING'} = [ $self->pending_players()->items() ];
     $data{'SETTINGS'}->{'PLAYERS_DONE'} = [ $self->done_players()->items() ];

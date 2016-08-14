@@ -224,9 +224,10 @@ sub action_add_player {
         return 0;
     }
 
-    if ( $self->user_ids()->contains( $args{'user_id'} ) ) {
-        $self->set_error( 'User ID Already Exists' );
-        return 0;
+    foreach my $player ( values( %{ $self->players() } ) ) {
+        if ( $player->user_id() eq $args{'user_id'} ) {
+            return 0;
+        }
     }
 
     $self->_raw_add_player( $EV_FROM_INTERFACE, $args{'user_id'} );
@@ -255,7 +256,15 @@ sub action_remove_player {
         return 0;
     }
 
-    unless ( $self->user_ids()->contains( $args{'user_id'} ) ) {
+    my $flag_exists = 0;
+
+    foreach my $player ( values( %{ $self->players() } ) ) {
+        if ( $player->user_id() eq $args{'user_id'} ) {
+            $flag_exists = 1;
+        }
+    }
+
+    unless ( $flag_exists ) {
         $self->set_error( 'User ID Doesn\'t Exist' );
         return 0;
     }
@@ -277,7 +286,7 @@ sub action_begin {
 
     # randomize player order
 
-    my @new_player_order = ( 0 .. $self->user_ids()->count() - 1 );
+    my @new_player_order = ( 0 .. scalar( keys( %{ $self->players } ) ) - 1 );
     shuffle_in_place( \@new_player_order );
 
     $self->_raw_set_player_order( $EV_FROM_INTERFACE, @new_player_order );

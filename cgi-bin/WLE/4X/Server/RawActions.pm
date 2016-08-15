@@ -60,7 +60,7 @@ my %actions = (
     \&_raw_return_influence_to_track    => 'return_influence_to_track',
     \&_raw_use_discovery                => 'use_discovery',
 
-    \&_raw_set_allowed_race_actions     => 'set_allowed_actions',
+    \&_raw_set_allowed_player_actions   => 'set_allowed_actions',
     \&_raw_increment_race_action        => 'inc_race_action',
 
     \&_raw_spend_influence              => 'spend_influence',
@@ -164,14 +164,13 @@ sub _raw_exchange {
         $self->_log_event( $source, __SUB__, @args );
     }
 
+    my $player_id   = shift( @args );
     my $res_from    = shift( @args );
     my $res_to      = shift( @args );
     my $quantity    = shift( @args );
 
-    my $race = $self->race_of_acting_player();
-
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        my ( $cost, $return ) = $race->exchange_rate( $res_from, $res_to );
+        my ( $cost, $return ) = $self->players()->{ $player_id }->race()->exchange_rate( $res_from, $res_to );
         return 'exchanged ' . $cost . ' ' . text_from_resource_enum( $res_from ) . ' for ' . $return . ' ' . text_from_resource_enum( $res_to );
     }
 
@@ -198,6 +197,7 @@ sub _raw_add_source {
     }
 
     $self->source_tags()->add_items( $tag );
+
 
     return;
 }
@@ -894,13 +894,12 @@ sub _raw_prepare_to_retreat_ships {
         $self->_log_event( $source, __SUB__, @args );
     }
 
+    my $player_id = shift( @args );
     my $tile_tag = shift( @args );
     my $template_tag = shift( @args );
 
-    my $race = $self->race_of_acting_player();
-
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return $race->tag() . ' begins retreating ships of type ' . $template_tag;
+        return $player_id . ' begins retreating ships of type ' . $template_tag;
     }
 
     $self->tag_ships_to_retreat( $tile_tag, $template_tag );
@@ -919,12 +918,11 @@ sub _raw_begin_attacking_population {
         $self->_log_event( $source, __SUB__, @args );
     }
 
+    my $player_id = shift( @args );
     my $tile_tag = shift( @args );
 
-    my $race = $self->race_of_acting_player();
-
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return $race->tag() . ' begins attacking population in ' . $tile_tag;
+        return $player_id . ' begins attacking population in ' . $tile_tag;
     }
 
     $self->attack_population( $tile_tag );
@@ -943,10 +941,10 @@ sub _raw_dont_kill_population {
         $self->_log_event( $source, __SUB__, @args );
     }
 
-    my $race = $self->race_of_acting_player();
+    my $player_id = shift( @args );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return $race->tag() . ' refrains from attacking population in ' . $self->current_tile();
+        return $player_id . ' refrains from attacking population in ' . $self->current_tile();
     }
 
     $self->next_population_attacker();
@@ -988,12 +986,11 @@ sub _raw_kill_population {
         $self->_log_event( $source, __SUB__, @args );
     }
 
+    my $player_id = shift( @args );
     my @cubes_to_kill = @args;
 
-    my $race = $self->race_of_acting_player();
-
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return $race->tag() . ' kills population in ' . $self->current_tile() . ': ' . join( ',', @cubes_to_kill );
+        return $player_id . ' kills population in ' . $self->current_tile() . ': ' . join( ',', @cubes_to_kill );
     }
 
     $self->kill_population( @cubes_to_kill );
@@ -1057,19 +1054,19 @@ sub _raw_add_vp_to_hand {
         $self->_log_event( $source, __SUB__, @args );
     }
 
-    my $race_tag = shift( @args );
+    my $player_id = shift( @args );
     my @vp_tokens = @args;
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return 'vp tokens added to ' . $race_tag . ' hand';
+        return 'vp tokens added to ' . $player_id . ' hand';
     }
 
     foreach my $token ( @vp_tokens ) {
-        $self->_raw_add_item_to_hand( $EV_SUB_ACTION, $race_tag, $token );
+        $self->_raw_add_item_to_hand( $EV_SUB_ACTION, $player_id, $token );
         $self->vp_bag()->remove_item( $token );
     }
 
-    $self->_raw_set_allowed_race_actions( $EV_SUB_ACTION, $race_tag, 'select_vp_token' );
+    $self->_raw_set_allowed_player_actions( $EV_SUB_ACTION, $player_id, 'select_vp_token' );
 
     return;
 }
@@ -1328,23 +1325,26 @@ sub _raw_select_race_and_location {
         $self->_log_event( $source, __SUB__, @args );
     }
 
+    my $player_id       = shift( @args );
     my $race_tag        = shift( @args );
     my $location_x      = shift( @args );
     my $location_y      = shift( @args );
     my $warp_gates      = shift( @args );
 
+    my $player = $self->players()->{ $player_id };
+
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return 'player ' . $self->current_player_id() . ' has selected ' . $race_tag . ' as race and is beginning at location ' . $location_x . ',' . $location_y;
+        return 'player ' . $player_id . ' has selected ' . $race_tag . ' as race and is beginning at location ' . $location_x . ',' . $location_y;
     }
 
-    $self->acting_player()->set_race_tag( $race_tag );
+    $player->set_race_tag( $race_tag );
 
     unless ( $self->has_option( 'all_races' ) ) {
-        my $backing_race = $self->acting_player()->race()->excludes();
+        my $backing_race = $player->race()->excludes();
         delete ( $self->races()->{ $backing_race } );
     }
 
-    my $start_hex_tag = $self->acting_player()->race()->home_tile();
+    my $start_hex_tag = $player->race()->home_tile();
 
     my $start_hex = $self->tiles()->{ $start_hex_tag };
 
@@ -1365,31 +1365,31 @@ sub _raw_select_race_and_location {
         my $open_slots = $start_hex->available_resource_spots( $type->[ 0 ], 0 );
 
         foreach ( 1 .. $open_slots ) {
-            $start_hex->add_cube( $self->acting_player()->id(), $type->[ 0 ], 0 )
+            $start_hex->add_cube( $player_id, $type->[ 0 ], 0 )
         }
 
-        if ( $self->acting_player()->race()->has_technology( $type->[ 1 ] ) ) {
+        if ( $player->race()->has_technology( $type->[ 1 ] ) ) {
 
             $open_slots = $start_hex->available_resource_spots( $type->[ 0 ], 1 );
 
             foreach ( 1 .. $open_slots ) {
-                $self->acting_player()->race()->resource_track_of( $type->[ 0 ] )->spend();
-                $start_hex->add_cube( $self->acting_player()->id(), $type->[ 0 ], 1 )
+                $player->race()->resource_track_of( $type->[ 0 ] )->spend();
+                $start_hex->add_cube( $player_id, $type->[ 0 ], 1 )
             }
         }
     }
 
     # build and place initial racial ships
 
-    foreach my $ship_class ( $self->acting_player()->race()->starting_ships() ) {
+    foreach my $ship_class ( $player->race()->starting_ships() ) {
 
-        my $template = $self->acting_player()->race()->template_of_class( $ship_class );
+        my $template = $player->race()->template_of_class( $ship_class );
 
         $self->_raw_create_ship_on_tile(
             $EV_SUB_ACTION,
             $start_hex->tag(),
             $template->tag(),
-            $self->acting_player()->id(),
+            $player_id,
         );
     }
 
@@ -1407,7 +1407,7 @@ sub _raw_place_cube_on_tile {
         $self->_log_event( $source, __SUB__, @args );
     }
 
-    my $race_tag        = shift( @args );
+    my $player_id       = shift( @args );
     my $tile_tag        = shift( @args );
     my $type            = shift( @args );
     my $flag_advanced   = shift( @args ); $flag_advanced = 0             unless defined( $flag_advanced );
@@ -1416,13 +1416,12 @@ sub _raw_place_cube_on_tile {
         if ( $flag_advanced ) {
             $type = '(adv) ' . $type;
         }
-        return $race_tag . ' placed ' . $type . ' cube on tile ' . $tile_tag;
+        return $player_id . ' placed ' . $type . ' cube on tile ' . $tile_tag;
     }
 
-    my $race = $self->races()->{ $race_tag };
     my $tile = $self->tiles()->{ $tile_tag };
 
-    $tile->add_cube( $race->owner_id(), $type, $flag_advanced );
+    $tile->add_cube( $player_id, $type, $flag_advanced );
 
     return;
 }
@@ -1438,14 +1437,14 @@ sub _raw_place_cube_on_track {
         $self->_log_event( $source, __SUB__, @args );
     }
 
-    my $race_tag    = shift( @args );
+    my $player_id   = shift( @args );
     my $cube_type   = shift( @args );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return $race_tag . ' returned cube to track ' . text_from_resource_enum( $cube_type );
+        return $player_id . ' returned cube to track ' . text_from_resource_enum( $cube_type );
     }
 
-    $self->race_of_acting_player()->resource_track_of( $cube_type )->add_to_track();
+    $self->players()->{ $player_id }->race()->resource_track_of( $cube_type )->add_to_track();
 
     return;
 }
@@ -1488,15 +1487,17 @@ sub _raw_pick_up_influence {
         $self->_log_event( $source, __SUB__, @args );
     }
 
+    my $player_id   = shift( @args );
     my $tile_tag    = shift( @args );
-    my $race        = $self->race_of_acting_player();
+
+    my $player = $self->players()->{ $player_id };
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return $race->tag() . ' picked up influence from ' . $tile_tag;
+        return $player_id . ' picked up influence from ' . $tile_tag;
     }
 
     if ( $tile_tag eq 'track' ) {
-        $race->resource_track_of( $RES_INFLUENCE )->spend();
+        $player->race()->resource_track_of( $RES_INFLUENCE )->spend();
     }
     else {
         my $tile = $self->tiles()->{ $tile_tag };
@@ -1504,7 +1505,7 @@ sub _raw_pick_up_influence {
         $self->_raw_remove_all_cubes_of_owner( $EV_SUB_ACTION, $tile_tag );
     }
 
-    $race->in_hand()->add_items( 'influence_token' );
+    $player->in_hand()->add_items( 'influence_token' );
 
     return;
 }
@@ -1520,15 +1521,16 @@ sub _raw_return_influence_to_track {
         $self->_log_event( $source, __SUB__, @args );
     }
 
-    my $race = $self->race_of_acting_player();
+    my $player_id = shift( @args );
+    my $player = $self->players()->{ $player_id };
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return $race->tag() . ' returned influence to the resource track';
+        return $player_id . ' returned influence to the resource track';
     }
 
-    $race->in_hand()->remove_item( 'influence_token' );
+    $player->in_hand()->remove_item( 'influence_token' );
 
-    $race->resource_track_of( $RES_INFLUENCE )->add_to_track();
+    $player->race()->resource_track_of( $RES_INFLUENCE )->add_to_track();
 
     return;
 }
@@ -1544,15 +1546,15 @@ sub _raw_remove_influence_from_tile {
         $self->_log_event( $source, __SUB__, @args );
     }
 
+    my $player_id   = shift( @args );
     my $tile_tag    = shift( @args );
-    my $race        = $self->race_of_acting_player();
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return $race->tag() . ' removed influence from tile ' . $tile_tag;
+        return $player_id . ' removed influence from tile ' . $tile_tag;
     }
 
-    $self->_raw_pick_up_influence( $EV_SUB_ACTION, $tile_tag );
-    $self->_raw_return_influence_to_track( $EV_SUB_ACTION );
+    $self->_raw_pick_up_influence( $EV_SUB_ACTION, $player_id, $tile_tag );
+    $self->_raw_return_influence_to_track( $EV_SUB_ACTION, $player_id );
 
     return;
 }
@@ -1569,24 +1571,26 @@ sub _raw_remove_all_cubes_of_owner {
     }
 
     my $tile_tag = shift( @args );
-    my $race = $self->race_of_acting_player();
+
+    my $tile = $self->tiles()->{ $tile_tag };
+    my $player = $self->players()->{ $tile->owner_id() };
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return $race->tag() . ' removed cubes from tile ' . $tile_tag;
+        return $player->id() . ' removed cubes from tile ' . $tile_tag;
     }
 
-    my @cubes = $self->tiles()->{ $tile_tag }->remove_all_cubes_of_owner( $race->owner_id() );
+    my @cubes = $self->tiles()->{ $tile_tag }->remove_all_cubes_of_owner( $player->id() );
 
     foreach my $cube_type ( @cubes ) {
         if ( $cube_type == $RES_WILD ) {
-            $self->_raw_add_item_to_hand( $EV_SUB_ACTION, 'cube:' . $cube_type );
+            $self->_raw_add_item_to_hand( $EV_SUB_ACTION, $player->id(), 'cube:' . $cube_type );
         }
         else {
-            if ( $race->resource_track_of( $cube_type )->available_spaces() > 0 ) {
-                $race->resource_track_of( $cube_type )->add_to_track();
+            if ( $player->race()->resource_track_of( $cube_type )->available_spaces() > 0 ) {
+                $player->race()->resource_track_of( $cube_type )->add_to_track();
             }
             else {
-                $self->_raw_add_item_to_hand( $EV_SUB_ACTION, 'cube:' . $RES_WILD );
+                $self->_raw_add_item_to_hand( $EV_SUB_ACTION, $player->id(), 'cube:' . $RES_WILD );
             }
         }
     }
@@ -1596,7 +1600,7 @@ sub _raw_remove_all_cubes_of_owner {
 
 #############################################################################
 
-sub _raw_set_allowed_race_actions {
+sub _raw_set_allowed_player_actions {
     my $self        = shift;
     my $source      = shift;
     my @args        = @_;
@@ -1605,13 +1609,13 @@ sub _raw_set_allowed_race_actions {
         $self->_log_event( $source, __SUB__, @args );
     }
 
-    my $race_tag    = shift( @args );
+    my $player_id   = shift( @args );
     my @allowed     = @args;
 
-    my $race = $self->races()->{ $race_tag };
+    my $player = $self->players()->{ $player_id };
 
-    $race->allowed_actions()->clear();
-    $race->allowed_actions()->add_items( @allowed );
+    $player->allowed_actions()->clear();
+    $player->allowed_actions()->add_items( @allowed );
 
     return;
 }
@@ -1671,12 +1675,7 @@ sub _raw_create_ship_on_tile {
     my $ship_tag        = $self->new_ship_tag( $template_tag, $owner_id );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        my $race_tag = $self->race_tag_of_acting_player();
-        if ( $race_tag eq '' ) {
-            $race_tag = 'game';
-        }
-
-        return $race_tag . ' created ship ' . $ship_tag . ' on tile ' . $tile_tag;
+        return $owner_id . ' created ship ' . $ship_tag . ' on tile ' . $tile_tag;
     }
 
     my $template = $self->templates()->{ $template_tag };
@@ -1714,12 +1713,8 @@ sub _raw_add_ship_to_tile {
     my $ship_tag = shift( @args );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        my $race_tag = $self->race_tag_of_acting_player();
-        if ( $race_tag eq '' ) {
-            $race_tag = 'game';
-        }
-
-        return $race_tag . ' placed ship ' . $ship_tag . ' on tile ' . $tile_tag;
+        my $ship = $self->ships()->{ $ship_tag };
+        return $ship->owner_id() . ' placed ship ' . $ship_tag . ' on tile ' . $tile_tag;
     }
 
 
@@ -1744,12 +1739,8 @@ sub _raw_remove_ship_from_tile {
     my $ship_tag = shift( @args );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        my $race_tag = $self->race_tag_of_acting_player();
-        if ( $race_tag eq '' ) {
-            $race_tag = 'game';
-        }
-
-        return $race_tag . ' removed ship ' . $ship_tag . ' from tile ' . $tile_tag;
+        my $ship = $self->ships()->{ $ship_tag };
+        return $ship->owner_id() . ' removed ship ' . $ship_tag . ' from tile ' . $tile_tag;
     }
 
 
@@ -1916,25 +1907,26 @@ sub _raw_use_discovery {
         $self->_log_event( $source, __SUB__, @args );
     }
 
+    my $player_id       = shift( @args );
     my $discovery_tag   = shift( @args );
     my $tile_tag        = shift( @args );
     my $flag_as_vp      = shift( @args );
 
-    my $race = $self->race_of_acting_player();
+    my $player = $self->players()->{ $player_id };
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
         my $as_text = ( $flag_as_vp == 1 ) ? 'as 2 vp' : 'for effect';
-        return $race->tag() . ' used discovery ' . $as_text;
+        return $player_id . ' used discovery ' . $as_text;
     }
 
     if ( $flag_as_vp ) {
-        $race->discovery_vps()->add_items( $discovery_tag );
+        $player->race()->discovery_vps()->add_items( $discovery_tag );
     }
     else {
         $self->use_discovery( $tile_tag, $discovery_tag );
     }
 
-    $race->in_hand()->remove_item( $tile_tag . ':' . $discovery_tag );
+    $player->in_hand()->remove_item( $tile_tag . ':' . $discovery_tag );
 
     return;
 }
@@ -2019,9 +2011,11 @@ sub _raw_increment_race_action {
         $self->_log_event( $source, __SUB__, @args );
     }
 
-    my $race = $self->race_of_acting_player();
+    my $player_id = shift( @args );
 
-    $race->set_action_count( $race->action_count() + 1 );
+    my $player = $self->players()->{ $player_id };
+
+    $player->race()->set_action_count( $player->race()->action_count() + 1 );
 
     return;
 }
@@ -2037,13 +2031,15 @@ sub _raw_spend_influence {
         $self->_log_event( $source, __SUB__, @args );
     }
 
-    my $race = $self->race_of_acting_player();
+    my $player_id = shift( @args );
+
+    my $player = $self->players()->{ $player_id };
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return $race->tag() . ' spent 1 influence';
+        return $player_id . ' spent 1 influence';
     }
 
-    $race->resource_track_of( $RES_INFLUENCE )->spend_but_keep();
+    $player->race()->resource_track_of( $RES_INFLUENCE )->spend_but_keep();
 
     return;
 }
@@ -2059,16 +2055,17 @@ sub _raw_spend_resource {
         $self->_log_event( $source, __SUB__, @args );
     }
 
+    my $player_id       = shift( @args );
     my $resource_type   = shift( @args );
     my $amount          = shift( @args );
 
-    my $race = $self->race_of_acting_player();
+    my $player = $self->players()->{ $id };
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return $race->tag() . ' spent ' . $amount . ' ' . text_from_resouce_enum( $resource_type );;
+        return $player_id . ' spent ' . $amount . ' ' . text_from_resouce_enum( $resource_type );;
     }
 
-    $race->add_resource( $resource_type, - $amount );
+    $player->race()->add_resource( $resource_type, - $amount );
 
     return;
 }
@@ -2084,18 +2081,19 @@ sub _raw_upgrade_ship_component {
         $self->_log_event( $source, __SUB__, @args );
     }
 
+    my $player_id       = shift( @args );
     my $template_tag    = shift( @args );
     my $component_tag   = shift( @args );
     my $replaces        = shift( @args );
 
-    my $race = $self->race_of_acting_player();
+    my $player = $self->players()->{ $player_id };
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
         if ( $replaces eq '' ) {
-            return $race->tag() . ' upgraded template ' . $template_tag . ' with ' . $component_tag;
+            return $player_id . ' upgraded template ' . $template_tag . ' with ' . $component_tag;
         }
         else {
-            return $race->tag() . ' upgraded template ' . $template_tag . ' replacing ' . $replaces . ' with ' . $component_tag;
+            return $player_id . ' upgraded template ' . $template_tag . ' replacing ' . $replaces . ' with ' . $component_tag;
         }
     }
 
@@ -2104,7 +2102,7 @@ sub _raw_upgrade_ship_component {
     my $message_holder = '';
     $template->add_component( $component_tag, $replaces, \$message_holder );
 
-    $race->component_overflow()->remove_item( $component_tag );
+    $player->race()->component_overflow()->remove_item( $component_tag );
 
     return;
 }
@@ -2120,22 +2118,23 @@ sub _raw_use_colony_ship {
         $self->_log_event( $source, __SUB__, @args );
     }
 
+    my $player_id   = shift( @args );
     my $tile_tag    = shift( @args );
     my $type        = shift( @args );
     my $advanced    = shift( @args );
 
-    my $race = $self->race_of_acting_player();
+    my $player = $self->players()->{ $player_id };
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
         my $advanced_text = ( $advanced == 1 ) ? ' (adv) ' : '';
-        return $race->tag() . ' used colony ship to place an ' . $advanced_text . text_from_resource_enum( $type ) . ' cube on ' . $tile_tag;
+        return $player_id . ' used colony ship to place an ' . $advanced_text . text_from_resource_enum( $type ) . ' cube on ' . $tile_tag;
     }
 
-    $race->set_colony_ships_used( $race->colony_ships_used() + 1 );
+    $player->race()->set_colony_ships_used( $player->race()->colony_ships_used() + 1 );
 
-    $race->track_tag( $type )->spend();
+    $player->race()->track_tag( $type )->spend();
 
-    $self->_raw_place_cube_on_tile( $race->tag(), $tile_tag, $type, $advanced );
+    $self->_raw_place_cube_on_tile( $EV_SUB_ACTION, $player_id, $tile_tag, $type, $advanced );
 
     return;
 }
@@ -2151,13 +2150,15 @@ sub _raw_unuse_colony_ship {
         $self->_log_event( $source, __SUB__, @args );
     }
 
-    my $race = $self->race_of_acting_player();
+    my $player_id = shift( @args );
+
+    my $player = $self->players()->{ $player_id };
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return $race->tag() . ' flipped a colony ship';
+        return $player_id . ' flipped a colony ship';
     }
 
-    $race->set_colony_ships_used( $race->colony_ships_used() - 1 );
+    $player->race()->set_colony_ships_used( $player->race()->colony_ships_used() - 1 );
 
     return;
 }
@@ -2173,14 +2174,14 @@ sub _raw_add_item_to_hand {
         $self->_log_event( $source, __SUB__, @args );
     }
 
-    my $race = $self->race_of_acting_player();
+    my $player_id = shift( @args );
     my $item = shift( @args );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
         return 'added to hand: ' . $item;
     }
 
-    $race->in_hand()->add_items( $item );
+    $self->players()->{ $player_id }->in_hand()->add_items( $item );
 
     return;
 }
@@ -2196,14 +2197,14 @@ sub _raw_remove_item_from_hand {
         $self->_log_event( $source, __SUB__, @args );
     }
 
-    my $race = $self->race_of_acting_player();
+    my $player_id = shift( @args );
     my $item = shift( @args );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return 'removed from hand: ' . $item;
+        return $player_id . 'removed from hand: ' . $item;
     }
 
-    $race->in_hand()->remove_item( $item );
+    $self->players()->{ $player_id }->in_hand()->remove_item( $item );
 
     return;
 }
@@ -2219,28 +2220,29 @@ sub _raw_buy_technology {
         $self->_log_event( $source, __SUB__, @args );
     }
 
+    my $player_id = shift( @args );
     my $tech_tag = shift( @args );
     my $track_type = shift( @args );
 
-    my $race = $self->race_of_acting_player();
+    my $player = $self->players()->{ $player_id };
     my $tech = $self->technologies()->{ $tech_tag };
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return $race->tag() . ' researched ' . $tech_tag;
+        return $player_id . ' researched ' . $tech_tag;
     }
 
     my $cost = $self->technologies()->base_cost();
-    my $credit = $race->tech_track_of( $track_type )->current_credit();
+    my $credit = $player->race()->tech_track_of( $track_type )->current_credit();
 
     $cost -= $credit;
     if ( $cost < $tech->min_cost() ) {
         $cost = $tech->min_cost();
     }
 
-    $race->add_resource( $RES_SCIENCE, - $cost );
+    $player->race()->add_resource( $RES_SCIENCE, - $cost );
 
     $self->_raw_remove_from_available_tech( $EV_SUB_ACTION, $tech_tag );
-    $self->_raw_add_to_tech_track( $EV_SUB_ACTION, $tech_tag, $track_type );
+    $self->_raw_add_to_tech_track( $EV_SUB_ACTION, $player_id, $tech_tag, $track_type );
 
     return;
 }
@@ -2256,16 +2258,15 @@ sub _raw_add_to_tech_track {
         $self->_log_event( $source, __SUB__, @args );
     }
 
-    my $race = $self->race_of_acting_player();
-
+    my $player_id = shift( @args );
     my $tech_tag = shift( @args );
     my $track_type = shift( @args );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return $race->tag() . ' added ' . $tech_tag . ' to tech track ' . text_from_tech_enum( $track_type );
+        return $player_id . ' added ' . $tech_tag . ' to tech track ' . text_from_tech_enum( $track_type );
     }
 
-    $race->tech_track_of( $track_type )->add_techs( $tech_tag );
+    $self->players()->{ $player_id }->race()->tech_track_of( $track_type )->add_techs( $tech_tag );
 
     return;
 }
@@ -2281,11 +2282,13 @@ sub _raw_player_pass_action {
         $self->_log_event( $source, __SUB__, @args );
     }
 
+    my $player_id = shift( @args );
+
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return $self->acting_player()->race()->tag() . ' passed';
+        return $player_id . ' passed';
     }
 
-    $self->acting_player()->set_flag_passed( 1 );
+    $self->players()->{ $player_id }->set_flag_passed( 1 );
 
     return;
 }
@@ -2301,11 +2304,13 @@ sub _raw_next_player {
         $self->_log_event( $source, __SUB__, @args );
     }
 
+    my $player_id = shift( @args );
+
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
         return 'next player';
     }
 
-    $self->acting_player()->end_turn();
+    $self->players()->{ $player_id }->end_turn();
 
     my $done_player = $self->waiting_on_player_id();
     $self->pending_players()->remove_item( $done_player );
@@ -2313,11 +2318,7 @@ sub _raw_next_player {
 
     if ( $self->pending_players()->count() > 0 ) {
         my $current_player = ( $self->pending_players()->items() )[ 0 ];
-
-        my $race = $self->race_of_player_id( $current_player );
-        if ( defined( $race ) ) {
-            $race->start_turn();
-        }
+        $current_player->start_turn();
 
         $self->set_waiting_on_player_id( $current_player );
         return;
@@ -2337,8 +2338,7 @@ sub _raw_next_player {
             $self->done_players()->clear();
             $self->set_waiting_on_player_id( ( $self->pending_players()->items() )[ 0 ] );
 
-            my $race = $self->race_of_player_id ( $self->waiting_on_player_id() );
-            $race->start_turn();
+            $self->players()->{ $self->waiting_on_player_id() }->start_turn();
         }
         else {
             $self->set_waiting_on_player_id( -1 );

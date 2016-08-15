@@ -537,6 +537,7 @@ sub action_exchange {
 
     $self->_raw_exchange(
         $EV_FROM_INTERFACE,
+        $self->acting_player()->id(),
         enum_from_resource_text( $args{'res_from'} ),
         enum_from_resource_text( $args{'res_to'} ),
     );

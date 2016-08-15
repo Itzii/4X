@@ -61,11 +61,8 @@ sub action_attack {
     }
 
     $self->_raw_make_attack_rolls( $EV_FROM_INTERFACE, @rolls );
-
     $self->_raw_set_pending_player( $EV_FROM_INTERFACE, $ship_owner );
-
-    my $race = $self->race_of_player_id( $ship_owner );
-    $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $race->tag(), 'allocate_hits' );
+    $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $ship_owner, 'allocate_hits' );
 
     return 1;
 }
@@ -133,10 +130,10 @@ sub action_roll_npc {
 
     if ( $missile_defense_hits > 0 ) {
         $self->_raw_set_defense_hits( $EV_FROM_INTERFACE, $missile_defense_hits );
-        $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $self->race_of_player_id( $enemy_id ), 'allocate_defense_hits' );
+        $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $enemy_id, 'allocate_defense_hits' );
     }
     else {
-        $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $self->race_of_player_id( $enemy_id ), 'acknowledge_hits' );
+        $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $enemy_id, 'acknowledge_hits' );
     }
 
     return 1;
@@ -214,17 +211,17 @@ sub action_allocate_hits {
         }
 
         $self->_raw_set_pending_player( $EV_FROM_INTERFACE, $self_id );
-        $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $self->race_of_player_id( $self_id ), 'acknowledge_hits' );
+        $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $self_id, 'acknowledge_hits' );
     }
     else {
         $self->_raw_set_pending_player( $enemy_id );
 
         if ( $missile_defense_hits > 0 ) {
             $self->_raw_set_defense_hits( $EV_FROM_INTERFACE, $missile_defense_hits );
-            $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $self->race_of_player_id( $enemy_id ), 'allocate_defense_hits' );
+            $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $enemy_id, 'allocate_defense_hits' );
         }
         else {
-            $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $self->race_of_player_id( $enemy_id ), 'acknowledge_hits' );
+            $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $enemy_id, 'acknowledge_hits' );
         }
     }
 
@@ -288,11 +285,11 @@ sub action_allocate_defense_hits {
 
     if ( $enemy_id == -1 ) {
         $self->_raw_set_pending_player( $EV_FROM_INTERFACE, $self_id );
-        $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $self->race_of_player_id( $self_id ), 'acknowledge_hits' );
+        $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $self_id, 'acknowledge_hits' );
     }
     else {
         $self->_raw_set_pending_player( $EV_FROM_INTERFACE, $enemy_id );
-        $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $self->race_of_player_id( $enemy_id ), 'acknowledge_hits' );
+        $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $enemy_id, 'acknowledge_hits' );
     }
 
     return 1;
@@ -323,7 +320,7 @@ sub action_retreat {
     my $tile_tag = $self->current_tile();
     my $template_tag = ($self->template_combat_order())[ 0 ];
 
-    $self->_raw_prepare_to_retreat_ships( $EV_FROM_INTERFACE, $tile_tag, $template_tag );
+    $self->_raw_prepare_to_retreat_ships( $EV_FROM_INTERFACE, $self->acting_player()->id(), $tile_tag, $template_tag );
 
     return 1;
 }
@@ -351,10 +348,8 @@ sub action_attack_populace {
         }
     }
 
-    my $race = $self->race_of_player_id( $tile->owner_id() );
-
     $self->_raw_allocate_population_hits( $EV_FROM_INTERFACE, @hits );
-    $self->_raw_set_allowed_race_actions( $EV_FROM_INTERFACE, $race->tag(), 'apply_population_hits' );
+    $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $tile->owner_id(), 'apply_population_hits' );
 
     return 1;
 }
@@ -392,7 +387,7 @@ sub action_apply_population_hits {
         push( @types_to_kill, $type );
     }
 
-    $self->_raw_kill_population( $EV_FROM_INTERFACE, @types_to_kill );
+    $self->_raw_kill_population( $EV_FROM_INTERFACE, $self->acting_player()->id(), @types_to_kill );
 
     return 1;
 }
@@ -403,7 +398,7 @@ sub action_dont_attack_populace {
     my $self            = shift;
     my %args            = @_;
 
-    $self->_raw_dont_kill_population( $EV_FROM_INTERFACE );
+    $self->_raw_dont_kill_population( $EV_FROM_INTERFACE, $self->acting_player()->id() );
 
     return 1;
 }
@@ -629,9 +624,8 @@ sub next_combat_ships {
         return;
     }
     else { # computer player
-        my $real_player_id = $self->real_player_in_combat();
         $self->set_waiting_on_player_id( $real_player_id );
-        $self->_raw_set_allowed_race_actions( $EV_SUB_ACTION, $self->race_of_player_id( $real_player_id )->tag(), 'roll_npc' );
+        $self->_raw_set_allowed_player_actions( $EV_SUB_ACTION, $real_player_id, 'roll_npc' );
         return;
     }
 }
@@ -686,7 +680,7 @@ sub start_combat_round {
             else { # computer player
                 my $real_player_id = $self->real_player_in_combat();
                 $self->set_waiting_on_player_id( $real_player_id );
-                $self->_raw_set_allowed_race_actions( $EV_SUB_ACTION, $self->race_of_player_id( $real_player_id )->tag(), 'roll_npc' );
+                $self->_raw_set_allowed_player_actions( $EV_SUB_ACTION, $real_player_id, 'roll_npc' );
                 return 1;
             }
         }
@@ -705,7 +699,7 @@ sub start_combat_round {
         else { # computer player
             my $real_player_id = $self->real_player_in_combat();
             $self->set_waiting_on_player_id( $real_player_id );
-            $self->_raw_set_allowed_race_actions( $EV_SUB_ACTION, $self->race_of_player_id( $real_player_id )->tag(), 'roll_npc' );
+            $self->_raw_set_allowed_player_actions( $EV_SUB_ACTION, $real_player_id, 'roll_npc' );
             return 1;
         }
     }
@@ -770,10 +764,7 @@ sub attack_population {
 
         my $next_player = $ship_owners[ 0 ];
         $self->_raw_set_pending_player( $EV_SUB_ACTION, $next_player );
-
-        my $race = $self->race_of_player_id( $next_player );
-
-        $self->_raw_set_allowed_race_actions( $EV_SUB_ACTION, $race->tag(), 'attack_populace', 'dont_attack_populace' );
+        $self->_raw_set_allowed_player_actions( $EV_SUB_ACTION, $next_player, 'attack_populace', 'dont_attack_populace' );
         return;
     }
 
@@ -833,9 +824,7 @@ sub next_population_attacker {
 
     if ( $tile->attack_population_queue()->count() > 0 ) {
         $self->_raw_set_pending_player( $pending[ 0 ] );
-
-        my $race = $self->race_of_player_id( $pending[ 0 ] );
-        $self->_raw_set_allowed_race_actions( $EV_SUB_ACTION, $race->tag(), 'attack_populace', 'dont_attack_populace' );
+        $self->_raw_set_allowed_player_actions( $EV_SUB_ACTION, $pending[ 0 ], 'attack_populace', 'dont_attack_populace' );
 
         return;
     }
@@ -951,9 +940,7 @@ sub next_vp_draw {
 
     my $tile = $self->tiles()->{ $tile_tag };
 
-    my $race = $self->race_of_player_id( $self->waiting_on_player_id() );
-
-    $self->_raw_set_allowed_race_actions( $EV_SUB_ACTION, $race->tag(), 'draw_vp' );
+    $self->_raw_set_allowed_player_actions( $EV_SUB_ACTION, $self->waiting_on_player_id(), 'draw_vp' );
 
     return;
 }

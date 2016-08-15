@@ -38,22 +38,12 @@ sub action_create_game {
         return 0;
     }
 
-    unless ( defined( $args{'source_tags'} ) ) {
-        $self->set_error( 'Missing Source Tags' );
-        return 0;
-    }
-
-    if ( $args{'source_tags'} eq '' ) {
-        $self->set_error( 'Must have at least one source tag.' );
-        return 0;
-    }
-
     unless ( $self->_open_for_writing( $self->log_id(), 1 ) ) {
         print STDERR "Failed to open for writing.";
         return 0;
     }
 
-    my @source_tags = split( ',', $args{'source_tags'} );
+    my @source_tags = ( 'src_base', split( ',', $args{'source_tags'} ) );
     my @option_tags = ();
 
     if ( defined( $args{'option_tags'} ) ) {
@@ -67,6 +57,18 @@ sub action_create_game {
         \@source_tags,
         \@option_tags,
     );
+
+    my @actions = ( 'add_player', 'add_source', 'add_option' );
+
+    if ( scalar( @source_tags ) > 1 ) {
+        push( @actions, 'remove_source' );
+    }
+
+    if ( scalar( @option_tags ) > 0 ) {
+        push( @actions, 'remove_option' );
+    }
+
+    $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, 0, @actions );
 
     return 1;
 }
@@ -439,15 +441,16 @@ sub action_select_race_and_location {
 
     $self->_raw_select_race_and_location(
         $EV_FROM_INTERFACE,
+        $self->acting_player()->id(),
         $args{'race_tag'},
         $args{'location_x'},
         $args{'location_y'},
         $location_warps,
     );
 
-    $self->_raw_player_pass_action( $EV_FROM_INTERFACE );
+    $self->_raw_player_pass_action( $EV_FROM_INTERFACE, $self->acting_player()->id() );
 
-    $self->_raw_next_player( $EV_FROM_INTERFACE );
+    $self->_raw_next_player( $EV_FROM_INTERFACE, $self->acting_player()->id() );
 
 #    print STDERR "\nNext User: " . $self->user_id_of_player_id( $self->waiting_on_player_id() );
 #    print STDERR "\nNext Player: " . $self->waiting_on_player_id();

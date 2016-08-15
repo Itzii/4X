@@ -112,7 +112,7 @@ sub long_name {
     my $self        = shift;
 
     if ( $self->{'LONG_NAME'} eq '' ) {
-        return 'Player #' . $self->get_user_id();
+        return 'Player #' . $self->user_id();
     }
 
     return $self->{'LONG_NAME'};

@@ -42,8 +42,8 @@ my @_test_methods = (
 	[ 'WLE::4X::Objects::Board'							, \&test_Object_Board ],
 
 
-	[ 'WLE::4X::Objects::Server'						, \&test_Object_Server ],
-	[ 'WLE::4X::Objects::ASCII_Server'					, \&test_Object_Ascii_Server ],
+	[ 'WLE::4X::Server::Server'					  		, \&test_Object_Server ],
+	[ 'WLE::4X::Server::ASCII_Server'					, \&test_Object_Ascii_Server ],
 
 
 );

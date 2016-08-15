@@ -140,7 +140,7 @@ $VAR1 = {
             'DEVELOPMENTS' => 5,
             'POSITIONS' => [
                 {
-                    'SPACE' => '2,2',
+                    'SPACE' => '2,-2',
                     'WARPS' => 54,
                 },
                 {
@@ -148,7 +148,7 @@ $VAR1 = {
                     'WARPS' => 54,
                 },
                 {
-                    'SPACE' => '-2,-2',
+                    'SPACE' => '-2,2',
                     'WARPS' => 54,
                 },
                 {
@@ -209,7 +209,7 @@ $VAR1 = {
                     'WARPS' => 54,
                 },
                 {
-                    'SPACE' => '-2,-2',
+                    'SPACE' => '-2,2',
                     'WARPS' => 54,
                 },
                 {

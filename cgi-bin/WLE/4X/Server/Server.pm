@@ -1,4 +1,4 @@
-package WLE::4X::Objects::Server;
+package WLE::4X::Server::Server;
 
 use strict;
 use warnings;
@@ -12,10 +12,10 @@ use WLE::Methods::Simple;
 
 use WLE::4X::Enums::Status;
 
-use WLE::4X::Objects::MetaActions;
-use WLE::4X::Objects::PlayerActions;
-use WLE::4X::Objects::RawActions;
-use WLE::4X::Objects::ServerState;
+use WLE::4X::Server::MetaActions;
+use WLE::4X::Server::PlayerActions;
+use WLE::4X::Server::RawActions;
+use WLE::4X::Server::ServerState;
 
 use WLE::4X::Objects::Element;
 use WLE::4X::Objects::Player;
@@ -206,8 +206,8 @@ sub do {
     $response{'message'} = $self->last_error();
     $response{'data'} = $self->returned_data();
 
-    print STDERR "\nActing Player Type - Bare : " . ref( $self->{'ENV'}->{'ACTING_PLAYER'} );
-    print STDERR "\nActing Player Type: " . ref( $self->acting_player() );
+#    print STDERR "\nActing Player Type - Bare : " . $self->{'ENV'}->{'ACTING_PLAYER'};
+#    print STDERR "\nActing Player Type: " . $self->acting_player();
 
     $response{'allowed'} = [ $self->acting_player()->adjusted_allowed_actions()->items() ];
 
@@ -307,7 +307,14 @@ sub _check_allowed_action {
 #        print STDERR "\n ( " . $self->outside_status() . " )";
     }
 
-    $self->{'ENV'}->{'ACTING_PLAYER'} = $self->player_of_user_id( $user_id );
+    if ( $user_id == -1 ) {
+        my $anon_user = WLE::4X::Objects::Player->new( 'server' => $self, 'user_id' => -1 );
+        $anon_user->set_long_name( 'Anonymous Player' );
+        $self->{'ENV'}->{'ACTING_PLAYER'} = $anon_user;
+    }
+    else {
+        $self->{'ENV'}->{'ACTING_PLAYER'} = $self->player_of_user_id( $user_id );
+    }
 
     if ( defined( $action->{'flag_anytime'} ) ) {
         return '';
@@ -341,7 +348,7 @@ sub _check_allowed_action {
 
         unless ( defined( $action->{'flag_ignore_allowed'} ) ) {
             unless ( $self->acting_player()->adjusted_allowed_actions()->contains( $action_tag ) ) {
-                print STDERR "\nAllowed Actions: " . join( ',', $self->acting_player()->allowed_actions()->items() );
+#                print STDERR "\nAllowed Actions: " . join( ',', $self->acting_player()->allowed_actions()->items() );
                 return 'Action is not allowed by player at this time.';
             }
         }

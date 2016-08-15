@@ -1,9 +1,9 @@
-package WLE::4X::Objects::Server;
+package WLE::4X::Server::Server;
 
 use strict;
 use warnings;
 
-use WLE::Methods::Simple qw( matches_any );
+use WLE::Methods::Simple qw( matches_any shuffle_in_place looks_like_number );
 
 use WLE::4X::Enums::Basic;
 
@@ -334,7 +334,7 @@ sub action_begin {
 
     my @developments = keys( %{ $self->developments() } );
 
-    WLE::Methods::Simple::shuffle_in_place( \@developments );
+    shuffle_in_place( \@developments );
 
     if ( $self->development_limit() > -1 ) {
         while ( scalar( @developments ) > $self->development_limit() ) {
@@ -399,8 +399,8 @@ sub action_select_race_and_location {
     }
 
     unless (
-        WLE::Methods::Simple::looks_like_number( $args{'location_x'} )
-        && WLE::Methods::Simple::looks_like_number( $args{'location_y'} )
+        looks_like_number( $args{'location_x'} )
+        && looks_like_number( $args{'location_y'} )
     ) {
         $self->set_error( 'Invalid location data.' );
         return 0;
@@ -432,7 +432,7 @@ sub action_select_race_and_location {
         $location_warps = $args{'warps'};
     }
 
-    unless ( WLE::Methods::Simple::looks_like_number( $location_warps ) ) {
+    unless ( looks_like_number( $location_warps ) ) {
         $self->set_error( "Invalid 'warps' argument." );
         return 0;
     }
@@ -507,8 +507,8 @@ sub _prepare_for_first_round {
     $self->set_state( $ST_NORMAL );
     $self->set_subphase( $SUB_NULL );
 
-    foreach my $race ( values( %{ $self->races() } ) ) {
-        $race->set_flag_passed( 0 );
+    foreach my $player ( $self->player_list() ) {
+        $player->set_flag_passed( 0 );
     }
 
     $self->_raw_set_status( $EV_FROM_INTERFACE, $self->status() );

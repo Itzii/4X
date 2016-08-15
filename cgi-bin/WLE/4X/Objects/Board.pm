@@ -391,7 +391,7 @@ sub _explorable_from_location {
         return ();
     }
 
-    my $has_wormhole = $self->server()->race_of_acting_player()->has_technology( 'tech_wormhole_generator' );
+    my $has_wormhole = $self->server()->acting_player()->race()->has_technology( 'tech_wormhole_generator' );
 
     my @adjacents = ();
 

@@ -1,4 +1,4 @@
-package WLE::4X::Objects::Server;
+package WLE::4X::Server::Server;
 
 use strict;
 use warnings;

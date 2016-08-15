@@ -1,4 +1,4 @@
-package WLE::4X::Objects::ASCII_Server;
+package WLE::4X::Server::ASCII_Server;
 
 use strict;
 use warnings;
@@ -10,7 +10,7 @@ use WLE::Methods::Simple;
 use WLE::4X::Enums::Basic;
 use WLE::4X::Enums::Status; # qw( state_text_from_enum phase_text_from_enum subphase_text_from_enum );
 
-use parent 'WLE::4X::Objects::Server';
+use parent 'WLE::4X::Server::Server';
 
 #############################################################################
 
@@ -29,7 +29,7 @@ sub _init {
     my $self		= shift;
     my %args		= @_;
 
-    $self->WLE::4X::Objects::Server::_init( %args );
+    $self->WLE::4X::Server::Server::_init( %args );
 
     return $self;
 }
@@ -69,7 +69,7 @@ sub do {
         return %response;
     }
 
-    %response = $self->WLE::4X::Objects::Server::do( %args );
+    %response = $self->WLE::4X::Server::Server::do( %args );
 
     # testing only
     $self->_fill_text_data();

@@ -11,11 +11,11 @@ use lib ".";
 
 use Data::Dumper;
 
-use WLE::4X::Objects::ASCII_Server;
+use WLE::4X::Server::ASCII_Server;
 
 my %args = _parse_commandline();
 
-my $server = WLE::4X::Objects::ASCII_Server->new(
+my $server = WLE::4X::Server::ASCII_Server->new(
     'resource_file'		=> "../resources/official.res",
     'state_files'		=> "../statefiles",
     'log_files'			=> "../statefiles",

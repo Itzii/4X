@@ -1,4 +1,4 @@
-package WLE::4X::Objects::Server;
+package WLE::4X::Server::Server;
 
 use strict;
 use warnings;
@@ -116,6 +116,9 @@ sub _raw_create_game {
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
         return 'game created by ' . $owner_id . '. sources used: ' . join( ',', @{ $r_source_tags } ) . '; options used: ' . join( ',', @{ $r_option_tags } );
     }
+
+    $self->set_waiting_on_player_id( 0 );
+    $self->set_subphase( $SUB_NULL );
 
     $self->set_long_name( $long_name );
     $self->source_tags()->fill( @{ $r_source_tags } );
@@ -367,17 +370,17 @@ sub _raw_begin {
         return 0;
     }
 
-    my $settings = $VAR1->{'PLAYER_COUNT_SETTINGS'}->{ scalar( $self->players_list() ) };
+    my $settings = $VAR1->{'PLAYER_COUNT_SETTINGS'}->{ scalar( $self->player_list() ) };
 #    print STDERR "\nPlayer Count: " . scalar( $self->players_list() );
 
     unless ( defined( $settings ) ) {
-        $self->set_error( 'Invalid Player Count: ' . scalar( $self->players_list() ) );
+        $self->set_error( 'Invalid Player Count: ' . scalar( $self->player_list() ) );
         print STDERR $self->last_error();
         return 0;
     }
 
     unless ( $self->source_tags()->contains( $settings->{'SOURCE_TAG'} ) ) {
-        $self->set_error( 'Invalid player count for chosen sources: ' . scalar( $self->players_list() ) );
+        $self->set_error( 'Invalid player count for chosen sources: ' . scalar( $self->player_list() ) );
         print STDERR $self->last_error();
         return 0;
     }
@@ -577,7 +580,6 @@ sub _raw_begin {
         if ( defined( $race ) ) {
 
             if ( $self->item_is_allowed_in_game( $race ) ) {
-                $race->set_flag_passed( 1 );
                 $self->races()->{ $race->tag() } = $race;
             }
             else {
@@ -2279,13 +2281,11 @@ sub _raw_player_pass_action {
         $self->_log_event( $source, __SUB__, @args );
     }
 
-    my $race = $self->race_of_acting_player();
-
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return $race->tag() . ' passed';
+        return $self->acting_player()->race()->tag() . ' passed';
     }
 
-    $race->set_flag_passed( 1 );
+    $self->acting_player()->set_flag_passed( 1 );
 
     return;
 }
@@ -2305,10 +2305,7 @@ sub _raw_next_player {
         return 'next player';
     }
 
-    my $race = $self->race_of_acting_player();
-    if ( defined( $race ) ) {
-        $race->end_turn();
-    }
+    $self->acting_player()->end_turn();
 
     my $done_player = $self->waiting_on_player_id();
     $self->pending_players()->remove_item( $done_player );
@@ -2317,7 +2314,7 @@ sub _raw_next_player {
     if ( $self->pending_players()->count() > 0 ) {
         my $current_player = ( $self->pending_players()->items() )[ 0 ];
 
-        $race = $self->race_of_player_id( $current_player );
+        my $race = $self->race_of_player_id( $current_player );
         if ( defined( $race ) ) {
             $race->start_turn();
         }
@@ -2328,8 +2325,8 @@ sub _raw_next_player {
     else {
         my $flag_continue_round = 0;
 
-        foreach my $race ( values( %{ $self->races() } ) ) {
-            unless ( $race->has_passed() ) {
+        foreach my $player ( $self->player_list() ) {
+            unless ( $player->has_passed() ) {
                 $flag_continue_round = 1;
                 last;
             }
@@ -2340,7 +2337,7 @@ sub _raw_next_player {
             $self->done_players()->clear();
             $self->set_waiting_on_player_id( ( $self->pending_players()->items() )[ 0 ] );
 
-            $race = $self->race_of_player_id ( $self->waiting_on_player_id() );
+            my $race = $self->race_of_player_id ( $self->waiting_on_player_id() );
             $race->start_turn();
         }
         else {
@@ -2399,9 +2396,8 @@ sub _raw_start_next_round {
 
     my $next_player = ( $self->pending_players()->items() )[ 0 ];
 
-
-    my $race = $self->race_of_player_id( $next_player );
-    $race->start_turn();
+    my $player = $self->players()->{ $next_player };
+    $player->start_turn();
 
     $self->set_state( $ST_NORMAL );
     $self->set_round( $new_round );

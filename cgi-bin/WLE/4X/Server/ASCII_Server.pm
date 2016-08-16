@@ -86,35 +86,42 @@ sub _fill_text_data {
 
     my @lines = $self->_info_board();
 
+    if ( $self->state() != $ST_PREGAME ) {
+        push( @lines, $self->_info_available_tech() );
+    }
+
+    push( @lines, $self->_info_players() );
+
     my $tile = $self->tiles()->{ $self->current_tile() };
     my $tile_name = ( defined( $tile ) ) ? $tile->long_name() : '';
 
-    my $waiting_on = ' ';
-    if ( $self->waiting_on_player_id() > -1 ) {
-        $waiting_on = 'Waiting on ' . $self->user_id_of_player_id( $self->waiting_on_player_id() );
-    }
-
     my $status_text = sprintf(
-        '%s - %s - %s - %s - %s - %s ',
+        '%s - %s - %s - %s - %s ',
         state_text_from_enum( $self->state() ),
         $self->round(),
         phase_text_from_enum( $self->phase() ),
-        $waiting_on,
         subphase_text_from_enum( $self->subphase() ),
         $tile_name,
 
     );
 
+    push( @lines, '' );
+    push( @lines, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^' );
     push( @lines, 'Current Game State: ' . $status_text );
 
-    push( @lines, $self->_info_available_tech() );
+    if ( $self->waiting_on_player_id() > -1 ) {
+        push( @lines, '' );
 
-    push( @lines, $self->_info_players() );
+        my @actions = $self->player_of_id( $self->waiting_on_player_id() )->allowed_actions()->items();
 
-
-
-
-
+        push(
+            @lines,
+            'Waiting On: '
+                . $self->user_id_of_player_id( $self->waiting_on_player_id() )
+                . '  --  Available Actions: '
+                . join( ',', sort( @actions ) )
+        );
+    }
 
     $self->set_returned_data( join( "\n", @lines ) );
 
@@ -537,7 +544,7 @@ sub _get_ship_text_of_owner_id {
 sub _info_available_tech {
     my $self            = shift;
 
-    my @lines = ( "\n" );
+    my @lines = ( "\n", 'Available Technology: ' );
     my %available_tech = ();
     my %tech_counts = ();
 
@@ -606,7 +613,7 @@ sub _player_ascii {
     my $waiting_on_text = '';
 
     if ( $self->waiting_on_player_id() == $player->id() ) {
-        $waiting_on_text = ' *waiting on* ' . join( ',', $player->allowed_actions()->items() );
+        $waiting_on_text = ' *waiting on* ';
 
 
         if ( $player->has_tile_in_hand() ) {
@@ -663,8 +670,15 @@ sub _player_ascii {
         }
     }
 
-    push( @lines, 'VP ' . join( ', ', @vps_formatted ) );
+    my @colony_ships = ();
+    foreach ( 1 .. $player->race()->colony_ships_available() ) {
+        push( @colony_ships, 'O' );
+    }
+    foreach ( 1 .. $player->race()->colony_ships_used() ) {
+        push( @colony_ships, 'X' );
+    }
 
+    push( @lines, 'VP ' . join( ' ', @vps_formatted ) . '   COLONY SHIPS ' . join( ' ', @colony_ships ) );
 
     foreach my $tech_type ( $TECH_MILITARY, $TECH_NANO, $TECH_GRID ) {
         my @tech_names = ();

@@ -169,7 +169,7 @@ sub _raw_exchange {
     my $res_to      = shift( @args );
     my $quantity    = shift( @args );
 
-    my $player = $self->players()->{ $player_id };
+    my $player = $self->player_of_id( $player_id );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
         my ( $cost, $return ) = $player->race()->exchange_rate( $res_from, $res_to );
@@ -289,13 +289,8 @@ sub _raw_add_player {
         return 'added player: ' . $user_id;
     }
 
-    my $id = 0;
-    while ( defined( $self->players()->{ $id } ) ) {
-        $id++;
-    }
-
-    my $new_player = WLE::4X::Objects::Player->new( 'server' => $self, 'user_id' => $user_id, 'id' => $id );
-    $self->players()->{ $id } = $new_player;
+    my $new_player = WLE::4X::Objects::Player->new( 'server' => $self, 'user_id' => $user_id );
+    $self->add_player( $new_player );
 
     return;
 }
@@ -318,11 +313,7 @@ sub _raw_remove_player {
         return 'player removed: ' . $user_id;
     }
 
-    foreach my $player ( $self->player_list() ) {
-        if ( $player->user_id() eq $user_id ) {
-            delete( $self->players()->{ $player->id() } );
-        }
-    }
+    $self->remove_player( $user_id );
 
     return;
 }
@@ -1333,7 +1324,7 @@ sub _raw_select_race_and_location {
     my $location_y      = shift( @args );
     my $warp_gates      = shift( @args );
 
-    my $player = $self->players()->{ $player_id };
+    my $player = $self->player_of_id( $player_id );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
         return 'player ' . $player_id . ' has selected ' . $race_tag . ' as race and is beginning at location ' . $location_x . ',' . $location_y;
@@ -1446,7 +1437,7 @@ sub _raw_place_cube_on_track {
         return $player_id . ' returned cube to track ' . text_from_resource_enum( $cube_type );
     }
 
-    $self->players()->{ $player_id }->race()->resource_track_of( $cube_type )->add_to_track();
+    $self->player_of_id( $player_id )->race()->resource_track_of( $cube_type )->add_to_track();
 
     return;
 }
@@ -1469,7 +1460,7 @@ sub _raw_influence_tile {
         return $player_id . ' influenced tile ' . $tile_tag;
     }
 
-    $self->players()->{ $player_id }->race()->resource_track_of( $RES_INFLUENCE )->spend();
+    $self->player_of_id( $player_id )->race()->resource_track_of( $RES_INFLUENCE )->spend();
 
     $self->tiles()->{ $tile_tag }->set_owner_id( $player_id );
 
@@ -1490,7 +1481,7 @@ sub _raw_pick_up_influence {
     my $player_id   = shift( @args );
     my $tile_tag    = shift( @args );
 
-    my $player = $self->players()->{ $player_id };
+    my $player = $self->player_of_id( $player_id );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
         return $player_id . ' picked up influence from ' . $tile_tag;
@@ -1522,7 +1513,7 @@ sub _raw_return_influence_to_track {
     }
 
     my $player_id = shift( @args );
-    my $player = $self->players()->{ $player_id };
+    my $player = $self->player_of_id( $player_id );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
         return $player_id . ' returned influence to the resource track';
@@ -1573,7 +1564,7 @@ sub _raw_remove_all_cubes_of_owner {
     my $tile_tag = shift( @args );
 
     my $tile = $self->tiles()->{ $tile_tag };
-    my $player = $self->players()->{ $tile->owner_id() };
+    my $player = $self->player_of_id( $tile->owner_id() );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
         return $player->id() . ' removed cubes from tile ' . $tile_tag;
@@ -1612,7 +1603,7 @@ sub _raw_set_allowed_player_actions {
     my $player_id   = shift( @args );
     my @allowed     = @args;
 
-    my $player = $self->players()->{ $player_id };
+    my $player = $self->player_of_id( $player_id );
 
     $player->allowed_actions()->clear();
     $player->allowed_actions()->add_items( @allowed );
@@ -1918,7 +1909,7 @@ sub _raw_use_discovery {
     my $tile_tag        = shift( @args );
     my $flag_as_vp      = shift( @args );
 
-    my $player = $self->players()->{ $player_id };
+    my $player = $self->player_of_id( $player_id );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
         my $as_text = ( $flag_as_vp == 1 ) ? 'as 2 vp' : 'for effect';
@@ -2019,7 +2010,7 @@ sub _raw_increment_race_action {
 
     my $player_id = shift( @args );
 
-    my $player = $self->players()->{ $player_id };
+    my $player = $self->player_of_id( $player_id );
 
     $player->race()->set_action_count( $player->race()->action_count() + 1 );
 
@@ -2039,7 +2030,7 @@ sub _raw_spend_influence {
 
     my $player_id = shift( @args );
 
-    my $player = $self->players()->{ $player_id };
+    my $player = $self->player_of_id( $player_id );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
         return $player_id . ' spent 1 influence';
@@ -2065,7 +2056,7 @@ sub _raw_spend_resource {
     my $resource_type   = shift( @args );
     my $amount          = shift( @args );
 
-    my $player = $self->players()->{ $player_id };
+    my $player = $self->player_of_id( $player_id );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
         return $player_id . ' spent ' . $amount . ' ' . text_from_resouce_enum( $resource_type );;
@@ -2092,7 +2083,7 @@ sub _raw_upgrade_ship_component {
     my $component_tag   = shift( @args );
     my $replaces        = shift( @args );
 
-    my $player = $self->players()->{ $player_id };
+    my $player = $self->player_of_id( $player_id );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
         if ( $replaces eq '' ) {
@@ -2129,7 +2120,7 @@ sub _raw_use_colony_ship {
     my $type        = shift( @args );
     my $advanced    = shift( @args );
 
-    my $player = $self->players()->{ $player_id };
+    my $player = $self->player_of_id( $player_id );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
         my $advanced_text = ( $advanced == 1 ) ? ' (adv) ' : '';
@@ -2158,7 +2149,7 @@ sub _raw_unuse_colony_ship {
 
     my $player_id = shift( @args );
 
-    my $player = $self->players()->{ $player_id };
+    my $player = $self->player_of_id( $player_id );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
         return $player_id . ' flipped a colony ship';
@@ -2187,7 +2178,7 @@ sub _raw_add_item_to_hand {
         return 'added to hand: ' . $item;
     }
 
-    $self->players()->{ $player_id }->in_hand()->add_items( $item );
+    $self->player_of_id( $player_id )->in_hand()->add_items( $item );
 
     return;
 }
@@ -2210,7 +2201,7 @@ sub _raw_remove_item_from_hand {
         return $player_id . 'removed from hand: ' . $item;
     }
 
-    $self->players()->{ $player_id }->in_hand()->remove_item( $item );
+    $self->player_of_id( $player_id )->in_hand()->remove_item( $item );
 
     return;
 }
@@ -2230,7 +2221,7 @@ sub _raw_buy_technology {
     my $tech_tag = shift( @args );
     my $track_type = shift( @args );
 
-    my $player = $self->players()->{ $player_id };
+    my $player = $self->player_of_id( $player_id );
     my $tech = $self->technologies()->{ $tech_tag };
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
@@ -2272,7 +2263,7 @@ sub _raw_add_to_tech_track {
         return $player_id . ' added ' . $tech_tag . ' to tech track ' . text_from_tech_enum( $track_type );
     }
 
-    $self->players()->{ $player_id }->race()->tech_track_of( $track_type )->add_techs( $tech_tag );
+    $self->player_of_id( $player_id )->race()->tech_track_of( $track_type )->add_techs( $tech_tag );
 
     return;
 }
@@ -2294,7 +2285,7 @@ sub _raw_player_pass_action {
         return $player_id . ' passed';
     }
 
-    $self->players()->{ $player_id }->set_flag_passed( 1 );
+    $self->player_of_id( $player_id )->set_flag_passed( 1 );
 
     return;
 }
@@ -2316,7 +2307,7 @@ sub _raw_next_player {
         return 'next player';
     }
 
-    $self->players()->{ $player_id }->end_turn();
+    $self->player_of_id( $player_id )->end_turn();
 
     my $done_player = $self->waiting_on_player_id();
     $self->pending_players()->remove_item( $done_player );
@@ -2324,7 +2315,7 @@ sub _raw_next_player {
 
     if ( $self->pending_players()->count() > 0 ) {
         my $current_player_id = ( $self->pending_players()->items() )[ 0 ];
-        $self->players()->{ $current_player_id }->start_turn();
+        $self->player_of_id( $current_player_id )->start_turn();
 
         $self->set_waiting_on_player_id( $current_player_id );
         return;
@@ -2344,7 +2335,7 @@ sub _raw_next_player {
             $self->done_players()->clear();
             $self->set_waiting_on_player_id( ( $self->pending_players()->items() )[ 0 ] );
 
-            $self->players()->{ $self->waiting_on_player_id() }->start_turn();
+            $self->player_of_id( $self->waiting_on_player_id() )->start_turn();
         }
         else {
             $self->set_waiting_on_player_id( -1 );
@@ -2402,7 +2393,7 @@ sub _raw_start_next_round {
 
     my $next_player = ( $self->pending_players()->items() )[ 0 ];
 
-    my $player = $self->players()->{ $next_player };
+    my $player = $self->player_of_id( $next_player );
     $player->start_turn();
 
     $self->set_state( $ST_NORMAL );

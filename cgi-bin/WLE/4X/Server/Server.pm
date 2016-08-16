@@ -389,12 +389,62 @@ sub player_of_user_id {
 
 #############################################################################
 
+sub player_of_id {
+    my $self        = shift;
+    my $player_id   = shift;
+
+    return $self->players()->{ $player_id };
+}
+
+#############################################################################
+
+sub player_count {
+    my $self        = shift;
+
+    return scalar( keys( %{ $self->players() } ) );
+}
+
+#############################################################################
+
 sub player_list {
     my $self        = shift;
 
     my @players = sort { $a->id() <=> $b->id() } values( %{ $self->players() } );
 
     return @players;
+}
+
+#############################################################################
+
+sub add_player {
+    my $self        = shift;
+    my $player      = shift;
+
+    my $id = 0;
+    while ( defined( $self->players()->{ $id } ) ) {
+        $id++;
+    }
+
+    $self->players()->{ $id } = $player;
+    $player->set_id( $id );
+
+    return;
+}
+
+#############################################################################
+
+sub remove_player {
+    my $self        = shift;
+    my $user_id     = shift;
+
+    foreach my $player ( $self->player_list() ) {
+        if ( $player->user_id() eq $user_id ) {
+            delete( $self->players()->{ $player->id() } );
+            last;
+        }
+    }
+
+    return;
 }
 
 #############################################################################

@@ -155,7 +155,7 @@ sub set_race_tag {
 sub has_passed {
     my $self        = shift;
 
-    return ( $self->{'FLAG_PASSED'} == 1 );
+    return ( $self->{'FLAG_PASSED'} == 1 ) ? 1 : 0;
 }
 
 #############################################################################

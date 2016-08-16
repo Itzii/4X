@@ -226,10 +226,8 @@ sub action_add_player {
         return 0;
     }
 
-    foreach my $player ( values( %{ $self->players() } ) ) {
-        if ( $player->user_id() eq $args{'user_id'} ) {
-            return 0;
-        }
+    if ( defined( $self->player_of_user_id( $args{'user_id'} ) ) ) {
+        return 0;
     }
 
     $self->_raw_add_player( $EV_FROM_INTERFACE, $args{'user_id'} );
@@ -258,15 +256,7 @@ sub action_remove_player {
         return 0;
     }
 
-    my $flag_exists = 0;
-
-    foreach my $player ( values( %{ $self->players() } ) ) {
-        if ( $player->user_id() eq $args{'user_id'} ) {
-            $flag_exists = 1;
-        }
-    }
-
-    unless ( $flag_exists ) {
+    unless ( defined( $self->player_of_user_id( $args{'user_id'} ) ) ) {
         $self->set_error( 'User ID Doesn\'t Exist' );
         return 0;
     }
@@ -371,6 +361,7 @@ sub action_begin {
 
     $self->_raw_set_pending_player( $EV_FROM_INTERFACE, $new_player_order[ 0 ] );
     $self->_raw_set_status( $EV_FROM_INTERFACE, $self->status() );
+    $self->_raw_set_allowed_player_actions( 'select_race' );
 
     return 1;
 }
@@ -468,7 +459,9 @@ sub action_select_race_and_location {
 
         $self->_raw_start_next_round( $EV_FROM_INTERFACE );
 #        print STDERR "\nAfter starting next Round: " . join( ',', $self->players_next_round()->items() );
-
+    }
+    else {
+        $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $self->waiting_on_player_id(), 'select_race' );
     }
 
     return 1;

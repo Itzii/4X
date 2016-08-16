@@ -335,7 +335,7 @@ sub tile_pair_is_traversable {
         return 0;
     }
 
-    my $has_wormhole = $self->players()->{ $player_id }->race()->has_technology( 'tech_wormhole_generator' );
+    my $has_wormhole = $self->player_of_id( $player_id )->race()->has_technology( 'tech_wormhole_generator' );
 
     my $tile1 = $self->tile_at_location( $loc_x1, $loc_y1 );
     my $tile2 = $self->tile_at_location( $loc_x2, $loc_y2 );
@@ -391,7 +391,7 @@ sub _explorable_from_location {
         return ();
     }
 
-    my $has_wormhole = $self->server()->players()->{ $player_id }->race()->has_technology( 'tech_wormhole_generator' );
+    my $has_wormhole = $self->server()->player_of_id( $player_id )->race()->has_technology( 'tech_wormhole_generator' );
 
     my @adjacents = ();
 

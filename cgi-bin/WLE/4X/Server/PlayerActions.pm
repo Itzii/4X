@@ -95,7 +95,7 @@ sub action_explore {
     my $self            = shift;
     my %args            = @_;
 
-    my $player = $self->active_player();
+    my $player = $self->acting_player();
     my $race = $player->race();
 
     unless ( defined( $args{'loc_x'} ) && defined( $args{'loc_y'} ) ) {
@@ -146,7 +146,7 @@ sub action_explore_place_tile {
     my $self            = shift;
     my %args            = @_;
 
-    my $player = $self->active_player();
+    my $player = $self->acting_player();
     my $race = $player->race();
 
     unless ( defined( $args{'tile_tag'} ) ) {
@@ -285,7 +285,7 @@ sub action_explore_discard_tile {
     my $self            = shift;
     my %args            = @_;
 
-    my $player = $self->active_player();
+    my $player = $self->acting_player();
     my $race = $player->race();
 
     unless ( defined( $args{'tile_tag'} ) ) {
@@ -338,7 +338,7 @@ sub action_influence {
     my $self            = shift;
     my %args            = @_;
 
-    my $player = $self->active_player();
+    my $player = $self->acting_player();
     my $race = $player->race();
 
     unless ( defined( $args{'from'} ) ) {
@@ -417,7 +417,7 @@ sub action_research {
     my $self            = shift;
     my %args            = @_;
 
-    my $player = $self->active_player();
+    my $player = $self->acting_player();
     my $race = $player->race();
 
     unless ( defined( $args{'tech_tag'} ) ) {
@@ -501,7 +501,7 @@ sub action_upgrade {
     my $self            = shift;
     my %args            = @_;
 
-    my $player = $self->active_player();
+    my $player = $self->acting_player();
     my $race = $player->race();
 
     unless ( defined( $args{'class'} ) ) {
@@ -578,7 +578,7 @@ sub action_build {
     my $self            = shift;
     my %args            = @_;
 
-    my $player = $self->active_player();
+    my $player = $self->acting_player();
     my $race = $player->race();
 
     unless ( defined( $args{'tile_tag'} ) ) {
@@ -646,7 +646,7 @@ sub action_move {
     my $self            = shift;
     my %args            = @_;
 
-    my $player = $self->active_player();
+    my $player = $self->acting_player();
     my $race = $player->race();
 
     unless ( defined( $args{'ship_tag'} ) ) {
@@ -776,7 +776,7 @@ sub action_interrupt_place_influence_token {
     my $self            = shift;
     my %args            = @_;
 
-    my $player = $self->active_player();
+    my $player = $self->acting_player();
     my $race = $player->race();
 
     unless ( defined( $args{'to'} ) ) {
@@ -833,7 +833,7 @@ sub action_interrupt_replace_cube {
     my $self            = shift;
     my %args            = @_;
 
-    my $player = $self->active_player();
+    my $player = $self->acting_player();
     my $race = $player->race();
 
     unless ( $player->in_hand()->count() > 0 ) {
@@ -896,7 +896,7 @@ sub action_interrupt_choose_discovery {
     my $self            = shift;
     my %args            = @_;
 
-    my $player = $self->active_player();
+    my $player = $self->acting_player();
     my $race = $player->race();
 
     unless ( defined( $args{'discovery_tag'} ) ) {
@@ -941,7 +941,7 @@ sub action_interrupt_select_technology {
     my $self            = shift;
     my %args            = @_;
 
-    my $player = $self->active_player();
+    my $player = $self->acting_player();
     my $race = $player->race();
 
     unless ( defined( $args{'chosen_tech'} ) ) {

@@ -169,12 +169,14 @@ sub _raw_exchange {
     my $res_to      = shift( @args );
     my $quantity    = shift( @args );
 
+    my $player = $self->players()->{ $player_id };
+
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        my ( $cost, $return ) = $self->players()->{ $player_id }->race()->exchange_rate( $res_from, $res_to );
+        my ( $cost, $return ) = $player->race()->exchange_rate( $res_from, $res_to );
         return 'exchanged ' . $cost . ' ' . text_from_resource_enum( $res_from ) . ' for ' . $return . ' ' . text_from_resource_enum( $res_to );
     }
 
-    $race->exchange_resources( $res_from, $res_to );
+    $player->race()->exchange_resources( $res_from, $res_to );
 
     return;
 }
@@ -1350,7 +1352,7 @@ sub _raw_select_race_and_location {
 
     $self->_raw_remove_tile_from_stack( $EV_SUB_ACTION, $start_hex_tag );
     $self->_raw_place_tile_on_board( $EV_SUB_ACTION, $start_hex_tag, $location_x, $location_y, $warp_gates );
-    $self->_raw_influence_tile( $EV_SUB_ACTION, $race_tag, $start_hex_tag );
+    $self->_raw_influence_tile( $EV_SUB_ACTION, $player_id, $start_hex_tag );
 
 
     # place cubes on available spots
@@ -1460,18 +1462,16 @@ sub _raw_influence_tile {
         $self->_log_event( $source, __SUB__, @args );
     }
 
-    my $race_tag    = shift( @args );
+    my $player_id   = shift( @args );
     my $tile_tag    = shift( @args );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return $race_tag . ' influenced tile ' . $tile_tag;
+        return $player_id . ' influenced tile ' . $tile_tag;
     }
 
-    my $race = $self->races()->{ $race_tag };
+    $self->players()->{ $player_id }->race()->resource_track_of( $RES_INFLUENCE )->spend();
 
-    $race->resource_track_of( $RES_INFLUENCE )->spend();
-
-    $self->tiles()->{ $tile_tag }->set_owner_id( $race->owner_id() );
+    $self->tiles()->{ $tile_tag }->set_owner_id( $player_id );
 
     return;
 }
@@ -1635,23 +1635,29 @@ sub _raw_remove_non_playing_races {
         return 'removed non-played races and associated resources';
     }
 
-    foreach my $race_tag ( keys( %{ $self->races() } ) ) {
+    my %removable_races = ();
+    foreach ( keys( %{ $self->races() } ) ) {
+        $removable_races{ $_ } = 1;
+    }
+
+    foreach my $player ( $self->player_list() ) {
+        delete( $removable_races{ $player->race_tag() } );
+    }
+
+    foreach my $race_tag ( keys( %removable_races ) ) {
         my $race = $self->races()->{ $race_tag };
 
-        if ( $race->owner_id() eq '' ) {
-
-            foreach my $template_tag ( $race->ship_templates() ) {
-                delete ( $self->templates()->{ $template_tag } );
-            }
-
-            my $home_tile = $race->home_tile();
-
-            $self->_raw_remove_tile_from_stack( $EV_SUB_ACTION, $home_tile );
-
-            delete ( $self->tiles()->{ $home_tile } );
-
-            delete ( $self->races()->{ $race_tag } );
+        foreach my $template_tag ( $race->ship_templates() ) {
+            delete ( $self->templates()->{ $template_tag } );
         }
+
+        my $home_tile = $race->home_tile();
+
+        $self->_raw_remove_tile_from_stack( $EV_SUB_ACTION, $home_tile );
+
+        delete ( $self->tiles()->{ $home_tile } );
+
+        delete ( $self->races()->{ $race_tag } );
     }
 
     return;
@@ -2059,7 +2065,7 @@ sub _raw_spend_resource {
     my $resource_type   = shift( @args );
     my $amount          = shift( @args );
 
-    my $player = $self->players()->{ $id };
+    my $player = $self->players()->{ $player_id };
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
         return $player_id . ' spent ' . $amount . ' ' . text_from_resouce_enum( $resource_type );;
@@ -2317,10 +2323,10 @@ sub _raw_next_player {
     $self->done_players()->add_items( $done_player );
 
     if ( $self->pending_players()->count() > 0 ) {
-        my $current_player = ( $self->pending_players()->items() )[ 0 ];
-        $current_player->start_turn();
+        my $current_player_id = ( $self->pending_players()->items() )[ 0 ];
+        $self->players()->{ $current_player_id }->start_turn();
 
-        $self->set_waiting_on_player_id( $current_player );
+        $self->set_waiting_on_player_id( $current_player_id );
         return;
     }
     else {

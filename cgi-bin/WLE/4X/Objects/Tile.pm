@@ -286,17 +286,15 @@ sub has_ancient_cruiser { # used for descendant race
 
 sub has_explorer {
     my $self                = shift;
-    my $race_tag            = shift;
+    my $player_id           = shift;
     my $flag_unpinned_only  = shift; $flag_unpinned_only = 1            unless defined( $flag_unpinned_only );
 
     my $flag_explorer_available = 0;
 
-    my $exploring_player = $self->server()->races()->{ $race_tag }->owner_id();
-
-    if ( $self->owner_id() == $exploring_player ) {
+    if ( $self->owner_id() == $player_id ) {
         return 1;
     }
-    elsif ( $self->unpinned_ship_count( $exploring_player ) > 0 ) {
+    elsif ( $self->unpinned_ship_count( $player_id ) > 0 ) {
         return 1;
     }
 

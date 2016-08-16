@@ -7,6 +7,8 @@ use warnings;
 use WLE::Methods::Simple;
 use WLE::Objects::Stack;
 
+use WLE::4X::Enums::Status;
+
 #############################################################################
 # constructor args
 #
@@ -361,7 +363,7 @@ sub has_cube_in_hand {
 sub can_explore {
     my $self        = shift;
 
-    my @explorable_locations = $self->server()->board()->explorable_spaces_for_race( $self->race()->tag() );
+    my @explorable_locations = $self->server()->board()->explorable_spaces_for_player( $self->id() );
     return ( scalar( @explorable_locations ) > 0 );
 }
 
@@ -370,8 +372,11 @@ sub can_explore {
 sub start_turn {
     my $self        = shift;
 
-    $self->race()->set_action_count( 0 );
-    $self->race()->set_colony_flip_count( 0 );
+    if ( defined( $self->race() ) ) {
+        $self->race()->set_action_count( 0 );
+        $self->race()->set_colony_flip_count( 0 );
+    }
+
     $self->allowed_actions()->clear();
 
     my $has_movable_ships = 0;
@@ -381,6 +386,11 @@ sub start_turn {
             $has_movable_ships = 1;
             last;
         }
+    }
+
+    if ( $self->server()->state() == $ST_RACESELECTION ) {
+        $self->allowed_actions()->add_items( 'select_race' );
+        return;
     }
 
     if ( $self->has_passed() ) {

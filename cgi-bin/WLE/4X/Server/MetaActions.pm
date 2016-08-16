@@ -450,6 +450,8 @@ sub action_select_race_and_location {
 
     $self->_raw_player_pass_action( $EV_FROM_INTERFACE, $self->acting_player()->id() );
 
+#    print STDERR "\nActing Player ID: " . $self->acting_player()->id();
+
     $self->_raw_next_player( $EV_FROM_INTERFACE, $self->acting_player()->id() );
 
 #    print STDERR "\nNext User: " . $self->user_id_of_player_id( $self->waiting_on_player_id() );

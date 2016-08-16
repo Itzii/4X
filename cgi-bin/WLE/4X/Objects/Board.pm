@@ -300,9 +300,9 @@ sub place_tile {
 
 #############################################################################
 
-sub explorable_spaces_for_race {
+sub explorable_spaces_for_player {
     my $self        = shift;
-    my $race_tag    = shift;
+    my $player_id   = shift;
 
     my %explorable = ();
 
@@ -310,7 +310,7 @@ sub explorable_spaces_for_race {
 
         my ( $column, $row ) = split( /:/, $self->location_of_tile( $tile_tag ) );
 
-        foreach my $adjacent_location ( $self->_explorable_from_location( $race_tag, $column, $row ) ) {
+        foreach my $adjacent_location ( $self->_explorable_from_location( $player_id, $column, $row ) ) {
             $explorable{ $adjacent_location } = 1;
         }
     }
@@ -325,7 +325,7 @@ sub explorable_spaces_for_race {
 
 sub tile_pair_is_traversable {
     my $self        = shift;
-    my $race_tag    = shift;
+    my $player_id   = shift;
     my $loc_x1      = shift;
     my $loc_y1      = shift;
     my $loc_x2      = shift;
@@ -335,7 +335,7 @@ sub tile_pair_is_traversable {
         return 0;
     }
 
-    my $has_wormhole = $self->server()->races()->{ $race_tag }->has_technology( 'tech_wormhole_generator' );
+    my $has_wormhole = $self->players()->{ $player_id }->race()->has_technology( 'tech_wormhole_generator' );
 
     my $tile1 = $self->tile_at_location( $loc_x1, $loc_y1 );
     my $tile2 = $self->tile_at_location( $loc_x2, $loc_y2 );
@@ -381,17 +381,17 @@ sub locations_adjacent {
 
 sub _explorable_from_location {
     my $self        = shift;
-    my $race_tag    = shift;
+    my $player_id   = shift;
     my $x_pos       = shift;
     my $y_pos       = shift;
 
     my $tile = $self->tile_at_location( $x_pos, $y_pos );
 
-    unless ( $tile->has_explorer( $race_tag ) ) {
+    unless ( $tile->has_explorer( $player_id ) ) {
         return ();
     }
 
-    my $has_wormhole = $self->server()->acting_player()->race()->has_technology( 'tech_wormhole_generator' );
+    my $has_wormhole = $self->server()->players()->{ $player_id }->race()->has_technology( 'tech_wormhole_generator' );
 
     my @adjacents = ();
 

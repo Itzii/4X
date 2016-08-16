@@ -11,9 +11,36 @@ use WLE::4X::Enums::Basic;
 
 #############################################################################
 
+sub action_pass_action {
+    my $self            = shift;
+
+    my $player = $self->active_player();
+    my $race = $player->race();
+
+    $self->_raw_player_pass_action( $EV_FROM_INTERFACE, $player->id() );
+    $self->_raw_next_player( $EV_FROM_INTERFACE, $player->id() );
+
+    if ( $self->waiting_on_player_id() == -1 ) {
+
+        my $combat_tile = $self->board()->outermost_combat_tile();
+
+        unless ( $combat_tile eq '' ) {
+            $self->_raw_start_combat_phase( $EV_FROM_INTERFACE );
+        }
+    }
+
+    return 1;
+}
+
+
+#############################################################################
+
 sub action_use_colony_ship {
     my $self            = shift;
     my %args            = @_;
+
+    my $player = $self->active_player();
+    my $race = $player->race();
 
     unless ( defined( $args{'tile_tag'} ) ) {
         $self->set_error( 'Missing Tile Tag' );
@@ -25,7 +52,7 @@ sub action_use_colony_ship {
         return 0;
     }
 
-    if ( $self->acting_player()->race()->colony_ships_available() > 0 ) {
+    if ( $race->colony_ships_available() > 0 ) {
         $self->set_error( 'No Available Colony Ships' );
         return 0;
     }
@@ -52,38 +79,12 @@ sub action_use_colony_ship {
         return 0;
     }
 
-    if ( $self->acting_player()->race()->resource_track_of( $type )->available_to_spend() < 1 ) {
+    if ( $race->resource_track_of( $type )->available_to_spend() < 1 ) {
         $self->set_error( 'No Available Cubes' );
         return 0;
     }
 
-    $self->_raw_use_colony_ship( $EV_FROM_INTERFACE, $self->acting_player()->id(), $tile_tag, $type, $advanced );
-
-    return 1;
-}
-
-
-
-#############################################################################
-
-sub action_pass_action {
-    my $self            = shift;
-
-    $self->_raw_player_pass_action( $EV_FROM_INTERFACE, $self->acting_player()->id() );
-    $self->_raw_next_player( $EV_FROM_INTERFACE, $self->acting_player()->id() );
-
-    if ( $self->waiting_on_player_id() == -1 ) {
-
-        my $combat_tile = $self->board()->outermost_combat_tile();
-
-        unless ( $combat_tile eq '' ) {
-            $self->_raw_start_combat_phase( $EV_FROM_INTERFACE );
-        }
-
-
-
-
-    }
+    $self->_raw_use_colony_ship( $EV_FROM_INTERFACE, $player->id(), $tile_tag, $type, $advanced );
 
     return 1;
 }
@@ -94,6 +95,9 @@ sub action_explore {
     my $self            = shift;
     my %args            = @_;
 
+    my $player = $self->active_player();
+    my $race = $player->race();
+
     unless ( defined( $args{'loc_x'} ) && defined( $args{'loc_y'} ) ) {
         $self->set_error( 'Missing Location Information' );
         return 0;
@@ -103,7 +107,7 @@ sub action_explore {
     my $loc_y = $args{'loc_y'};
     my $loc_tag = $loc_x . ':' . $loc_y;
 
-    my @explorables = $self->board()->explorable_spaces_for_race( $self->acting_player()->race_tag() );
+    my @explorables = $self->board()->explorable_spaces_for_player( $player->id() );
 
     unless ( matches_any( $loc_tag, @explorables ) ) {
         $self->set_error( 'Invalid Exploration Location' );
@@ -112,7 +116,7 @@ sub action_explore {
 
     my $stack_id = $self->board()->stack_from_location( $loc_x, $loc_y );
 
-    my $tiles_to_draw = ( $self->acting_player()->race()->provides( 'spec_descendants') ) ? 2 : 1;
+    my $tiles_to_draw = ( $race->provides( 'spec_descendants') ) ? 2 : 1;
 
     foreach ( 1 .. $tiles_to_draw ) {
         if ( $self->board()->tile_draw_stack( $stack_id )->count() == 0 ) {
@@ -125,12 +129,13 @@ sub action_explore {
         if ( $self->board()->tile_draw_stack( $stack_id )->count() > 0 ) {
             my $tile_tag = $self->board()->tile_draw_stack( $stack_id )->select_random_item();
             $self->_raw_remove_tile_from_stack( $EV_FROM_INTERFACE, $tile_tag );
-            $self->_raw_add_item_to_hand( $EV_FROM_INTERFACE, $self->acting_player()->id(), $loc_tag . ':' . $tile_tag );
+            $self->_raw_add_item_to_hand( $EV_FROM_INTERFACE, $player->id(), $loc_tag . ':' . $tile_tag );
         }
     }
 
-    $self->_raw_spend_influence( $EV_FROM_INTERFACE, $self->acting_player()->id() );
-    $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $self->acting_player()->id(), 'place_tile', 'discard_tile' );
+    $self->_raw_spend_influence( $EV_FROM_INTERFACE, $player->id() );
+
+    $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $player->id(), 'place_tile', 'discard_tile' );
 
     return 1;
 }
@@ -140,6 +145,9 @@ sub action_explore {
 sub action_explore_place_tile {
     my $self            = shift;
     my %args            = @_;
+
+    my $player = $self->active_player();
+    my $race = $player->race();
 
     unless ( defined( $args{'tile_tag'} ) ) {
         $self->set_error( 'Missing Tile Tag' );
@@ -151,7 +159,7 @@ sub action_explore_place_tile {
     my $flag_tile_in_hand = 0;
     my $tile_tag_w_loc = '';
 
-    foreach my $in_hand ( $self->acting_player()->in_hand()->items() ) {
+    foreach my $in_hand ( $player->in_hand()->items() ) {
         if ( $in_hand =~ m { : $tile_tag $ }xs ) {
             $flag_tile_in_hand = 1;
             $tile_tag_w_loc = $in_hand;
@@ -190,7 +198,7 @@ sub action_explore_place_tile {
     $tile->set_warps( $warps );
 
     my $valid_rotation = 0;
-    my $has_wormhole = $self->acting_player()->race()->has_technology( 'tech_wormhole_generator' );
+    my $has_wormhole = $race->has_technology( 'tech_wormhole_generator' );
 
     foreach my $direction ( 0 .. 5 ) {
 #        print STDERR "\nChecking direction $direction ... ";
@@ -203,7 +211,7 @@ sub action_explore_place_tile {
 
 #            print STDERR "found tile " . $adjacent_tile->tag() . ' ... ';
 
-            if ( $adjacent_tile->has_explorer( $self->acting_player()->race->tag() ) ) {
+            if ( $adjacent_tile->has_explorer( $player->id() ) ) {
 
 #                print STDERR "has explorer ... ";
 
@@ -232,36 +240,41 @@ sub action_explore_place_tile {
         return 0;
     }
 
-    $self->_raw_remove_item_from_hand( $EV_FROM_INTERFACE, $self->acting_player()->id(), $tile_tag_w_loc );
+    $self->_raw_remove_item_from_hand( $EV_FROM_INTERFACE, $player->id(), $tile_tag_w_loc );
 
     $self->_raw_place_tile_on_board( $EV_FROM_INTERFACE, $tile_tag, $loc_x, $loc_y, $warps );
 
     $tile->add_starting_ships();
 
-    if ( $tile->ships()->count() < 1 || $self->acting_player()->race()->provides( 'spec_descendants') ) {
+    if ( $tile->ships()->count() < 1 || $race->provides( 'spec_descendants') ) {
         if ( defined( $args{'influence'} ) ) {
             if ( $args{'influence'} eq '1' ) {
-                $self->_raw_influence_tile( $EV_FROM_INTERFACE, $self->acting_player()->race->tag(), $tile_tag );
+                $self->_raw_influence_tile( $EV_FROM_INTERFACE, $player->id(), $tile_tag );
             }
         }
     }
 
-    $self->_raw_increment_race_action( $EV_FROM_INTERFACE, $self->acting_player()->id() );
+    $self->_raw_increment_race_action( $EV_FROM_INTERFACE, $player->id() );
 
-    my @tiles_still_in_hand = $self->acting_player()->in_hand()->items();
+    my @tiles_still_in_hand = $player->in_hand()->items();
     foreach my $tile_tag ( @tiles_still_in_hand ) {
-        $self->_raw_remove_item_from_hand( $EV_FROM_INTERFACE, $self->acting_player()->id(), $tile_tag );
+        $self->_raw_remove_item_from_hand( $EV_FROM_INTERFACE, $player->id(), $tile_tag );
         $self->_raw_discard_tile( $EV_FROM_INTERFACE, $tile_tag );
     }
 
-    if ( $self->acting_player()->race()->action_count() < $self->acting_player()->race()->maximum_action_count( $ACT_EXPLORE ) ) {
-        if ( $self->acting_player()->race()->can_explore() ) {
-            $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $self->acting_player()->id(), 'action_explore', 'finish_turn' );
+    my @actions = ( 'finish_turn' );
+
+    if ( $race->action_count() < $race->maximum_action_count( $ACT_EXPLORE ) ) {
+        if ( $race->can_explore() ) {
+            push( @actions, 'action_explore' );
         }
     }
-    else {
-        $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $self->acting_player()->id(), 'finish_turn' );
+
+    if ( $race->colony_ships_available() > 0 ) {
+        push( @actions, 'use_colony_ship' );
     }
+
+    $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $player->id(), @actions );
 
     return 1;
 }
@@ -272,6 +285,9 @@ sub action_explore_discard_tile {
     my $self            = shift;
     my %args            = @_;
 
+    my $player = $self->active_player();
+    my $race = $player->race();
+
     unless ( defined( $args{'tile_tag'} ) ) {
         $self->set_error( 'Missing Tile Tag' );
         return 0;
@@ -279,29 +295,39 @@ sub action_explore_discard_tile {
 
     my $tile_tag_w_loc = $args{'tile_tag'};
 
-    unless ( $self->acting_player()->in_hand()->contains( $tile_tag_w_loc ) ) {
+    unless ( $player->in_hand()->contains( $tile_tag_w_loc ) ) {
         $self->set_error( 'Invalid Tile Tag' );
         return 0;
     }
 
     my ( $loc_x, $loc_y, $tile_tag ) = split( /:/, $tile_tag_w_loc, 3 );
 
-    $self->_raw_remove_item_from_hand( $EV_FROM_INTERFACE, $self->acting_player()->id(), $tile_tag_w_loc );
+    $self->_raw_remove_item_from_hand( $EV_FROM_INTERFACE, $player->id(), $tile_tag_w_loc );
     $self->_raw_discard_tile( $EV_FROM_INTERFACE, $tile_tag );
 
-    $self->_raw_increment_race_action( $EV_FROM_INTERFACE, $self->acting_player()->id() );
+    $self->_raw_increment_race_action( $EV_FROM_INTERFACE, $player->id() );
 
-    if ( $self->acting_player()->in_hand()->count() > 0 ) {
-        $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $self->acting_player()->id(), 'discard_tile', 'place_tile' );
-    }
-    elsif ( $self->acting_player()->race()->action_count() < $self->acting_player()->race()->maximum_action_count( $ACT_EXPLORE ) ) {
-        if ( $self->acting_player()->race()->can_explore() ) {
-            $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $self->acting_player()->id(), 'action_explore', 'finish_turn' );
-        }
+    my @actions = ();
+
+    if ( $player->in_hand()->count() > 0 ) {
+        push( @actions, 'discard_tile', 'place_tile' );
     }
     else {
-        $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $self->acting_player()->id(), 'finish_turn' );
+        push( @actions, 'finish_turn' );
+
+        if (
+            $race->action_count() < $race->maximum_action_count( $ACT_EXPLORE )
+            && $race->can_explore()
+        ) {
+            push( @actions, 'action_explore' );
+        }
+
+        if ( $race->colony_ships_available() > 0 ) {
+            push( @actions, 'use_colony_ship' );
+        }
     }
+
+    $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $player->id(), @actions );
 
     return 1;
 }
@@ -312,6 +338,9 @@ sub action_influence {
     my $self            = shift;
     my %args            = @_;
 
+    my $player = $self->active_player();
+    my $race = $player->race();
+
     unless ( defined( $args{'from'} ) ) {
         $self->set_error( 'Missing From Element' );
         return 0;
@@ -321,7 +350,7 @@ sub action_influence {
 
     if ( $influence_from eq 'track' ) {
 
-        if ( $self->acting_player()->race()->resource_track_of( $RES_INFLUENCE )->available_to_spend() < 1 ) {
+        if ( $race->resource_track_of( $RES_INFLUENCE )->available_to_spend() < 1 ) {
             $self->set_error( 'No Influence to spend' );
             return 0;
         }
@@ -335,23 +364,23 @@ sub action_influence {
             return 0;
         }
 
-        unless ( $tile->owner_id() == $self->acting_player()->id() ) {
+        unless ( $tile->owner_id() == $player->id() ) {
             $self->set_error( 'Tile not owned by player' );
             return 0;
         }
     }
 
-    $self->_raw_pick_up_influence( $EV_FROM_INTERFACE, $self->acting_player()->id(), $influence_from );
+    $self->_raw_pick_up_influence( $EV_FROM_INTERFACE, $player->id(), $influence_from );
 
-    $self->_raw_increment_race_action( $EV_FROM_INTERFACE, $self->acting_player()->id() );
+    $self->_raw_increment_race_action( $EV_FROM_INTERFACE, $player->id() );
 
     my @allowed = ( 'unflip_colony_ship', 'finish_turn' );
 
-    if ( $self->acting_player()->race()->action_count() < $self->acting_player()->race()->maximum_action_count( $ACT_INFLUENCE ) ) {
+    if ( $race->action_count() < $race->maximum_action_count( $ACT_INFLUENCE ) ) {
         push( @allowed, 'action_influence' );
     }
 
-    $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $self->acting_player()->id(), @allowed );
+    $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $player->id(), @allowed );
 
     return 1;
 }
@@ -362,18 +391,21 @@ sub action_influence_unflip_colony_ship {
     my $self            = shift;
     my %args            = @_;
 
-    if ( $self->acting_player()->race()->colony_ships_used() < 1 ) {
+    my $player = $self->acting_player();
+    my $race = $player->race();
+
+    if ( $race->colony_ships_used() < 1 ) {
         $self->set_error( 'No Colony Ships to flip' );
         return 0;
     }
 
-    $self->_raw_unuse_colony_ship( $EV_FROM_INTERFACE, $self->acting_player()->id() );
+    $self->_raw_unuse_colony_ship( $EV_FROM_INTERFACE, $player->id() );
 
     if (
-        $self->acting_player()->race()->colony_ships_used() == 0
-        || $self->acting_player()->race()->colony_flip_count() >= $self->acting_player()->race()->maximum_colony_flip_count()
+        $race->colony_ships_used() == 0
+        || $race->colony_flip_count() >= $race->maximum_colony_flip_count()
     ) {
-        $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $self->acting_player()->id(), 'action_influence', 'finish_turn' );
+        $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $player->id(), 'action_influence', 'finish_turn' );
     }
 
     return 1;
@@ -384,6 +416,9 @@ sub action_influence_unflip_colony_ship {
 sub action_research {
     my $self            = shift;
     my %args            = @_;
+
+    my $player = $self->active_player();
+    my $race = $player->race();
 
     unless ( defined( $args{'tech_tag'} ) ) {
         $self->set_error( 'Missing Tech Item' );
@@ -399,7 +434,8 @@ sub action_research {
 
     my $provides = $self->techs()->{ $tech_tag }->provides();
 
-    if ( $self->acting_player()->race()->has_technology( $provides ) ) {
+
+    if ( $race->has_technology( $provides ) ) {
         $self->set_error( 'Race already has technology' );
         return 0;
     }
@@ -422,12 +458,12 @@ sub action_research {
         return 0;
     }
 
-    if ( $self->acting_player()->race()->tech_track_of( $dest_type )->available_spaces() < 1 ) {
+    if ( $race->tech_track_of( $dest_type )->available_spaces() < 1 ) {
         $self->set_error( 'No spaces left on tech track' );
         return 0;
     }
 
-    my $credits = $self->acting_player()->race()->tech_track_of( $dest_type )->current_credit();
+    my $credits = $race->tech_track_of( $dest_type )->current_credit();
 
     my $cost = $tech->base_cost();
 
@@ -435,21 +471,26 @@ sub action_research {
         $cost = $tech->min_cost();
     }
 
-    if ( $self->acting_player()->race()->resource_count( $RES_SCIENCE ) < $cost ) {
+    if ( $race->resource_count( $RES_SCIENCE ) < $cost ) {
         $self->set_error( 'Not enough science to purchase resource' );
         return 0;
     }
 
-    $self->_raw_increment_race_action( $EV_FROM_INTERFACE, $self->acting_player()->id() );
+    $self->_raw_increment_race_action( $EV_FROM_INTERFACE, $player->id() );
 
-    $self->_raw_buy_technology( $EV_FROM_INTERFACE, $self->acting_player()->id(), $tech->tag(), $dest_type );
+    $self->_raw_buy_technology( $EV_FROM_INTERFACE, $player->id(), $tech->tag(), $dest_type );
 
-    if ( $self->acting_player()->race()->action_count() < $self->acting_player()->race()->maximum_action_count( $ACT_RESEARCH ) ) {
-        $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $self->acting_player()->id(), 'action_research', 'finish_turn' );
+    my @actions = ( 'finish_turn' );
+
+    if ( $race->action_count() < $race->maximum_action_count( $ACT_RESEARCH ) ) {
+        push( @actions, 'action_research' );
     }
-    else {
-        $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $self->acting_player()->id(), 'finish_turn' );
+
+    if ( $race->colony_ships_available() > 0 ) {
+        push( @actions, 'use_colony_ship' );
     }
+
+    $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $player->id(), @actions );
 
     return 1;
 }
@@ -460,12 +501,15 @@ sub action_upgrade {
     my $self            = shift;
     my %args            = @_;
 
+    my $player = $self->active_player();
+    my $race = $player->race();
+
     unless ( defined( $args{'class'} ) ) {
         $self->set_error( 'Missing Ship Class' );
         return 0;
     }
 
-    my $template = $self->acting_player()->race()->template_of_class( $args{'class'} );
+    my $template = $race->template_of_class( $args{'class'} );
 
     unless ( defined( $template ) ) {
         $self->set_error( 'Invalid Ship Template' );
@@ -484,9 +528,9 @@ sub action_upgrade {
         return 0;
     }
 
-    unless ( $self->acting_player()->race()->component_overflow()->contains( $component->tag() ) ) {
+    unless ( $race->component_overflow()->contains( $component->tag() ) ) {
         if ( $component->tech_required() ne '' ) {
-            unless ( $self->acting_player()->race()->has_technology( $component->tech_required() ) ) {
+            unless ( $race->has_technology( $component->tech_required() ) ) {
                 $self->set_error( 'Missing Technology Requirement' );
                 return 0;
             }
@@ -507,19 +551,23 @@ sub action_upgrade {
         return 0;
     }
 
-    $self->_raw_increment_race_action( $EV_FROM_INTERFACE, $self->acting_player()->id() );
+    $self->_raw_increment_race_action( $EV_FROM_INTERFACE, $player->id() );
 
-    $self->_raw_upgrade_ship_component( $EV_FROM_INTERFACE, $self->acting_player()->id(), $template->tag(), $component->tag(), $replaces_component );
+    $self->_raw_upgrade_ship_component( $EV_FROM_INTERFACE, $player->id(), $template->tag(), $component->tag(), $replaces_component );
 
-    if (
-        defined( $args{'as_react'} )
-        || $self->acting_player()->race()->action_count() >= $self->acting_player()->race()->maximum_action_count( $ACT_UPGRADE )
-    ) {
-        $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $self->acting_player()->id(), 'finish_turn' );
+    my @actions = ( 'finish_turn' );
+
+    unless ( defined( $args{'as_react'} ) ) {
+        if ( $race->action_count() < $race->maximum_action_count( $ACT_UPGRADE ) ) {
+            push( @actions, 'action_upgrade' );
+        }
     }
-    else {
-        $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $self->acting_player()->id_tag(), 'action_upgrade', 'finish_turn' );
+
+    if ( $race->colony_ships_available() > 0 ) {
+        push( @actions, 'use_colony_ship' );
     }
+
+    $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $player->id(), @actions );
 
     return 1;
 }
@@ -529,6 +577,9 @@ sub action_upgrade {
 sub action_build {
     my $self            = shift;
     my %args            = @_;
+
+    my $player = $self->active_player();
+    my $race = $player->race();
 
     unless ( defined( $args{'tile_tag'} ) ) {
         $self->set_error( 'Missing Tile Location' );
@@ -546,12 +597,12 @@ sub action_build {
 
     my $tile = $self->tiles()->{ $tile_tag };
 
-    unless ( $tile->owner_id() == $self->acting_player() ) {
+    unless ( $tile->owner_id() == $player->id() ) {
         $self->set_error( 'Invalid Tile' );
         return 0;
     }
 
-    my $template = $self->acting_player()->race()->template_of_class( $class );
+    my $template = $race->template_of_class( $class );
 
     unless ( $self->has_option( 'option_unlimited_ships' ) ) {
         if ( $template->count() == 0 ) {
@@ -562,25 +613,29 @@ sub action_build {
 
     my $cost = $template->cost();
 
-    if ( $cost > $self->acting_player()->race()->resource_count( $RES_MINERALS ) ) {
+    if ( $cost > $race->resource_count( $RES_MINERALS ) ) {
         $self->set_error( 'Unable to afford ship of type' );
         return 0;
     }
 
-    $self->_raw_increment_race_action( $EV_FROM_INTERFACE, $self->acting_player()->id() );
+    $self->_raw_increment_race_action( $EV_FROM_INTERFACE, $player->id() );
 
-    $self->_raw_spend_resource( $EV_FROM_INTERFACE, $self->acting_player->id(), $RES_MINERALS, $template->cost() );
-    $self->_raw_create_ship_on_tile( $EV_FROM_INTERFACE, $tile_tag, $template->tag(), $self->acting_player()->id() );
+    $self->_raw_spend_resource( $EV_FROM_INTERFACE, $player->id(), $RES_MINERALS, $template->cost() );
+    $self->_raw_create_ship_on_tile( $EV_FROM_INTERFACE, $tile_tag, $template->tag(), $player->id() );
 
-    if (
-        defined( $args{'as_react'} )
-        || $self->acting_player()->race()->action_count() >= $self->acting_player()->race()->maximum_action_count( $ACT_BUILD )
-    ) {
-        $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $self->acting_player()->id(), 'finish_turn' );
+    my @actions = ( 'finish_turn' );
+
+    unless ( defined( $args{'as_react'} ) ) {
+        if ( $race->action_count() < $race->maximum_action_count( $ACT_BUILD ) ) {
+            push( @actions, 'action_build' );
+        }
     }
-    else {
-        $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $self->acting_player()->id(), 'action_build', 'finish_turn' );
+
+    if ( $race->colony_ships_available() > 0 ) {
+        push( @actions, 'use_colony_ship' );
     }
+
+    $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $player->id(), @actions );
 
     return 1;
 }
@@ -590,6 +645,9 @@ sub action_build {
 sub action_move {
     my $self            = shift;
     my %args            = @_;
+
+    my $player = $self->active_player();
+    my $race = $player->race();
 
     unless ( defined( $args{'ship_tag'} ) ) {
         $self->set_error( 'Missing Ship Tag' );
@@ -603,7 +661,7 @@ sub action_move {
         return 0;
     }
 
-    unless ( $ship->owner_id() == $self->acting_player()->id() ) {
+    unless ( $ship->owner_id() == $player->id() ) {
         $self->set_error( 'Ship not owned by user' );
         return 0;
     }
@@ -637,12 +695,12 @@ sub action_move {
     }
 
     my $reachable = $self->board()->tile_is_within_distance(
-        $self->acting_player()->id(),
+        $player->id(),
         $origin_tag,
         $destination_tag,
         $ship->total_movement(),
         $ship->template()->provides( 'jump_drive' ),
-        $self->acting_player()->race()->has_technology( 'tech_wormhole_generator' ),
+        $race->has_technology( 'tech_wormhole_generator' ),
     );
 
     unless ( $reachable ) {
@@ -650,20 +708,24 @@ sub action_move {
         return 0;
     }
 
-    $self->_raw_increment_race_action( $EV_FROM_INTERFACE, $self->acting_player()->id() );
+    $self->_raw_increment_race_action( $EV_FROM_INTERFACE, $player->id() );
 
     $self->_raw_remove_ship_from_tile( $EV_FROM_INTERFACE, $origin_tag, $ship->tag() );
     $self->_raw_add_ship_to_tile( $EV_FROM_INTERFACE, $destination_tag, $ship->tag() );
 
-    if (
-        defined( $args{'as_react'} )
-        || $self->acting_player()->race()->action_count() >= $self->acting_player()->race()->maximum_action_count( $ACT_MOVE )
-    ) {
-        $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $self->acting_player()->id(), 'finish_turn' );
+    my @actions = ( 'finish_turn' );
+
+    unless ( defined( $args{'as_react'} ) ) {
+        if ( $race->action_count() < $race->maximum_action_count( $ACT_MOVE ) ) {
+            push( @actions, 'action_move' );
+        }
     }
-    else {
-        $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $self->acting_player()->id(), 'action_move', 'finish_turn' );
+
+    if ( $race->colony_ships_available() > 0 ) {
+        push( @actions, 'use_colony_ship' );
     }
+
+    $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $player->id(), @actions );
 
     return 1;
 }
@@ -714,6 +776,9 @@ sub action_interrupt_place_influence_token {
     my $self            = shift;
     my %args            = @_;
 
+    my $player = $self->active_player();
+    my $race = $player->race();
+
     unless ( defined( $args{'to'} ) ) {
         $self->set_error( 'Missing To Element' );
         return 0;
@@ -722,7 +787,7 @@ sub action_interrupt_place_influence_token {
     my $influence_to = $args{'to'};
 
     if ( $influence_to eq 'track' ) {
-        $self->_raw_return_influence_to_track( $EV_FROM_INTERFACE, $self->acting_player()->id() );
+        $self->_raw_return_influence_to_track( $EV_FROM_INTERFACE, $player->id() );
     }
     else {
         my $tile = $self->tiles()->{ $influence_to };
@@ -748,12 +813,12 @@ sub action_interrupt_place_influence_token {
             return 0;
         }
 
-        $self->_raw_influence_tile( $EV_FROM_INTERFACE, $self->acting_player()->race_tag(), $influence_to );
+        $self->_raw_influence_tile( $EV_FROM_INTERFACE, $player->id(), $influence_to );
 
         unless ( $tile->has_ancient_cruiser() ) {
             foreach my $discovery_tag ( $tile->discoveries() ) {
                 $self->_raw_remove_discovery_from_tile( $EV_FROM_INTERFACE, $influence_to, $discovery_tag );
-                $self->_raw_add_item_to_hand( $EV_FROM_INTERFACE, $self->acting_player()->id(), $tile->tag() . ':' . $discovery_tag );
+                $self->_raw_add_item_to_hand( $EV_FROM_INTERFACE, $player->id(), $tile->tag() . ':' . $discovery_tag );
             }
         }
 
@@ -768,7 +833,10 @@ sub action_interrupt_replace_cube {
     my $self            = shift;
     my %args            = @_;
 
-    unless ( $self->acting_player()->in_hand()->count() > 0 ) {
+    my $player = $self->active_player();
+    my $race = $player->race();
+
+    unless ( $player->in_hand()->count() > 0 ) {
         $self->set_error( 'Nothing in hand' );
         return 0;
     }
@@ -792,32 +860,32 @@ sub action_interrupt_replace_cube {
 
     my $cube_type = $args{'cube_type'};
 
-    unless ( $self->acting_player()->in_hand()->contains( 'cube:' . $cube_type ) ) {
+    unless ( $player->in_hand()->contains( 'cube:' . $cube_type ) ) {
         $self->set_error( 'Not holding cube of that type' );
         return 0;
     }
 
-    unless ( $self->acting_player()->race()->resource_track_of( $dest_type )->available_spaces() > 0 ) {
+    unless ( $race->resource_track_of( $dest_type )->available_spaces() > 0 ) {
         $self->set_error( 'No spaces available of that type' );
         return 0;
     }
 
     unless ( $cube_type == $dest_type || $cube_type == $RES_WILD ) {
-        if ( $self->acting_player()->race()->resource_track_of( $cube_type )->available_spaces() > 0 ) {
+        if ( $race->resource_track_of( $cube_type )->available_spaces() > 0 ) {
             $self->set_error( 'Invalid track for cube' );
             return 0;
         }
     }
 
-    $self->_raw_place_cube_on_track( $EV_FROM_INTERFACE, $self->acting_player()->id(), $dest_type );
+    $self->_raw_place_cube_on_track( $EV_FROM_INTERFACE, $player->id(), $dest_type );
 
     my @allowed = ( 'unflip_colony_ship', 'finish_turn' );
 
-    if ( $self->acting_player()->race()->action_count() < $self->acting_player()->race()->maximum_action_count( $ACT_INFLUENCE ) ) {
+    if ( $race->action_count() < $race->maximum_action_count( $ACT_INFLUENCE ) ) {
         push( @allowed, 'action_influence' );
     }
 
-    $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $self->acting_player()->id(), @allowed );
+    $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $player->id(), @allowed );
 
     return 1;
 }
@@ -827,6 +895,9 @@ sub action_interrupt_replace_cube {
 sub action_interrupt_choose_discovery {
     my $self            = shift;
     my %args            = @_;
+
+    my $player = $self->active_player();
+    my $race = $player->race();
 
     unless ( defined( $args{'discovery_tag'} ) ) {
         $self->set_error( 'Missing Discovery tag' );
@@ -843,7 +914,7 @@ sub action_interrupt_choose_discovery {
     my $full_tag = '';
     my $tile_tag = '';
 
-    foreach my $item ( $self->active_player()->in_hand()->items() ) {
+    foreach my $item ( $player->in_hand()->items() ) {
         my ( $tile_tag, $tag ) = split( /:/, $item );
         if ( defined( $tag ) ) {
             if ( $tag eq $discovery_tag ) {
@@ -859,7 +930,7 @@ sub action_interrupt_choose_discovery {
 
     ( $tile_tag, $discovery_tag ) = split( /:/, $full_tag );
 
-    $self->_raw_use_discovery( $EV_FROM_INTERFACE, $self->active_player()->id(), $discovery_tag, $tile_tag, $flag_as_vp );
+    $self->_raw_use_discovery( $EV_FROM_INTERFACE, $player->id(), $discovery_tag, $tile_tag, $flag_as_vp );
 
     return 1;
 }
@@ -870,6 +941,9 @@ sub action_interrupt_select_technology {
     my $self            = shift;
     my %args            = @_;
 
+    my $player = $self->active_player();
+    my $race = $player->race();
+
     unless ( defined( $args{'chosen_tech'} ) ) {
         $self->set_error( 'Missing Tech Choice' );
         return 0;
@@ -877,7 +951,7 @@ sub action_interrupt_select_technology {
 
     my $tech_tag = $args{'chosen_tech'};
 
-    unless ( $self->acting_player()->in_hand()->contains( $tech_tag ) ) {
+    unless ( $player->in_hand()->contains( $tech_tag ) ) {
         $self->set_error( 'Invalid Tech Choice' );
         return 0;
     }
@@ -897,13 +971,13 @@ sub action_interrupt_select_technology {
         }
     }
 
-    foreach my $item ( $self->acting_player()->in_hand()->items() ) {
+    foreach my $item ( $player->in_hand()->items() ) {
         if ( defined( $self->technologies()->{ $item } ) ) {
-            $self->_raw_remove_item_from_hand( $EV_FROM_INTERFACE, $self->acting_player()->id(), $item );
+            $self->_raw_remove_item_from_hand( $EV_FROM_INTERFACE, $player->id(), $item );
         }
     }
 
-    $self->_raw_add_to_tech_track( $EV_FROM_INTERFACE, $self->acting_player()->id(), $tech_tag, $tech_type );
+    $self->_raw_add_to_tech_track( $EV_FROM_INTERFACE, $player->id(), $tech_tag, $tech_type );
     $self->_raw_remove_from_available_tech( $EV_FROM_INTERFACE, $tech_tag );
 
     return 1;

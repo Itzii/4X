@@ -518,6 +518,7 @@ sub _get_ship_text_of_owner_id {
     my $ship_text = '';
     my %ship_type_counts = ();
 
+    # if the tile is on the board - get info on real ships
     foreach my $ship_tag ( $tile->ships()->items() ) {
         my $ship = $self->ships()->{ $ship_tag };
         if ( $ship->owner_id() == $owner_id ) {
@@ -526,6 +527,18 @@ sub _get_ship_text_of_owner_id {
             }
             else {
                 $ship_type_counts{ $ship->template()->class() } = 1;
+            }
+        }
+    }
+
+    # if the tile hasn't been placed yet - get info on starting ship templates
+    if ( $tile->ships()->count() == 0 ) {
+        foreach my $ship_class ( $tile->starting_ships() ) {
+            if ( defined( $ship_type_counts{ $ship_class } ) ) {
+                $ship_type_counts{ $ship_class }++;
+            }
+            else {
+                $ship_type_counts{ $ship_class } = 1;
             }
         }
     }
@@ -556,12 +569,12 @@ sub _info_available_tech {
                 $available_tech{ $tech->category() } = [];
             }
 
-            unless ( defined( $tech_counts{ $tech->tag() } ) ) {
-                $tech_counts{ $tech->tag() } = 0;
+            unless ( defined( $tech_counts{ $tech->provides() } ) ) {
+                $tech_counts{ $tech->provides() } = 0;
                 push( @{ $available_tech{ $tech->category() } }, $tech );
             }
 
-            $tech_counts{ $tech->tag() }++;
+            $tech_counts{ $tech->provides() }++;
         }
     }
 
@@ -574,9 +587,9 @@ sub _info_available_tech {
         }
 
         foreach my $tech ( @sorted_techs ) {
-            my $text = $tech->long_name() . ' (' . $tech->base_cost() . '/' . $tech->min_cost() . ')';
-            if ( $tech_counts{ $tech->tag() } > 1 ) {
-                $text .= ' x' . $tech_counts{ $tech->tag() };
+            my $text = $tech->provides() . ' (' . $tech->base_cost() . '/' . $tech->min_cost() . ')';
+            if ( $tech_counts{ $tech->provides() } > 1 ) {
+                $text .= ' x' . $tech_counts{ $tech->provides() };
             }
             push( @tech_names, $text );
         }
@@ -621,7 +634,47 @@ sub _player_ascii {
 
             foreach ( $player->bare_in_hand() ) {
                 my $tile = $self->tiles()->{ $_ };
-                push( @tile_texts, $tile->tag() . ' [' . reverse( sprintf( '%06b', $tile->warps() ) ) . ']' );
+
+                my $text = $tile->tag() . ' [';
+                $text .= reverse( sprintf( '%06b', $tile->warps() ) ) . ' ';
+                $text .= $tile->base_vp() . 'VP ';
+                if ( $tile->ancient_links() > 0 ) {
+                    $text .= 'ANC' . $tile->ancient_links() . ' ';
+                }
+                if ( $tile->has_wormhole() ) {
+                    $text .= 'WORM ';
+                }
+                if ( $tile->is_hive() ) {
+                    $text .= 'HIVE ';
+                }
+                if ( $tile->discovery_count() > 0 ) {
+                    $text .= 'DISC' . $tile->discovery_count() . ' ';
+                }
+
+                my $ship_text = $self->_get_ship_text_of_owner_id( $tile, $tile->owner_id() );
+
+                if ( $ship_text ne '' ) {
+                    $text .= $ship_text . ' ';
+                }
+
+                my $colony_text = '';
+                foreach my $slot ( $tile->resource_slots() ) {
+                    my $temp_text = lc( text_from_resource_enum( $slot->resource_type(), 1 ) );
+
+                    if ( $slot->is_advanced() ) {
+                        $temp_text = uc( $temp_text );
+                    }
+
+                    $colony_text .= $temp_text;
+                }
+
+                if ( $colony_text ne '' ) {
+                    $text .= $colony_text . ' ';
+                }
+
+                $text .= ']';
+
+                push( @tile_texts, $text );
 
                 # TODO need more information about the tile. discoveries, defenders, etc ...
             }

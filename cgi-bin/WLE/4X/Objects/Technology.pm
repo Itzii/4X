@@ -73,6 +73,20 @@ sub min_cost {
 
 #############################################################################
 
+sub provides {
+    my $self        = shift;
+
+    my @items = $self->WLE::4X::Objects::Element::provides();
+
+    if ( scalar( @items ) > 0 ) {
+        return $items[ 0 ];
+    }
+
+    return '';
+}
+
+#############################################################################
+
 sub from_hash {
     my $self        = shift;
     my $r_hash      = shift;

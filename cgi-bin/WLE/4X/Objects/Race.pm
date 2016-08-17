@@ -526,6 +526,7 @@ sub template_of_class {
     my $class       = shift;
 
 #    print STDERR "\nAll Template Keys: " . join( ',', keys( %{ $self->server()->templates() } ) );
+#    print STDERR "\nlooking for class " . $class;
 
     foreach my $template_tag ( $self->ship_templates() ) {
 
@@ -538,6 +539,7 @@ sub template_of_class {
 #            print STDERR " ... class " . $template->class();
 
             if ( $template->class() eq $class ) {
+#                print STDERR " found.";
                 return $template;
             }
         }

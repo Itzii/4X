@@ -98,14 +98,23 @@ sub action_explore {
     my $player = $self->acting_player();
     my $race = $player->race();
 
-    unless ( defined( $args{'loc_x'} ) && defined( $args{'loc_y'} ) ) {
+    my $loc_tag = '';
+    my $loc_x = 0;
+    my $loc_y = 0;
+
+    if ( defined( $args{'location'} ) ) {
+        $loc_tag = $args{'location'};
+        ( $loc_x, $loc_y ) = split( /:/, $loc_tag );
+    }
+    elsif ( defined( $args{'loc_x'} && defined( $args{'loc_y'} ) ) ) {
+        $loc_x = $args{'loc_x'};
+        $loc_y = $args{'loc_y'};
+        $loc_tag = $loc_x . ':' . $loc_y;
+    }
+    else {
         $self->set_error( 'Missing Location Information' );
         return 0;
     }
-
-    my $loc_x = $args{'loc_x'};
-    my $loc_y = $args{'loc_y'};
-    my $loc_tag = $loc_x . ':' . $loc_y;
 
     my @explorables = $self->board()->explorable_spaces_for_player( $player->id() );
 

@@ -492,10 +492,16 @@ sub add_starting_ships {
 
     foreach my $ship_class ( $self->starting_ships() ) {
 
+#        print STDERR "\nCreating NPC ship of class $ship_class ... ";
+
         my @templates_of_class = ();
         foreach my $template ( values( %{ $self->server()->templates() } ) ) {
+
+#            print STDERR $template->tag() . ' ... ';
             if ( $template->class() eq $ship_class ) {
+#                print STDERR 'match found ' . $template->count() . ' ... ';
                 if ( $template->count() > 0 || $template->count() == -1 ) {
+#                    print STDERR "pushed ... ";
                     push( @templates_of_class, $template->tag() );
                 }
             }

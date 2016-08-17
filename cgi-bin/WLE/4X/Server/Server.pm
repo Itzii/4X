@@ -307,14 +307,14 @@ sub _check_allowed_action {
 #        print STDERR "\n ( " . $self->outside_status() . " )";
     }
 
-    if ( $user_id == -1 ) {
-        my $anon_user = WLE::4X::Objects::Player->new( 'server' => $self, 'user_id' => -1 );
-        $anon_user->set_long_name( 'Anonymous Player' );
-        $self->{'ENV'}->{'ACTING_PLAYER'} = $anon_user;
+    my $acting_player = $self->player_of_user_id( $user_id );
+
+    unless ( defined( $acting_player ) ) {
+        $acting_player = WLE::4X::Objects::Player->new( 'server' => $self, 'user_id' => -1, 'id' => -1 );
+        $acting_player->set_long_name( 'Anonymous Player' );
     }
-    else {
-        $self->{'ENV'}->{'ACTING_PLAYER'} = $self->player_of_user_id( $user_id );
-    }
+
+    $self->{'ENV'}->{'ACTING_PLAYER'} = $acting_player;
 
     if ( defined( $action->{'flag_anytime'} ) ) {
         return '';

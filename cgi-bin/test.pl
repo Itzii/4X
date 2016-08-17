@@ -14,7 +14,7 @@ use Data::Dumper;
 use Time::HiRes;
 use Module::Load;
 
-use WLE::4X::Objects::Server;
+# use WLE::4X::Objects::Server;
 
 
 # Do not use credentials for a database with working data!!!!!
@@ -43,7 +43,7 @@ my @_test_methods = (
 
 
 	[ 'WLE::4X::Server::Server'					  		, \&test_Object_Server ],
-	[ 'WLE::4X::Server::ASCII_Server'					, \&test_Object_Ascii_Server ],
+#	[ 'WLE::4X::Server::ASCII_Server'					, \&test_Object_Ascii_Server ],
 
 
 );
@@ -111,11 +111,11 @@ sub test_Methods_Simple {
 
 	ok( $value == $shifted_value, 'left shift of short byte is correct' );
 
-	$value = 0b00101101;
-	foreach ( 1 .. 6 ) {
-		$value = WLE::Methods::Simple::rotate_bits_left( $value, 6 );
-		show( sprintf( '%02i', $value ) );
-	}
+#	$value = 0b00101101;
+#	foreach ( 1 .. 6 ) {
+#		$value = WLE::Methods::Simple::rotate_bits_left( $value, 6 );
+#		show( sprintf( '%02i', $value ) );
+#	}
 
 	$value = 0b00000111;
 	$shifted_value = 0b00100011;
@@ -217,7 +217,7 @@ sub test_Object_Board {
 
 sub test_server {
 
-	return WLE::4X::Objects::Server->new(
+	return WLE::4X::Server::Server->new(
 		'resource_file'		=> "../resources/core.res",
 		'state_files'		=> "../statefiles",
 		'log_files'			=> "../statefiles",
@@ -235,10 +235,15 @@ sub test_Object_Server {
 
 	my $test_server = test_server();
 
-	my $owner_id = 55;
+	my $owner_id = 100;
 	my @user_ids = ( $owner_id, 200, 300 );
+	my %locations = (
+		'0:-2'	=> { 'explore' => '0:-1', 'race' => 'race_human1' },
+		'2:0' => { 'explore' => '1:0', 'race' => 'race_human2' },
+		'-2:2' => { 'explore' => '-1:1', 'race' => 'race_human3' },
+	);
 
-	ok( defined( $test_server ) && ref( $test_server ) eq 'WLE::4X::Objects::Server', 'server object created');
+	ok( defined( $test_server ) && ref( $test_server ) eq 'WLE::4X::Server::Server', 'server object created');
 
 	ok( $test_server->last_error() eq '', 'no errors found' );
 
@@ -272,15 +277,7 @@ sub test_Object_Server {
 
 	ok( $response{'success'} == 0, 'action_create_game failed with invalid owner_id' );
 
-	%response = test_server()->do(
-		'action' 		=> 'create_game',
-		'user'			=> $owner_id,
-		'log_id'		=> $log_id,
-		'source_tags'   => '',
-		'option_tags'   => '',
-	);
 
-	ok( $response{'success'} == 0, 'action_create_game failed with missing source tag' );
 
 	%response = test_server()->do(
 		'action' 		=> 'create_game',
@@ -392,107 +389,75 @@ sub test_Object_Server {
 
 #	return;
 
-	%response = test_server()->do(
-		'action'		=> 'select_race',
-		'user'			=> $waiting_for,
-		'log_id'		=> $log_id,
-		'race_tag'		=> 'race_human5',
-		'location_x'	=> 0,
-		'location_y'	=> -2,
-	);
+	my %explorable_locations = ();
 
-	ok( $response{'success'} == 1, 'select_race successful' );
-	unless( $response{'success'} == 1 ) {
-#		print STDERR "\nSending User ID: " . $waiting_for;
-		show( $response{'message'} );
+	foreach my $location ( keys( %locations ) ) {
+		$explorable_locations{ $waiting_for } = $locations{ $location }->{'explore'};
+
+		%response = test_server()->do(
+			'action'	=> 'select_race',
+			'user'		=> $waiting_for,
+			'log_id'	=> $log_id,
+			'race_tag'	=> $locations{ $location }->{'race'},
+			'location'	=> $location,
+		);
+
+		ok( $response{'success'} == 1, 'select_race successful' );
+		unless( $response{'success'} == 1 ) {
+			show( $response{'message'} );
+		}
+
+		%response = test_server()->do(
+			'action'		=> 'status',
+			'user'			=> $owner_id,
+			'log_id'		=> $log_id,
+		);
+		unless( $response{'success'} == 1 ) {
+			show( $response{'message'} );
+		}
+		@status = split( /:/, $response{'data'} );
+		$waiting_for = $status[ 3 ];
+
 	}
 
-#	return;
-
-	%response = test_server()->do(
-		'action'		=> 'status',
-		'user'			=> $owner_id,
-		'log_id'		=> $log_id,
-	);
-	unless( $response{'success'} == 1 ) {
-		show( $response{'message'} );
-	}
-#	show( $response{'data'} );
-
-	@status = split( /:/, $response{'data'} );
-	$waiting_for = $status[ 3 ];
-
-#	return;
-
-
-#	print STDERR "\n" . test_server()->outside_status();
-#	print STDERR "\n" . test_server()->status();
-#	print STDERR "\nSending User ID: " . $waiting_for;
-	%response = test_server()->do(
-		'action'		=> 'select_race',
-		'user'			=> $waiting_for,
-		'log_id'		=> $log_id,
-		'race_tag'		=> 'race_human2',
-		'location_x'	=> 2,
-		'location_y'	=> 0,
-	);
-	unless( $response{'success'} == 1 ) {
-		show( $response{'message'} );
-	}
-
-	%response = test_server()->do(
-		'action'		=> 'status',
-		'user'			=> $owner_id,
-		'log_id'		=> $log_id,
-	);
-
-	@status = split( /:/, $response{'data'} );
-	$waiting_for = $status[ 3 ];
-	show( $response{'data'} );
-
-#	return;
-
-	%response = test_server()->do(
-		'action'		=> 'select_race',
-		'user'			=> $waiting_for,
-		'log_id'		=> $log_id,
-		'race_tag'		=> 'race_human1',
-		'location_x'	=> -2,
-		'location_y'	=> 2,
-	);
-	unless( $response{'success'} == 1 ) {
-		show( $response{'message'} );
-	}
-
-	%response = test_server()->do(
-		'action'		=> 'status',
-		'user'			=> $owner_id,
-		'log_id'		=> $log_id,
-	);
-
-	@status = split( /:/, $response{'data'} );
-	$waiting_for = $status[ 3 ];
-	show( $response{'data'} );
-
-
-#	%response = test_server()->do(
-#		'action'		=> 'action_pass',
-#		'user'			=> '3',
-#		'log_id'		=> $log_id,
-#	);
+#	foreach ( 1 .. 3 ) {
 #
-#	ok( $response{'success'} == 0, 'action_pass failed' );
-
-
-
-#	%response = test_server()->do(
-#		'action'		=> 'action_pass',
-#		'user'			=> $waiting_for,
-#		'log_id'		=> $log_id,
-#	);
+#		%response = test_server()->do(
+#			'action'	=> 'action_explore',
+#			'user'		=> $waiting_for,
+#			'log_id'	=> $log_id,
+#			'location'	=> $explorable_locations{ $waiting_for },
+#		);
 #
-#	ok( $response{'success'} == 1, 'action_pass succeeded' );
-#	show( $response{'message'} );
+#		ok( $response{'success'} == 1, 'action_explore successful' );
+#		unless ( $response{'success'} == 1 ) {
+#			show( $response{'message'} );
+#		}
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#		%response = test_server()->do(
+#			'action'		=> 'status',
+#			'user'			=> $owner_id,
+#			'log_id'		=> $log_id,
+#		);
+#		unless( $response{'success'} == 1 ) {
+#			show( $response{'message'} );
+#		}
+#		@status = split( /:/, $response{'data'} );
+#		$waiting_for = $status[ 3 ];
+#
+#
+#	}
+
 
 
 	return;

@@ -35,40 +35,40 @@ $VAR1 = {
             'DEVELOPMENTS' => 3,
             'POSITIONS' => [
                 {
-                    'SPACE' => '0,-2',
+                    'SPACE' => '0:-2',
                     'WARPS' => 27,
                 },
                 {
-                    'SPACE' => '0,2',
+                    'SPACE' => '0:2',
                     'WARPS' => 27,
                 },
             ],
             'POSITIONS_W_NPC' => [
                 {
-                    'SPACE' => '0,-2',
+                    'SPACE' => '0:-2',
                     'WARPS' => 27,
                 },
                 {
-                    'SPACE' => '2,-2',
+                    'SPACE' => '2:-2',
                     'WARPS' => 54,
                     'NPC' => 1,
                 },
                 {
-                    'SPACE' => '2,0',
+                    'SPACE' => '2:0',
                     'WARPS' => 45,
                     'NPC' => 1,
                 },
                 {
-                    'SPACE' => '0,2',
+                    'SPACE' => '0:2',
                     'WARPS' => 27,
                 },
                 {
-                    'SPACE' => '-2,2',
+                    'SPACE' => '-2:2',
                     'WARPS' => 54,
                     'NPC' => 1,
                 },
                 {
-                    'SPACE' => '-2,0',
+                    'SPACE' => '-2:0',
                     'WARPS' => 45,
                     'NPC' => 1,
                 },
@@ -86,43 +86,43 @@ $VAR1 = {
             'DEVELOPMENTS' => 4,
             'POSITIONS' => [
                 {
-                    'SPACE' => '0,-2',
+                    'SPACE' => '0:-2',
                     'WARPS' => 27,
                 },
                 {
-                    'SPACE' => '2,0',
+                    'SPACE' => '2:0',
                     'WARPS' => 45,
                 },
                 {
-                    'SPACE' => '-2,2',
+                    'SPACE' => '-2:2',
                     'WARPS' => 54,
                 },
             ],
             'POSITIONS_W_NPC' => [
                 {
-                    'SPACE' => '0,-2',
+                    'SPACE' => '0:-2',
                     'WARPS' => 27,
                 },
                 {
-                    'SPACE' => '2,-2',
+                    'SPACE' => '2:-2',
                     'WARPS' => 54,
                     'NPC' => 1,
                 },
                 {
-                    'SPACE' => '2,0',
+                    'SPACE' => '2:0',
                     'WARPS' => 45,
                 },
                 {
-                    'SPACE' => '0,2',
+                    'SPACE' => '0:2',
                     'WARPS' => 27,
                     'NPC' => 1,
                 },
                 {
-                    'SPACE' => '-2,2',
+                    'SPACE' => '-2:2',
                     'WARPS' => 54,
                 },
                 {
-                    'SPACE' => '-2,0',
+                    'SPACE' => '-2:0',
                     'WARPS' => 45,
                     'NPC' => 1,
                 },
@@ -140,47 +140,47 @@ $VAR1 = {
             'DEVELOPMENTS' => 5,
             'POSITIONS' => [
                 {
-                    'SPACE' => '2,-2',
+                    'SPACE' => '2:-2',
                     'WARPS' => 54,
                 },
                 {
-                    'SPACE' => '2,0',
+                    'SPACE' => '2:0',
                     'WARPS' => 54,
                 },
                 {
-                    'SPACE' => '-2,2',
+                    'SPACE' => '-2:2',
                     'WARPS' => 54,
                 },
                 {
-                    'SPACE' => '-2,0',
+                    'SPACE' => '-2:0',
                     'WARPS' => 54,
                 },
             ],
             'POSITIONS_W_NPC' => [
                 {
-                    'SPACE' => '0,-2',
+                    'SPACE' => '0:-2',
                     'WARPS' => 27,
                     'NPC' => 1,
                 },
                 {
-                    'SPACE' => '2,-2',
+                    'SPACE' => '2:-2',
                     'WARPS' => 54,
                 },
                 {
-                    'SPACE' => '2,0',
+                    'SPACE' => '2:0',
                     'WARPS' => 45,
                 },
                 {
-                    'SPACE' => '0,2',
+                    'SPACE' => '0:2',
                     'WARPS' => 27,
                     'NPC' => 1,
                 },
                 {
-                    'SPACE' => '-2,2',
+                    'SPACE' => '-2:2',
                     'WARPS' => 54,
                 },
                 {
-                    'SPACE' => '-2,0',
+                    'SPACE' => '-2:0',
                     'WARPS' => 45,
                 },
             ],
@@ -197,50 +197,50 @@ $VAR1 = {
             'DEVELOPMENTS' => 6,
             'POSITIONS' => [
                 {
-                    'SPACE' => '0,-2',
+                    'SPACE' => '0:-2',
                     'WARPS' => 27,
                 },
                 {
-                    'SPACE' => '2,-2',
+                    'SPACE' => '2:-2',
                     'WARPS' => 27,
                 },
                 {
-                    'SPACE' => '2,0',
+                    'SPACE' => '2:0',
                     'WARPS' => 54,
                 },
                 {
-                    'SPACE' => '-2,2',
+                    'SPACE' => '-2:2',
                     'WARPS' => 54,
                 },
                 {
-                    'SPACE' => '-2,0',
+                    'SPACE' => '-2:0',
                     'WARPS' => 45,
                 },
             ],
             'POSITIONS_W_NPC' => [
                 {
-                    'SPACE' => '0,-2',
+                    'SPACE' => '0:-2',
                     'WARPS' => 27,
                 },
                 {
-                    'SPACE' => '2,-2',
+                    'SPACE' => '2:-2',
                     'WARPS' => 54,
                 },
                 {
-                    'SPACE' => '2,0',
+                    'SPACE' => '2:0',
                     'WARPS' => 45,
                 },
                 {
-                    'SPACE' => '0,2',
+                    'SPACE' => '0:2',
                     'WARPS' => 27,
                     'NPC' => 1,
                 },
                 {
-                    'SPACE' => '-2,2',
+                    'SPACE' => '-2:2',
                     'WARPS' => 54,
                 },
                 {
-                    'SPACE' => '-2,0',
+                    'SPACE' => '-2:0',
                     'WARPS' => 45,
                 },
             ],
@@ -257,53 +257,53 @@ $VAR1 = {
             'DEVELOPMENTS' => 7,
             'POSITIONS' => [
                 {
-                    'SPACE' => '0,-2',
+                    'SPACE' => '0:-2',
                     'WARPS' => 27,
                 },
                 {
-                    'SPACE' => '2,-2',
+                    'SPACE' => '2:-2',
                     'WARPS' => 54,
                 },
                 {
-                    'SPACE' => '2,0',
+                    'SPACE' => '2:0',
                     'WARPS' => 45,
                 },
                 {
-                    'SPACE' => '0,2',
+                    'SPACE' => '0:2',
                     'WARPS' => 27,
                 },
                 {
-                    'SPACE' => '-2,2',
+                    'SPACE' => '-2:2',
                     'WARPS' => 54,
                 },
                 {
-                    'SPACE' => '-2,0',
+                    'SPACE' => '-2:0',
                     'WARPS' => 45,
                 },
             ],
             'POSITIONS_W_NPC' => [
                 {
-                    'SPACE' => '0,-2',
+                    'SPACE' => '0:-2',
                     'WARPS' => 27,
                 },
                 {
-                    'SPACE' => '2,-2',
+                    'SPACE' => '2:-2',
                     'WARPS' => 54,
                 },
                 {
-                    'SPACE' => '2,0',
+                    'SPACE' => '2:0',
                     'WARPS' => 45,
                 },
                 {
-                    'SPACE' => '0,2',
+                    'SPACE' => '0:2',
                     'WARPS' => 27,
                 },
                 {
-                    'SPACE' => '-2,2',
+                    'SPACE' => '-2:2',
                     'WARPS' => 54,
                 },
                 {
-                    'SPACE' => '-2,0',
+                    'SPACE' => '-2:0',
                     'WARPS' => 45,
                 },
             ],
@@ -321,25 +321,25 @@ $VAR1 = {
             'DEVELOPMENTS' => 8,
             'POSITIONS' => [
                 {
-                    'SPACE' => '1,-3',
+                    'SPACE' => '1:-3',
                 },
                 {
-                    'SPACE' => '3,-2',
+                    'SPACE' => '3:-2',
                 },
                 {
-                    'SPACE' => '2,1',
+                    'SPACE' => '2:1',
                 },
                 {
-                    'SPACE' => '0,3',
+                    'SPACE' => '0:3',
                 },
                 {
-                    'SPACE' => '-2,3',
+                    'SPACE' => '-2:3',
                 },
                 {
-                    'SPACE' => '-3,2',
+                    'SPACE' => '-3:2',
                 },
                 {
-                    'SPACE' => '-2,-1',
+                    'SPACE' => '-2:-1',
                 },
             ],
         },
@@ -356,28 +356,28 @@ $VAR1 = {
             'DEVELOPMENTS' => 8,
             'POSITIONS' => [
                 {
-                    'SPACE' => '0,-3',
+                    'SPACE' => '0:-3',
                 },
                 {
-                    'SPACE' => '2,-3',
+                    'SPACE' => '2:-3',
                 },
                 {
-                    'SPACE' => '3,-2',
+                    'SPACE' => '3:-2',
                 },
                 {
-                    'SPACE' => '2,1',
+                    'SPACE' => '2:1',
                 },
                 {
-                    'SPACE' => '0,3',
+                    'SPACE' => '0:3',
                 },
                 {
-                    'SPACE' => '-2,3',
+                    'SPACE' => '-2:3',
                 },
                 {
-                    'SPACE' => '-3,2',
+                    'SPACE' => '-3:2',
                 },
                 {
-                    'SPACE' => '-2,-1',
+                    'SPACE' => '-2:-1',
                 },
             ],
         },
@@ -394,31 +394,31 @@ $VAR1 = {
             'DEVELOPMENTS' => 8,
             'POSITIONS' => [
                 {
-                    'SPACE' => '1,-3',
+                    'SPACE' => '1:-3',
                 },
                 {
-                    'SPACE' => '3,-3',
+                    'SPACE' => '3:-3',
                 },
                 {
-                    'SPACE' => '3,-1',
+                    'SPACE' => '3:-1',
                 },
                 {
-                    'SPACE' => '2,1',
+                    'SPACE' => '2:1',
                 },
                 {
-                    'SPACE' => '0,3',
+                    'SPACE' => '0:3',
                 },
                 {
-                    'SPACE' => '-2,3',
+                    'SPACE' => '-2:3',
                 },
                 {
-                    'SPACE' => '-3,2',
+                    'SPACE' => '-3:2',
                 },
                 {
-                    'SPACE' => '-3,0',
+                    'SPACE' => '-3:0',
                 },
                 {
-                    'SPACE' => '-1,-2',
+                    'SPACE' => '-1:-2',
                 },
             ],
         },

@@ -393,10 +393,21 @@ sub action_select_race_and_location {
         }
     }
 
-    unless (
-        looks_like_number( $args{'location_x'} )
-        && looks_like_number( $args{'location_y'} )
-    ) {
+    my $location_tag = '0:0';
+    my $loc_x = 0;
+    my $loc_y = 0;
+
+    if ( defined( $args{'location'} ) ) {
+        $location_tag = $args{'location'};
+        ( $loc_x, $loc_y ) = split( /:/, $location_tag );
+    }
+    elsif ( defined( $args{'loc_x'} ) && defined( $args{'loc_y'} ) ) {
+        $loc_x = $args{'loc_x'};
+        $loc_y = $args{'loc_y'};
+        $location_tag = $loc_x . ':' . $loc_y;
+    }
+
+    unless ( looks_like_number( $loc_x ) && looks_like_number( $loc_y ) ) {
         $self->set_error( 'Invalid location data.' );
         return 0;
     }
@@ -405,9 +416,8 @@ sub action_select_race_and_location {
     my $location_warps = undef;
 
     foreach my $location ( $self->starting_locations()->items() ) {
-        my ( $x, $y ) = split( ',', $location->{'SPACE'} );
-
-        if ( $args{'location_x'} == $x && $args{'location_y'} == $y ) {
+        print STDERR "\nChecking location: " . $location->{'SPACE'};
+        if ( $location_tag eq $location->{'SPACE'} ) {
             unless ( defined( $location->{'NPC'} ) ) {
                 $valid_location = 1;
                 if ( defined( $location->{'WARPS'} ) ) {
@@ -419,7 +429,7 @@ sub action_select_race_and_location {
     }
 
     unless ( $valid_location ) {
-        $self->set_error( 'Location is not available for starting.' );
+        $self->set_error( 'Location is not available for starting - ' . $location_tag );
         return 0;
     }
 
@@ -436,31 +446,18 @@ sub action_select_race_and_location {
         $EV_FROM_INTERFACE,
         $self->acting_player()->id(),
         $args{'race_tag'},
-        $args{'location_x'},
-        $args{'location_y'},
+        $loc_x,
+        $loc_y,
         $location_warps,
     );
 
     $self->_raw_player_pass_action( $EV_FROM_INTERFACE, $self->acting_player()->id() );
-
-#    print STDERR "\nActing Player ID: " . $self->acting_player()->id();
-
     $self->_raw_next_player( $EV_FROM_INTERFACE, $self->acting_player()->id() );
 
-#    print STDERR "\nNext User: " . $self->user_id_of_player_id( $self->waiting_on_player_id() );
-#    print STDERR "\nNext Player: " . $self->waiting_on_player_id();
-
-#    print STDERR "\nAfter selecting race Next Round: " . join( ',', $self->players_next_round()->items() );
-
-
     if ( $self->waiting_on_player_id() == -1 ) {
-#        print STDERR "\nStarting next round ... ";
 
         $self->_raw_prepare_for_first_round( $EV_FROM_INTERFACE );
-#        print STDERR "\nAfter preparing for first Round: " . join( ',', $self->players_next_round()->items() );
-
         $self->_raw_start_next_round( $EV_FROM_INTERFACE );
-#        print STDERR "\nAfter starting next Round: " . join( ',', $self->players_next_round()->items() );
     }
     else {
         $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $self->waiting_on_player_id(), 'select_race' );
@@ -475,13 +472,6 @@ sub _prepare_for_first_round {
     my $self            = shift;
 
     $self->_raw_remove_non_playing_races( $EV_FROM_INTERFACE );
-
-    # place galactic defense
-
-#    print STDERR "\n" . Dumper( $self->board()->{'SPACES'} );
-
-    my $tile = $self->board()->tile_at_location( 0, 0 );
-    $tile->add_starting_ships();
 
     if ( $self->has_option( 'ancient_homeworlds' ) ) {
 
@@ -498,8 +488,6 @@ sub _prepare_for_first_round {
 
                 $self->_raw_remove_tile_from_stack( 1, $tile_tag );
                 $self->_raw_place_tile_on_board( 1, $tile_tag, $x, $y, $location_warps );
-
-                $tile->add_starting_ships();
             }
         }
     }

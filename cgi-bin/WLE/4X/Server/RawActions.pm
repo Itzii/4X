@@ -1382,6 +1382,10 @@ sub _raw_select_race_and_location {
 
         my $template = $player->race()->template_of_class( $ship_class );
 
+#        unless ( defined( $template ) ) {
+#            print STDERR "\nNo template found ($ship_class) for player id " . $player->id();
+#        }
+
         $self->_raw_create_ship_on_tile(
             $EV_SUB_ACTION,
             $start_hex->tag(),
@@ -1678,6 +1682,8 @@ sub _raw_create_ship_on_tile {
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
         return $owner_id . ' created ship ' . $ship_tag . ' on tile ' . $tile_tag;
     }
+
+#    print "\nCreating ship $template_tag on $tile_tag";
 
     my $template = $self->templates()->{ $template_tag };
 

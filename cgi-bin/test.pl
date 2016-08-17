@@ -218,7 +218,7 @@ sub test_Object_Board {
 sub test_server {
 
 	return WLE::4X::Objects::Server->new(
-		'resource_file'		=> "../resources/official.res",
+		'resource_file'		=> "../resources/core.res",
 		'state_files'		=> "../statefiles",
 		'log_files'			=> "../statefiles",
 	);
@@ -503,7 +503,7 @@ sub test_Object_Server {
 sub ascii_server {
 
 	return WLE::4X::Objects::ASCII_Server->new(
-		'resource_file'		=> "../resources/official.res",
+		'resource_file'		=> "../resources/core.res",
 		'state_files'		=> "../statefiles",
 		'log_files'			=> "../statefiles",
 	);

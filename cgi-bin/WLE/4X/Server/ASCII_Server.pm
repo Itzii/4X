@@ -509,7 +509,7 @@ sub _get_ship_text_of_owner_id {
     'class_cruiser',
     'class_dreadnought',
     'class_starbase',
-    'class_ancient_cuiser',
+    'class_ancient_cruiser',
     'class_ancient_destroyer',
     'class_ancient_dreadnought',
     'class_defense',
@@ -622,6 +622,8 @@ sub _player_ascii {
             foreach ( $player->bare_in_hand() ) {
                 my $tile = $self->tiles()->{ $_ };
                 push( @tile_texts, $tile->tag() . ' [' . reverse( sprintf( '%06b', $tile->warps() ) ) . ']' );
+
+                # TODO need more information about the tile. discoveries, defenders, etc ...
             }
 
             $waiting_on_text .= ' (' . join( ',', @tile_texts ) . ')';
@@ -638,12 +640,19 @@ sub _player_ascii {
         return @lines;
     }
 
+    my $pass_text = '';
+
+    if ( $player->has_passed() ) {
+        $pass_text = ' [*PASSED*]';
+    }
+
     push(
         @lines,
         $player->id() . ') '
             . $player->race()->long_name()
             . ' [' . $player->user_id() . ']'
             . $waiting_on_text
+            . $pass_text
     );
 
     my %vp_items = $player->race()->vp_items_in_slots();

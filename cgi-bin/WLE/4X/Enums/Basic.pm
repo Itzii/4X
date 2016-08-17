@@ -253,7 +253,7 @@ sub desc_from_class {
         'class_cruiser'             => ['Cruiser', 'C' ],
         'class_dreadnought'         => ['Dreadnought', 'D' ],
         'class_starbase'            => ['Starbase', 'S' ],
-        'class_ancient_cuiser'      => ['Ancient Cruiser', 'Ac' ],
+        'class_ancient_cruiser'     => ['Ancient Cruiser', 'Ac' ],
         'class_ancient_destroyer'   => ['Ancient Destroyer', 'Ad' ],
         'class_ancient_dreadnought' => ['Ancient Dreadnought', 'An' ],
         'class_defense'             => ['Galactic Defense', 'G' ],

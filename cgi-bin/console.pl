@@ -16,7 +16,7 @@ use WLE::4X::Server::ASCII_Server;
 my %args = _parse_commandline();
 
 my $server = WLE::4X::Server::ASCII_Server->new(
-    'resource_file'		=> "../resources/official.res",
+    'resource_file'		=> "../resources/core.res",
     'state_files'		=> "../statefiles",
     'log_files'			=> "../statefiles",
 );

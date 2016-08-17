@@ -226,7 +226,9 @@ sub action_add_player {
         return 0;
     }
 
-    if ( defined( $self->player_of_user_id( $args{'user_id'} ) ) ) {
+    my $existing_player = $self->player_of_user_id( $args{'user_id'} );
+    if ( defined( $existing_player ) ) {
+        $self->set_error( 'User ID Already Exists' . ' ' . $args{'user_id'} );
         return 0;
     }
 
@@ -361,7 +363,7 @@ sub action_begin {
 
     $self->_raw_set_pending_player( $EV_FROM_INTERFACE, $new_player_order[ 0 ] );
     $self->_raw_set_status( $EV_FROM_INTERFACE, $self->status() );
-    $self->_raw_set_allowed_player_actions( 'select_race' );
+    $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $new_player_order[ 0 ], 'select_race' );
 
     return 1;
 }

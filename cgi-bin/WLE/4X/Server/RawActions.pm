@@ -1252,6 +1252,10 @@ sub _raw_place_tile_on_board {
     $self->tiles()->{ $tile_tag }->set_warps( $warps );
     $self->board()->place_tile( $location_x, $location_y, $tile_tag );
 
+    $self->tiles()->{ $tile_tag }->add_starting_ships();
+
+
+
     return;
 }
 
@@ -2129,7 +2133,7 @@ sub _raw_use_colony_ship {
 
     $player->race()->set_colony_ships_used( $player->race()->colony_ships_used() + 1 );
 
-    $player->race()->track_tag( $type )->spend();
+    $player->race()->resource_track_of( $type )->spend();
 
     $self->_raw_place_cube_on_tile( $EV_SUB_ACTION, $player_id, $tile_tag, $type, $advanced );
 

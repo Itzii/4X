@@ -14,7 +14,7 @@ use WLE::4X::Enums::Basic;
 sub action_pass_action {
     my $self            = shift;
 
-    my $player = $self->active_player();
+    my $player = $self->acting_player();
     my $race = $player->race();
 
     $self->_raw_player_pass_action( $EV_FROM_INTERFACE, $player->id() );
@@ -39,7 +39,7 @@ sub action_use_colony_ship {
     my $self            = shift;
     my %args            = @_;
 
-    my $player = $self->active_player();
+    my $player = $self->acting_player();
     my $race = $player->race();
 
     unless ( defined( $args{'tile_tag'} ) ) {
@@ -52,7 +52,7 @@ sub action_use_colony_ship {
         return 0;
     }
 
-    if ( $race->colony_ships_available() > 0 ) {
+    if ( $race->colony_ships_available() < 1 ) {
         $self->set_error( 'No Available Colony Ships' );
         return 0;
     }
@@ -244,11 +244,12 @@ sub action_explore_place_tile {
 
     $self->_raw_place_tile_on_board( $EV_FROM_INTERFACE, $tile_tag, $loc_x, $loc_y, $warps );
 
-    $tile->add_starting_ships();
-
     if ( $tile->ships()->count() < 1 || $race->provides( 'spec_descendants') ) {
+        print STDERR "\nChecking to influence ... ";
         if ( defined( $args{'influence'} ) ) {
+            print STDERR "influencing defined ... ";
             if ( $args{'influence'} eq '1' ) {
+                print STDERR "calling raw method.";
                 $self->_raw_influence_tile( $EV_FROM_INTERFACE, $player->id(), $tile_tag );
             }
         }

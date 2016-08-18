@@ -24,7 +24,10 @@ sub action_pass_action {
 
         my $combat_tile = $self->board()->outermost_combat_tile();
 
-        unless ( $combat_tile eq '' ) {
+        if ( $combat_tile eq '' ) {
+            $self->_raw_start_upkeep( $EV_FROM_INTERFACE );
+        }
+        else {
             $self->_raw_start_combat_phase( $EV_FROM_INTERFACE );
         }
     }
@@ -435,37 +438,40 @@ sub action_research {
         return 0;
     }
 
-    my $tech_tag = $args{'tech_tag'};
+    my $flag_tech_is_valid = 0;
+    my $tech = undef;
 
-    unless ( $self->tech_bag()->contains( $tech_tag ) ) {
+    foreach my $tag ( $self->tech_bag()->items() ) {
+        $tech = $self->technology()->{ $tag };
+        if ( $tech->provides() eq $args{'tech_tag'} ) {
+            $flag_tech_is_valid = 1;
+            last;
+        }
+    }
+
+    unless ( $flag_tech_is_valid ) {
         $self->set_error( 'Tech is unavailable' );
         return 0;
     }
 
-    my $provides = $self->techs()->{ $tech_tag }->provides();
-
-
-    if ( $race->has_technology( $provides ) ) {
+    if ( $race->has_technology( $tech->provides() ) ) {
         $self->set_error( 'Race already has technology' );
         return 0;
     }
 
-    my $tech = $self->techs()->{ $tech_tag };
+    my $dest_type = $tech->category();
 
-    unless ( defined( $args{'destination_type'} ) ) {
-        $self->set_error( 'Missing destination track' );
-        return 0;
-    }
+    if ( $tech->category() == $TECH_WILD ) {
+        unless ( defined( $args{'destination_type'} ) ) {
+            $self->set_error( 'Missing destination track' );
+            return 0;
+        }
 
-    my $dest_type = enum_from_tech_text( $args{'destination_type'} );
-    if ( $dest_type == $TECH_UNKNOWN ) {
-        $self->set_error( 'Invalid destination type' );
-        return 0;
-    }
-
-    unless ( $tech->category() == $TECH_WILD || $tech->category() == $dest_type ) {
-        $self->set_error( 'Tech may not be placed there' );
-        return 0;
+        $dest_type = enum_from_tech_text( $args{'destination_type'} );
+        if ( $dest_type == $TECH_UNKNOWN ) {
+            $self->set_error( 'Invalid destination type' );
+            return 0;
+        }
     }
 
     if ( $race->tech_track_of( $dest_type )->available_spaces() < 1 ) {

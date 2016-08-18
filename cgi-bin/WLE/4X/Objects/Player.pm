@@ -8,6 +8,7 @@ use WLE::Methods::Simple;
 use WLE::Objects::Stack;
 
 use WLE::4X::Enums::Status;
+use WLE::4X::Enums::Basic;
 
 #############################################################################
 # constructor args
@@ -432,6 +433,31 @@ sub end_turn {
     my $self        = shift;
 
     $self->allowed_actions()->clear();
+
+    return;
+}
+
+#############################################################################
+
+sub start_upkeep {
+    my $self        = shift;
+
+    my @actions = ();
+
+    if ( $self->race()->colony_ships_available() > 0 ) {
+        push( @actions, 'upkeep_colony_ship' );
+    }
+
+    my $upkeep_cost = $self->race()->resource_track_of( $RES_INFLUENCE )->track_value();
+
+    if ( $upkeep_cost <= $self->race()->resource_count( $RES_MONEY ) ) {
+        push( @actions, 'pay_upkeep' );
+    }
+    else {
+        push( @actions, 'pull_influence' )
+    }
+
+    $self->allowed_actions()->fill( @actions );
 
     return;
 }

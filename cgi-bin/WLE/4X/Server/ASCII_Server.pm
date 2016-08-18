@@ -102,7 +102,6 @@ sub _fill_text_data {
         phase_text_from_enum( $self->phase() ),
         subphase_text_from_enum( $self->subphase() ),
         $tile_name,
-
     );
 
     push( @lines, '' );
@@ -573,6 +572,8 @@ sub _info_available_tech {
                 $tech_counts{ $tech->provides() } = 0;
                 push( @{ $available_tech{ $tech->category() } }, $tech );
             }
+
+#            print STDERR "\n$tech_tag : " . $tech->provides();
 
             $tech_counts{ $tech->provides() }++;
         }

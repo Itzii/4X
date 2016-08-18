@@ -576,7 +576,7 @@ sub has_technology {
             my $tech = $self->server()->technology()->{ $possessed_tech_tag };
 
             if ( defined( $tech ) ) {
-                if ( $tech->provides( $tech_tag ) ) {
+                if ( $tech->does_provide( $tech_tag ) ) {
                     return 1;
                 }
             }

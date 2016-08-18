@@ -92,6 +92,8 @@ my %actions = (
     \&_raw_select_vp_token              => 'select_vp_token',
     \&_raw_next_vp_draw_player          => 'next_vp_draw',
 
+    \&_raw_start_upkeep                 => 'start_upkeep',
+
     \&_raw_swap_back_ambassadors        => 'swap_back_ambassadors',
 
 
@@ -2232,13 +2234,13 @@ sub _raw_buy_technology {
     my $track_type = shift( @args );
 
     my $player = $self->player_of_id( $player_id );
-    my $tech = $self->technologies()->{ $tech_tag };
+    my $tech = $self->technology()->{ $tech_tag };
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
         return $player_id . ' researched ' . $tech_tag;
     }
 
-    my $cost = $self->technologies()->base_cost();
+    my $cost = $self->technology()->{ $tech_tag }->base_cost();
     my $credit = $player->race()->tech_track_of( $track_type )->current_credit();
 
     $cost -= $credit;
@@ -2409,6 +2411,41 @@ sub _raw_start_next_round {
     $self->set_state( $ST_NORMAL );
     $self->set_round( $new_round );
     $self->set_phase( $PH_ACTION );
+    $self->set_waiting_on_player_id( $next_player );
+    $self->set_subphase( $SUB_NULL );
+    $self->set_current_tile( '' );
+
+    $self->_raw_set_status( $EV_SUB_ACTION, $self->status() );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_start_upkeep {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'starting upkeep';
+    }
+
+    my @ready = $self->done_players()->items();
+    $self->done_players()->clear();
+    $self->pending_players()->fill( @ready );
+
+    my $next_player = ( $self->pending_players()->items() )[ 0 ];
+
+    my $player = $self->player_of_id( $next_player );
+    $player->start_upkeep();
+
+    $self->set_state( $ST_NORMAL );
+    $self->set_phase( $PH_UPKEEP );
     $self->set_waiting_on_player_id( $next_player );
     $self->set_subphase( $SUB_NULL );
     $self->set_current_tile( '' );

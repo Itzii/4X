@@ -343,13 +343,15 @@ sub from_hash {
 
     my $provides = $r_hash->{'PROVIDES'};
 
-    if ( ref( $provides ) eq 'SCALAR') {
-        unless ( $provides eq '' ) {
-            push( @{ $self->{'PROVIDES'} }, $provides );
+    if ( defined( $provides ) ) {
+        if ( ref( $provides ) eq 'ARRAY' ) {
+            push( @{ $self->{'PROVIDES'} }, @{ $provides } );
         }
-    }
-    elsif ( ref( $provides ) eq 'ARRAY' ) {
-        push( @{ $self->{'PROVIDES'} }, @{ $provides } );
+        else {
+            unless ( $provides eq '' ) {
+                push( @{ $self->{'PROVIDES'} }, $provides );
+            }
+        }
     }
 
     return 1;
@@ -372,7 +374,7 @@ sub to_hash {
     $r_hash->{'REQUIRED_OPTION'} = $self->required_option();
     $r_hash->{'COUNT'} = $self->count();
 
-    $r_hash->{'PROVIDES'} = $self->{'PROVIDES'};
+    $r_hash->{'PROVIDES'} = [ @{ $self->{'PROVIDES'} } ];
 
     return 1;
 }

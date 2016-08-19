@@ -29,7 +29,18 @@ use WLE::4X::Objects::Race;
 use WLE::4X::Objects::Ship;
 use WLE::4X::Objects::ShipTemplate;
 
+my $_option_notes = <<'END';
 
+    option_unlimited_ships      => not limited to the count of plastic ships
+
+    option_order_by_passing     => next round order determined by passing order
+    option_order_direction      => 2nd player to pass determines play direction
+
+
+
+
+
+END
 
 #############################################################################
 # constructor args

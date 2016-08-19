@@ -204,14 +204,9 @@ sub adjusted_allowed_actions {
 
     my $list = WLE::Objects::Stack->new();
 
-    # has discoveries in hand from influencing tile
-    if ( $self->has_discovery_in_hand() ) {
-        $list->add_items( 'choose_discovery' );
-    }
-
-    # has influence token in hand from influence action
-    elsif ( $self->in_hand()->contains( 'influence_token' ) ) {
-        $list->add_items( 'place_influence_token' );
+    # cube in hand from de-influencing tile
+    if ( $self->has_cube_in_hand() ) {
+        $list->add_items( 'replace_cube' );
     }
 
     # has multiple technologies in hand from discovery tile
@@ -224,9 +219,14 @@ sub adjusted_allowed_actions {
         $list->add_items( 'place_component' );
     }
 
-    # cube in hand from de-influencing tile
-    elsif ( $self->has_cube_in_hand() ) {
-        $list->add_items( 'replace_cube' );
+    # has discoveries in hand from influencing tile
+    elsif ( $self->has_discovery_in_hand() ) {
+        $list->add_items( 'choose_discovery' );
+    }
+
+    # has influence token in hand from influence action
+    elsif ( $self->in_hand()->contains( 'influence_token' ) ) {
+        $list->add_items( 'place_influence_token' );
     }
 
     else {

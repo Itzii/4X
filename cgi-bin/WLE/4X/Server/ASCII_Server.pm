@@ -107,6 +107,9 @@ sub _fill_text_data {
     push( @lines, '' );
     push( @lines, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^' );
     push( @lines, 'Current Game State: ' . $status_text );
+    push( @lines, 'Pending: ' . join( ',', $self->pending_players()->items() ) );
+    push( @lines, 'Done: ' . join( ',', $self->done_players()->items() ) );
+    push( @lines, 'Next Round: ' . join( ',', $self->players_next_round()->items() ) );
 
     if ( $self->waiting_on_player_id() > -1 ) {
         push( @lines, '' );

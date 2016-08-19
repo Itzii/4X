@@ -554,7 +554,7 @@ sub available_resource_spots {
     my $count = 0;
 
     foreach my $slot ( $self->resource_slots() ) {
-        unless ( $slot->resource_type() == $res_type ) {
+        unless ( $slot->resource_type() == $res_type || $slot->resource_type() == $RES_WILD ) {
             next;
         }
 

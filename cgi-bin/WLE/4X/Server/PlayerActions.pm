@@ -161,26 +161,37 @@ sub action_explore_place_tile {
     my $player = $self->acting_player();
     my $race = $player->race();
 
-    unless ( defined( $args{'tile_tag'} ) ) {
-        $self->set_error( 'Missing Tile Tag' );
-        return 0;
-    }
-
-    my $tile_tag = $args{'tile_tag'};
-
-    my $flag_tile_in_hand = 0;
+    my $tile_tag = '';
     my $tile_tag_w_loc = '';
 
-    foreach my $in_hand ( $player->in_hand()->items() ) {
-        if ( $in_hand =~ m { : $tile_tag $ }xs ) {
-            $flag_tile_in_hand = 1;
-            $tile_tag_w_loc = $in_hand;
-            last;
+    if ( $player->in_hand()->count() > 1 ) {
+
+        unless ( defined( $args{'tile_tag'} ) ) {
+            $self->set_error( 'Missing Tile Tag' );
+            return 0;
+        }
+
+        $tile_tag = $args{'tile_tag'};
+
+        unless ( matches_any( $tile_tag, $player->bare_in_hand() ) ) {
+            $self->set_error( 'Invalid Tile Tag' );
+            return 0;
+        }
+
+        foreach my $item ( $player->in_hand()->items() ) {
+            my @parts = split( /:/, $item );
+            if ( $parts[ -1 ] eq $tile_tag ) {
+                $tile_tag_w_loc = $item;
+            }
         }
     }
-
-    unless ( $flag_tile_in_hand ) {
-        $self->set_error( 'Invalid Tile Tag' );
+    elsif ( $player->has_tile_in_hand() ) {
+        $tile_tag_w_loc = ( $player->in_hand()->items() )[ 0 ];
+        my @parts = split( /:/, $tile_tag_w_loc );
+        $tile_tag = $parts[ -1 ];
+    }
+    else {
+        $self->set_error( 'No Tile In Hand' );
         return 0;
     }
 
@@ -257,11 +268,11 @@ sub action_explore_place_tile {
     $self->_raw_place_tile_on_board( $EV_FROM_INTERFACE, $tile_tag, $loc_x, $loc_y, $warps );
 
     if ( $tile->ships()->count() < 1 || $race->provides( 'spec_descendants') ) {
-        print STDERR "\nChecking to influence ... ";
+#        print STDERR "\nChecking to influence ... ";
         if ( defined( $args{'influence'} ) ) {
-            print STDERR "influencing defined ... ";
+#            print STDERR "influencing defined ... ";
             if ( $args{'influence'} eq '1' ) {
-                print STDERR "calling raw method.";
+#                print STDERR "calling raw method.";
                 $self->_raw_influence_tile( $EV_FROM_INTERFACE, $player->id(), $tile_tag );
             }
         }
@@ -275,7 +286,13 @@ sub action_explore_place_tile {
         $self->_raw_discard_tile( $EV_FROM_INTERFACE, $tile_tag );
     }
 
-    my @actions = ( 'finish_turn' );
+    my @actions = ();
+
+    if ( $tile->discovery_count() > 0 && $tile->owner_id() == $self->player->id() ) {
+        $self->_raw_add_tile_discoveries_to_hand( $EV_FROM_INTERFACE, $player->id(), $tile->tag() );
+    }
+
+    @actions = ( 'finish_turn' );
 
     if ( $race->action_count() < $race->maximum_action_count( $ACT_EXPLORE ) ) {
         if ( $race->can_explore() ) {
@@ -301,19 +318,39 @@ sub action_explore_discard_tile {
     my $player = $self->acting_player();
     my $race = $player->race();
 
-    unless ( defined( $args{'tile_tag'} ) ) {
-        $self->set_error( 'Missing Tile Tag' );
+    my $tile_tag = '';
+    my $tile_tag_w_loc = '';
+
+    if ( $player->in_hand()->count > 1 ) {
+
+        unless ( defined( $args{'tile_tag'} ) ) {
+            $self->set_error( 'Missing Tile Tag' );
+            return 0;
+        }
+
+        $tile_tag = $args{'tile_tag'};
+
+        unless ( matches_any( $tile_tag, $player->bare_in_hand() ) ) {
+            $self->set_error( 'Invalid Tile Tag' );
+            return 0;
+        }
+
+        foreach my $item ( $player->in_hand()->items() ) {
+            my @parts = split( /:/, $item );
+            if ( $parts[ -1 ] eq $tile_tag ) {
+                $tile_tag_w_loc = $item;
+            }
+        }
+    }
+    elsif ( $player->has_tile_in_hand() ) {
+        $tile_tag_w_loc = ( $player->in_hand()->items() )[ 0 ];
+        my @parts = split( /:/, $tile_tag_w_loc );
+        $tile_tag = $parts[ -1 ];
+    }
+    else {
+        $self->set_error( 'No Tile In Hand' );
         return 0;
     }
-
-    my $tile_tag_w_loc = $args{'tile_tag'};
-
-    unless ( $player->in_hand()->contains( $tile_tag_w_loc ) ) {
-        $self->set_error( 'Invalid Tile Tag' );
-        return 0;
-    }
-
-    my ( $loc_x, $loc_y, $tile_tag ) = split( /:/, $tile_tag_w_loc, 3 );
 
     $self->_raw_remove_item_from_hand( $EV_FROM_INTERFACE, $player->id(), $tile_tag_w_loc );
     $self->_raw_discard_tile( $EV_FROM_INTERFACE, $tile_tag );

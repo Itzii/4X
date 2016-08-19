@@ -54,6 +54,7 @@ my %actions = (
     \&_raw_add_ancient_link_to_tile     => 'add_ancient_link_to_tile',
     \&_raw_add_wormhole_to_tile         => 'add_wormhole_to_tile',
     \&_raw_add_vp_to_tile               => 'add_vp_to_tile',
+    \&_raw_add_tile_discoveries_to_hand => 'add_discovery_to_hand',
 
     \&_raw_place_cube_on_track          => 'place_cube_on_track',
     \&_raw_pick_up_influence            => 'pick_up_influence',
@@ -1807,6 +1808,32 @@ sub _raw_remove_discovery_from_tile {
 
 #############################################################################
 
+sub _raw_add_tile_discoveries_to_hand {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $player_id       = shift( @args );
+    my $tile_tag        = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return $player_id . ' claiming discoveries from tile ' . $tile_tag;
+    }
+
+    foreach my $discovery_tag ( $self->tiles()->{ $tile_tag }->discoveries() ) {
+        $self->_raw_remove_discovery_from_tile( $EV_SUB_ACTION, $tile_tag, $discovery_tag );
+        $self->_raw_add_item_to_hand( $EV_SUB_ACTION, $player_id, $tile_tag . ':' . $discovery_tag );
+    }
+
+    return;
+}
+
+#############################################################################
+
 sub _raw_add_slot_to_tile {
     my $self        = shift;
     my $source      = shift;
@@ -2298,6 +2325,47 @@ sub _raw_player_pass_action {
     }
 
     $self->player_of_id( $player_id )->set_flag_passed( 1 );
+
+    if ( $self->has_option( 'option_order_by_passing' ) ) {
+        unless ( $self->players_next_round()->contains( $player_id ) ) {
+            $self->players_next_round()->add_items( $player_id );
+        }
+    }
+    elsif ( $self->has_option( 'option_order_direction' ) ) {
+        if ( $self->players_next_round()->count() == 0 ) {
+            $self->players_next_round()->add_items( $player_id );
+        }
+        elsif ( $self->players_next_round()->count() == 1 ) {
+            unless ( $self->players_next_round()->contains( $player_id ) {
+                my $first_player = ($self->players_next_round())[ 0 ];
+
+                my @order = $self->pending_players()->items();
+                push( @order, $self->done_players()->items() );
+
+                while ( $order[ 0 ] != $first_player ) {
+                    push( @order, shift( @order ) );
+                }
+
+                $self->_raw_add_item_to_hand( $EV_SUB_ACTION, $player_id, 'order:' . join( ',', @order ) );
+
+                push( @order, shift( @order ) );
+                @order = reverse( @order );
+
+                $self->_raw_add_item_to_hand( $EV_SUB_ACTION, $player_id, 'order:', join( ',', @order ) );
+            }
+        }
+
+    }
+    elsif ( $self->players_next_round()->count() == 0 ) {
+        my @order = $self->pending_players()->items();
+        push( @order, $self->done_players()->items() );
+
+        while ( $order[ 0 ] != $first_player ) {
+            push( @order, shift( @order ) );
+        }
+
+        $self->players_next_round()->add_items( @order );
+    }
 
     return;
 }

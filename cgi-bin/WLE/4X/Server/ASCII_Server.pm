@@ -114,7 +114,7 @@ sub _fill_text_data {
     if ( $self->waiting_on_player_id() > -1 ) {
         push( @lines, '' );
 
-        my @actions = $self->player_of_id( $self->waiting_on_player_id() )->allowed_actions()->items();
+        my @actions = $self->player_of_id( $self->waiting_on_player_id() )->adjusted_allowed_actions()->items();
 
         push(
             @lines,
@@ -621,6 +621,57 @@ sub _info_players {
 
 #############################################################################
 
+sub _tile_in_hand_ascii {
+    my $self            = shift;
+    my $tile_tag        = shift;
+
+    my $tile = $self->tiles()->{ $tile_tag };
+
+    my $text = $tile->tag() . ' [';
+    $text .= reverse( sprintf( '%06b', $tile->warps() ) ) . ' ';
+    $text .= $tile->base_vp() . 'VP ';
+    if ( $tile->ancient_links() > 0 ) {
+        $text .= 'ANC' . $tile->ancient_links() . ' ';
+    }
+    if ( $tile->has_wormhole() ) {
+        $text .= 'WORM ';
+    }
+    if ( $tile->is_hive() ) {
+        $text .= 'HIVE ';
+    }
+    if ( $tile->discovery_count() > 0 ) {
+        $text .= 'DISC' . $tile->discovery_count() . ' ';
+    }
+
+    my $ship_text = $self->_get_ship_text_of_owner_id( $tile, $tile->owner_id() );
+
+    if ( $ship_text ne '' ) {
+        $text .= $ship_text . ' ';
+    }
+
+    my $colony_text = '';
+    foreach my $slot ( $tile->resource_slots() ) {
+        my $temp_text = lc( text_from_resource_enum( $slot->resource_type(), 1 ) );
+
+        if ( $slot->is_advanced() ) {
+            $temp_text = uc( $temp_text );
+        }
+
+        $colony_text .= $temp_text;
+    }
+
+    if ( $colony_text ne '' ) {
+        $text .= $colony_text . ' ';
+    }
+
+    $text .= ']';
+
+    return $text;
+}
+
+
+#############################################################################
+
 sub _player_ascii {
     my $self            = shift;
     my $player          = shift;
@@ -637,53 +688,18 @@ sub _player_ascii {
             my @tile_texts = ();
 
             foreach ( $player->bare_in_hand() ) {
-                my $tile = $self->tiles()->{ $_ };
-
-                my $text = $tile->tag() . ' [';
-                $text .= reverse( sprintf( '%06b', $tile->warps() ) ) . ' ';
-                $text .= $tile->base_vp() . 'VP ';
-                if ( $tile->ancient_links() > 0 ) {
-                    $text .= 'ANC' . $tile->ancient_links() . ' ';
-                }
-                if ( $tile->has_wormhole() ) {
-                    $text .= 'WORM ';
-                }
-                if ( $tile->is_hive() ) {
-                    $text .= 'HIVE ';
-                }
-                if ( $tile->discovery_count() > 0 ) {
-                    $text .= 'DISC' . $tile->discovery_count() . ' ';
-                }
-
-                my $ship_text = $self->_get_ship_text_of_owner_id( $tile, $tile->owner_id() );
-
-                if ( $ship_text ne '' ) {
-                    $text .= $ship_text . ' ';
-                }
-
-                my $colony_text = '';
-                foreach my $slot ( $tile->resource_slots() ) {
-                    my $temp_text = lc( text_from_resource_enum( $slot->resource_type(), 1 ) );
-
-                    if ( $slot->is_advanced() ) {
-                        $temp_text = uc( $temp_text );
-                    }
-
-                    $colony_text .= $temp_text;
-                }
-
-                if ( $colony_text ne '' ) {
-                    $text .= $colony_text . ' ';
-                }
-
-                $text .= ']';
-
-                push( @tile_texts, $text );
-
-                # TODO need more information about the tile. discoveries, defenders, etc ...
+                push( @tile_texts, $self->_tile_in_hand_ascii( $_ ) );
             }
 
             $waiting_on_text .= ' (' . join( ',', @tile_texts ) . ')';
+        }
+
+        if ( $player->has_discovery_in_hand() ) {
+            my @discovery_texts = ();
+            foreach ( $player->bare_in_hand() ) {
+                push( @discovery_texts, $_ );
+            }
+            $waiting_on_text .= ' (' . join( ',', @discovery_texts ) . ')';
         }
 
     }

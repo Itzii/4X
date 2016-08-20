@@ -54,8 +54,8 @@ sub _init {
     $self->{'ORBITAL'} = 0;
     $self->{'MONOLITH'} = 0;
     $self->{'STARTING_SHIPS'} = [];
-    $self->{'DISCOVERIES'} = [];
 
+    $self->{'DISCOVERIES'} = WLE::Objects::Stack->new();
     $self->{'SHIPS'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
     $self->{'OWNER_QUEUE'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
     $self->{'VP_DRAW_QUEUE'} = WLE::Objects::Stack->new();
@@ -166,7 +166,7 @@ sub discovery_count {
 sub discoveries {
     my $self        = shift;
 
-    return @{ $self->{'DISCOVERIES'} };
+    return $self->{'DISCOVERIES'};
 }
 
 #############################################################################
@@ -175,9 +175,7 @@ sub add_discovery {
     my $self        = shift;
     my $value       = shift;
 
-    $self->remove_discovery( $value );
-
-    push( @{ $self->{'DISCOVERIES'} }, $value );
+    $self->discoveries()->add_items( $value );
 
     return;
 }
@@ -188,15 +186,8 @@ sub remove_discovery {
     my $self        = shift;
     my $value       = shift;
 
-    my @holder = ();
-
-    foreach my $tag ( $self->discoveries() ) {
-        unless ( $tag eq $value ) {
-            push( @holder, $tag );
-        }
-    }
-
-    $self->{'DISCOVERIES'} = \@holder;
+    $self->discoveries()->remove_item( $value );
+    $self->{'DISCOVERY_COUNT'} = $self->discoveries()->count();
 
     return;
 }
@@ -805,14 +796,14 @@ sub from_hash {
         }
     }
 
-    foreach my $tag ( 'STARTING_SHIPS', 'DISCOVERIES' ) {
+    foreach my $tag ( 'STARTING_SHIPS' ) {
         if ( defined( $r_hash->{ $tag } ) ) {
             my @temp_array = @{ $r_hash->{ $tag } };
             $self->{ $tag } = \@temp_array;
         }
     }
 
-    foreach my $tag ( 'SHIPS', 'OWNER_QUEUE', 'VP_DRAW_QUEUE' ) {
+    foreach my $tag ( 'SHIPS', 'OWNER_QUEUE', 'VP_DRAW_QUEUE', 'DISCOVERIES' ) {
         $self->{ $tag }->fill( @{ $r_hash->{ $tag } } );
     }
 
@@ -852,11 +843,11 @@ sub to_hash {
         $r_hash->{ $tag } = $self->{ $tag };
     }
 
-    foreach my $tag ( 'SHIPS', 'OWNER_QUEUE', 'VP_DRAW_QUEUE' ) {
+    foreach my $tag ( 'SHIPS', 'OWNER_QUEUE', 'VP_DRAW_QUEUE', 'DISCOVERIES' ) {
         $r_hash->{ $tag } = [ $self->{ $tag }->items() ];
     }
 
-    foreach my $tag ( 'STARTING_SHIPS', 'DISCOVERIES' ) {
+    foreach my $tag ( 'STARTING_SHIPS' ) {
         $r_hash->{ $tag } = [ @{ $self->{ $tag } } ];
     }
 

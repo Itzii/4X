@@ -1824,7 +1824,7 @@ sub _raw_add_tile_discoveries_to_hand {
         return $player_id . ' claiming discoveries from tile ' . $tile_tag;
     }
 
-    foreach my $discovery_tag ( $self->tiles()->{ $tile_tag }->discoveries() ) {
+    foreach my $discovery_tag ( $self->tiles()->{ $tile_tag }->discoveries()->items() ) {
         $self->_raw_remove_discovery_from_tile( $EV_SUB_ACTION, $tile_tag, $discovery_tag );
         $self->_raw_add_item_to_hand( $EV_SUB_ACTION, $player_id, $tile_tag . ':' . $discovery_tag );
     }
@@ -1959,7 +1959,10 @@ sub _raw_use_discovery {
         $player->race()->discovery_vps()->add_items( $discovery_tag );
     }
     else {
-        $self->use_discovery( $tile_tag, $discovery_tag );
+        unless( $self->use_discovery( $player_id, $tile_tag, $discovery_tag ) ) {
+            $self->set_error( 'Unknown Discovery Effect' );
+            return;
+        }
     }
 
     $player->in_hand()->remove_item( $tile_tag . ':' . $discovery_tag );
@@ -2336,7 +2339,7 @@ sub _raw_player_pass_action {
             $self->players_next_round()->add_items( $player_id );
         }
         elsif ( $self->players_next_round()->count() == 1 ) {
-            unless ( $self->players_next_round()->contains( $player_id ) {
+            unless ( $self->players_next_round()->contains( $player_id ) ) {
                 my $first_player = ($self->players_next_round())[ 0 ];
 
                 my @order = $self->pending_players()->items();
@@ -2360,7 +2363,7 @@ sub _raw_player_pass_action {
         my @order = $self->pending_players()->items();
         push( @order, $self->done_players()->items() );
 
-        while ( $order[ 0 ] != $first_player ) {
+        while ( $order[ 0 ] != $player_id ) {
             push( @order, shift( @order ) );
         }
 

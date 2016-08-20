@@ -14,7 +14,7 @@ use Data::Dumper;
 use Time::HiRes;
 use Module::Load;
 
-# use WLE::4X::Objects::Server;
+use WLE::4X::Server::Server;
 
 
 # Do not use credentials for a database with working data!!!!!

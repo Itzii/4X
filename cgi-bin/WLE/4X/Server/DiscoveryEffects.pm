@@ -1,4 +1,4 @@
-package WLE::4X::Objects::Server;
+package WLE::4X::Server::Server;
 
 use strict;
 use warnings;
@@ -12,11 +12,16 @@ use WLE::4X::Objects::ShipComponent;
 
 sub use_discovery {
     my $self            = shift;
+    my $player_id       = shift;
     my $tile_tag        = shift;
     my $discovery_tag   = shift;
 
+    print STDERR "\nUse Discovery: " . $player_id . ' ' . $tile_tag . ' ' . $discovery_tag;
+
+    my $player = $self->player_of_id( $player_id );
+    my $race = $player->race();
+
     my $discovery = $self->discoveries()->{ $discovery_tag };
-    my $race = $self->race_of_acting_player();
 
     if ( $discovery->adds_component() ) {
         $race->add_hand_item( $discovery->component() );
@@ -24,6 +29,7 @@ sub use_discovery {
     }
     elsif ( $discovery->adds_resource() ) {
         foreach my $resource ( keys( %{ $discovery->resources() } ) ) {
+            print STDERR " adding " . $discovery->resources()->{ $resource } . ' points of ' . text_from_resource_enum( $resource ) . ' to player ' . $race->owner_id();
             $race->add_resource( $resource, $discovery->resources()->{ $resource } );
         }
 
@@ -40,7 +46,7 @@ sub use_discovery {
             return 0;
         }
 
-        $self->_raw_create_ship_on_tile( $EV_SUB_ACTION, $tile_tag, $template->tag(), $race->owner_id() );
+        $self->_raw_create_ship_on_tile( $EV_SUB_ACTION, $tile_tag, $template->tag(), $player->id() );
 
         return 1;
     }
@@ -58,7 +64,7 @@ sub use_discovery {
         my $resource = 6;
 
         while ( $resource >= $template->cost() ) {
-            $resource -= $template_cost();
+            $resource -= $template->cost();
             $self->_raw_create_ship_on_tile( $EV_SUB_ACTION, $tile_tag, $template->tag(), $race->owner_id() );
         }
 
@@ -82,7 +88,7 @@ sub use_discovery {
 
         return 1;
     }
-    elsif ( $discovery()->tag() eq 'disc_technology' ) {
+    elsif ( $discovery->tag() eq 'disc_technology' ) {
 
         my $tech_list = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
 

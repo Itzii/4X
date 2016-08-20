@@ -288,8 +288,9 @@ sub action_explore_place_tile {
 
     my @actions = ();
 
-    if ( $tile->discovery_count() > 0 && $tile->owner_id() == $self->player->id() ) {
+    if ( $tile->discovery_count() > 0 && $tile->owner_id() == $player->id() ) {
         $self->_raw_add_tile_discoveries_to_hand( $EV_FROM_INTERFACE, $player->id(), $tile->tag() );
+
     }
 
     @actions = ( 'finish_turn' );
@@ -869,7 +870,7 @@ sub action_interrupt_place_influence_token {
         $self->_raw_influence_tile( $EV_FROM_INTERFACE, $player->id(), $influence_to );
 
         unless ( $tile->has_ancient_cruiser() ) {
-            foreach my $discovery_tag ( $tile->discoveries() ) {
+            foreach my $discovery_tag ( $tile->discoveries()->items() ) {
                 $self->_raw_remove_discovery_from_tile( $EV_FROM_INTERFACE, $influence_to, $discovery_tag );
                 $self->_raw_add_item_to_hand( $EV_FROM_INTERFACE, $player->id(), $tile->tag() . ':' . $discovery_tag );
             }

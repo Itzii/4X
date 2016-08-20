@@ -229,6 +229,11 @@ sub adjusted_allowed_actions {
         $list->add_items( 'place_influence_token' );
     }
 
+    # has player-order selection
+    elsif ( $self->has_player_order_in_hand() ) {
+        $list->add_items( 'select_player_order' );
+    }
+
     else {
         return $self->allowed_actions();
     }
@@ -358,6 +363,21 @@ sub has_cube_in_hand {
 
     return 0;
 }
+
+#############################################################################
+
+sub has_player_order_in_hand {
+    my $self        = shift;
+
+    foreach my $item ( $self->in_hand()->items() ) {
+        if ( $item =~ m{ ^ order: }xs ) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
 
 #############################################################################
 

@@ -73,7 +73,7 @@ sub adds_component {
 sub adds_resource {
     my $self        = shift;
 
-    foreach my $resource ( $self->{'RESOURCES'} ) {
+    foreach my $resource ( keys( %{ $self->{'RESOURCES'} } ) ) {
         if ( $self->{'RESOURCES'}->{ $resource } > 0 ) {
             return 1;
         }

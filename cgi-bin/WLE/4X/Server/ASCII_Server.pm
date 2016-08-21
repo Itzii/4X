@@ -702,6 +702,10 @@ sub _player_ascii {
             $waiting_on_text .= ' (' . join( ',', @discovery_texts ) . ')';
         }
 
+        if ( $player->has_influence_in_hand() ) {
+            $waiting_on_text .= ' (influence_token)';
+        }
+
     }
 
     if ( $player->race_tag() eq '' ) {

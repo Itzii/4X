@@ -20,9 +20,13 @@ sub action_pass_action {
     $self->_raw_player_pass_action( $EV_FROM_INTERFACE, $player->id() );
     $self->_raw_next_player( $EV_FROM_INTERFACE, $player->id() );
 
+    print STDERR "\nWaiting On Player: " . $self->waiting_on_player_id();
+
     if ( $self->waiting_on_player_id() == -1 ) {
 
         my $combat_tile = $self->board()->outermost_combat_tile();
+
+        print STDERR " combat tile: " . $combat_tile;
 
         if ( $combat_tile eq '' ) {
             $self->_raw_start_upkeep( $EV_FROM_INTERFACE );
@@ -88,6 +92,10 @@ sub action_use_colony_ship {
     }
 
     $self->_raw_use_colony_ship( $EV_FROM_INTERFACE, $player->id(), $tile_tag, $type, $advanced );
+
+    if ( $player->race()->colony_ships_available() < 1 ) {
+        $self->_raw_remove_allowed_player_action( $EV_FROM_INTERFACE, $player->id(), 'use_colony_ship' );
+    }
 
     return 1;
 }

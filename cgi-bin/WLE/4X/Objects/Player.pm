@@ -225,7 +225,7 @@ sub adjusted_allowed_actions {
     }
 
     # has influence token in hand from influence action
-    elsif ( $self->in_hand()->contains( 'influence_token' ) ) {
+    elsif ( $self->has_influence_in_hand ) {
         $list->add_items( 'place_influence_token' );
     }
 
@@ -378,7 +378,13 @@ sub has_player_order_in_hand {
     return 0;
 }
 
+#############################################################################
 
+sub has_influence_in_hand {
+    my $self        = shift;
+
+    return ( $self->in_hand()->contains( 'influence_token' ) );
+}
 #############################################################################
 
 sub can_explore {

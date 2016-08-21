@@ -3,6 +3,8 @@ package WLE::4X::Objects::Race;
 use strict;
 use warnings;
 
+use WLE::Methods::Simple qw( looks_like_number );
+
 use WLE::4X::Enums::Basic;
 
 use WLE::4X::Objects::ResourceTrack;
@@ -623,7 +625,7 @@ sub from_hash {
 
     if ( defined( $r_hash->{'ACTIONS'} ) ) {
         foreach my $action_tag ( 'EXPLORE', 'INFLUENCE_INF', 'INFLUENCE_COLONY', 'RESEARCH', 'UPGRADE', 'BUILD', 'MOVE' ) {
-            if ( WLE::Methods::Simple::looks_like_number( $r_hash->{'ACTIONS'}->{ $action_tag } ) ) {
+            if ( looks_like_number( $r_hash->{'ACTIONS'}->{ $action_tag } ) ) {
                 $self->{'ACTIONS'}->{ $action_tag } = $r_hash->{'ACTIONS'}->{ $action_tag };
             }
         }
@@ -632,7 +634,7 @@ sub from_hash {
     if ( defined( $r_hash->{'RESOURCES'} ) ) {
         foreach my $resource_type ( $RES_MONEY, $RES_SCIENCE, $RES_MINERALS ) {
             my $resource_text = text_from_resource_enum( $resource_type );
-            if ( WLE::Methods::Simple::looks_like_number( $r_hash->{'ACTIONS'}->{ $resource_text } ) ) {
+            if ( looks_like_number( $r_hash->{'ACTIONS'}->{ $resource_text } ) ) {
                 $self->{'RESOURCES'}->{ $resource_type } = $r_hash->{'RESOURCES'}->{ $resource_text };
             }
         }
@@ -675,7 +677,7 @@ sub from_hash {
     if ( defined( $r_hash->{'VP_SLOT_COUNTS'} ) ) {
         foreach my $section_enum ( 0 .. $VP_COUNT ) {
             my $section_tag = text_from_vp_enum( $section_enum );
-            if ( WLE::Methods::Simple::looks_like_number( $r_hash->{'VP_SLOT_COUNTS'}->{ $section_tag } ) ) {
+            if ( looks_like_number( $r_hash->{'VP_SLOT_COUNTS'}->{ $section_tag } ) ) {
                 $self->{'VP_SLOT_COUNTS'}->{ $section_tag } = $r_hash->{'VP_SLOT_COUNTS'}->{ $section_tag };
             }
         }

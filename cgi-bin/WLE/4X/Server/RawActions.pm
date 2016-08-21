@@ -63,6 +63,7 @@ my %actions = (
 
     \&_raw_set_allowed_player_actions   => 'set_allowed_actions',
     \&_raw_increment_race_action        => 'inc_race_action',
+    \&_raw_remove_allowed_player_action => 'remove_action',
 
     \&_raw_spend_influence              => 'spend_influence',
     \&_raw_use_colony_ship              => 'use_colony_ship',
@@ -1503,8 +1504,8 @@ sub _raw_pick_up_influence {
     }
     else {
         my $tile = $self->tiles()->{ $tile_tag };
-        $tile->set_owner_id( -1 );
         $self->_raw_remove_all_cubes_of_owner( $EV_SUB_ACTION, $tile_tag );
+        $tile->set_owner_id( -1 );
     }
 
     $player->in_hand()->add_items( 'influence_token' );
@@ -1614,10 +1615,39 @@ sub _raw_set_allowed_player_actions {
     my $player_id   = shift( @args );
     my @allowed     = @args;
 
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'set actions for player ' . $player_id . ' - ' . join( ',', @allowed );
+    }
+
     my $player = $self->player_of_id( $player_id );
 
     $player->allowed_actions()->clear();
     $player->allowed_actions()->add_items( @allowed );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_remove_allowed_player_action {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $player_id = shift( @args );
+    my $removed_action = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'removed action ' . $removed_action . ' for player ' . $player_id;
+    }
+
+    my $player = $self->player_of_id( $player_id );
+
+    $player->allowed_actions()->remove_item( $removed_action );
 
     return;
 }

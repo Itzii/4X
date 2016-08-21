@@ -24,7 +24,7 @@ sub looks_like_number {
 	# checks from perlfaq4
 
 	unless ( defined( $value ) ) {
-		return 1;
+		return 0;
 	}
 
 	if ( $value =~ m{ ^[+-]?\d+$ }xms ) { # is a +/- integer

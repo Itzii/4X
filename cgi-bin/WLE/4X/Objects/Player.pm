@@ -475,8 +475,9 @@ sub start_upkeep {
     }
 
     my $upkeep_cost = $self->race()->resource_track_of( $RES_INFLUENCE )->track_value();
+    my $income = $self->race()->resource_track_of( $RES_MONEY )->track_value();
 
-    if ( $upkeep_cost <= $self->race()->resource_count( $RES_MONEY ) ) {
+    if ( $upkeep_cost <= $self->race()->resource_count( $RES_MONEY ) + $income ) {
         push( @actions, 'pay_upkeep' );
     }
     else {

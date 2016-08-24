@@ -281,7 +281,7 @@ sub action_explore_place_tile {
 #            print STDERR "influencing defined ... ";
             if ( $args{'influence'} eq '1' ) {
 #                print STDERR "calling raw method.";
-                $self->_raw_influence_tile( $EV_FROM_INTERFACE, $player->id(), $tile_tag );
+                $self->_raw_influence_tile( $EV_FROM_INTERFACE, $player->id(), $tile_tag, 1 );
             }
         }
     }
@@ -429,11 +429,23 @@ sub action_influence {
         }
     }
 
-    $self->_raw_pick_up_influence( $EV_FROM_INTERFACE, $player->id(), $influence_from );
+    $self->_raw_spend_influence( $EV_FROM_INTERFACE, $player->id() );
+
+    unless ( $influence_from eq 'nowhere' ) {
+        $self->_raw_pick_up_influence( $EV_FROM_INTERFACE, $player->id(), $influence_from );
+    }
 
     $self->_raw_increment_race_action( $EV_FROM_INTERFACE, $player->id() );
 
-    my @allowed = ( 'unflip_colony_ship', 'finish_turn' );
+    my @allowed = ( 'finish_turn' );
+
+    if ( $race->colony_ships_available() > 0 ) {
+        push( @allowed, 'use_colony_ship' );
+    }
+
+    if ( $race->colony_flip_available() > 0 ) {
+        push( @allowed, 'unflip_colony_ship' );
+    }
 
     if ( $race->action_count() < $race->maximum_action_count( $ACT_INFLUENCE ) ) {
         push( @allowed, 'action_influence' );
@@ -460,12 +472,21 @@ sub action_influence_unflip_colony_ship {
 
     $self->_raw_unuse_colony_ship( $EV_FROM_INTERFACE, $player->id() );
 
-    if (
-        $race->colony_ships_used() == 0
-        || $race->colony_flip_count() >= $race->maximum_colony_flip_count()
-    ) {
-        $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $player->id(), 'action_influence', 'finish_turn' );
+    my @allowed = ( 'finish_turn' );
+
+    if ( $race->colony_ships_available() > 0 ) {
+        push( @allowed, 'use_colony_ship' );
     }
+
+    if ( $race->colony_flip_available() > 0 ) {
+        push( @allowed, 'unflip_colony_ship' );
+    }
+
+    if ( $race->action_count() < $race->maximum_action_count( $ACT_INFLUENCE ) ) {
+        push( @allowed, 'action_influence' );
+    }
+
+    $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $player->id(), @allowed );
 
     return 1;
 }
@@ -537,6 +558,8 @@ sub action_research {
         $self->set_error( 'Not enough science to purchase resource' );
         return 0;
     }
+
+    $self->_raw_spend_influence( $EV_FROM_INTERFACE, $player->id() );
 
     $self->_raw_increment_race_action( $EV_FROM_INTERFACE, $player->id() );
 
@@ -870,12 +893,13 @@ sub action_interrupt_place_influence_token {
             return 0;
         }
 
-        unless ( $self->board()->tile_is_influencible( $influence_to ) ) {
+        unless ( $self->board()->tile_is_influencible( $influence_to, $player->id() ) ) {
             $self->set_error( 'No Path Available' );
             return 0;
         }
 
         $self->_raw_influence_tile( $EV_FROM_INTERFACE, $player->id(), $influence_to );
+        $self->_raw_remove_item_from_hand( $EV_FROM_INTERFACE, $player->id(), 'influence_token' );
 
         unless ( $tile->has_ancient_cruiser() ) {
             foreach my $discovery_tag ( $tile->discoveries()->items() ) {
@@ -940,14 +964,6 @@ sub action_interrupt_replace_cube {
     }
 
     $self->_raw_place_cube_on_track( $EV_FROM_INTERFACE, $player->id(), $dest_type );
-
-    my @allowed = ( 'unflip_colony_ship', 'finish_turn' );
-
-    if ( $race->action_count() < $race->maximum_action_count( $ACT_INFLUENCE ) ) {
-        push( @allowed, 'action_influence' );
-    }
-
-    $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $player->id(), @allowed );
 
     return 1;
 }
@@ -1045,6 +1061,68 @@ sub action_interrupt_select_technology {
     return 1;
 }
 
+#############################################################################
+
+sub action_pay_upkeep {
+    my $self            = shift;
+    my %args            = @_;
+
+    my $player = $self->acting_player();
+    my $race = $player->race();
+
+    my $income = $race->resource_track_of( $RES_MONEY )->track_value();
+    my $upkeep_cost = - $race->resource_track_of( $RES_INFLUENCE )->track_value();
+
+    if ( $upkeep_cost > $race->resource_count( $RES_MONEY ) + $income ) {
+        $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $player->id(), 'pay_upkeep', 'pull_influence' );
+        return 1;
+    }
+
+    $self->_raw_pay_upkeep( $EV_FROM_INTERFACE, $player->id() );
+    $self->_raw_next_upkeep_player( $EV_FROM_INTERFACE, $player->id() );
+
+    return 1;
+}
+
+#############################################################################
+
+sub action_pull_influence {
+    my $self            = shift;
+    my %args            = @_;
+
+    my $player = $self->acting_player();
+    my $race = $player->race();
+
+    unless ( defined( $args{'tile_tag'} ) ) {
+        $self->set_error( 'Missing Tile Tag' );
+        return 0;
+    }
+
+    my $tile = $self->tiles()->{ $args{'tile_tag'} };
+
+    unless ( defined( $tile ) ) {
+        $self->set_error( 'Invalid Tile Tag' );
+        return 0;
+    }
+
+    unless ( $tile->owner_id() == $player->id() ) {
+        $self->set_error( 'Not Tile Owner' );
+        return 0;
+    }
+
+    $self->_raw_pick_up_influence( $EV_FROM_INTERFACE, $player->id(), $tile->tag() );
+    $self->_raw_return_influence_to_track( $EV_FROM_INTERFACE, $player->id() );
+
+    if ( $self->board()->player_owns_any_tile( $player->id() ) ) {
+        $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $player->id(), 'pay_upkeep', 'pull_influence' );
+        return 1;
+    }
+
+    $self->_raw_eliminate_player( $EV_FROM_INTERFACE, $player->id() );
+    $self->_raw_next_upkeep_player( $EV_FROM_INTERFACE );
+
+    return 1;
+}
 
 
 #############################################################################

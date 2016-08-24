@@ -291,6 +291,9 @@ sub _check_allowed_action {
         'draw_vp'           => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_COMBAT, 'method' => \&action_draw_vp },
         'select_vp_token'   => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_COMBAT, 'method' => \&action_select_vp_token },
 
+        'pay_upkeep'   => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_UPKEEP, 'method' => \&action_pay_upkeep },
+        'pull_influence'   => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_UPKEEP, 'method' => \&action_pull_influence },
+
 
         'use_colony_ship'   => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'flag_ignore_allowed' => 1, 'method' => \&action_use_colony_ship },
         'finish_turn'       => { 'flag_req_state' => $ST_NORMAL, 'flag_active_player' => 1, 'flag_req_phase' => $PH_ACTION, 'method' => \&action_finish_turn },

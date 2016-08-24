@@ -507,14 +507,14 @@ sub _get_ship_text_of_owner_id {
     my $owner_id    = shift;
 
     my @class_order = (
-    'class_interceptor',
-    'class_cruiser',
-    'class_dreadnought',
-    'class_starbase',
-    'class_ancient_cruiser',
-    'class_ancient_destroyer',
-    'class_ancient_dreadnought',
-    'class_defense',
+        'class_interceptor',
+        'class_cruiser',
+        'class_dreadnought',
+        'class_starbase',
+        'class_ancient_cruiser',
+        'class_ancient_destroyer',
+        'class_ancient_dreadnought',
+        'class_defense',
     );
 
     my $ship_text = '';
@@ -756,6 +756,11 @@ sub _player_ascii {
         }
     }
 
+    my @action_count = ();
+    foreach my $action ( $ACT_EXPLORE, $ACT_INFLUENCE, $ACT_RESEARCH, $ACT_UPGRADE, $ACT_BUILD, $ACT_MOVE ) {
+        push( @action_count, text_from_action_enum( $action, 1 ) . ':' . $player->race()->maximum_action_count( $action ) );
+    }
+
     my @colony_ships = ();
     foreach ( 1 .. $player->race()->colony_ships_available() ) {
         push( @colony_ships, 'O' );
@@ -764,7 +769,7 @@ sub _player_ascii {
         push( @colony_ships, 'X' );
     }
 
-    push( @lines, 'VP ' . join( ' ', @vps_formatted ) . '   COLONY SHIPS ' . join( ' ', @colony_ships ) );
+    push( @lines, 'VP ' . join( ' ', @vps_formatted ) . '   ' . join( ' ', @action_count ) . '   COLONY SHIPS ' . join( ' ', @colony_ships ) );
 
     foreach my $tech_type ( $TECH_MILITARY, $TECH_NANO, $TECH_GRID ) {
         my @tech_names = ();

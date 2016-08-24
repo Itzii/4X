@@ -300,6 +300,21 @@ sub place_tile {
 
 #############################################################################
 
+sub player_owns_any_tile {
+    my $self        = shift;
+    my $player_id   = shift;
+
+    foreach my $tile_tag ( $self->tiles_on_board() ) {
+        if ( $self->server()->tiles()->{ $tile_tag }->owner_id() == $player_id ) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+#############################################################################
+
 sub explorable_spaces_for_player {
     my $self        = shift;
     my $player_id   = shift;
@@ -335,7 +350,7 @@ sub tile_pair_is_traversable {
         return 0;
     }
 
-    my $has_wormhole = $self->player_of_id( $player_id )->race()->has_technology( 'tech_wormhole_generator' );
+    my $has_wormhole = $self->server()->player_of_id( $player_id )->race()->has_technology( 'tech_wormhole_generator' );
 
     my $tile1 = $self->tile_at_location( $loc_x1, $loc_y1 );
     my $tile2 = $self->tile_at_location( $loc_x2, $loc_y2 );
@@ -422,13 +437,16 @@ sub _explorable_from_location {
 sub tile_is_influencible {
     my $self        = shift;
     my $tile_tag    = shift;
+    my $player_id   = shift;
 
-    my $race = $self->server()->race_of_acting_player();
+    my $player = $self->server()->player_of_id( $player_id );
+    my $race = $player->race();
+
     my ( $loc_x, $loc_y ) = split( /:/, $self->location_of_tile( $tile_tag ) );
 
     my $this_tile = $self->server()->tiles()->{ $tile_tag };
 
-    if ( $this_tile->enemy_ship_count( $self->current_player_id() ) > 0 ) {
+    if ( $this_tile->enemy_ship_count( $player->id() ) > 0 ) {
         return 0;
     }
 
@@ -438,8 +456,8 @@ sub tile_is_influencible {
         my $tile = $self->tile_at_location( $loc_x2, $loc_y2 );
 
         if ( defined( $tile ) ) {
-            if ( $self->tile_pair_is_traversable( $race->tag(), $loc_x, $loc_y, $loc_x2, $loc_y2 ) ) {
-                if ( $tile->user_ship_count( $self->active_player_id() ) > 0 ) {
+            if ( $self->tile_pair_is_traversable( $player->id(), $loc_x, $loc_y, $loc_x2, $loc_y2 ) ) {
+                if ( $tile->user_ship_count( $player->id() ) > 0 ) {
                     return 1;
                 }
             }

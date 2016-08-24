@@ -53,13 +53,13 @@ sub _init {
     $self->{'EXCHANGE'} = 2;
 
     $self->{'ACTIONS'} = {
-        'EXPLORE' => 1,
-        'INFLUENCE_INF' => 2,
-        'INFLUENCE_COLONY' => 2,
-        'RESEARCH' => 1,
-        'UPGRADE' => 2,
-        'BUILD' => 2,
-        'MOVE' => 3,
+        $ACT_EXPLORE => 1,
+        $ACT_INFLUENCE => 2,
+        $ACT_INFLUENCE_COLONY => 2,
+        $ACT_RESEARCH => 1,
+        $ACT_UPGRADE => 2,
+        $ACT_BUILD => 2,
+        $ACT_MOVE => 3,
     };
 
     $self->{'ACTION_COUNT'} = 0;
@@ -182,7 +182,13 @@ sub maximum_action_count {
     my $self        = shift;
     my $action_type = shift;
 
-    return $self->{'ACTIONS'}->{ $action_type };
+    my $bonus = 0;
+
+    if ( $action_type == $ACT_BUILD && $self->has_technology( 'tech_advanced_build' ) ) {
+        $bonus++;
+    }
+
+    return $self->{'ACTIONS'}->{ $action_type } + $bonus;
 
 }
 
@@ -207,10 +213,18 @@ sub set_colony_flip_count {
 
 #############################################################################
 
+sub colony_flip_available {
+    my $self        = shift;
+
+    return $self->maximum_colony_flip_count() - $self->colony_flip_count();
+}
+
+#############################################################################
+
 sub maximum_colony_flip_count {
     my $self        = shift;
 
-    return $self->{'ACTIONS'}->{'INFLUENCE_COLONY'};
+    return $self->{'ACTIONS'}->{ $ACT_INFLUENCE_COLONY };
 }
 
 #############################################################################
@@ -624,9 +638,10 @@ sub from_hash {
 
 
     if ( defined( $r_hash->{'ACTIONS'} ) ) {
-        foreach my $action_tag ( 'EXPLORE', 'INFLUENCE_INF', 'INFLUENCE_COLONY', 'RESEARCH', 'UPGRADE', 'BUILD', 'MOVE' ) {
+        foreach my $action ( $ACT_EXPLORE, $ACT_INFLUENCE, $ACT_INFLUENCE_COLONY, $ACT_RESEARCH, $ACT_UPGRADE, $ACT_BUILD, $ACT_MOVE ) {
+            my $action_tag = text_from_action_enum( $action );
             if ( looks_like_number( $r_hash->{'ACTIONS'}->{ $action_tag } ) ) {
-                $self->{'ACTIONS'}->{ $action_tag } = $r_hash->{'ACTIONS'}->{ $action_tag };
+                $self->{'ACTIONS'}->{ $action } = $r_hash->{'ACTIONS'}->{ $action_tag };
             }
         }
     }
@@ -763,8 +778,9 @@ sub to_hash {
     $r_hash->{'DICOVERY_VPS'} = [ $self->discovery_vps()->items() ];
 
     $r_hash->{'ACTIONS'} = {};
-    foreach my $action_tag ( 'EXPLORE', 'INFLUENCE_INF', 'INFLUENCE_COLONY', 'RESEARCH', 'UPGRADE', 'BUILD', 'MOVE' ) {
-        $r_hash->{'ACTION'}->{ $action_tag } = $self->{'ACTIONS'}->{ $action_tag };
+    foreach my $action ( $ACT_EXPLORE, $ACT_INFLUENCE, $ACT_INFLUENCE_COLONY, $ACT_RESEARCH, $ACT_UPGRADE, $ACT_BUILD, $ACT_MOVE ) {
+        my $action_tag = text_from_action_enum( $action );
+        $r_hash->{'ACTION'}->{ $action_tag } = $self->{'ACTIONS'}->{ $action };
     }
 
     $r_hash->{'RESOURCES'} = {};

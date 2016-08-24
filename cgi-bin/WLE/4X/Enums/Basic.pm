@@ -208,21 +208,22 @@ sub enum_from_vp_text {
 #############################################################################
 
 sub text_from_action_enum {
-    my $act_type         = shift;
+    my $act_type        = shift;
+    my $flag_short      = shift; $flag_short = 0            unless defined( $flag_short );
 
     my %values = (
-        $ACT_EXPLORE        => 'EXPLORE',
-        $ACT_INFLUENCE      => 'INFLUENCE',
-        $ACT_INFLUENCE_COLONY => 'INFLUENCE_COL',
-        $ACT_RESEARCH       => 'RESEARCH',
-        $ACT_UPGRADE        => 'UPGRADE',
-        $ACT_BUILD          => 'BUILD',
-        $ACT_MOVE           => 'MOVE',
-        $ACT_PASS           => 'PASS',
+        $ACT_EXPLORE        => [ 'EXPLORE', 'EXP' ],
+        $ACT_INFLUENCE      => [ 'INFLUENCE', 'INF' ],
+        $ACT_INFLUENCE_COLONY => [ 'INFLUENCE_COL', 'INFC' ],
+        $ACT_RESEARCH       => [ 'RESEARCH', 'RES' ],
+        $ACT_UPGRADE        => [ 'UPGRADE', 'UPG' ],
+        $ACT_BUILD          => [ 'BUILD', 'BUI' ],
+        $ACT_MOVE           => [ 'MOVE', 'MOV' ],
+        $ACT_PASS           => [ 'PASS', 'PASS' ],
     );
 
     if ( defined( $values{ $act_type } ) ) {
-        return $values{ $act_type };
+        return $values{ $act_type }->[ $flag_short ];
     }
 
     return 'UNKNOWN';

@@ -95,6 +95,11 @@ my %actions = (
     \&_raw_next_vp_draw_player          => 'next_vp_draw',
 
     \&_raw_start_upkeep                 => 'start_upkeep',
+    \&_raw_pay_upkeep                   => 'pay_upkeep',
+    \&_raw_next_upkeep_player           => 'next_upkeep',
+    \&_raw_eliminate_player             => 'eliminate_player',
+
+    \&_raw_start_cleanup                => 'start_cleanup',
 
     \&_raw_swap_back_ambassadors        => 'swap_back_ambassadors',
 
@@ -1467,12 +1472,15 @@ sub _raw_influence_tile {
 
     my $player_id   = shift( @args );
     my $tile_tag    = shift( @args );
+    my $flag_from_track = shift( @args );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
         return $player_id . ' influenced tile ' . $tile_tag;
     }
 
-    $self->player_of_id( $player_id )->race()->resource_track_of( $RES_INFLUENCE )->spend();
+    if ( defined( $flag_from_track ) ) {
+        $self->player_of_id( $player_id )->race()->resource_track_of( $RES_INFLUENCE )->spend();
+    }
 
     $self->tiles()->{ $tile_tag }->set_owner_id( $player_id );
 
@@ -2227,6 +2235,7 @@ sub _raw_unuse_colony_ship {
         return $player_id . ' flipped a colony ship';
     }
 
+    $player->race()->set_colony_flip_count( $player->race()->set_colony_flip_count() + 1 );
     $player->race()->set_colony_ships_used( $player->race()->colony_ships_used() - 1 );
 
     return;
@@ -2552,6 +2561,103 @@ sub _raw_start_upkeep {
     $self->set_current_tile( '' );
 
     $self->_raw_set_status( $EV_SUB_ACTION, $self->status() );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_pay_upkeep {
+
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $player_id = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return $player_id . ' paying upkeep';
+    }
+
+    my $player = $self->player_of_id( $player_id );
+    my $race = $player->race();
+
+    foreach my $resource ( $RES_MONEY, $RES_SCIENCE, $RES_MINERALS ) {
+        my $income = $race->resource_track_of( $resource )->track_value();
+        $self->_raw_spend_resource( $EV_SUB_ACTION, $player->id(), $resource, - $income );
+    }
+
+    my $upkeep_cost = - $race->resource_track_of( $RES_INFLUENCE )->track_value();
+    $self->_raw_spend_resource( $EV_SUB_ACTION, $player->id(), $RES_MONEY, $upkeep_cost );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_next_upkeep_player {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    my $player_id = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'next upkeep player';
+    }
+
+    $self->player_of_id( $player_id )->end_turn();
+
+    my $done_player = $self->waiting_on_player_id();
+    $self->pending_players()->remove_item( $done_player );
+    $self->done_players()->add_items( $done_player );
+
+    if ( $self->pending_players()->count() > 0 ) {
+        my $current_player_id = ( $self->pending_players()->items() )[ 0 ];
+        $self->player_of_id( $current_player_id )->start_upkeep();
+
+        $self->set_waiting_on_player_id( $current_player_id );
+        return;
+    }
+    else {
+        $self->_raw_start_cleanup( $EV_SUB_ACTION );
+    }
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_eliminate_player {
+
+
+}
+
+#############################################################################
+
+sub _raw_start_cleanup {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'starting cleanup';
+    }
+
+
+
 
     return;
 }

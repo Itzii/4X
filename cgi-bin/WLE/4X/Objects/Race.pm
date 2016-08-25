@@ -65,7 +65,6 @@ sub _init {
     $self->{'ACTION_COUNT'} = 0;
     $self->{'ACTION_FLIP_COLONY_COUNT'} = 0;
 
-    $self->{'IN_HAND'} = WLE::Objects::Stack->new();
     $self->{'COMPONENT_OVERFLOW'} = WLE::Objects::Stack->new();
     $self->{'GRAVEYARD'} = WLE::Objects::Stack->new();
     $self->{'DISCOVERY_VPS'} = WLE::Objects::Stack->new();

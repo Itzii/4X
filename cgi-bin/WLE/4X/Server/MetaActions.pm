@@ -416,7 +416,7 @@ sub action_select_race_and_location {
     my $location_warps = undef;
 
     foreach my $location ( $self->starting_locations()->items() ) {
-        print STDERR "\nChecking location: " . $location->{'SPACE'};
+#        print STDERR "\nChecking location: " . $location->{'SPACE'};
         if ( $location_tag eq $location->{'SPACE'} ) {
             unless ( defined( $location->{'NPC'} ) ) {
                 $valid_location = 1;

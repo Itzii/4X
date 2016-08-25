@@ -413,7 +413,7 @@ sub _save_state {
 
         $data{'SETTINGS'}->{'STARTING_LOCATIONS'} = [ $self->starting_locations()->items() ];
 
-        $data{'TECH_DRAW_COUNT'} = $self->tech_draw_count();
+        $data{'ROUND_TECH_COUNT'} = $self->tech_draw_count();
 
         # ship components
         $data{'COMPONENTS'} = {};

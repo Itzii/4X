@@ -132,6 +132,7 @@ sub reset {
         $self->{'SETTINGS'}->{'WAITING_ON_PLAYER'} = -1;
 
         $self->{'SETTINGS'}->{'CURRENT_TRAITOR'} = '';
+        $self->{'SETTINGS'}->{'TECHS_PER_ROUND'} = 0;
     }
 
     $self->{'RACES'} = {};
@@ -157,6 +158,8 @@ sub reset {
     $self->{'VP_BAG'} = WLE::Objects::Stack->new();
 
     $self->{'TEMPLATE_COMBAT_ORDER'} = WLE::Objects::Stack->new();
+
+    $self->{'ROUND_TECH_COUNT'} = 0;
 
 
     $self->{'STATE'} = {
@@ -969,7 +972,7 @@ sub set_start_tech_count {
 sub tech_draw_count {
     my $self        = shift;
 
-    return $self->{'TECH_DRAW_COUNT'}
+    return $self->{'ROUND_TECH_COUNT'}
 }
 
 #############################################################################
@@ -978,7 +981,7 @@ sub set_tech_draw_count {
     my $self        = shift;
     my $value       = shift;
 
-    $self->{'TECH_DRAW_COUNT'} = $value;
+    $self->{'ROUND_TECH_COUNT'} = $value;
 
     return;
 }

@@ -20,13 +20,15 @@ sub action_pass_action {
     $self->_raw_player_pass_action( $EV_FROM_INTERFACE, $player->id() );
     $self->_raw_next_player( $EV_FROM_INTERFACE, $player->id() );
 
-    print STDERR "\nWaiting On Player: " . $self->waiting_on_player_id();
+#    print STDERR "\nWaiting On Player: " . $self->waiting_on_player_id();
 
     if ( $self->waiting_on_player_id() == -1 ) {
 
+        $self->_raw_clear_pass_flags( $EV_FROM_INTERFACE );
+
         my $combat_tile = $self->board()->outermost_combat_tile();
 
-        print STDERR " combat tile: " . $combat_tile;
+#        print STDERR " combat tile: " . $combat_tile;
 
         if ( $combat_tile eq '' ) {
             $self->_raw_start_upkeep( $EV_FROM_INTERFACE );
@@ -1081,6 +1083,11 @@ sub action_pay_upkeep {
     $self->_raw_pay_upkeep( $EV_FROM_INTERFACE, $player->id() );
     $self->_raw_next_upkeep_player( $EV_FROM_INTERFACE, $player->id() );
 
+    if ( $self->waiting_on_player_id() == -1 ) {
+        $self->_pull_next_technologies();
+        $self->_raw_start_cleanup( $EV_FROM_INTERFACE );
+    }
+
     return 1;
 }
 
@@ -1121,9 +1128,35 @@ sub action_pull_influence {
     $self->_raw_eliminate_player( $EV_FROM_INTERFACE, $player->id() );
     $self->_raw_next_upkeep_player( $EV_FROM_INTERFACE );
 
+    if ( $self->waiting_on_player_id() == -1 ) {
+        $self->_pull_next_technologies();
+        $self->_raw_start_cleanup( $EV_FROM_INTERFACE );
+    }
+
     return 1;
 }
 
+#############################################################################
+
+sub _pull_next_technologies {
+    my $self            = shift;
+
+    my @available_tech = ();
+
+    my $tech_count = 0;
+    while ( $tech_count < $self->tech_draw_count() && $self->tech_bag()->count() > 0 ) {
+        my $tech_tag = $self->tech_bag()->select_random_item();
+
+        $self->_raw_remove_from_tech_bag( $EV_FROM_INTERFACE, $tech_tag );
+        $self->_raw_add_to_available_tech( $EV_FROM_INTERFACE, $tech_tag );
+
+        unless ( $self->technology()->{ $tech_tag }->category() == $TECH_WILD ) {
+            $tech_count++;
+        }
+    }
+
+    return;
+}
 
 #############################################################################
 #############################################################################

@@ -94,6 +94,7 @@ my %actions = (
     \&_raw_select_vp_token              => 'select_vp_token',
     \&_raw_next_vp_draw_player          => 'next_vp_draw',
 
+    \&_raw_clear_pass_flags             => 'clear_pass_flags',
     \&_raw_start_upkeep                 => 'start_upkeep',
     \&_raw_pay_upkeep                   => 'pay_upkeep',
     \&_raw_next_upkeep_player           => 'next_upkeep',
@@ -2435,33 +2436,32 @@ sub _raw_next_player {
     $self->pending_players()->remove_item( $done_player );
     $self->done_players()->add_items( $done_player );
 
+    my $flag_continue_round = 0;
+
+    foreach my $player ( $self->player_list() ) {
+        unless ( $player->has_passed() ) {
+            $flag_continue_round = 1;
+            last;
+        }
+    }
+
+    unless ( $flag_continue_round ) {
+        $self->set_waiting_on_player_id( -1 );
+        return;
+    }
+
     if ( $self->pending_players()->count() > 0 ) {
         my $current_player_id = ( $self->pending_players()->items() )[ 0 ];
         $self->player_of_id( $current_player_id )->start_turn();
 
         $self->set_waiting_on_player_id( $current_player_id );
-        return;
     }
     else {
-        my $flag_continue_round = 0;
+        $self->pending_players()->fill( $self->done_players()->items() );
+        $self->done_players()->clear();
+        $self->set_waiting_on_player_id( ( $self->pending_players()->items() )[ 0 ] );
 
-        foreach my $player ( $self->player_list() ) {
-            unless ( $player->has_passed() ) {
-                $flag_continue_round = 1;
-                last;
-            }
-        }
-
-        if ( $flag_continue_round ) {
-            $self->pending_players()->fill( $self->done_players()->items() );
-            $self->done_players()->clear();
-            $self->set_waiting_on_player_id( ( $self->pending_players()->items() )[ 0 ] );
-
-            $self->player_of_id( $self->waiting_on_player_id() )->start_turn();
-        }
-        else {
-            $self->set_waiting_on_player_id( -1 );
-        }
+        $self->player_of_id( $self->waiting_on_player_id() )->start_turn();
     }
 
     return;
@@ -2526,6 +2526,28 @@ sub _raw_start_next_round {
     $self->set_current_tile( '' );
 
     $self->_raw_set_status( $EV_SUB_ACTION, $self->status() );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_clear_pass_flags {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return 'clearing pass flags';
+    }
+
+    foreach my $player ( $self->player_list() ) {
+        $player->set_flag_passed( 0 );
+    }
 
     return;
 }
@@ -2628,7 +2650,7 @@ sub _raw_next_upkeep_player {
         return;
     }
     else {
-        $self->_raw_start_cleanup( $EV_SUB_ACTION );
+        $self->set_waiting_on_player_id( -1 );
     }
 
     return;
@@ -2637,8 +2659,55 @@ sub _raw_next_upkeep_player {
 #############################################################################
 
 sub _raw_eliminate_player {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
 
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->_log_event( $source, __SUB__, @args );
+    }
 
+    my $player_id = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return $player_id ' is eliminated';
+    }
+
+    my $player = $self->player_of_id( $player_id );
+    my $race = $player->race();
+
+    foreach my $template_tag ( $race->ship_templates() ) {
+
+        foreach my $ship_tag ( keys( %{ $self->ships() } ) ) {
+
+            foreach my $tile_tag ( $self->board()->tiles()->items() ) {
+
+                my @ship_tags = $self->tiles()->{ $tile_tag }->ships()->items();
+
+                foreach my $ship_tag ( @ship_tags ) {
+                    if ( $self->ships()->{ $ship_tag }->owner_id() == $player->id() ) {
+                        $self->_raw_remove_ship_from_tile( $EV_SUB_ACTION, $tile_tag, $ship_tag );
+                        delete( $self->ships()->{ $ship_tag } );
+                    }
+                }
+            }
+        }
+
+        delete ( $self->ship_templates()->{ $template_tag } );
+    }
+
+    delete( $self->races()->{ $race->tag() } );
+    $self->_raw_remove_player( $EV_SUB_ACTION, $player->user_id() );
+
+    $self->pending_players()->remove_item( $player_id );
+    $self->done_player()->remove_item( $player_id );
+    $self->players_next_round()->remove_item( $player_id );
+
+    if ( $self->current_traitor() == $player_id ) {
+        $self->set_current_traitor( -1 );
+    }
+
+    return;
 }
 
 #############################################################################
@@ -2656,12 +2725,29 @@ sub _raw_start_cleanup {
         return 'starting cleanup';
     }
 
+    foreach my $player ( $self->player_list() ) {
+        $player->race()->resource_track_of( $RES_INFLUENCE )->reset_spent();
+        $player->race()->set_colony_ships_used( 0 );
 
+        if ( $player->race()->graveyard()->count() > 0 ) {
+            foreach my $cube_type ( $player->race()->graveyard()->items() ) {
+                $self->_raw_add_item_to_hand( $EV_SUB_ACTION, $player->id(), 'cube:' . $cube_type );
+            }
+            $player->race()->graveyard()->empty();
+        }
+    }
 
+    $self->_raw_start_next_round( $EV_SUB_ACTION );
 
     return;
 }
 
+#############################################################################
+#############################################################################
+#############################################################################
+#############################################################################
+#############################################################################
+#############################################################################
 #############################################################################
 
 sub _log_event {

@@ -2670,7 +2670,7 @@ sub _raw_eliminate_player {
     my $player_id = shift( @args );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        return $player_id ' is eliminated';
+        return $player_id . ' is eliminated';
     }
 
     my $player = $self->player_of_id( $player_id );

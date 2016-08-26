@@ -624,11 +624,12 @@ sub action_upgrade {
         }
     }
 
-    my $replaces_component = '';
-
-    if ( defined( $args{'replaces_component'} ) ) {
-        $replaces_component = $args{'replaces_component'};
+    unless ( defined( $args{'slot_number'} ) ) {
+        $self->set_error( 'Invalid Component Slot' );
+        return 0;
     }
+
+    my $slot_number = $args{'slot_number'};
 
     my $template_copy = $template->copy_of( 'copy_tag' );
 

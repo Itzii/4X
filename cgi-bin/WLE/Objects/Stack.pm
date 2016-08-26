@@ -118,6 +118,19 @@ sub insert_item {
 
 #############################################################################
 
+sub item_at_index {
+    my $self        = shift;
+    my $index       = shift;
+
+    if ( $index < 0 || $index >= $self->count() ) {
+        return undef;
+    }
+
+    return $self->{'ITEMS'}->[ $index ];
+}
+
+#############################################################################
+
 sub draw_item {
     my $self        = shift;
 

@@ -43,7 +43,8 @@ sub _init {
 
     $self->{'SLOTS'} = 0;
 
-    $self->{'COMPONENTS'} = [];
+    $self->{'COMPONENTS'} = WLE::Objects::Stack->new();
+    $self->{'ORIGINAL_COMPONENTS'} = WLE::Objects::Stack->new();
 
     $self->{'VP_DRAW'} = 0;
 
@@ -101,7 +102,7 @@ sub total_initiative {
 
     my $init = $self->initiative();
 
-    foreach my $component_tag ( $self->components() ) {
+    foreach my $component_tag ( $self->merged_components() ) {
         my $component = $self->server()->ship_components()->{ $component_tag };
 
         if ( defined( $component ) ) {
@@ -127,7 +128,7 @@ sub total_energy {
 
     my $energy = $self->energy();
 
-    foreach my $component_tag ( $self->components() ) {
+    foreach my $component_tag ( $self->merged_components() ) {
         my $component = $self->server()->ship_components()->{ $component_tag };
 
         if ( defined( $component ) ) {
@@ -153,7 +154,7 @@ sub total_computer {
 
     my $computer = $self->computer();
 
-    foreach my $component_tag ( $self->components() ) {
+    foreach my $component_tag ( $self->merged_components() ) {
         my $component = $self->server()->ship_components()->{ $component_tag };
 
         if ( defined( $component ) ) {
@@ -179,7 +180,7 @@ sub total_shields {
 
     my $shields = $self->shields();
 
-    foreach my $component_tag ( $self->components() ) {
+    foreach my $component_tag ( $self->merged_components() ) {
         my $component = $self->server()->ship_components()->{ $component_tag };
 
         if ( defined( $component ) ) {
@@ -205,7 +206,7 @@ sub total_hull_points {
 
     my $hull = $self->hull_points();
 
-    foreach my $component_tag ( $self->components() ) {
+    foreach my $component_tag ( $self->merged_components() ) {
         my $component = $self->server()->ship_components()->{ $component_tag };
 
         if ( defined( $component ) ) {
@@ -223,7 +224,7 @@ sub total_energy_used {
 
     my $energy = 0;
 
-    foreach my $component_tag ( $self->components() ) {
+    foreach my $component_tag ( $self->merged_components() ) {
         my $component = $self->server()->ship_components()->{ $component_tag };
 
         if ( defined( $component ) ) {
@@ -241,7 +242,7 @@ sub total_movement {
 
     my $move = 0;
 
-    foreach my $component_tag ( $self->components() ) {
+    foreach my $component_tag ( $self->merged_components() ) {
         my $component = $self->server()->ship_components()->{ $component_tag };
 
         if ( defined( $component ) ) {
@@ -259,7 +260,7 @@ sub provides {
 
     my %provide_tags = ();
 
-    foreach my $component_tag ( $self->components() ) {
+    foreach my $component_tag ( $self->merged_components() ) {
         my $component = $self->server()->ship_components()->{ $component_tag };
 
         if ( defined( $component ) ) {
@@ -277,46 +278,21 @@ sub provides {
 sub add_component {
     my $self            = shift;
     my $new_tag         = shift;
-    my $replaces_tag    = shift;
+    my $slot_number     = shift;
     my $r_message       = shift;
 
-    # TODO this needs to be changed. if a starting component is replaced and the new component
-    # is eventually discarded, the original component is now active.
-
-    my @new_components = ();
-
-    if ( $replaces_tag eq '' ) {
-        @new_components = $self->components();
-
-        if ( scalar( @new_components ) >= $self->{'SLOTS'} ) {
-            $$r_message = 'No available space.';
-            return 0;
-        }
-        push( @new_components, $new_tag );
-    }
-    else {
-        my $flag_found_location = 0;
-
-        foreach my $old_component ( $self->components() ) {
-            if ( $old_component eq $replaces_tag ) {
-                $flag_found_location = 1;
-                push( @new_components, $new_tag );
-            }
-            else {
-                push( @new_components, $old_component );
-            }
-        }
-
-        unless ( $flag_found_location ) {
-            $$r_message = 'Unable to find location for component.';
-            return 0;
-        }
+    if ( $slot_number < 0 || $slot_number >= $self->components()->count() ) {
+        $$r_message = 'Invalid Slot Number';
+        return 0;
     }
 
-    $$r_message = $self->_problem( @new_components );
+    my @test_components = $self->components()->items();
+    $test_components[ $slot_number ] = $new_tag;
+
+    $$r_message = $self->_problem( @test_components );
 
     if ( $$r_message eq '' ) {
-        $self->{'COMPONENTS'} = \@new_components;
+        $self->components()->fill( @test_components );
         return 1;
     }
 
@@ -327,31 +303,30 @@ sub add_component {
 
 sub remove_component {
     my $self            = shift;
-    my $component_tag   = shift;
+    my $slot_number     = shift;
     my $r_message       = shift;
 
     my @new_components = ();
 
-    unless ( matches_any( $component_tag, $self->components() ) ) {
-        $$r_message = 'Unable to locate component.';
+    if ( $slot_number < 0 || $slot_number >= $self->components()->count() ) {
+        $$r_message = 'Invalid Slot Number';
         return 0;
     }
 
-    my $flag_found_component = 0;
-
-    foreach my $old_component ( $self->components() ) {
-        if ( $old_component eq $component_tag && $flag_found_component == 0 ) {
-            $flag_found_component = 1;
-        }
-        else {
-            push( @new_components, $old_component );
-        }
+    if ( $self->components()->item_at_index( $slot_number ) eq '' ) {
+        $$r_message = 'Unable to locate removable component.';
+        return 0;
     }
 
-    $$r_message = $self->_problem( @new_components );
+    my @test_components = $self->merged_components();
+    $test_components[ $slot_number ] = $self->original_components()->item_at_index( $slot_number );
+
+    $$r_message = $self->_problem( @test_components );
 
     if ( $$r_message eq '' ) {
-        $self->{'COMPONENTS'} = \@new_components;
+        my @new_components = $self->components()->items();
+        $new_components[ $slot_number ] = '';
+        $self->components()->fill( @new_components );
         return 1;
     }
 
@@ -440,7 +415,7 @@ sub _total_attacks {
 
     my %attacks = ();
 
-    foreach my $component_tag ( $self->components() ) {
+    foreach my $component_tag ( $self->merged_components() ) {
         my $component = $self->server()->ship_components()->{ $component_tag };
 
         if ( defined( $component ) ) {
@@ -475,7 +450,37 @@ sub slots {
 sub components {
     my $self        = shift;
 
-    return @{ $self->{'COMPONENTS'} };
+    return $self->{'COMPONENTS'}->items();
+}
+
+#############################################################################
+
+sub original_components {
+    my $self        = shift;
+
+    return $self->{'ORIGINAL_COMPONENTS'}->items();
+}
+
+#############################################################################
+
+sub merged_components {
+    my $self            = shift;
+
+    my @merged = ();
+
+    my @components = $self->components()->items();
+    my @orig_components = $self->original_components()->items();
+
+    foreach my $index ( 0 .. scalar( @components ) - 1 ) {
+        if ( $components[ $index ] eq '' ) {
+            push( @merged, $orig_components[ $index ] );
+        }
+        else {
+            push( @merged, $components[ $index ] );
+        }
+    }
+
+    return @merged;
 }
 
 #############################################################################
@@ -507,8 +512,11 @@ sub copy_of {
 
     $copy->{'SLOTS'} = $self->{'SLOTS'};
 
-    my @components = @{ $self->{'COMPONENTS'} };
-    $copy->{'COMPONENTS'} = \@components;
+    $copy->{'ORIGINAL_COMPONENTS'}->fill( @{ $self->{'COMPONENTS'} } );
+
+    foreach ( $self->original_components()->items() ) {
+        $self->components()->add_item( '' );
+    }
 
     $copy->{'VP_DRAW'} = $self->{'VP_DRAW'};
 
@@ -540,8 +548,13 @@ sub from_hash {
     }
 
     if ( defined( $r_hash->{'COMPONENTS'} ) ) {
-        $self->{'COMPONENTS'} = $r_hash->{'COMPONENTS'};
+        $self->components()->fill( @{ $r_hash->{'COMPONENTS'} } );
     }
+
+    if ( defined( $r_hash->{'ORIGINAL_COMPONENTS'} ) ) {
+        $self->original_components()->fill( @{ $r_hash->{'ORIGINAL_COMPONENTS'} } );
+    }
+
 
     return 1;
 }
@@ -560,7 +573,8 @@ sub to_hash {
         $r_hash->{ $tag } = $self->{ $tag };
     }
 
-    $r_hash->{'COMPONENTS'} = $self->{'COMPONENTS'};
+    $r_hash->{'COMPONENTS'} = [ $self->components()->items() ];
+    $r_hash->{'ORIGINAL_COMPONENTS'} = [ $self->original_components()->items() ];
 
     return 1;
 }

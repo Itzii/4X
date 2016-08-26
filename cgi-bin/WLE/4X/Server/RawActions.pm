@@ -8,104 +8,110 @@ use feature qw( current_sub );
 use WLE::Methods::Simple;
 use WLE::4X::Enums::Basic;
 
-my %actions = (
-    \&_raw_create_game                  => 'create',
-    \&_raw_set_status                   => 'status',
-    \&_raw_exchange                     => 'exchange',
-    \&_raw_add_source                   => 'add_source',
-    \&_raw_remove_source                => 'remove_source',
-    \&_raw_add_option                   => 'add_option',
-    \&_raw_remove_option                => 'remove_option',
-    \&_raw_add_player                   => 'add_player',
-    \&_raw_remove_player                => 'remove_player',
-    \&_raw_begin                        => 'begin',
-    \&_raw_prepare_for_first_round      => 'prepare_first_round',
+sub _init_raw_actions {
+    my $self        = shift;
 
-    \&_raw_set_player_order             => 'set_player_order',
-    \&_raw_add_players_to_next_round    => 'queue_next_round',
+    $self->add_raw_actions(
+        {
+            \&_raw_create_game                  => 'create',
+            \&_raw_set_status                   => 'status',
+            \&_raw_exchange                     => 'exchange',
+            \&_raw_add_source                   => 'add_source',
+            \&_raw_remove_source                => 'remove_source',
+            \&_raw_add_option                   => 'add_option',
+            \&_raw_remove_option                => 'remove_option',
+            \&_raw_add_player                   => 'add_player',
+            \&_raw_remove_player                => 'remove_player',
+            \&_raw_begin                        => 'begin',
+            \&_raw_prepare_for_first_round      => 'prepare_first_round',
 
-    \&_raw_create_tile_stack            => 'create_tile_stack',
-    \&_raw_remove_tile_from_stack       => 'remove_tile_from_stack',
-    \&_raw_empty_tile_discard_stack     => 'empty_tile_discard',
-    \&_raw_place_tile_on_board          => 'place_tile_on_board',
-    \&_raw_discard_tile                 => 'discard_tile',
+            \&_raw_set_player_order             => 'set_player_order',
+            \&_raw_add_players_to_next_round    => 'queue_next_round',
 
-    \&_raw_create_development_stack     => 'create_development_stack',
+            \&_raw_create_tile_stack            => 'create_tile_stack',
+            \&_raw_remove_tile_from_stack       => 'remove_tile_from_stack',
+            \&_raw_empty_tile_discard_stack     => 'empty_tile_discard',
+            \&_raw_place_tile_on_board          => 'place_tile_on_board',
+            \&_raw_discard_tile                 => 'discard_tile',
 
-    \&_raw_select_race_and_location     => 'select_race_and_location',
-    \&_raw_remove_non_playing_races     => 'remove_non_playing_races',
+            \&_raw_create_development_stack     => 'create_development_stack',
 
-    \&_raw_remove_from_tech_bag         => 'remove_from_tech_bag',
-    \&_raw_add_to_available_tech        => 'add_to_available_tech',
-    \&_raw_remove_from_available_tech   => 'remove_from_available_tech',
-    \&_raw_next_player                  => 'next_player',
-    \&_raw_start_next_round             => 'start_next_round',
+            \&_raw_select_race_and_location     => 'select_race_and_location',
+            \&_raw_remove_non_playing_races     => 'remove_non_playing_races',
 
-
-    \&_raw_influence_tile               => 'influence_tile',
-    \&_raw_remove_influence_from_tile   => 'uninfluence_tile',
-    \&_raw_place_cube_on_tile           => 'place_cube_on_tile',
-    \&_raw_create_ship_on_tile          => 'create_ship_on_tile',
-    \&_raw_add_ship_to_tile             => 'add_ship_to_tile',
-    \&_raw_remove_ship_from_tile        => 'remove_ship_from_tile',
-    \&_raw_add_discovery_to_tile        => 'add_discovery_to_tile',
-    \&_raw_remove_discovery_from_tile   => 'remove_discovery_from_tile',
-    \&_raw_add_slot_to_tile             => 'add_slot_to_tile',
-    \&_raw_add_ancient_link_to_tile     => 'add_ancient_link_to_tile',
-    \&_raw_add_wormhole_to_tile         => 'add_wormhole_to_tile',
-    \&_raw_add_vp_to_tile               => 'add_vp_to_tile',
-    \&_raw_add_tile_discoveries_to_hand => 'add_discovery_to_hand',
-
-    \&_raw_place_cube_on_track          => 'place_cube_on_track',
-    \&_raw_pick_up_influence            => 'pick_up_influence',
-    \&_raw_return_influence_to_track    => 'return_influence_to_track',
-    \&_raw_use_discovery                => 'use_discovery',
-
-    \&_raw_set_allowed_player_actions   => 'set_allowed_actions',
-    \&_raw_increment_race_action        => 'inc_race_action',
-    \&_raw_remove_allowed_player_action => 'remove_action',
-
-    \&_raw_spend_influence              => 'spend_influence',
-    \&_raw_use_colony_ship              => 'use_colony_ship',
-    \&_raw_add_item_to_hand             => 'add_hand_item',
-    \&_raw_remove_item_from_hand        => 'remove_hand_item',
-    \&_raw_player_pass_action           => 'player_pass',
-    \&_raw_add_to_tech_track            => 'add_to_tech_track',
-    \&_raw_buy_technology               => 'buy_technology',
-    \&_raw_spend_resource               => 'spend_resource',
-    \&_raw_upgrade_ship_component       => 'upgrade_ship',
-
-    \&_raw_set_pending_player           => 'set_pending_player',
-    \&_raw_start_combat_phase           => 'start_combat_phase',
-    \&_raw_begin_combat_in_tile         => 'begin_combat_in_tile',
-    \&_raw_prepare_to_retreat_ships     => 'set_ships_as_retreating',
-    \&_raw_make_attack_rolls            => 'make_attack_rolls',
-    \&_raw_set_defense_hits             => 'set_defense_hits',
-    \&_raw_destroy_ship                 => 'destroy_ship',
-    \&_raw_allocate_hits                => 'allocate_hits',
-    \&_raw_apply_combat_hits            => 'apply_combat_hits',
-    \&_raw_next_combat_ships            => 'next_set_of_ships',
-    \&_raw_begin_attacking_population   => 'attack_population',
-    \&_raw_dont_kill_population         => 'dont_kill_population',
-    \&_raw_allocate_population_hits     => 'allocate_population_hits',
-    \&_raw_kill_population_cube         => 'kill_population',
-    \&_raw_add_vp_to_hand               => 'add_vp_to_hand',
-    \&_raw_start_vp_draws               => 'start_vp_draws',
-    \&_raw_select_vp_token              => 'select_vp_token',
-    \&_raw_next_vp_draw_player          => 'next_vp_draw',
-
-    \&_raw_clear_pass_flags             => 'clear_pass_flags',
-    \&_raw_start_upkeep                 => 'start_upkeep',
-    \&_raw_pay_upkeep                   => 'pay_upkeep',
-    \&_raw_next_upkeep_player           => 'next_upkeep',
-    \&_raw_eliminate_player             => 'eliminate_player',
-
-    \&_raw_start_cleanup                => 'start_cleanup',
-
-    \&_raw_swap_back_ambassadors        => 'swap_back_ambassadors',
+            \&_raw_remove_from_tech_bag         => 'remove_from_tech_bag',
+            \&_raw_add_to_available_tech        => 'add_to_available_tech',
+            \&_raw_remove_from_available_tech   => 'remove_from_available_tech',
+            \&_raw_next_player                  => 'next_player',
+            \&_raw_start_next_round             => 'start_next_round',
 
 
-);
+            \&_raw_influence_tile               => 'influence_tile',
+            \&_raw_remove_influence_from_tile   => 'uninfluence_tile',
+            \&_raw_place_cube_on_tile           => 'place_cube_on_tile',
+            \&_raw_create_ship_on_tile          => 'create_ship_on_tile',
+            \&_raw_add_ship_to_tile             => 'add_ship_to_tile',
+            \&_raw_remove_ship_from_tile        => 'remove_ship_from_tile',
+            \&_raw_add_discovery_to_tile        => 'add_discovery_to_tile',
+            \&_raw_remove_discovery_from_tile   => 'remove_discovery_from_tile',
+            \&_raw_add_slot_to_tile             => 'add_slot_to_tile',
+            \&_raw_add_ancient_link_to_tile     => 'add_ancient_link_to_tile',
+            \&_raw_add_wormhole_to_tile         => 'add_wormhole_to_tile',
+            \&_raw_add_vp_to_tile               => 'add_vp_to_tile',
+            \&_raw_add_tile_discoveries_to_hand => 'add_discovery_to_hand',
+
+            \&_raw_place_cube_on_track          => 'place_cube_on_track',
+            \&_raw_pick_up_influence            => 'pick_up_influence',
+            \&_raw_return_influence_to_track    => 'return_influence_to_track',
+            \&_raw_use_discovery                => 'use_discovery',
+
+            \&_raw_set_allowed_player_actions   => 'set_allowed_actions',
+            \&_raw_increment_race_action        => 'inc_race_action',
+            \&_raw_remove_allowed_player_action => 'remove_action',
+
+            \&_raw_spend_influence              => 'spend_influence',
+            \&_raw_use_colony_ship              => 'use_colony_ship',
+            \&_raw_add_item_to_hand             => 'add_hand_item',
+            \&_raw_remove_item_from_hand        => 'remove_hand_item',
+            \&_raw_player_pass_action           => 'player_pass',
+            \&_raw_add_to_tech_track            => 'add_to_tech_track',
+            \&_raw_buy_technology               => 'buy_technology',
+            \&_raw_spend_resource               => 'spend_resource',
+            \&_raw_upgrade_ship_component       => 'upgrade_ship',
+
+            \&_raw_set_pending_player           => 'set_pending_player',
+            \&_raw_start_combat_phase           => 'start_combat_phase',
+            \&_raw_begin_combat_in_tile         => 'begin_combat_in_tile',
+            \&_raw_prepare_to_retreat_ships     => 'set_ships_as_retreating',
+            \&_raw_make_attack_rolls            => 'make_attack_rolls',
+            \&_raw_set_defense_hits             => 'set_defense_hits',
+            \&_raw_destroy_ship                 => 'destroy_ship',
+            \&_raw_allocate_hits                => 'allocate_hits',
+            \&_raw_apply_combat_hits            => 'apply_combat_hits',
+            \&_raw_next_combat_ships            => 'next_set_of_ships',
+            \&_raw_begin_attacking_population   => 'attack_population',
+            \&_raw_dont_kill_population         => 'dont_kill_population',
+            \&_raw_allocate_population_hits     => 'allocate_population_hits',
+            \&_raw_kill_population_cube         => 'kill_population',
+            \&_raw_add_vp_to_hand               => 'add_vp_to_hand',
+            \&_raw_start_vp_draws               => 'start_vp_draws',
+            \&_raw_select_vp_token              => 'select_vp_token',
+            \&_raw_next_vp_draw_player          => 'next_vp_draw',
+
+            \&_raw_clear_pass_flags             => 'clear_pass_flags',
+            \&_raw_start_upkeep                 => 'start_upkeep',
+            \&_raw_pay_upkeep                   => 'pay_upkeep',
+            \&_raw_next_upkeep_player           => 'next_upkeep',
+            \&_raw_eliminate_player             => 'eliminate_player',
+
+            \&_raw_start_cleanup                => 'start_cleanup',
+
+            \&_raw_swap_back_ambassadors        => 'swap_back_ambassadors',
+        }
+    );
+
+    return;
+}
 
 #############################################################################
 
@@ -115,7 +121,7 @@ sub _raw_create_game {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE ) {
-        $self->_log_event( __SUB__, @args );
+        $self->log_event( __SUB__, @args );
     }
 
     my $owner_id        = shift( @args );
@@ -145,7 +151,7 @@ sub _raw_set_status {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $status = shift( @args );
@@ -171,7 +177,7 @@ sub _raw_exchange {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id   = shift( @args );
@@ -199,7 +205,7 @@ sub _raw_add_source {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $tag = shift( @args );
@@ -222,7 +228,7 @@ sub _raw_remove_source {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $tag = shift( @args );
@@ -245,7 +251,7 @@ sub _raw_add_option {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $tag = shift( @args );
@@ -267,7 +273,7 @@ sub _raw_remove_option {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $tag = shift( @args );
@@ -290,7 +296,7 @@ sub _raw_add_player {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $user_id   = shift( @args );
@@ -314,7 +320,7 @@ sub _raw_remove_player {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $user_id   = shift( @args );
@@ -336,7 +342,7 @@ sub _raw_begin {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
@@ -630,7 +636,7 @@ sub _raw_set_player_order {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my @new_order_ids   = @args;
@@ -652,7 +658,7 @@ sub _raw_add_players_to_next_round {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my @player_ids = @args;
@@ -674,7 +680,7 @@ sub _raw_set_pending_player {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $pending_id = shift( @args );
@@ -703,7 +709,7 @@ sub _raw_start_combat_phase {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
@@ -724,7 +730,7 @@ sub _raw_begin_combat_in_tile {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $tile_tag = shift( @args );
@@ -759,7 +765,7 @@ sub _raw_make_attack_rolls {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my @rolls = @args;
@@ -782,7 +788,7 @@ sub _raw_set_defense_hits {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $hit_count = shift( @args );
@@ -803,7 +809,7 @@ sub _raw_destroy_ship {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $tile_tag = shift( @args );
@@ -831,7 +837,7 @@ sub _raw_allocate_hits {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my @hits = @args;
@@ -854,7 +860,7 @@ sub _raw_apply_combat_hits {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
@@ -874,7 +880,7 @@ sub _raw_next_combat_ships {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
@@ -894,7 +900,7 @@ sub _raw_prepare_to_retreat_ships {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id = shift( @args );
@@ -918,7 +924,7 @@ sub _raw_begin_attacking_population {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id = shift( @args );
@@ -941,7 +947,7 @@ sub _raw_dont_kill_population {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id = shift( @args );
@@ -963,7 +969,7 @@ sub _raw_allocate_population_hits {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my @hits = @args;
@@ -986,7 +992,7 @@ sub _raw_kill_population {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id = shift( @args );
@@ -1009,7 +1015,7 @@ sub _raw_kill_population_cube {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $tile_tag = shift( @args );
@@ -1032,7 +1038,7 @@ sub _raw_start_vp_draws {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $tile_tag = shift( @args );
@@ -1054,7 +1060,7 @@ sub _raw_add_vp_to_hand {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id = shift( @args );
@@ -1082,7 +1088,7 @@ sub _raw_select_vp_token {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $race_tag = shift( @args );
@@ -1121,7 +1127,7 @@ sub _raw_next_vp_draw_player {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $tile_tag = shift( @args );
@@ -1143,7 +1149,7 @@ sub _raw_swap_back_ambassadors {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $race_tag = shift( @args );
@@ -1170,7 +1176,7 @@ sub _raw_create_tile_stack {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $stack_id        = shift( @args );
@@ -1194,7 +1200,7 @@ sub _raw_remove_tile_from_stack {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $tile_tag = shift( @args );
@@ -1225,7 +1231,7 @@ sub _raw_empty_tile_discard_stack {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $stack_id = shift( @args );
@@ -1247,7 +1253,7 @@ sub _raw_place_tile_on_board {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $tile_tag        = shift( @args );
@@ -1277,7 +1283,7 @@ sub _raw_discard_tile {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $tile_tag        = shift( @args );
@@ -1307,7 +1313,7 @@ sub _raw_create_development_stack {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my @values = @args;
@@ -1329,7 +1335,7 @@ sub _raw_select_race_and_location {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id       = shift( @args );
@@ -1415,7 +1421,7 @@ sub _raw_place_cube_on_tile {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id       = shift( @args );
@@ -1445,7 +1451,7 @@ sub _raw_place_cube_on_track {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id   = shift( @args );
@@ -1468,7 +1474,7 @@ sub _raw_influence_tile {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id   = shift( @args );
@@ -1496,7 +1502,7 @@ sub _raw_pick_up_influence {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id   = shift( @args );
@@ -1530,7 +1536,7 @@ sub _raw_return_influence_to_track {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id = shift( @args );
@@ -1555,7 +1561,7 @@ sub _raw_remove_influence_from_tile {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id   = shift( @args );
@@ -1579,7 +1585,7 @@ sub _raw_remove_all_cubes_of_owner {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $tile_tag = shift( @args );
@@ -1618,7 +1624,7 @@ sub _raw_set_allowed_player_actions {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id   = shift( @args );
@@ -1644,7 +1650,7 @@ sub _raw_remove_allowed_player_action {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id = shift( @args );
@@ -1669,7 +1675,7 @@ sub _raw_remove_non_playing_races {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
@@ -1712,7 +1718,7 @@ sub _raw_create_ship_on_tile {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $tile_tag        = shift( @args );
@@ -1755,7 +1761,7 @@ sub _raw_add_ship_to_tile {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $tile_tag = shift( @args );
@@ -1781,7 +1787,7 @@ sub _raw_remove_ship_from_tile {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $tile_tag = shift( @args );
@@ -1807,7 +1813,7 @@ sub _raw_add_discovery_to_tile {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $tile_tag        = shift( @args );
@@ -1830,7 +1836,7 @@ sub _raw_remove_discovery_from_tile {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $tile_tag        = shift( @args );
@@ -1853,7 +1859,7 @@ sub _raw_add_tile_discoveries_to_hand {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id       = shift( @args );
@@ -1879,7 +1885,7 @@ sub _raw_add_slot_to_tile {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $tile_tag        = shift( @args );
@@ -1908,7 +1914,7 @@ sub _raw_add_ancient_link_to_tile {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $tile_tag        = shift( @args );
@@ -1932,7 +1938,7 @@ sub _raw_add_wormhole_to_tile {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $tile_tag        = shift( @args );
@@ -1954,7 +1960,7 @@ sub _raw_add_vp_to_tile {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $tile_tag        = shift( @args );
@@ -1979,7 +1985,7 @@ sub _raw_use_discovery {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id       = shift( @args );
@@ -2017,7 +2023,7 @@ sub _raw_remove_from_tech_bag {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my @removed_tech = @args;
@@ -2042,7 +2048,7 @@ sub _raw_add_to_available_tech {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my @new_tech = @args;
@@ -2064,7 +2070,7 @@ sub _raw_remove_from_available_tech {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $tech_tag = shift( @args );
@@ -2086,7 +2092,7 @@ sub _raw_increment_race_action {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id = shift( @args );
@@ -2106,7 +2112,7 @@ sub _raw_spend_influence {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id = shift( @args );
@@ -2130,7 +2136,7 @@ sub _raw_spend_resource {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id       = shift( @args );
@@ -2156,29 +2162,24 @@ sub _raw_upgrade_ship_component {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id       = shift( @args );
     my $template_tag    = shift( @args );
     my $component_tag   = shift( @args );
-    my $replaces        = shift( @args );
+    my $slot_number     = shift( @args );
 
     my $player = $self->player_of_id( $player_id );
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
-        if ( $replaces eq '' ) {
-            return $player_id . ' upgraded template ' . $template_tag . ' with ' . $component_tag;
-        }
-        else {
-            return $player_id . ' upgraded template ' . $template_tag . ' replacing ' . $replaces . ' with ' . $component_tag;
-        }
+        return $player_id . ' upgraded template ' . $template_tag . ' with ' . $component_tag . ' in slot ' . $slot_number;
     }
 
     my $template = $self->ship_templates()->{ $template_tag };
 
     my $message_holder = '';
-    $template->add_component( $component_tag, $replaces, \$message_holder );
+    $template->add_component( $component_tag, $slot_number, \$message_holder );
 
     $player->race()->component_overflow()->remove_item( $component_tag );
 
@@ -2193,7 +2194,7 @@ sub _raw_use_colony_ship {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id   = shift( @args );
@@ -2225,7 +2226,7 @@ sub _raw_unuse_colony_ship {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id = shift( @args );
@@ -2250,7 +2251,7 @@ sub _raw_add_item_to_hand {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id = shift( @args );
@@ -2273,7 +2274,7 @@ sub _raw_remove_item_from_hand {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id = shift( @args );
@@ -2296,7 +2297,7 @@ sub _raw_buy_technology {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id = shift( @args );
@@ -2334,7 +2335,7 @@ sub _raw_add_to_tech_track {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id = shift( @args );
@@ -2358,7 +2359,7 @@ sub _raw_player_pass_action {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id = shift( @args );
@@ -2421,7 +2422,7 @@ sub _raw_next_player {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id = shift( @args );
@@ -2475,7 +2476,7 @@ sub _raw_prepare_for_first_round {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
@@ -2496,7 +2497,7 @@ sub _raw_start_next_round {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
@@ -2538,7 +2539,7 @@ sub _raw_clear_pass_flags {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
@@ -2560,7 +2561,7 @@ sub _raw_start_upkeep {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
@@ -2596,7 +2597,7 @@ sub _raw_pay_upkeep {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id = shift( @args );
@@ -2627,7 +2628,7 @@ sub _raw_next_upkeep_player {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id = shift( @args );
@@ -2664,7 +2665,7 @@ sub _raw_eliminate_player {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     my $player_id = shift( @args );
@@ -2718,7 +2719,7 @@ sub _raw_start_cleanup {
     my @args        = @_;
 
     if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
-        $self->_log_event( $source, __SUB__, @args );
+        $self->log_event( $source, __SUB__, @args );
     }
 
     if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
@@ -2749,114 +2750,6 @@ sub _raw_start_cleanup {
 #############################################################################
 #############################################################################
 #############################################################################
-
-sub _log_event {
-    my $self            = shift;
-    my $event_type      = shift;
-    my $ref_to_method   = shift;
-    my @args            = @_;
-
-    $Data::Dumper::Indent = 0;
-
-    if ( $event_type == $EV_FROM_INTERFACE ) {
-        $self->_log_data( $actions{ $ref_to_method } . ':' . Dumper( \@args ) );
-    }
-    elsif ( $event_type == $EV_SUB_ACTION ) {
-        $self->_log_data( '  _' . $actions{ $ref_to_method } . ':' . Dumper( \@args ) );
-    }
-
-    return;
-}
-
-#############################################################################
-#
-# action_parse_state_from_log - args
-#
-# log_id        : required - 8-20 character unique indentifier [a-zA-Z0-9]
-#
-
-sub action_parse_state_from_log {
-    my $self        = shift;
-    my %args        = @_;
-
-    $self->set_error( '' );
-
-    unless ( $self->set_log_id( $args{'log_id'} ) ) {
-        $self->set_error( 'Invalid Log ID: ' . $args{'log_id'} );
-        return 0;
-    }
-
-    my $fh_state;
-    my $fh_log;
-
-    unless ( open( $fh_state, '>', $self->_state_file() ) ) {
-        $self->set_error( 'Failed to write state file: ' . $self->_state_file() );
-        return 0;
-    }
-
-    unless( flock( $fh_state, LOCK_EX ) ) {
-        $self->set_error( 'Failed to lock state file: ' . $self->_state_file() );
-        return 0;
-    }
-
-    unless ( open( $fh_log, '<', $self->_log_file() ) ) {
-        $self->set_error( 'Unable to open log file: ' . $self->_log_file() );
-        return 0;
-    }
-
-    flock( $fh_log, LOCK_SH );
-
-    $self->set_long_name( <$fh_log> );
-
-    $self->source_tags()->fill( split( /,/, <$fh_log> ) );
-
-    unless ( $self->source_tags()->count() > 0 ) {
-        $self->set_error( 'Missing source tags' );
-        return 0;
-    }
-
-    $self->option_tags()->fill( split( /,/, <$fh_log> ) );
-
-    my $line = <$fh_log>;
-
-    while ( defined( $line ) ) {
-
-        my ( $action, $data ) = split( /:/, $line, 2 );
-        my $VAR1;
-
-        eval $data; warn $@ if $@;
-
-        my $flag_found_method = 0;
-
-        foreach my $method ( keys( %actions ) ) {
-            if ( $actions{ $method } eq $action ) {
-                $flag_found_method = 1;
-                $method->( $self, $EV_FROM_LOG, $data );
-                last;
-            }
-        }
-
-        unless ( $flag_found_method ) {
-            $self->set_error( 'Invalid Action In Log: ' . $action );
-        }
-
-        $line = <$fh_log>;
-    }
-
-    # using Data::Dumper
-
-    print $fh_state Dumper( $self->{'DATA'} );
-
-    # using Storable
-
-#    store_fd( $self->{'DATA'}, $fh_state );
-
-    close( $fh_state );
-
-    close( $fh_log );
-
-    return 1;
-}
 
 #############################################################################
 #############################################################################

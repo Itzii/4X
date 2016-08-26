@@ -1,4 +1,4 @@
-package WLE::4X::Server::Server;
+package WLE::Objects::Server;
 
 use strict;
 use warnings;
@@ -10,35 +10,7 @@ use Fcntl ':flock';
 
 use WLE::Methods::Simple;
 
-use WLE::4X::Enums::Status;
-
-use WLE::4X::Server::MetaActions;
-use WLE::4X::Server::PlayerActions;
-use WLE::4X::Server::RawActions;
-use WLE::4X::Server::ServerState;
-use WLE::4X::Server::DiscoveryEffects;
-
-use WLE::4X::Objects::Element;
-use WLE::4X::Objects::Player;
-use WLE::4X::Objects::ShipComponent;
-use WLE::4X::Objects::Technology;
-use WLE::4X::Objects::Development;
-use WLE::4X::Objects::Discovery;
-use WLE::4X::Objects::Tile;
-use WLE::4X::Objects::Board;
-use WLE::4X::Objects::Race;
-use WLE::4X::Objects::Ship;
-use WLE::4X::Objects::ShipTemplate;
-
 my $_option_notes = <<'END';
-
-    option_unlimited_ships      => not limited to the count of plastic ships
-
-    option_order_by_passing     => next round order determined by passing order
-    option_order_direction      => 2nd player to pass determines play direction
-
-
-
 
 
 END
@@ -172,56 +144,13 @@ sub reset {
 
         $self->{'SETTINGS'}->{'SOURCE_TAGS'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
         $self->{'SETTINGS'}->{'OPTION_TAGS'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
-        $self->{'SETTINGS'}->{'STARTING_LOCATIONS'} = WLE::Objects::Stack->new();
 
         $self->{'SETTINGS'}->{'LONG_NAME'} = '';
 
         $self->{'SETTINGS'}->{'PLAYERS'} = {};
 
-        $self->{'SETTINGS'}->{'PLAYERS_PENDING'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
-        $self->{'SETTINGS'}->{'PLAYERS_DONE'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
-        $self->{'SETTINGS'}->{'PLAYERS_NEXT_ROUND'} = WLE::Objects::Stack->new( 'flag_exclusive' => 1 );
         $self->{'SETTINGS'}->{'WAITING_ON_PLAYER'} = -1;
-
-        $self->{'SETTINGS'}->{'CURRENT_TRAITOR'} = '';
-        $self->{'SETTINGS'}->{'TECHS_PER_ROUND'} = 0;
     }
-
-    $self->{'RACES'} = {};
-    $self->{'SHIP_TEMPLATES'} = {};
-    $self->{'SHIPS'} = {};
-    $self->{'SHIP_POOL'} = {};
-    $self->{'COMPONENTS'} = {};
-    $self->{'TILES'} = {};
-    $self->{'TECHNOLOGY'} = {};
-    $self->{'DISCOVERIES'} = {};
-    $self->{'DEVELOPMENTS'} = {};
-
-    $self->{'COMBAT_HITS'} = WLE::Objects::Stack->new();
-    $self->{'MISSILE_DEFENSE_HITS'} = 0;
-
-    $self->{'DIE_ROLLS'} = [];
-
-    $self->{'BOARD'} = WLE::4X::Objects::Board->new( 'server' => $self );
-    $self->{'TECH_BAG'} = WLE::Objects::Stack->new();
-    $self->{'AVAILABLE_TECH'} = WLE::Objects::Stack->new();
-    $self->{'DISCOVERY_BAG'} = WLE::Objects::Stack->new();
-    $self->{'DEVELOPMENT_STACK'} = WLE::Objects::Stack->new();
-    $self->{'VP_BAG'} = WLE::Objects::Stack->new();
-
-    $self->{'TEMPLATE_COMBAT_ORDER'} = WLE::Objects::Stack->new();
-
-    $self->{'ROUND_TECH_COUNT'} = 0;
-
-
-    $self->{'STATE'} = {
-        'STATE' => $ST_PREGAME,
-        'ROUND' => 0,
-        'PHASE' => $PH_PREPARING,
-        'PLAYER' => -1,
-        'SUBPHASE' => 0,
-        'TILE' => '',
-    };
 
     return;
 }

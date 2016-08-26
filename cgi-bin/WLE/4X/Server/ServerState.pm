@@ -596,5 +596,81 @@ sub _open_file {
 }
 
 #############################################################################
+
+sub action_parse_state_from_log {
+    my $self        = shift;
+    my %args        = @_;
+
+    $self->set_error( '' );
+
+    unless ( $self->set_log_id( $args{'log_id'} ) ) {
+        $self->set_error( 'Invalid Log ID: ' . $args{'log_id'} );
+        return 0;
+    }
+
+    my $fh_state;
+    my $fh_log;
+
+    unless ( open( $fh_state, '>', $self->_state_file() ) ) {
+        $self->set_error( 'Failed to write state file: ' . $self->_state_file() );
+        return 0;
+    }
+
+    unless( flock( $fh_state, LOCK_EX ) ) {
+        $self->set_error( 'Failed to lock state file: ' . $self->_state_file() );
+        return 0;
+    }
+
+    unless ( open( $fh_log, '<', $self->_log_file() ) ) {
+        $self->set_error( 'Unable to open log file: ' . $self->_log_file() );
+        return 0;
+    }
+
+    flock( $fh_log, LOCK_SH );
+
+    $self->set_long_name( <$fh_log> );
+
+    $self->source_tags()->fill( split( /,/, <$fh_log> ) );
+
+    unless ( $self->source_tags()->count() > 0 ) {
+        $self->set_error( 'Missing source tags' );
+        return 0;
+    }
+
+    $self->option_tags()->fill( split( /,/, <$fh_log> ) );
+
+    my $line = <$fh_log>;
+
+    while ( defined( $line ) ) {
+
+        my ( $action, $data ) = split( /:/, $line, 2 );
+        my $VAR1;
+
+        eval $data; warn $@ if $@;
+
+        unless( $self->run_raw_action_from_log( $action, $data ) ) {
+            $self->set_error( 'Invalid Action In Log: ' . $action );
+        }
+
+        $line = <$fh_log>;
+    }
+
+    # using Data::Dumper
+
+    print $fh_state Dumper( $self->{'DATA'} );
+
+    # using Storable
+
+#    store_fd( $self->{'DATA'}, $fh_state );
+
+    close( $fh_state );
+
+    close( $fh_log );
+
+    return 1;
+}
+
+
+#############################################################################
 #############################################################################
 1

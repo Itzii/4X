@@ -608,42 +608,45 @@ sub action_upgrade {
         return 0;
     }
 
-    my $component = $self->ship_components( $args{'component'} );
+    my $component_tag = $args{'component'};
 
-    unless ( defined( $component ) ) {
-        $self->set_error( 'Invalid Component' );
-        return 0;
-    }
+    unless ( $component_tag eq 'none' ) {
 
-    unless ( $race->component_overflow()->contains( $component->tag() ) ) {
-        if ( $component->tech_required() ne '' ) {
-            unless ( $race->has_technology( $component->tech_required() ) ) {
-                $self->set_error( 'Missing Technology Requirement' );
-                return 0;
+        my $component = $self->ship_components( $component_tag );
+
+        unless ( defined( $component ) ) {
+            $self->set_error( 'Invalid Component' );
+            return 0;
+        }
+
+        unless ( $race->component_overflow()->contains( $component_tag ) ) {
+            if ( $component->tech_required() ne '' ) {
+                unless ( $race->has_technology( $component->tech_required() ) ) {
+                    $self->set_error( 'Missing Technology Requirement' );
+                    return 0;
+                }
             }
         }
-    }
 
-    unless ( defined( $args{'slot_number'} ) ) {
-        $self->set_error( 'Invalid Component Slot' );
-        return 0;
-    }
+        unless ( defined( $args{'slot_number'} ) ) {
+            $self->set_error( 'Invalid Component Slot' );
+            return 0;
+        }
 
-    my $slot_number = $args{'slot_number'};
+        my $slot_number = $args{'slot_number'};
 
-    my $template_copy = $template->copy_of( 'copy_tag' );
+        my $error = '';
+        unless ( $template->add_component( $component->tag(), $slot_number, \$error, 0 ) ) {
+            $self->set_error( $error );
+            return 0;
+        }
 
-    my $error = '';
-    unless ( $template_copy->add_component( $component->tag(), $replaces_component, \$error ) ) {
-        $self->set_error( $error );
-        return 0;
+        $self->_raw_upgrade_ship_component( $EV_FROM_INTERFACE, $player->id(), $template->tag(), $component->tag(), $slot_number );
     }
 
     $self->_raw_increment_race_action( $EV_FROM_INTERFACE, $player->id() );
 
-    $self->_raw_upgrade_ship_component( $EV_FROM_INTERFACE, $player->id(), $template->tag(), $component->tag(), $replaces_component );
-
-    my @actions = ( 'finish_turn' );
+    my @actions = ( 'downgrade_template', 'finish_turn' );
 
     unless ( defined( $args{'as_react'} ) ) {
         if ( $race->action_count() < $race->maximum_action_count( $ACT_UPGRADE ) ) {
@@ -656,6 +659,45 @@ sub action_upgrade {
     }
 
     $self->_raw_set_allowed_player_actions( $EV_FROM_INTERFACE, $player->id(), @actions );
+
+    return 1;
+}
+
+#############################################################################
+
+sub action_upgrade_downgrade {
+    my $self            = shift;
+    my %args            = @_;
+
+    my $player = $self->acting_player();
+    my $race = $player->race();
+
+    unless ( defined( $args{'class'} ) ) {
+        $self->set_error( 'Missing Ship Class' );
+        return 0;
+    }
+
+    my $template = $race->template_of_class( $args{'class'} );
+
+    unless ( defined( $template ) ) {
+        $self->set_error( 'Invalid Ship Template' );
+        return 0;
+    }
+
+    unless ( defined( $args{'slot_number'} ) ) {
+        $self->set_error( 'Invalid Component Slot' );
+        return 0;
+    }
+
+    my $slot_number = $args{'slot_number'};
+
+    my $error = '';
+    unless ( $template->remove_component( $slot_number, \$error, 0 ) ) {
+        $self->set_error( $error );
+        return 0;
+    }
+
+    $self->_raw_downgrade_ship_component( $EV_FROM_INTERFACE, $player->id(), $template->tag(), $slot_number );
 
     return 1;
 }

@@ -59,9 +59,17 @@ sub do {
 
         %response = $self->do( %args );
 
-        $self->_fill_text_data();
+        # $self->_fill_text_data();
 
         $response{'success'} = $self->_fill_text_data();
+        $response{'message'} = $self->last_error();
+        $response{'data'} = $self->returned_data();
+        $response{'allowed'} = [];
+
+        return %response;
+    }
+    elsif ( $args{'action'} eq 'shipinfo' ) {
+        $response{'success'} = $self->_fill_text_data_ship( $args{'user_id'}, $args{'class'} );
         $response{'message'} = $self->last_error();
         $response{'data'} = $self->returned_data();
         $response{'allowed'} = [];
@@ -81,16 +89,10 @@ sub do {
 
 #############################################################################
 
-sub _fill_text_data {
+sub _fill_text_game_status {
     my $self        = shift;
 
-    my @lines = $self->_info_board();
-
-    if ( $self->state() != $ST_PREGAME ) {
-        push( @lines, $self->_info_available_tech() );
-    }
-
-    push( @lines, $self->_info_players() );
+    my @lines = ();
 
     my $tile = $self->tiles()->{ $self->current_tile() };
     my $tile_name = ( defined( $tile ) ) ? $tile->long_name() : '';
@@ -124,6 +126,54 @@ sub _fill_text_data {
                 . join( ',', sort( @actions ) )
         );
     }
+
+    return @lines;
+}
+
+#############################################################################
+
+sub _fill_text_data_ship {
+    my $self        = shift;
+    my $user_id     = shift; $user_id = -1                      unless defined( $user_id );
+    my $ship_class  = shift; $ship_class = ''                   unless defined( $ship_class );
+
+    my $player = $self->player_of_user_id( $user_id );
+
+    unless ( defined( $player ) ) {
+        $self->set_error( 'Invalid User ID' );
+        return 0;
+    }
+
+    my $ship_template = $player->race()->template_of_class( $ship_class );
+
+    unless ( defined( $ship_template ) ) {
+        $self->set_error( 'Invalid Ship Class' );
+        return 0;
+    }
+
+    my @lines = $self->_ship_template_ascii( $ship_template, 1 );
+
+    push( @lines, $self->_fill_text_game_status()  );
+
+    $self->set_returned_data( join( "\n", @lines ) );
+
+    return 1;
+}
+
+#############################################################################
+
+sub _fill_text_data {
+    my $self        = shift;
+
+    my @lines = $self->_info_board();
+
+    if ( $self->state() != $ST_PREGAME ) {
+        push( @lines, $self->_info_available_tech() );
+    }
+
+    push( @lines, $self->_info_players() );
+
+    push( @lines, $self->_fill_text_game_status() );
 
     $self->set_returned_data( join( "\n", @lines ) );
 
@@ -822,46 +872,127 @@ sub _player_ascii {
 #############################################################################
 
 sub _ship_template_ascii {
-    my $self        = shift;
-    my $template    = shift;
+    my $self            = shift;
+    my $template        = shift;
+    my $flag_verbose    = shift; $flag_verbose = 0                  unless defined( $flag_verbose );
 
-    my $text = desc_from_class( $template->class() ) . ' : ' . $template->cost() . '  ';
+    my @parts = ();
+    my $final = '';
 
-    $text .= 'Mv' . $template->total_movement() . ' ';
-    $text .= 'In' . $template->total_initiative() . ' ';
-    $text .= 'Co' . $template->total_computer() . ' ';
-    $text .= 'Sh' . $template->total_shields() . ' ';
-    $text .= 'Hp' . $template->total_hull_points() . ' ';
-    $text .= 'En' . $template->total_energy_used() . '/' . $template->total_energy() . ' ';
+    push( @parts, desc_from_class( $template->class() ) . ' : ' . $template->cost() . ' ' );;
 
-    my %beam = $template->total_beam_attacks();
-    if ( %beam ) {
-        $text .= 'Beam ';
-        foreach my $strength ( sort( keys( %beam ) ) ) {
-            $text .= $strength . 'x' . $beam{ $strength } . ' ';
+    if ( $flag_verbose ) {
+        push( @parts, '' );
+
+        push( @parts, 'Mv  In  Co  Sh  Hp  En   Beam   Missile    Component        (Original)' );
+
+        my @components = $template->merged_components();
+
+        foreach my $index ( 0 .. scalar( @components ) - 1 ) {
+
+            my $component_tag = $components[ $index ];
+            my $original_tag = $template->original_components()->item_at_index( $index );
+            my $flag_original = ( $component_tag eq $original_tag ) ? 1 : 0;
+
+            my $component = $self->components()->{ $component_tag };
+
+            unless ( defined( $component ) ) {
+                next;
+            }
+
+            my $original_name = '';
+            unless ( $flag_original ) {
+                $original_name = '(' . $self->components()->{ $original_tag }->long_name() . ')';
+            }
+
+            my $move = ( $component->movement() > 0 ) ? $component->movement() : ' ';
+            my $initiative = ( $component->initiative() > 0 ) ? $component->initiative() : ' ';
+            my $computer = ( $component->computer() > 0 ) ? $component->computer() : ' ';
+            my $shields = ( $component->shields() > 0 ) ? $component->shields() : ' ';
+            my $hull = ( $component->hull_points() > 0 ) ? $component->hull_points() : ' ';
+
+            my $energy = '  ';
+
+            if ( $component->energy() > 0 ) {
+                $energy = sprintf( '%+2i', $component->energy() );
+            }
+            elsif ( $component->energy_used() > 0 ) {
+                $energy = sprintf( '%+2i', $component->energy_used() * -1 );
+            }
+
+            my $beam = '';
+            my $missile = '';
+            if ( $component->is_missile() ) {
+                $missile = $component->attack_strength() . 'x' . $component->attack_count();
+            }
+            else {
+                $beam = $component->attack_strength() . 'x' . $component->attack_count();
+            }
+
+
+
+            push(
+                @parts,
+                sprintf(
+                    '%s  %s  %s  %s  %s  %s  %s  %s    %s     %s',
+                    $move,
+                    $initiative,
+                    $computer,
+                    $shields,
+                    $hull,
+                    $energy,
+                    $beam,
+                    $missile,
+                    $component->long_name(),
+                    $original_name,
+                ),
+            )
         }
-    }
 
-    my %missile = $template->total_missile_attacks();
-    if ( %missile ) {
-        $text .= 'Missile ';
-        foreach my $strength ( sort( keys( %missile ) ) ) {
-            $text .= $strength . 'x' . $missile{ $strength } . ' ';
+        $final = join( "\n", @parts );
+    }
+    else {
+
+        push( @parts, 'Mv' . $template->total_movement() );
+        push( @parts, 'In' . $template->total_initiative() );
+        push( @parts, 'Co' . $template->total_computer() );
+        push( @parts, 'Sh' . $template->total_shields() );
+        push( @parts, 'Hp' . $template->total_hull_points() );
+        push( @parts, 'En' . $template->total_energy_used() . '/' . $template->total_energy() );
+
+        my %beam = $template->total_beam_attacks();
+        if ( %beam ) {
+            my $text = 'Beam ';
+            foreach my $strength ( sort( keys( %beam ) ) ) {
+                $text .= $strength . 'x' . $beam{ $strength } . ' ';
+            }
+            push( @parts, $text );
         }
+
+        my %missile = $template->total_missile_attacks();
+        if ( %missile ) {
+            my $text = 'Missile ';
+            foreach my $strength ( sort( keys( %missile ) ) ) {
+                $text .= $strength . 'x' . $missile{ $strength } . ' ';
+            }
+            push( @parts, $text );
+        }
+
+        my @component_names = ();
+        foreach my $comp_tag ( $template->merged_components() ) {
+            push( @component_names, $self->ship_components()->{ $comp_tag }->long_name() );
+        }
+
+        while ( scalar( @component_names ) < $template->slots() ) {
+            push( @component_names, '[empty]' );
+        }
+
+        push( @parts, '(' . join( ',', @component_names ) . ')' );
+
+        $final = join( ' ', @parts );
     }
 
-    my @component_names = ();
-    foreach my $comp_tag ( $template->components() ) {
-        push( @component_names, $self->ship_components()->{ $comp_tag }->long_name() );
-    }
-
-    while ( scalar( @component_names ) < $template->slots() ) {
-        push( @component_names, '[empty]' );
-    }
-
-    $text .= '(' . join( ',', @component_names ) . ') ';
-
-    return $text;
+    return $final;
 }
 
 #############################################################################

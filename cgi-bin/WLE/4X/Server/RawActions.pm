@@ -78,6 +78,7 @@ sub _init_raw_actions {
             \&_raw_buy_technology               => 'buy_technology',
             \&_raw_spend_resource               => 'spend_resource',
             \&_raw_upgrade_ship_component       => 'upgrade_ship',
+            \&_raw_downgrade_ship_component     => 'downgrade_ship',
 
             \&_raw_set_pending_player           => 'set_pending_player',
             \&_raw_start_combat_phase           => 'start_combat_phase',
@@ -2182,6 +2183,35 @@ sub _raw_upgrade_ship_component {
     $template->add_component( $component_tag, $slot_number, \$message_holder );
 
     $player->race()->component_overflow()->remove_item( $component_tag );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_downgrade_ship_component {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->log_event( $source, __SUB__, @args );
+    }
+
+    my $player_id       = shift( @args );
+    my $template_tag    = shift( @args );
+    my $slot_number     = shift( @args );
+
+    my $player = $self->player_of_id( $player_id );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return $player_id . ' downgraded template ' . $template_tag . ' clearing slot ' . $slot_number;
+    }
+
+    my $template = $self->ship_templates()->{ $template_tag };
+
+    my $message_holder = '';
+    $template->remove_component( $slot_number, \$message_holder );
 
     return;
 }

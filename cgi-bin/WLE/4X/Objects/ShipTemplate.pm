@@ -280,6 +280,7 @@ sub add_component {
     my $new_tag         = shift;
     my $slot_number     = shift;
     my $r_message       = shift;
+    my $flag_real       = shift; $flag_real = 1                    unless defined( $flag_real );
 
     if ( $slot_number < 0 || $slot_number >= $self->components()->count() ) {
         $$r_message = 'Invalid Slot Number';
@@ -291,12 +292,15 @@ sub add_component {
 
     $$r_message = $self->_problem( @test_components );
 
-    if ( $$r_message eq '' ) {
-        $self->components()->fill( @test_components );
-        return 1;
+    unless ( $$r_message eq '' ) {
+        return 0;
     }
 
-    return 0;
+    if ( $flag_real ) {
+        $self->components()->fill( @test_components );
+    }
+
+    return 1;
 }
 
 #############################################################################
@@ -305,6 +309,7 @@ sub remove_component {
     my $self            = shift;
     my $slot_number     = shift;
     my $r_message       = shift;
+    my $flag_real       = shift; $flag_real = 1                    unless defined( $flag_real );
 
     my @new_components = ();
 
@@ -323,14 +328,17 @@ sub remove_component {
 
     $$r_message = $self->_problem( @test_components );
 
-    if ( $$r_message eq '' ) {
+    unless ( $$r_message eq '' ) {
+        return 0;
+    }
+
+    if ( $flag_real) {
         my @new_components = $self->components()->items();
         $new_components[ $slot_number ] = '';
         $self->components()->fill( @new_components );
-        return 1;
     }
 
-    return 0;
+    return 1;
 }
 
 #############################################################################
@@ -450,7 +458,7 @@ sub slots {
 sub components {
     my $self        = shift;
 
-    return $self->{'COMPONENTS'}->items();
+    return $self->{'COMPONENTS'};
 }
 
 #############################################################################
@@ -458,7 +466,7 @@ sub components {
 sub original_components {
     my $self        = shift;
 
-    return $self->{'ORIGINAL_COMPONENTS'}->items();
+    return $self->{'ORIGINAL_COMPONENTS'};
 }
 
 #############################################################################
@@ -512,7 +520,10 @@ sub copy_of {
 
     $copy->{'SLOTS'} = $self->{'SLOTS'};
 
-    $copy->{'ORIGINAL_COMPONENTS'}->fill( @{ $self->{'COMPONENTS'} } );
+    $copy->{'COMPONENTS'} = WLE::Objects::Stack->new();
+    $copy->{'ORIGINAL_COMPONENTS'} = WLE::Objects::Stack->new();
+
+    $copy->{'ORIGINAL_COMPONENTS'}->fill( $self->{'COMPONENTS'}->items() );
 
     foreach ( $self->original_components()->items() ) {
         $self->components()->add_item( '' );

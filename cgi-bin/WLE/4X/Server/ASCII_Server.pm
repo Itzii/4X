@@ -50,7 +50,11 @@ sub do {
 
     my %response = ();
 
-    if ( $args{'action'} eq 'info' ) {
+    my @actions = ( 'info', 'shipinfo' );
+
+    if ( matches_any( $args{'action'}, @actions ) ) {
+        my $action = $args{'action'};
+
         $args{'action'} = 'status';
 
         unless ( defined( $args{'user'} ) ) {
@@ -59,17 +63,14 @@ sub do {
 
         %response = $self->do( %args );
 
-        # $self->_fill_text_data();
+        if ( $action eq 'info' ) {
+            $response{'success'} = $self->_fill_text_data();
+        }
+        elsif ( $action eq 'shipinfo' ) {
+#            $response{'success'} = $self->_fill_text_data();
+            $response{'success'} = $self->_fill_text_data_ship( $args{'user_id'}, $args{'class'} );
+        }
 
-        $response{'success'} = $self->_fill_text_data();
-        $response{'message'} = $self->last_error();
-        $response{'data'} = $self->returned_data();
-        $response{'allowed'} = [];
-
-        return %response;
-    }
-    elsif ( $args{'action'} eq 'shipinfo' ) {
-        $response{'success'} = $self->_fill_text_data_ship( $args{'user_id'}, $args{'class'} );
         $response{'message'} = $self->last_error();
         $response{'data'} = $self->returned_data();
         $response{'allowed'} = [];
@@ -884,7 +885,7 @@ sub _ship_template_ascii {
     if ( $flag_verbose ) {
         push( @parts, '' );
 
-        push( @parts, 'Mv  In  Co  Sh  Hp  En   Beam   Missile    Component        (Original)' );
+        push( @parts, 'Mv  In  Co  Sh  Hp  En  Beam Missile  Component        (Original)' );
 
         my @components = $template->merged_components();
 
@@ -894,7 +895,7 @@ sub _ship_template_ascii {
             my $original_tag = $template->original_components()->item_at_index( $index );
             my $flag_original = ( $component_tag eq $original_tag ) ? 1 : 0;
 
-            my $component = $self->components()->{ $component_tag };
+            my $component = $self->ship_components()->{ $component_tag };
 
             unless ( defined( $component ) ) {
                 next;
@@ -902,13 +903,13 @@ sub _ship_template_ascii {
 
             my $original_name = '';
             unless ( $flag_original ) {
-                $original_name = '(' . $self->components()->{ $original_tag }->long_name() . ')';
+                $original_name = '(' . $self->ship_components()->{ $original_tag }->long_name() . ')';
             }
 
             my $move = ( $component->movement() > 0 ) ? $component->movement() : ' ';
             my $initiative = ( $component->initiative() > 0 ) ? $component->initiative() : ' ';
             my $computer = ( $component->computer() > 0 ) ? $component->computer() : ' ';
-            my $shields = ( $component->shields() > 0 ) ? $component->shields() : ' ';
+            my $shields = ( $component->shield() > 0 ) ? $component->shield() : ' ';
             my $hull = ( $component->hull_points() > 0 ) ? $component->hull_points() : ' ';
 
             my $energy = '  ';
@@ -923,10 +924,12 @@ sub _ship_template_ascii {
             my $beam = '';
             my $missile = '';
             if ( $component->is_missile() ) {
-                $missile = $component->attack_strength() . 'x' . $component->attack_count();
+                $missile = $component->attack_damage() . 'x' . $component->attack_count();
             }
             else {
-                $beam = $component->attack_strength() . 'x' . $component->attack_count();
+                if ( $component->attack_damage() > 0 ) {
+                    $beam = $component->attack_damage() . 'x' . $component->attack_count();
+                }
             }
 
 
@@ -934,7 +937,7 @@ sub _ship_template_ascii {
             push(
                 @parts,
                 sprintf(
-                    '%s  %s  %s  %s  %s  %s  %s  %s    %s     %s',
+                    '%2s  %2s  %2s  %2s  %2s  %2s  %4s  %4s    %s     %s',
                     $move,
                     $initiative,
                     $computer,
@@ -948,6 +951,20 @@ sub _ship_template_ascii {
                 ),
             )
         }
+
+        push( @parts, '-------------------------------------------------------------------' );
+
+        push(
+            @parts,
+            sprintf(
+                '    %2s  %2s  %2s  %2s  %2s',
+                $template->initiative(),
+                $template->computer(),
+                $template->shields(),
+                $template->hull_points(),
+                $template->energy(),
+            ),
+        );
 
         $final = join( "\n", @parts );
     }
@@ -980,11 +997,12 @@ sub _ship_template_ascii {
 
         my @component_names = ();
         foreach my $comp_tag ( $template->merged_components() ) {
-            push( @component_names, $self->ship_components()->{ $comp_tag }->long_name() );
-        }
-
-        while ( scalar( @component_names ) < $template->slots() ) {
-            push( @component_names, '[empty]' );
+            if ( $comp_tag eq '' ) {
+                push( @component_names, '[empty]' );
+            }
+            else {
+                push( @component_names, $self->ship_components()->{ $comp_tag }->long_name() );
+            }
         }
 
         push( @parts, '(' . join( ',', @component_names ) . ')' );

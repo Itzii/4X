@@ -474,21 +474,16 @@ sub original_components {
 sub merged_components {
     my $self            = shift;
 
-    my @merged = ();
-
     my @components = $self->components()->items();
     my @orig_components = $self->original_components()->items();
 
-    foreach my $index ( 0 .. scalar( @components ) - 1 ) {
-        if ( $components[ $index ] eq '' ) {
-            push( @merged, $orig_components[ $index ] );
-        }
-        else {
-            push( @merged, $components[ $index ] );
+    foreach my $index ( 0 .. scalar( @orig_components ) - 1 ) {
+        unless ( $components[ $index ] eq '' ) {
+            $orig_components[ $index ] = $components[ $index ];
         }
     }
 
-    return @merged;
+    return @orig_components;
 }
 
 #############################################################################
@@ -524,6 +519,7 @@ sub copy_of {
     $copy->{'ORIGINAL_COMPONENTS'} = WLE::Objects::Stack->new();
 
     $copy->{'ORIGINAL_COMPONENTS'}->fill( $self->{'COMPONENTS'}->items() );
+
 
     foreach ( $self->original_components()->items() ) {
         $self->components()->add_item( '' );
@@ -561,9 +557,15 @@ sub from_hash {
     if ( defined( $r_hash->{'COMPONENTS'} ) ) {
         $self->components()->fill( @{ $r_hash->{'COMPONENTS'} } );
     }
+    while ( $self->components()->count() < $self->slots() ) {
+        $self->components()->add_items( '' );
+    }
 
     if ( defined( $r_hash->{'ORIGINAL_COMPONENTS'} ) ) {
         $self->original_components()->fill( @{ $r_hash->{'ORIGINAL_COMPONENTS'} } );
+    }
+    while ( $self->original_components()->count() < $self->slots() ) {
+        $self->original_components()->add_items( '' );
     }
 
 

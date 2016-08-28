@@ -522,7 +522,7 @@ sub copy_of {
 
 
     foreach ( $self->original_components()->items() ) {
-        $self->components()->add_item( '' );
+        $self->components()->add_items( '' );
     }
 
     $copy->{'VP_DRAW'} = $self->{'VP_DRAW'};

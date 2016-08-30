@@ -3,6 +3,8 @@ package WLE::4X::Objects::ShipTemplate;
 use strict;
 use warnings;
 
+use WLE::Methods::Simple qw( matches_any );
+
 use WLE::4X::Enums::Basic;
 
 use parent 'WLE::4X::Objects::Element';
@@ -282,12 +284,12 @@ sub add_component {
     my $r_message       = shift;
     my $flag_real       = shift; $flag_real = 1                    unless defined( $flag_real );
 
-    if ( $slot_number < 0 || $slot_number >= $self->components()->count() ) {
+    if ( $slot_number < 0 || $slot_number >= $self->slots() ) {
         $$r_message = 'Invalid Slot Number';
         return 0;
     }
 
-    my @test_components = $self->components()->items();
+    my @test_components = $self->merged_components();
     $test_components[ $slot_number ] = $new_tag;
 
     $$r_message = $self->_problem( @test_components );
@@ -313,7 +315,7 @@ sub remove_component {
 
     my @new_components = ();
 
-    if ( $slot_number < 0 || $slot_number >= $self->components()->count() ) {
+    if ( $slot_number < 0 || $slot_number >= $self->slots() ) {
         $$r_message = 'Invalid Slot Number';
         return 0;
     }
@@ -348,6 +350,8 @@ sub _problem {
     my @components  = @_;
 
     my $flag_contains_drive = 0;
+
+    print STDERR "\nChecking Config Of: " . join( ',', @components );
 
     foreach my $component_tag ( @components ) {
         my $component = $self->server()->ship_components()->{ $component_tag };
@@ -520,10 +524,7 @@ sub copy_of {
 
     $copy->{'ORIGINAL_COMPONENTS'}->fill( $self->{'COMPONENTS'}->items() );
 
-
-    foreach ( $self->original_components()->items() ) {
-        $self->components()->add_items( '' );
-    }
+    $self->components()->pad_with( '', $self->original_components()->count() );
 
     $copy->{'VP_DRAW'} = $self->{'VP_DRAW'};
 
@@ -557,17 +558,12 @@ sub from_hash {
     if ( defined( $r_hash->{'COMPONENTS'} ) ) {
         $self->components()->fill( @{ $r_hash->{'COMPONENTS'} } );
     }
-    while ( $self->components()->count() < $self->slots() ) {
-        $self->components()->add_items( '' );
-    }
+    $self->components()->pad_with( '', $self->slots() );
 
     if ( defined( $r_hash->{'ORIGINAL_COMPONENTS'} ) ) {
         $self->original_components()->fill( @{ $r_hash->{'ORIGINAL_COMPONENTS'} } );
     }
-    while ( $self->original_components()->count() < $self->slots() ) {
-        $self->original_components()->add_items( '' );
-    }
-
+    $self->original_components()->pad_with( '', $self->slots() );
 
     return 1;
 }

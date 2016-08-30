@@ -182,6 +182,71 @@ sub location_of_tile {
 
 #############################################################################
 
+sub valid_path_for_player_id {
+    my $self            = shift;
+    my $player_id       = shift;
+    my $ship_can_jump   = shift;
+    my $flag_aggressive = shift;
+    my @path            = @_;
+
+    my $player = $self->server()->player_of_id( $player_id );
+    my $race = $player->race();
+
+    my $flag_doable = 1;
+    my $flag_used_jump_drive = 0;
+
+    my @treaties = $race->treaties_with();
+
+    while ( scalar( @path ) >= 2 ) {
+
+        my $start_tile = $self->server()->tiles()->{ $path[ 0 ] };
+
+        if ( $start_tile->unpinned_ship_count( $player_id ) < 1 ) {
+            $flag_doable = 0;
+            last;
+        }
+
+        my ( $loc_x1, $loc_y1 ) = split( /:/, $self->location_of_tile( $path[ 0 ] ) );
+        my ( $loc_x2, $loc_y2 ) = split( /:/, $self->location_of_tile( $path[ 1 ] ) );
+
+        my $flag_normally_reachable = $self->tile_pair_is_traversable(
+            $player_id,
+            $loc_x1,
+            $loc_y1,
+            $loc_x2,
+            $loc_y2,
+        );
+
+        if ( $flag_normally_reachable ) {
+            shift( @path );
+            next;
+        }
+
+        if ( $flag_used_jump_drive ) {
+            $flag_doable = 0;
+            last;
+        }
+
+        unless ( $ship_can_jump ) {
+            $flag_doable = 0;
+            last;
+        }
+
+        $flag_used_jump_drive = 1;
+
+        unless ( $self->locations_adjacent( $loc_x1, $loc_y1, $loc_x2, $loc_y2 )  ) {
+            $flag_doable = 0;
+            last;
+        }
+
+        shift( @path );
+    }
+
+    return $flag_doable;
+}
+
+#############################################################################
+
 sub tile_is_within_distance {
     my $self            = shift;
     my $player_id       = shift;
@@ -189,8 +254,10 @@ sub tile_is_within_distance {
     my $destination_tag = shift;
     my $max_distance    = shift;
     my $flag_jump_drive = shift;
+    my $flag_has_wormhole = shift;
 
-    my $race = $self->server()->race_of_player_id( $player_id );
+    my $player = $self->server()->player_of_id( $player_id );
+    my $race = $player->race();
 
     my $start = $self->location_of_tile( $origin_tag );
     my ( $loc_x, $loc_y ) = split( /:/, $start );
@@ -215,7 +282,7 @@ sub tile_is_within_distance {
                     unless ( matches_any( $tile->tag(), @{ $path } ) ) {
 
                         my $traversable = $self->tile_pair_is_traversable(
-                            $race->tag(),
+                            $player_id,
                             $loc_x,
                             $loc_y,
                             $loc_x2,

@@ -92,6 +92,24 @@ sub add_items {
 
 #############################################################################
 
+sub pad_with {
+    my $self        = shift;
+    my $item        = shift;
+    my $max_count   = shift;
+
+    if ( $self->{'FLAG_EXCLUSIVE'} ) {
+        return;
+    }
+
+    while ( scalar( @{ $self->{'ITEMS'} } ) < $max_count ) {
+        push( @{ $self->{'ITEMS'} }, $item );
+    }
+
+    return;
+}
+
+#############################################################################
+
 sub insert_item {
     my $self        = shift;
     my $item        = shift;

@@ -612,7 +612,7 @@ sub action_upgrade {
 
     unless ( $component_tag eq 'none' ) {
 
-        my $component = $self->ship_components( $component_tag );
+        my $component = $self->ship_components()->{ $component_tag };
 
         unless ( defined( $component ) ) {
             $self->set_error( 'Invalid Component' );
@@ -779,59 +779,59 @@ sub action_move {
     my $player = $self->acting_player();
     my $race = $player->race();
 
-    unless ( defined( $args{'ship_tag'} ) ) {
-        $self->set_error( 'Missing Ship Tag' );
+
+    unless ( defined( $args{'path'} ) ) {
+        $self->set_error( 'Missing Path' );
         return 0;
     }
 
-    my $ship = $self->ships()->{ $args{'ship_tag'} };
+    my @path = split( ',', $args{'path'} );
+
+    foreach my $tile_tag ( @path ) {
+        my $location = $self->board()->location_of_tile( $tile_tag );
+        if ( $location eq '' ) {
+            $self->set_error( 'Invalid Path Element' );
+            return 0;
+        }
+    }
+
+    my $origin_tile = $self->tiles()->{ $path[ 0 ] };
+
+    unless ( defined( $args{'class'} ) ) {
+        $self->set_error( 'Missing Ship Class' );
+        return 0;
+    }
+
+    my $ship = undef;
+
+    foreach my $tile_ship_tag ( $origin_tile->ships()->items() ) {
+        $ship = $self->ships()->{ $tile_ship_tag };
+        if ( defined( $ship ) ) {
+            if ( $ship->owner_id() == $player->id() && $ship->class() eq $args{'class'}  ) {
+                last;
+            }
+        }
+        $ship = undef;
+    }
 
     unless ( defined( $ship ) ) {
-        $self->set_error( 'Invalid Ship Tag' );
+        $self->set_error( 'No Ships Of Class In Origin' );
         return 0;
     }
 
-    unless ( $ship->owner_id() == $player->id() ) {
-        $self->set_error( 'Ship not owned by user' );
+    if ( scalar( @path ) - 1 > $ship->total_movement() ) {
+        $self->set_error( 'Distance Too Great' );
         return 0;
     }
 
-    unless ( defined( $args{'origin'} ) ) {
-        $self->set_error( 'Missing Origin Tag' );
-        return 0;
-    }
-
-    my $origin_tag = $args{'origin'};
-
-    my $location = $self->board()->location_of_tile( $origin_tag );
-
-    if ( $location eq '' ) {
-        $self->set_error( 'Invalid Origin Tag' );
-        return 0;
-    }
-
-    unless ( defined( $args{'destination'} ) ) {
-        $self->set_error( 'Missing Destination Tag' );
-        return 0;
-    }
-
-    my $destination_tag = $args{'destination'};
-
-    $location = $self->board()->location_of_tile( $destination_tag );
-
-    if ( $location eq '' ) {
-        $self->set_error( 'Invalid Destination Tag' );
-        return 0;
-    }
-
-    my $reachable = $self->board()->tile_is_within_distance(
+    my $reachable = $self->board()->valid_path_for_player_id(
         $player->id(),
-        $origin_tag,
-        $destination_tag,
-        $ship->total_movement(),
-        $ship->template()->provides( 'jump_drive' ),
-        $race->has_technology( 'tech_wormhole_generator' ),
+        $ship->template()->does_provide( 'jump_drive' ),
+        @path,
     );
+
+
+
 
     unless ( $reachable ) {
         $self->set_error( 'Tile Not Reachable' );

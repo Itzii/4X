@@ -2177,7 +2177,7 @@ sub _raw_upgrade_ship_component {
         return $player_id . ' upgraded template ' . $template_tag . ' with ' . $component_tag . ' in slot ' . $slot_number;
     }
 
-    my $template = $self->ship_templates()->{ $template_tag };
+    my $template = $self->templates()->{ $template_tag };
 
     my $message_holder = '';
     $template->add_component( $component_tag, $slot_number, \$message_holder );
@@ -2208,7 +2208,7 @@ sub _raw_downgrade_ship_component {
         return $player_id . ' downgraded template ' . $template_tag . ' clearing slot ' . $slot_number;
     }
 
-    my $template = $self->ship_templates()->{ $template_tag };
+    my $template = $self->templates()->{ $template_tag };
 
     my $message_holder = '';
     $template->remove_component( $slot_number, \$message_holder );

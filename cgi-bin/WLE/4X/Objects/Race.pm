@@ -287,6 +287,25 @@ sub discovery_vps {
 
 #############################################################################
 
+sub has_treaty_with {
+    my $self        = shift;
+    my $tag         = shift;
+
+    foreach my $item ( $self->{'VP_SLOTS'}->items() ) {
+        my ( $type, $value ) = split( /:/, $item );
+
+        if ( $type == $VP_AMBASSADOR ) {
+            if ( $value eq $tag ) {
+                return 1;
+            }
+        }
+    }
+
+    return 0;
+}
+
+#############################################################################
+
 sub treaties_with {
     my $self            = shift;
 

@@ -183,23 +183,28 @@ sub location_of_tile {
 #############################################################################
 
 sub valid_path_for_player_id {
-    my $self            = shift;
-    my $player_id       = shift;
-    my $ship_can_jump   = shift;
-    my $flag_aggressive = shift;
-    my @path            = @_;
+    my $self                = shift;
+    my $player_id           = shift;
+    my $ship_can_jump       = shift;
+    my $flag_aggressive     = shift;
+    my $r_broken_treaties   = shift;
+    my $r_path              = shift;
 
     my $player = $self->server()->player_of_id( $player_id );
     my $race = $player->race();
 
+    my @path = @{ $r_path };
+
     my $flag_doable = 1;
     my $flag_used_jump_drive = 0;
 
-    my @treaties = $race->treaties_with();
+    my %broken_treaties = ();
+
 
     while ( scalar( @path ) >= 2 ) {
 
         my $start_tile = $self->server()->tiles()->{ $path[ 0 ] };
+        my $end_tile = $self->server()->tiles()->{ $path[ 1 ] };
 
         if ( $start_tile->unpinned_ship_count( $player_id ) < 1 ) {
             $flag_doable = 0;
@@ -239,8 +244,18 @@ sub valid_path_for_player_id {
             last;
         }
 
+        foreach my $treaty_id ( $end_tile->treaties_on_tile( $player_id ) ) {
+            $broken_treaties{ $treaty_id } = 1;
+
+            unless ( $flag_aggressive ) {
+                $flag_doable = 0;
+            }
+        }
+
         shift( @path );
     }
+
+    @{ $r_broken_treaties } = keys( %broken_treaties );
 
     return $flag_doable;
 }

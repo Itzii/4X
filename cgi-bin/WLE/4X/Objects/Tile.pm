@@ -294,6 +294,38 @@ sub has_explorer {
 
 #############################################################################
 
+sub treaty_ids {
+    my $self            = shift;
+    my $player_id       = shift;
+
+    my %treaties_on_tile = ();
+
+    my @player_treaties = $self->server()->player_of_id( $player_id )->race()->treaties_with();
+
+    if ( $self->owner_id() != -1 && $self->owner_id() != $player_id ) {
+        my $owner_tag = $self->server()->player_of_id( $self->owner_id() )->race()->tag();
+
+        if ( matches_any( $owner_tag, @player_treaties ) ) {
+            $treaties_on_tile{ $self->owner_id() } = 1;
+        }
+    }
+
+    foreach my $ship_owner ( $self->ship_owners() ) {
+        if ( $ship_owner != -1 && $ship_owner != $player_id ) {
+            my $ship_owner_tag = $self->server()->player_of_id( $ship_owner )->race()->tag();
+
+            if ( matches_any( $ship_owner_tag, @player_treaties ) ) {
+                $treaties_on_tile{ $ship_owner } = 1;
+            }
+        }
+    }
+
+    return keys( %treaties_on_tile );
+}
+
+
+#############################################################################
+
 sub unpinned_ship_count {
     my $self            = shift;
     my $player_id       = shift;

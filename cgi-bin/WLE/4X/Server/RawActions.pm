@@ -108,6 +108,7 @@ sub _init_raw_actions {
             \&_raw_start_cleanup                => 'start_cleanup',
 
             \&_raw_swap_back_ambassadors        => 'swap_back_ambassadors',
+            \&_raw_set_traitor                  => 'set_traitor',
         }
     );
 
@@ -1165,6 +1166,28 @@ sub _raw_swap_back_ambassadors {
 
     $self->races()->{ $race_tag }->remove_vp_item( $other_race_tag );
     $self->races()->{ $race_tag }->in_hand()->add_items( 'cube:' . $RES_WILD );
+
+    return;
+}
+
+#############################################################################
+
+sub _raw_set_traitor {
+    my $self        = shift;
+    my $source      = shift;
+    my @args        = @_;
+
+    if ( $source == $EV_FROM_INTERFACE || $source == $EV_SUB_ACTION ) {
+        $self->log_event( $source, __SUB__, @args );
+    }
+
+    my $player_id = shift( @args );
+
+    if ( $source == $EV_FROM_LOG_FOR_DISPLAY ) {
+        return $player_id . ' is given the traitor card';
+    }
+
+    $self->set_current_traitor( $player_id );
 
     return;
 }
@@ -2734,8 +2757,10 @@ sub _raw_eliminate_player {
     $self->done_player()->remove_item( $player_id );
     $self->players_next_round()->remove_item( $player_id );
 
+
+
     if ( $self->current_traitor() == $player_id ) {
-        $self->set_current_traitor( -1 );
+        $self->_raw_set_traitor( $EV_SUB_ACTION, -1 );
     }
 
     return;

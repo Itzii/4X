@@ -785,10 +785,11 @@ sub action_move {
         return 0;
     }
 
-    my @path = split( ',', $args{'path'} );
+    my @path = @{ $args{'path'} };
 
     foreach my $tile_tag ( @path ) {
         my $location = $self->board()->location_of_tile( $tile_tag );
+
         if ( $location eq '' ) {
             $self->set_error( 'Invalid Path Element' );
             return 0;
@@ -824,14 +825,25 @@ sub action_move {
         return 0;
     }
 
+    my $flag_allow_aggression = 0;
+    if ( defined( $args{'aggressive'} ) ) {
+        $flag_allow_aggression = $args{'aggressive'};
+    }
+
+    my @broken_treaties = ();
+
     my $reachable = $self->board()->valid_path_for_player_id(
         $player->id(),
         $ship->template()->does_provide( 'jump_drive' ),
-        @path,
+        $flag_allow_aggression,
+        \@broken_treaties,
+        \@path,
     );
 
-
-
+    if ( scalar( @broken_treaties ) > 0 && $flag_allow_aggression == 0 ) {
+        $self->set_error( 'Path would break treaty' );
+        return 0;
+    }
 
     unless ( $reachable ) {
         $self->set_error( 'Tile Not Reachable' );
@@ -840,8 +852,16 @@ sub action_move {
 
     $self->_raw_increment_race_action( $EV_FROM_INTERFACE, $player->id() );
 
-    $self->_raw_remove_ship_from_tile( $EV_FROM_INTERFACE, $origin_tag, $ship->tag() );
-    $self->_raw_add_ship_to_tile( $EV_FROM_INTERFACE, $destination_tag, $ship->tag() );
+    $self->_raw_remove_ship_from_tile( $EV_FROM_INTERFACE, $path[ 0 ], $ship->tag() );
+    $self->_raw_add_ship_to_tile( $EV_FROM_INTERFACE, $path[ -1 ], $ship->tag() );
+
+    foreach my $other_id ( @broken_treaties ) {
+        my $other_race_tag = $self->player_of_id( $other_id )->race()->tag();
+
+        $self->_raw_swap_back_ambassadors( $EV_FROM_INTERFACE, $race->tag(), $other_race_tag );
+        $self->_raw_set_traitor( $EV_FROM_INTERFACE, $player->id() );
+    }
+
 
     my @actions = ( 'finish_turn' );
 

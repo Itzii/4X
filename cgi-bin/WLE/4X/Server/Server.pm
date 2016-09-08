@@ -15,6 +15,7 @@ use WLE::4X::Enums::Status;
 use WLE::4X::Server::MetaActions;
 use WLE::4X::Server::PlayerActions;
 use WLE::4X::Server::RawActions;
+use WLE::4X::Server::CombatActions;
 use WLE::4X::Server::ServerState;
 use WLE::4X::Server::DiscoveryEffects;
 

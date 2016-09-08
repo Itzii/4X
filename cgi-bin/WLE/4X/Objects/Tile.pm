@@ -363,8 +363,11 @@ sub unpinned_ship_count {
         return $friendly_count;
     }
 
-    if ( $self->server()->race_of_acting_player()->has_technology( 'tech_stealth' ) ) {
-        $enemy_count = int( $enemy_count / 2 );
+    my $player = $self->server()->player_of_id( $player_id );
+    if ( defined( $player ) ) {
+        if ( $player->race()->has_technology( 'tech_stealth' ) ) {
+            $enemy_count = int( $enemy_count / 2 );
+        }
     }
 
     if ( $enemy_count >= $friendly_count ) {

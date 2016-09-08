@@ -49,7 +49,7 @@ sub action_attack {
 
     my $enemy_id = $defender_id;
     if ( $enemy_id == $ship_owner ) {
-        $enemy_id = $attack_id;
+        $enemy_id = $attacker_id;
     }
 
     my @rolls = ();
@@ -117,6 +117,8 @@ sub action_roll_npc {
     @rolls = $self->ai_descision_allocate_hits( $template_tag, @rolls );
 
     $self->_raw_allocate_hits( $EV_FROM_INTERFACE, @rolls );
+
+    my $missile_defense_hits = 0;
 
     if ( $self->subphase() == $SUB_MISSILE ) {
         foreach my $ship ( $tile->ships()->items() ) {
@@ -187,7 +189,7 @@ sub action_allocate_hits {
                 return 0;
             }
 
-            $hits->recorded()->remove_item( $hit );
+            $hits_recorded->remove_item( $hit );
         }
     }
 
@@ -281,7 +283,7 @@ sub action_allocate_defense_hits {
         $self_id = $defender_id;
     }
 
-    $self->_raw_allocate_hits( $EV_FROM_INTERFACE, @hits_recorded );
+    $self->_raw_allocate_hits( $EV_FROM_INTERFACE, $hits_recorded->items() );
 
     if ( $enemy_id == -1 ) {
         $self->_raw_set_pending_player( $EV_FROM_INTERFACE, $self_id );
@@ -370,7 +372,7 @@ sub action_apply_population_hits {
     foreach my $attack ( $self->combat_rolls()->items() ) {
         my ( $result, $strength, $roll ) = split( /:/, $attack );
         if ( $result eq 'hit' ) {
-            $total_allowed_hits += $stength;
+            $total_allowed_hits += $strength;
         }
     }
 
@@ -415,14 +417,14 @@ sub action_draw_vp {
         $vp_draws = 5;
     }
 
-    my @all_vp_tokens = $server->vp_bag()->items();
+    my @all_vp_tokens = $self->vp_bag()->items();
     shuffle_in_place( \@all_vp_tokens );
 
     if ( scalar( @all_vp_tokens ) < $vp_draws ) {
         $vp_draws = scalar( @all_vp_tokens );
     }
 
-    my $player_vp_tokens = ();
+    my @player_vp_tokens = ();
     for ( 1 .. $vp_draws ) {
         push( @player_vp_tokens, shift( @all_vp_tokens ) );
     }
@@ -559,6 +561,9 @@ sub apply_combat_hits {
 sub next_combat_ships {
     my $self            = shift;
 
+    my $tile = $self->tiles()->{ $self->current_tile() };
+    my $player_id = $self->waiting_on_player_id();
+
     my ( $defender_id, $attacker_id ) = $tile->current_combatant_ids();
 
     my $defender_count = $self->tiles()->{ $self->current_tile() }->user_ship_count( $defender_id );
@@ -588,7 +593,7 @@ sub next_combat_ships {
     }
 
     unless ( $flag_someone_has_beam_weapons ) {
-        my @retreat_options = $self->board()->player_retreat_options( $tile_tag, $player_id );
+        my @retreat_options = $self->board()->player_retreat_options( $tile->tag(), $player_id );
 
         if ( scalar( @retreat_options ) == 0 ) {
             foreach my $ship_tag ( $self->tiles()->{ $self->current_tile() }->ships()->items() ) {
@@ -616,16 +621,16 @@ sub next_combat_ships {
 
     # still got more fight
 
-    my $player_id = $self->ship_templates()->{ $templates[ 0 ] }->owner_id();
+    my $real_player_id = $self->ship_templates()->{ ( $self->template_combat_order()->items() )[ 0 ] }->owner_id();
 
-    if ( $player_id > -1 ) {
-        $self->set_waiting_on_player_id( $player_id );
+    if ( $real_player_id > -1 ) {
+        $self->set_waiting_on_player_id( $real_player_id );
         $self->_give_attack_or_retreat_option();
         return;
     }
     else { # computer player
-        $self->set_waiting_on_player_id( $real_player_id );
-        $self->_raw_set_allowed_player_actions( $EV_SUB_ACTION, $real_player_id, 'roll_npc' );
+        $self->set_waiting_on_player_id( $player_id );
+        $self->_raw_set_allowed_player_actions( $EV_SUB_ACTION, $player_id, 'roll_npc' );
         return;
     }
 }
@@ -636,6 +641,8 @@ sub end_combat_round {
     my $self            = shift;
 
     # do regeneration if needed
+
+    my $tile = $self->tiles()->{ $self->current_tile() };
 
     my ( $defender_id, $attacker_id ) = $tile->current_combatant_ids();
 
@@ -663,6 +670,7 @@ sub start_combat_round {
     my $flag_missile    = shift;
 
     my $first_player_id = undef;
+    my $tile_tag = $self->current_tile();
 
     if ( $flag_missile ) {
         $self->set_subphase( $SUB_MISSILE );
@@ -686,7 +694,7 @@ sub start_combat_round {
         }
     }
 
-    my $first_player_id = $self->_queue_up_ships( $self->current_tile(), 0 );
+    $first_player_id = $self->_queue_up_ships( $self->current_tile(), 0 );
 
     if ( defined( $first_player_id ) ) {
         $self->set_subphase( $SUB_BEAM );
@@ -801,7 +809,7 @@ sub kill_population_cube {
     $flag_found_cube = ( $tile->remove_cube( $type, 1 ) ); # first we attempt to remove a cube of the advanced type
 
     unless ( $flag_found_cube ) {
-        $tile->remove_cube( $type, 0 ) ); # next we try a basic cube
+        $tile->remove_cube( $type, 0 ); # next we try a basic cube
     }
 
     my $race = $self->race_of_player_id( $tile->owner_id() );
@@ -899,6 +907,12 @@ sub end_combat {
 sub bomb_all_cubes {
     my $self            = shift;
     my $tile_tag        = shift;
+
+    my $tile = $self->tiles()->{ $tile_tag };
+
+    unless ( defined( $tile ) ) {
+        return;
+    }
 
     foreach my $slot ( $tile->resource_slots() ) {
         if ( $slot->owner_id() > -1 ) {
@@ -1044,7 +1058,7 @@ sub _queue_up_ships {
                     if ( $ship->owner_id() == $defender_id ) {
                         $initiative += 0.5;
                     }
-                    $missile_ship_templates{ $ship->template()->tag() } = $intiative;
+                    $missile_ship_templates{ $ship->template()->tag() } = $initiative;
                 }
             }
         }

@@ -1042,6 +1042,8 @@ sub _queue_up_ships {
     my %ships_templates = ();
     my $first_player_id = undef;
 
+    q{
+
     foreach my $ship_tag ( $tile->ships()->items() ) {
         my $ship = $self->ships()->{ $ship_tag };
 
@@ -1071,6 +1073,8 @@ sub _queue_up_ships {
 
         $self->template_combat_order()->add_items( @template_tags );
     }
+
+    };
 
     return $first_player_id;
 }
